@@ -1,5 +1,4 @@
 ﻿using System;
-using InventorySystem.Items;
 using LabApi.Features.Wrappers;
 using SER.ArgumentSystem.Arguments;
 using SER.ArgumentSystem.BaseArguments;
@@ -16,11 +15,11 @@ public class ItemInfoMethod : ReturningMethod, IReferenceResolvingMethod
     public override string Description => null!;
 
     public override Type[] ReturnTypes => [typeof(TextValue), typeof(PlayerValue), typeof(BoolValue)];
-    public Type ReferenceType => typeof(ItemBase);
+    public Type ReferenceType => typeof(Item);
     
     public override Argument[] ExpectedArguments { get; } =
     [
-        new ReferenceArgument<ItemBase>("reference"),
+        new ReferenceArgument<Item>("reference"),
         new OptionsArgument("property", 
             Option.Enum<ItemType>("type"),
             Option.Enum<ItemCategory>("category"),
@@ -31,13 +30,13 @@ public class ItemInfoMethod : ReturningMethod, IReferenceResolvingMethod
     
     public override void Execute()
     {
-        var item = Args.GetReference<ItemBase>("reference");
+        var item = Args.GetReference<Item>("reference");
         ReturnValue = Args.GetOption("property") switch
         {
-            "type" => new TextValue(item.ItemTypeId.ToString()),
+            "type" => new TextValue(item.Type.ToString()),
             "category" => new TextValue(item.Category.ToString()),
-            "owner" => new PlayerValue(Player.Get(item.Owner)),
-            "isEquipped" => new BoolValue(item.IsEquipped),
+            "owner" => new PlayerValue(item.CurrentOwner is not null ? [item.CurrentOwner] : []),
+            "isequipped" => new BoolValue(item.IsEquipped),
             _ => throw new AndrzejFuckedUpException()
         };
     }

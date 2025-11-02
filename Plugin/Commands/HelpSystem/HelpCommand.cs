@@ -508,16 +508,15 @@ public class HelpCommand : ICommand
                 {
                     typeReturn = types
                         .Select(Value.FriendlyName)
-                        .Select(name => $"a {name} value")
-                        .JoinStrings(" or ");
+                        .JoinStrings(" or ") + " value";
                 }
                 else
                 {
-                    typeReturn = "a literal value depending on your input";
+                    typeReturn = "literal value depending on your input";
                 }
 
                 sb.AppendLine();
-                sb.AppendLine($"This method returns {typeReturn}, which can be saved or used directly. ");
+                sb.AppendLine($"This method returns a {typeReturn}, which can be saved or used directly. ");
                 break;
             }
             case ReturningMethod<CollectionValue>:
@@ -540,17 +539,16 @@ public class HelpCommand : ICommand
                 if (ret.ReturnTypes is { } types)
                 {
                     typeReturn = types
-                        .Select(t => t.FriendlyTypeName())
-                        .Select(name => $"a {name} value")
-                        .JoinStrings(" or ");
+                        .Select(Value.FriendlyName)
+                        .JoinStrings(" or ") + " value";
                 }
                 else
                 {
-                    typeReturn = "a value depending on your input";
+                    typeReturn = "value depending on your input";
                 }
                 
                 sb.AppendLine();
-                sb.AppendLine($"This method returns {typeReturn}, which can be saved or used directly. ");
+                sb.AppendLine($"This method returns a {typeReturn}, which can be saved or used directly. ");
                 break;
             }
         } 

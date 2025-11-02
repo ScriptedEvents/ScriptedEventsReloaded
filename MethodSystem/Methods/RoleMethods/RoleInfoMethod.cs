@@ -24,7 +24,8 @@ public class RoleInfoMethod : ReturningMethod<TextValue>, IReferenceResolvingMet
             Option.Enum<Team>("team"),
             Option.Enum<RoleSpawnFlags>("spawnFlags"), 
             Option.Enum<RoleChangeReason>("spawnReason"),
-            "name")
+            "name"
+        )
     ];
 
     public override void Execute()

@@ -191,11 +191,12 @@ public static class EventHandler
     {
         List<(object, string, Type)> properties = (
             from prop in ev.GetType().GetProperties()
+            where !Attribute.IsDefined(prop, typeof(ObsoleteAttribute))
             let value = prop.GetValue(ev)
             let type = prop.PropertyType
             select (value, prop.Name, type)
         ).ToList();
-        
+
         return InternalGetVariablesFromProperties(properties);
     }
     
@@ -209,6 +210,7 @@ public static class EventHandler
 
         List<(Type, string)> properties = (
             from prop in genericType.GetProperties()
+            where !Attribute.IsDefined(prop, typeof(ObsoleteAttribute))
             let value = prop.PropertyType
             where value is not null
             select (value, prop.Name)

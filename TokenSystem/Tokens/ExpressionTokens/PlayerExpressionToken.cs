@@ -4,6 +4,7 @@ using System.Linq;
 using InventorySystem.Items;
 using LabApi.Features.Wrappers;
 using PlayerRoles;
+using PlayerRoles.PlayableScps.Scp079;
 using SER.ArgumentSystem.Arguments;
 using SER.Helpers.Extensions;
 using SER.Helpers.ResultSystem;
@@ -52,6 +53,9 @@ public class PlayerExpressionToken : ExpressionToken
         IsBypassEnabled,
         IsGodModeEnabled,
         IsNoclipEnabled,
+        RoleChangeReason,
+        RoleSpawnFlags,
+        AuxiliaryPower
     }
 
     public abstract class Info
@@ -103,6 +107,20 @@ public class PlayerExpressionToken : ExpressionToken
         [PlayerProperty.IsBypassEnabled] = new Info<BoolValue>(plr => plr.IsBypassEnabled, null),
         [PlayerProperty.IsGodModeEnabled] = new Info<BoolValue>(plr => plr.IsGodModeEnabled, null),
         [PlayerProperty.IsNoclipEnabled] = new Info<BoolValue>(plr => plr.IsNoclipEnabled, null),
+        [PlayerProperty.RoleChangeReason] = new Info<TextValue>(plr => plr.RoleBase._spawnReason.ToString(), null),
+        [PlayerProperty.RoleSpawnFlags] = new Info<TextValue>(plr => plr.RoleBase._spawnFlags.ToString(), null),
+        [PlayerProperty.AuxiliaryPower] = new Info<NumberValue>(plr =>
+        {
+            if (plr.RoleBase is Scp079Role scp)
+            {
+                if (scp.SubroutineModule.TryGetSubroutine<Scp079TierManager>(out Scp079TierManager tier))
+                {
+                    return tier.TotalExp;
+                }
+                else return -1;
+            }
+            else return -1;
+        }, "Returns player EXP if he is SCP-079, otherwise returns -1"),
     };
 
     protected override IParseResult InternalParse(BaseToken[] tokens)

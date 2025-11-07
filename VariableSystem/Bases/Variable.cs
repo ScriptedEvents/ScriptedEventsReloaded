@@ -11,20 +11,6 @@ public abstract class Variable
 
     public abstract Value BaseValue { get; }
 
-    public static Variable CopyVariable(Variable variable)
-    {
-        var name = variable.Name;
-        return variable switch
-        {
-            CollectionVariable coll => new CollectionVariable(name, new(coll.Value.CastedValues)),
-            PlayerVariable plr      => new PlayerVariable(name, new(plr.Players)),
-            ReferenceVariable @ref  => @ref,
-            LiteralVariable lit     => new LiteralVariable(name, lit.Value),
-            _ => throw new AndrzejFuckedUpException(
-                $"CopyVariable called on variable of type {variable.GetType().AccurateName}")
-        };
-    }
-
     public static Variable CreateVariable(string name, Value value)
     {
         return value switch

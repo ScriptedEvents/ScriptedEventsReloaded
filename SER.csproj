@@ -1,12 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-    <Compile Include="Helpers\Exceptions\KrzysiuFuckedUpException.cs" />
-    <Compile Include="MethodSystem\Methods\ItemMethods\FirearmItemInfoMethod.cs" />
-    <Compile Include="MethodSystem\Methods\ItemMethods\UsableItemInfoMethod.cs" />
-    <Compile Include="MethodSystem\Methods\RoleMethods\Set079AuxPowerMethod.cs" />
-    <Compile Include="MethodSystem\Methods\WarheadMethods\WarheadInfoMethod.cs" />
-    <Compile Include="MethodSystem\Methods\WarheadMethods\WarheadMethod.cs" />
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">x64</Platform>

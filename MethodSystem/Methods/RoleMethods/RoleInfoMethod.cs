@@ -22,6 +22,8 @@ public class RoleInfoMethod : ReturningMethod<TextValue>, IReferenceResolvingMet
         new OptionsArgument("property",
             Option.Enum<RoleTypeId>("type"),
             Option.Enum<Team>("team"),
+            Option.Enum<RoleSpawnFlags>("spawnFlags"), 
+            Option.Enum<RoleChangeReason>("spawnReason"),
             "name"
         )
     ];
@@ -33,6 +35,8 @@ public class RoleInfoMethod : ReturningMethod<TextValue>, IReferenceResolvingMet
         {
             "type" => new TextValue(role.RoleTypeId.ToString()),
             "team" => new TextValue(role.Team.ToString()),
+            "spawnflags" => new TextValue(role.ServerSpawnFlags.ToString()),
+            "spawnreason" => new TextValue(role.ServerSpawnReason.ToString()),
             "name" => new TextValue(role.RoleName),
             _ => throw new AndrzejFuckedUpException("out of range")
         };

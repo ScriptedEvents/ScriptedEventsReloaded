@@ -12,19 +12,24 @@ public abstract class Flag
 {
     public abstract string Description { get; }
 
-    public readonly struct Argument(string name, string description, Func<string[], Result> handler, bool required)
+    public readonly record struct Argument(
+        string Name, 
+        string Description, 
+        Func<string[], Result> Handler, 
+        bool IsRequired, 
+        bool Multiple = false
+    )
     {
-        public string Name => name;
-        public string Description => description;
-        public Result AddArgument(string[] values) => handler(values);
-        public bool IsRequired => required;
+        public Result AddArgument(string[] values) => Handler(values);
     }
 
     public abstract Argument? InlineArgument { get; }
 
     public abstract Argument[] Arguments { get; }
 
-    public abstract void FinalizeFlag();
+    public virtual void FinalizeFlag()
+    {
+    }
 
     public abstract void Unbind();
 

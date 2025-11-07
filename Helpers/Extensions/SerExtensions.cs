@@ -21,7 +21,7 @@ public static class SerExtensions
         return value.OnSuccess(v => v.TryCast<Value, TOut>());
     }
     
-    public static TryGet<TOut> TryCast<TIn, TOut>([NotNull] this TIn value) where TOut : TIn
+    public static TryGet<TOut> TryCast<TIn, TOut>([NotNull] this TIn value, string rawRep = "") where TOut : TIn
     {
         if (value is null) throw new AndrzejFuckedUpException();
         
@@ -29,8 +29,14 @@ public static class SerExtensions
         {
             return outValue;
         }
+
+        string valueRep = "";
+        if (!string.IsNullOrWhiteSpace(rawRep))
+        {
+            valueRep = $"A value '{rawRep}' of type ";
+        }
         
-        return $"{value.FriendlyTypeName()} is not a {typeof(TOut).FriendlyTypeName()}";
+        return $"{valueRep}{value.FriendlyTypeName()} is not a {typeof(TOut).FriendlyTypeName()}";
     }
 
     public static bool CanReturn<T>(this BaseToken token, out Func<TryGet<T>> get) where T : Value

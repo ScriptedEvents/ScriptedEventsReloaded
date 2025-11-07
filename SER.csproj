@@ -162,6 +162,7 @@
         <Compile Include="Examples\ScanScript.cs" />
         <Compile Include="Examples\WelcomeScript.cs" />
         <Compile Include="FlagSystem\Flags\CustomCommandFlag.cs" />
+        <Compile Include="FlagSystem\Flags\FunctionFlag.cs" />
         <Compile Include="FlagSystem\Flags\OnCustomTriggerFlag.cs" />
         <Compile Include="FlagSystem\Flags\OnEventFlag.cs" />
         <Compile Include="FlagSystem\ScriptFlagHandler.cs" />
@@ -240,6 +241,7 @@
         <Compile Include="MethodSystem\Methods\PlayerMethods\SetInfoAreaMethod.cs" />
         <Compile Include="MethodSystem\Methods\PlayerMethods\SetSizeMethod.cs" />
         <Compile Include="MethodSystem\Methods\PlayerVariableMethods\ContainsPlayerMethod.cs" />
+        <Compile Include="MethodSystem\Methods\PlayerVariableMethods\FilterPlayersMethod.cs" />
         <Compile Include="MethodSystem\Methods\PlayerVariableMethods\GetPlayerFromReferenceMethod.cs" />
         <Compile Include="MethodSystem\Methods\PlayerVariableMethods\JoinPlayersMethod.cs" />
         <Compile Include="MethodSystem\Methods\PlayerVariableMethods\LimitPlayersMethod.cs" />

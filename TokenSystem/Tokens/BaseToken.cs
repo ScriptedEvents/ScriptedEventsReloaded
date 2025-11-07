@@ -1,4 +1,5 @@
-﻿using SER.Helpers.Extensions;
+﻿using System.Linq;
+using SER.Helpers.Extensions;
 using SER.Helpers.ResultSystem;
 using SER.ScriptSystem;
 using SER.TokenSystem.Slices;
@@ -134,5 +135,25 @@ public class BaseToken
         }
         
         return mainErr;
+    }
+
+    public static TryGet<T> TryParse<T>(string rawRep, Script scr) where T : BaseToken
+    {
+        if (Tokenizer.TokenizeLine(rawRep, scr, null).HasErrored(out var error, out var tokens))
+        {
+            return error;
+        }
+
+        if (tokens.Length != 1)
+        {
+            return $"Value '{rawRep}' cannot represent a single {typeof(T).FriendlyTypeName()}";
+        }
+        
+        if (tokens.First().TryCast<BaseToken, T>(rawRep).HasErrored(out error, out var tToken))
+        {
+            return error;
+        }
+
+        return tToken;
     }
 }

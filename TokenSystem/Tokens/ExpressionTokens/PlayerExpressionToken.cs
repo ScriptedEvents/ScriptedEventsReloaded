@@ -57,6 +57,7 @@ public class PlayerExpressionToken : ExpressionToken
         RoleChangeReason,
         RoleSpawnFlags,
         AuxiliaryPower,
+        Emotion,
     }
 
     public abstract class Info
@@ -123,6 +124,7 @@ public class PlayerExpressionToken : ExpressionToken
             }
             else return -1;
         }, "Returns player EXP if he is SCP-079, otherwise returns -1"),
+        [PlayerProperty.Emotion] = new Info<TextValue>(plr => plr.Emotion.ToString(), "Current emotion (e.g. Neutral, Chad)"),
     };
 
     protected override IParseResult InternalParse(BaseToken[] tokens)

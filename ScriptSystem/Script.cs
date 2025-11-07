@@ -58,8 +58,10 @@ public class Script
     
     public bool IsRunning => RunningScripts.Contains(this);
 
-    public static readonly List<Script> RunningScripts = [];
-    
+    private static readonly List<Script> _runningScripts = [];
+    public static readonly ReadOnlyCollection<Script> RunningScripts = _runningScripts.AsReadOnly();
+
+
     private readonly HashSet<Variable> _variables = [];
     public ReadOnlyCollection<Variable> Variables => new(_variables.ToList());
     
@@ -176,14 +178,14 @@ public class Script
             return null;
         }
         
-        RunningScripts.Add(this);
+        _runningScripts.Add(this);
         _scriptCoroutine = InternalExecute().Run(this, _ => _scriptCoroutine.Kill());
         return _isEventAllowed;
     }
 
     public void Stop(bool silent = false)
     {
-        RunningScripts.Remove(this);
+        _runningScripts.Remove(this);
         _scriptCoroutine.Kill();
         if (!silent) Logger.Info($"Script {Name} was stopped");
     }
@@ -279,7 +281,7 @@ public class Script
             }
         }
 
-        RunningScripts.Remove(this);
+        _runningScripts.Remove(this);
     }
 
     public TryGet<T> TryGetVariable<T>(VariableToken variable) where T : Variable

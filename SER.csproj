@@ -306,6 +306,7 @@
         <Compile Include="MethodSystem\Methods\TimeMethods\TimeInfoMethod.cs" />
         <Compile Include="MethodSystem\Methods\WaitingMethods\WaitMethod.cs" />
         <Compile Include="MethodSystem\Methods\WaitingMethods\WaitUntilMethod.cs" />
+	<Compile Include="MethodSystem\Methods\ScriptMethods\IsRunningMethod.cs" />
         <Compile Include="Helpers\ResultSystem\Result.cs" />
         <Compile Include="Helpers\BetterCoros.cs" />
         <Compile Include="Plugin\Commands\ExamplesCommand.cs" />

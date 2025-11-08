@@ -1,8 +1,9 @@
-﻿using LabApi.Features.Wrappers;
+﻿using System.Linq;
+using System.Collections.Generic;
+using LabApi.Features.Wrappers;
 using SER.ArgumentSystem.Arguments;
 using SER.ArgumentSystem.BaseArguments;
 using SER.MethodSystem.BaseMethods;
-using System.Collections.Generic;
 
 namespace SER.MethodSystem.Methods.PlayerMethods;
 
@@ -22,7 +23,9 @@ public class SetInfoAreaMethod : SynchronousMethod
     public override void Execute()
     {
         List<Player> players = Args.GetPlayers("players");
-        PlayerInfoArea info = Args.GetEnum<PlayerInfoArea>("info area");
+        PlayerInfoArea info = Args.GetRemainingArguments<object, EnumArgument<PlayerInfoArea>>("info area")
+            .Cast<PlayerInfoArea>()
+            .Aggregate(PlayerInfoArea.Nickname, (a, b) => a | b);
         
         players.ForEach(p => p.InfoArea = info);
     }

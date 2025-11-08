@@ -20,18 +20,23 @@ public static class Log
 
     public static void Warn(Script scr, object obj)
     {
-        var ident = scr.CurrentLine == 0 ? "Compile warning" : $"Warning in line {scr.CurrentLine}";
+        var ident = scr.CurrentLine == 0 ? "Compile warning" : $"Line {scr.CurrentLine}";
         Logger.Raw($"[Script '{scr.Name}'] [{ident}] {obj}", ConsoleColor.Yellow);
     }
     
-    public static void Warn(string scrName, object obj)
+    public static void Warn(string scrName, uint line, object obj)
     {
-        Logger.Raw($"[Script '{scrName}'] {obj}", ConsoleColor.Yellow);
+        Logger.Raw($"[Script '{scrName}'] [Line {line}] {obj}", ConsoleColor.Yellow);
     }
     
-    public static void Error(string scrName, string msg)
+    public static void RuntimeError(string scrName, uint line, string msg)
     {
-        Logger.Raw($"[Script '{scrName}'] {msg}", ConsoleColor.Red);
+        Logger.Raw($"[Script '{scrName}'] [Line {line}] {msg}", ConsoleColor.Red);
+    }
+    
+    public static void CompileError(string scrName, string msg)
+    {
+        Logger.Raw($"[Script '{scrName}'] [Compile error] {msg}", ConsoleColor.Red);
     }
 
     public static void D(string msg)

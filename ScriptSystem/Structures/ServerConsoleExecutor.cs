@@ -19,11 +19,11 @@ public class ServerConsoleExecutor : ScriptExecutor
 
     public override void Warn(string content, Script scr)
     {
-        Log.Warn(scr, $"[Script '{scr.Name}'] [{(scr.CurrentLine == 0 ? "Compile warning" : $"Line {scr.CurrentLine}")} {content}");
+        Log.Warn(scr, content);
     }
 
     public override void Error(string content, Script scr)
     {
-        Log.Error(scr.Name, $"[{(scr.CurrentLine == 0 ? "Compile error" : $"Line {scr.CurrentLine}")}] {content}");
+        Log.RuntimeError(scr.Name, scr.CurrentLine, content);
     }
 }

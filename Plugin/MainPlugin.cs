@@ -39,17 +39,20 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
         QualityAssurance = 1 << 3,
         Sponsor          = 1 << 4,
         Betatester       = 1 << 5,
-        EarlyAdopter     = 1 << 6
+        EarlyAdopter     = 1 << 6,
+        TechSupport      = 1 << 7,
     }
 
     public static Contributor[] Contributors => 
     [
         new(Instance.Author, Contribution.LeadDeveloper),
         new("Whitty985playz", Contribution.QualityAssurance | Contribution.EarlyAdopter),
-        new("Jraylor", Contribution.Sponsor),
-        new("Luke", Contribution.Betatester | Contribution.Sponsor),
         new("Krzysiu Wojownik", Contribution.QualityAssurance | Contribution.Developer),
-        new("Raging Tornado", Contribution.Betatester)
+        new("Jraylor", Contribution.Sponsor),
+        new("Luke", Contribution.Sponsor | Contribution.Betatester),
+        new("Tosoks67", Contribution.Developer | Contribution.Betatester),
+        new("Raging Tornado", Contribution.Betatester),
+        new("Saskyc", Contribution.TechSupport)
     ];
 
     public override void Enable()

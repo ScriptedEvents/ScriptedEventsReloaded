@@ -55,6 +55,7 @@ public class PlayerExpressionToken : ExpressionToken
         RoleSpawnFlags,
         AuxiliaryPower,
         Emotion,
+        Experience
     }
 
     public abstract class Info
@@ -110,6 +111,18 @@ public class PlayerExpressionToken : ExpressionToken
         [PlayerProperty.RoleChangeReason] = new Info<TextValue>(plr => plr.RoleBase._spawnReason.ToString(), null),
         [PlayerProperty.RoleSpawnFlags] = new Info<TextValue>(plr => plr.RoleBase._spawnFlags.ToString(), null),
         [PlayerProperty.AuxiliaryPower] = new Info<NumberValue>(plr =>
+        {
+            if (plr.RoleBase is Scp079Role scp)
+            {
+                if (scp.SubroutineModule.TryGetSubroutine<Scp079AuxManager>(out Scp079AuxManager man))
+                {
+                    return (decimal)man.CurrentAux;
+                }
+                else return -1;
+            }
+            else return -1;
+        }, "Returns player Aux power if he is SCP-079, otherwise returns -1"),
+        [PlayerProperty.Experience] = new Info<NumberValue>(plr =>
         {
             if (plr.RoleBase is Scp079Role scp)
             {

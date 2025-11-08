@@ -17,6 +17,7 @@ public class WarheadInfoMethod : ReturningMethod
     [
         new OptionsArgument("property",
             "isLocked",
+            "isOpen",
             "isArmed",
             "hasStarted",
             "isDetonated",
@@ -29,7 +30,8 @@ public class WarheadInfoMethod : ReturningMethod
         ReturnValue = Args.GetOption("property") switch
         {
             "islocked" => new BoolValue(Warhead.IsLocked),
-            "isarmed" => new BoolValue(Warhead.IsAuthorized),
+            "isopen" => new BoolValue(Warhead.IsAuthorized),
+            "isarmed" => new BoolValue(Warhead.LeverStatus),
             "hasstarted" => new BoolValue(Warhead.IsDetonationInProgress),
             "isdetonated" => new BoolValue(Warhead.IsDetonated),
             "duration" => new DurationValue(TimeSpan.FromSeconds(AlphaWarheadController.TimeUntilDetonation)),

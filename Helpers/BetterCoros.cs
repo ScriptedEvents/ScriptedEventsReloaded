@@ -36,7 +36,7 @@ public static class BetterCoros
             catch (DeveloperFuckedUpException devErr)
             {
                 onException?.Invoke(devErr);
-                scr.Error(devErr.Message);
+                scr.Error(devErr.Message + "\n" + devErr.StackTrace);
                 yield break;
             }
             catch (Exception ex)

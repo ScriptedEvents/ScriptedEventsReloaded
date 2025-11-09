@@ -4,7 +4,6 @@ using LabApi.Features.Wrappers;
 using SER.ArgumentSystem.BaseArguments;
 using SER.Helpers.ResultSystem;
 using SER.TokenSystem.Tokens;
-using System.Linq;
 
 namespace SER.ArgumentSystem.Arguments;
 

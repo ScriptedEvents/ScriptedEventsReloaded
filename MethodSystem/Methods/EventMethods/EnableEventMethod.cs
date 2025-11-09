@@ -1,6 +1,5 @@
 ﻿using SER.ArgumentSystem.Arguments;
 using SER.ArgumentSystem.BaseArguments;
-using SER.EventSystem;
 using SER.MethodSystem.BaseMethods;
 
 namespace SER.MethodSystem.Methods.EventMethods;

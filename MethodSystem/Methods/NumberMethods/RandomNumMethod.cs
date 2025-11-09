@@ -7,7 +7,7 @@ using SER.ValueSystem;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace SER.MethodSystem.Methods.MathMethods;
+namespace SER.MethodSystem.Methods.NumberMethods;
 
 public class RandomNumMethod : ReturningMethod<NumberValue>, IAdditionalDescription
 {

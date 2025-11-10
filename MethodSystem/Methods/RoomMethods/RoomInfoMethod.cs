@@ -26,7 +26,8 @@ public class RoomInfoMethod : LiteralValueReturningMethod, IReferenceResolvingMe
             Option.Enum<FacilityZone>(),
             "xPos",
             "yPos",
-            "zPos")
+            "zPos"
+        )
     ];
     
     public override void Execute()

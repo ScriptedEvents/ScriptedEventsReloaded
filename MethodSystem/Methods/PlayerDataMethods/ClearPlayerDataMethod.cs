@@ -7,7 +7,7 @@ namespace SER.MethodSystem.Methods.PlayerDataMethods;
 
 public class ClearPlayerDataMethod : SynchronousMethod
 {
-    public override string? Description => "Clears data associated with specified players";
+    public override string Description => "Clears data associated with specified players";
 
     public override Argument[] ExpectedArguments =>
     [

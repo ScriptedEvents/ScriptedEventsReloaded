@@ -78,11 +78,17 @@
     </ItemGroup>
     
     <ItemGroup>
-      <PackageReference Include="Costura.Fody" Version="6.0.0" PrivateAssets='All' />
-        
+      <PackageReference Include="AudioPlayerApi" Version="1.1.2" />
+      <PackageReference Include="Costura.Fody" Version="6.0.0" PrivateAssets="All" />
       <PackageReference Include="Fody" Version="6.9.3" />
-        
       <PackageReference Include="ncalc" Version="1.3.8" />
     </ItemGroup>
-    
+
+    <!-- older versions of packages use different versions of these -->
+    <!-- this forces them to use the newest, silencing the warnings -->
+    <ItemGroup>
+        <PackageReference Include="System.Memory" Version="4.6.0" />
+        <PackageReference Include="System.Numerics.Vectors" Version="4.6.0" />
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
+    </ItemGroup>
 </Project>

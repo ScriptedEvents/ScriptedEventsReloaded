@@ -34,7 +34,7 @@ public class MethodContext(MethodToken methodToken) : YieldingContext
 
     public override Result VerifyCurrentState()
     {
-        return Result.Assert(_providedArguments >= Method.ExpectedArguments.Count(arg => arg.DefaultValue is not null),
+        return Result.Assert(_providedArguments >= Method.ExpectedArguments.Count(arg => arg.DefaultValue is null),
             $"Method '{Method.Name}' is missing required arguments: " +
             $"{", ".Join(Method.ExpectedArguments.Skip(_providedArguments).Select(arg => arg.Name))}");
     }

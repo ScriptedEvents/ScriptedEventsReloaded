@@ -1,0 +1,15 @@
+﻿This plugin embeds the following dependencies:
+
+- NCalc (MIT License)
+  Copyright (c) ncalc
+  https://github.com/ncalc/ncalc
+  
+- Newtonsoft.Json (MIT License)
+  Copyright (c) JamesNK
+  https://github.com/JamesNK/Newtonsoft.Json
+
+- AudioPlayerApi (GPL v3 License)
+  Copyright (c) Killers0992
+  https://github.com/Killers0992/AudioPlayerApi
+
+Each is redistributed under the terms of its respective license.

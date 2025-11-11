@@ -7,17 +7,18 @@ using SER.Helpers.Extensions;
 using SER.ScriptSystem;
 using SER.ScriptSystem.Structures;
 
-namespace SER.Plugin;
+namespace SER.FileSystem;
 
 public static class FileSystem
 {
-    public static readonly string DirPath = Path.Combine(PathManager.Configs.FullName, "Scripted Events Reloaded");
+    public static readonly string MainDirPath = Path.Combine(PathManager.Configs.FullName, "Scripted Events Reloaded");
+    public static readonly string DbDirPath = Path.Combine(MainDirPath, "Databases");
     public static string[] RegisteredScriptPaths = [];
 
     public static void UpdateScriptPathCollection()
     {
         RegisteredScriptPaths = Directory
-            .GetFiles(DirPath, "*.txt", SearchOption.AllDirectories)
+            .GetFiles(MainDirPath, "*.txt", SearchOption.AllDirectories)
             // ignore files with a pound sign at the start
             .Where(path => Path.GetFileName(path).FirstOrDefault() != '#')
             .ToArray();
@@ -44,9 +45,9 @@ public static class FileSystem
     
     public static void Initialize()
     {
-        if (!Directory.Exists(DirPath))
+        if (!Directory.Exists(MainDirPath))
         {
-            Directory.CreateDirectory(DirPath);
+            Directory.CreateDirectory(MainDirPath);
             return;
         }
 
@@ -95,7 +96,7 @@ public static class FileSystem
             .Where(t => typeof(IExample).IsAssignableFrom(t) && !t.IsAbstract)
             .Select(t => t.CreateInstance<IExample>());
 
-        var exampleDir = Directory.CreateDirectory(Path.Combine(DirPath, "Example Scripts"));
+        var exampleDir = Directory.CreateDirectory(Path.Combine(MainDirPath, "Example Scripts"));
         foreach (var example in examples)
         {
             var path = Path.Combine(exampleDir.FullName, $"{example.Name}.txt");

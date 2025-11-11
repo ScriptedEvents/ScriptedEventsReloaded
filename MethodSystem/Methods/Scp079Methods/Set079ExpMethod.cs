@@ -20,14 +20,17 @@ public class Set079ExpMethod : SynchronousMethod
     {
         var plrs = Args.GetPlayers("players");
         var value = Args.GetInt("exp");
+        
         foreach (Player p in plrs)
         {
-            if (p.RoleBase is Scp079Role scp)
+            if (p.RoleBase is not Scp079Role scp)
             {
-                if (scp.SubroutineModule.TryGetSubroutine(out Scp079TierManager tier))
-                {
-                    tier.TotalExp = value;
-                }
+                continue;
+            }
+            
+            if (scp.SubroutineModule.TryGetSubroutine(out Scp079TierManager tier))
+            {
+                tier.TotalExp = value;
             }
         }
     }

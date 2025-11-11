@@ -20,15 +20,18 @@ public class Set079AccessTierMethod : SynchronousMethod
     {
         var plrs = Args.GetPlayers("players");
         var value = Args.GetInt("tier");
-        foreach(Player p in plrs)
+        
+        foreach (Player p in plrs)
         {
-            if(p.RoleBase is Scp079Role scp)
+            if (p.RoleBase is not Scp079Role scp)
             {
-                var levelIndex = value - 1;
-                if (scp.SubroutineModule.TryGetSubroutine(out Scp079TierManager tier))
-                {
-                    tier.TotalExp = levelIndex != 0 ? tier.AbsoluteThresholds[levelIndex - 1] : 0;
-                }
+                continue;
+            }
+            
+            var levelIndex = value - 1;
+            if (scp.SubroutineModule.TryGetSubroutine(out Scp079TierManager tier))
+            {
+                tier.TotalExp = levelIndex != 0 ? tier.AbsoluteThresholds[levelIndex - 1] : 0;
             }
         }
     }

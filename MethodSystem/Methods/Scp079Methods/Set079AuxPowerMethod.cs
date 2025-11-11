@@ -20,14 +20,17 @@ public class Set079AuxPowerMethod : SynchronousMethod
     {
         var plrs = Args.GetPlayers("players");
         var value = Args.GetInt("power");
+        
         foreach (Player p in plrs)
         {
-            if (p.RoleBase is Scp079Role scp)
+            if (p.RoleBase is not Scp079Role scp)
             {
-                if (scp.SubroutineModule.TryGetSubroutine(out Scp079AuxManager aux))
-                {
-                    aux.CurrentAux = value;
-                }
+                continue;
+            }
+            
+            if (scp.SubroutineModule.TryGetSubroutine(out Scp079AuxManager aux))
+            {
+                aux.CurrentAux = value;
             }
         }
     }

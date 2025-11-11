@@ -10,7 +10,7 @@ public class ReferenceValue(object? value) : Value
 
     public override string ToString()
     {
-        return $"<{Value.GetType().GetAccurateName()} reference>";
+        return $"<{Value.GetType().GetAccurateName()} reference | {Value.GetHashCode()}>";
     }
 
     public override bool Equals(object? obj)

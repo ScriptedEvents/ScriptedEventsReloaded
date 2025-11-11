@@ -20,14 +20,21 @@ public class AppendDBMethod : SynchronousMethod, ICanError
         new DatabaseArgument("database"),
         new TextArgument("key"),
         new AnyValueArgument("value")
+        {
+            Description = "For now only literal values and player values are supported."
+        }
     ];
 
     public override void Execute()
     {
-        if (Args.GetDatabase("database").Set(
-            Args.GetText("key"), 
+        var res = Args.GetDatabase("database").TrySet(
+            Args.GetText("key"),
             Args.GetAnyValue("value")
-        ).HasErrored(out var error)) 
+        );
+
+        if (res.HasErrored(out var error))
+        {
             throw new ScriptRuntimeError(error);
+        }
     }
 }

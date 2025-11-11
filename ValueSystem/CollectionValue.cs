@@ -14,11 +14,7 @@ public class CollectionValue(IEnumerable value) : Value
             
             List<Value> list = [];
             list.AddRange(from object item in value select Parse(item));
-            if (list.Any(i => i is not LiteralValue and not ReferenceValue))
-            {
-                throw new ScriptRuntimeError("Collection was detected with illegal values.");
-            }
-
+            
             if (list.Select(i => i.GetType()).Distinct().Count() > 1)
             {
                 throw new ScriptRuntimeError("Collection was detected with mixed types.");
@@ -44,8 +40,6 @@ public class CollectionValue(IEnumerable value) : Value
 
     public override string ToString()
     {
-        List<string> objects = [];
-        objects.AddRange(from object? obj in CastedValues select obj?.ToString() ?? "???");
-        return $"[{string.Join(", ", objects)}]";
+        return $"[{string.Join(", ", CastedValues.Select(v => v.ToString()))}]";
     }
 }

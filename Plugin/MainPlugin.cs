@@ -23,6 +23,9 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
     public override Version Version => new(0, 10, 0);
     
     public static string GitHubLink => "https://github.com/ScriptedEvents/ScriptedEventsReloaded";
+    public static string DocsLink => "https://scriptedeventsreloaded.gitbook.io/docs/tutorial";
+    public static string DiscordLink => "https://discord.gg/3j54zBnbbD";
+    
     public static string HelpCommandName => "serhelp";
     public static MainPlugin Instance { get; private set; } = null!;
 
@@ -85,6 +88,8 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
 
              Help command: {HelpCommandName}
              GitHub repository: {GitHubLink}
+             Documentation: {DocsLink}
+             Discord: {DiscordLink}
              """,
             ConsoleColor.Cyan
         );

@@ -46,14 +46,8 @@
             <HintPath>$(SL_DEV_REFERENCES)\CommandSystem.Core.dll</HintPath>
             <Private>true</Private>
         </Reference>
-        <Reference Include="LabApi">
-            <HintPath>$(SL_DEV_REFERENCES)\LabApi.dll</HintPath>
-        </Reference>
         <Reference Include="Mirror">
             <HintPath>$(SL_DEV_REFERENCES)\Mirror.dll</HintPath>
-        </Reference>
-        <Reference Include="NorthwoodLib">
-            <HintPath>$(SL_DEV_REFERENCES)\NorthwoodLib.dll</HintPath>
         </Reference>
         <Reference Include="Pooling">
             <HintPath>$(SL_DEV_REFERENCES)\Pooling.dll</HintPath>
@@ -91,6 +85,7 @@
         <PackageReference Include="AudioPlayerApi" Version="1.1.2" />
         <PackageReference Include="NCalc" Version="1.3.8" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+        <PackageReference Include="Northwood.LabAPI" Version="1.1.4" />
     </ItemGroup>
 
 

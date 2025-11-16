@@ -61,6 +61,9 @@ public class PlayerExpressionToken : ExpressionToken
         SizeY,
         SizeZ,
         AccessTier,
+        RelativeX,
+        RelativeY,
+        RelativeZ,
     }
 
     public abstract class Info
@@ -166,7 +169,10 @@ public class PlayerExpressionToken : ExpressionToken
                 else return -1;
             }
             else return -1;
-        }, "Returns the player's Access Tier Level if they are SCP-079, otherwise returns -1")
+        }, "Returns the player's Access Tier Level if they are SCP-079, otherwise returns -1"),
+        [PlayerProperty.RelativeX] = new Info<NumberValue>(plr => (decimal)plr.RelativeRoomPosition().x, "Returns the player's x relative to the current room or 0 if in no room"),
+        [PlayerProperty.RelativeY] = new Info<NumberValue>(plr => (decimal)plr.RelativeRoomPosition().y, "Returns the player's y relative to the current room or 0 if in no room"),
+        [PlayerProperty.RelativeZ] = new Info<NumberValue>(plr => (decimal)plr.RelativeRoomPosition().z, "Returns the player's z relative to the current room or 0 if in no room"),
     };
 
     protected override IParseResult InternalParse(BaseToken[] tokens)

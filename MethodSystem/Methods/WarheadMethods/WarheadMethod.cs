@@ -10,7 +10,7 @@ public class WarheadMethod : SynchronousMethod
 {
     public override string Description => "Manages alpha warhead.";
     
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new OptionsArgument("action", 
             "open",

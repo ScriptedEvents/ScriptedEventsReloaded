@@ -10,7 +10,7 @@ public class DBExistsMethod : ReturningMethod<BoolValue>
 {
     public override string Description => "Returns true if the provided database exists.";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new TextArgument("database name")
     ];

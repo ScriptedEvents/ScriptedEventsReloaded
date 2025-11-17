@@ -10,7 +10,7 @@ public class Set079AccessTierMethod : SynchronousMethod
 {
     public override string Description => "Sets the Access Tier of the given player(s) if they are SCP-079";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new PlayersArgument("players"),
         new IntArgument("tier", 1, 5)

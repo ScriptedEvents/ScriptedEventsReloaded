@@ -13,7 +13,7 @@ public class SetDoorHealthMethod : SynchronousMethod, IAdditionalDescription
     public string AdditionalDescription =>
         "This is only applicable for doors that can break, like HCZ doors and not gates.";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new DoorsArgument("doors"),
         new FloatArgument("health")

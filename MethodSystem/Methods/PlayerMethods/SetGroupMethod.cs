@@ -9,7 +9,7 @@ public class SetGroupMethod : SynchronousMethod
 {
     public override string Description => "Sets or removes group from specified players";
     
-    public override Argument[] ExpectedArguments => 
+    public override Argument[] ExpectedArguments { get; } = 
     [
         new PlayersArgument("players"),
         new TextArgument("group")

@@ -9,7 +9,7 @@ public class SetDoorMaxHealthMethod : SynchronousMethod
 {
     public override string Description => "Sets max health for specified doors if possible";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new DoorsArgument("doors"),
         new FloatArgument("max health")

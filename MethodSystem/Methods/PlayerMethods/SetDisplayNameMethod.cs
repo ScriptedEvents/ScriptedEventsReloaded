@@ -8,7 +8,7 @@ public class SetDisplayNameMethod : SynchronousMethod
 {
     public override string Description => "Sets display name for specified players";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new PlayersArgument("players"),
         new TextArgument("display name")

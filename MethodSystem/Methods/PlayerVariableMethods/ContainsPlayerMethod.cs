@@ -12,7 +12,7 @@ public class ContainsPlayerMethod : ReturningMethod<BoolValue>
     public override string Description =>
         "Returns a true/false value indicating if the provided player is in the list.";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new PlayersArgument("player list")
         {

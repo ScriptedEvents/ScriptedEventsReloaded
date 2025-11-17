@@ -8,7 +8,7 @@ public class SetInfoAreaMethod : SynchronousMethod
 {
     public override string Description => "Sets InfoArea for specified players";
 
-    public override Argument[] ExpectedArguments => 
+    public override Argument[] ExpectedArguments { get; } = 
     [
         new PlayersArgument("players"),
         new EnumArgument<PlayerInfoArea>("info area")

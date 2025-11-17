@@ -17,7 +17,7 @@ public class GetFromDBMethod : ReturningMethod, ICanError
         "Provided key does not exist in the database."
     ];
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new DatabaseArgument("database"),
         new TextArgument("key")

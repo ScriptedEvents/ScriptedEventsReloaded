@@ -11,7 +11,7 @@ public class CollectionFetchMethod : ReturningMethod
     public override string Description => "Returns a value from a collection variable at a given position.";
     public override Type[]? ReturnTypes => null;
     
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new CollectionArgument("collection"),
         new IntArgument("index", 1)

@@ -11,7 +11,7 @@ public class TryParseNumberMethod : ReferenceReturningMethod<ParseResult<NumberV
 {
     public override string Description => "Tries to parse a given value to a number.";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new AnyValueArgument("value to parse")
     ];

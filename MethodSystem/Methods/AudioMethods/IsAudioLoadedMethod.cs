@@ -9,7 +9,7 @@ public class IsAudioLoadedMethod : ReturningMethod<BoolValue>
 {
     public override string Description => "Returns true if a given audio clip has been loaded";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new TextArgument("clip name")
         {

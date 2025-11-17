@@ -11,7 +11,7 @@ public class CleanupRagdollsMethod : SynchronousMethod
 {
     public override string Description => "Destroys ragdolls.";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new EnumArgument<RoleTypeId>("roleToRemove")
         {

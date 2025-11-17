@@ -13,7 +13,7 @@ public class WarheadInfoMethod : ReturningMethod
 
     public override Type[] ReturnTypes => [typeof(BoolValue), typeof(DurationValue)];
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new OptionsArgument("property",
             "isLocked",

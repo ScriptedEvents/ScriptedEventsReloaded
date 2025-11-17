@@ -9,7 +9,7 @@ public class SetEmoteMethod : SynchronousMethod
 {
     public override string Description => "Sets emotion for specified players";
 
-    public override Argument[] ExpectedArguments => 
+    public override Argument[] ExpectedArguments { get; } = 
     [
         new PlayersArgument("players"),
         new EnumArgument<EmotionPresetType>("emotion")

@@ -38,6 +38,11 @@ public class DurationValue(TimeSpan value) : LiteralValue<TimeSpan>(value)
             {
                 sb.Append($"{Value.Milliseconds:D3}ms ");
             }
+
+            if (sb.Length == 0)
+            {
+                sb.Append("0s ");
+            }
             
             return sb.Remove(sb.Length - 1, 1).ToString();
         }

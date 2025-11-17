@@ -13,7 +13,7 @@ public class RepairDoorMethod : SynchronousMethod, IAdditionalDescription
     public string AdditionalDescription =>
         "Remember, you can't repair things like gates, but you can repair normal doors like HCZ doors";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new DoorsArgument("doors to repair")
     ];

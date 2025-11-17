@@ -9,7 +9,7 @@ public class IsNumberMethod : ReturningMethod<BoolValue>
 {
     public override string Description => "Returns true if the provided value is a number.";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new AnyValueArgument("value to check")
     ];

@@ -9,7 +9,7 @@ public class ClearPlayerDataMethod : SynchronousMethod
 {
     public override string Description => "Clears data associated with specified players";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new PlayersArgument("players"),
         new TextArgument("key to clear")

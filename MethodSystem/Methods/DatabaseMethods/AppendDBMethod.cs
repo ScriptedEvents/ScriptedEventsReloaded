@@ -15,7 +15,7 @@ public class AppendDBMethod : SynchronousMethod, ICanError
         "Provided value cannot be stored in databases"
     ];
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new DatabaseArgument("database"),
         new TextArgument("key"),

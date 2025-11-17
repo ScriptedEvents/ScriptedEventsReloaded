@@ -9,7 +9,7 @@ public class CreateDBMethod : SynchronousMethod
 {
     public override string Description => "Creates a new JSON file in the database folder.";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new TextArgument("name"),
     ];

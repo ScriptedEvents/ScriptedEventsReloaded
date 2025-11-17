@@ -12,7 +12,7 @@ internal class UsableItemInfoMethod : ReturningMethod
 
     public override Type[] ReturnTypes => [typeof(NumberValue), typeof(BoolValue)];
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new ReferenceArgument<UsableItem>("usable"),
         new OptionsArgument("property",

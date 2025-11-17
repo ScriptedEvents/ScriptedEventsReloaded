@@ -10,7 +10,7 @@ public class Set079AuxPowerMethod : SynchronousMethod
 {
     public override string Description => "Sets the Auxiliary Power of the given player(s) if they are SCP-079";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new PlayersArgument("players"),
         new IntArgument("power", 0)

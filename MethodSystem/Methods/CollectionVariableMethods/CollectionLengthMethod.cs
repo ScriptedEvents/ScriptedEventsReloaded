@@ -9,7 +9,7 @@ public class CollectionLengthMethod : ReturningMethod<NumberValue>
 {
     public override string? Description => "Returns the amount of items in a collection.";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new CollectionArgument("collection")
     ];

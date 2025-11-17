@@ -21,7 +21,7 @@ public class ParseResultMethod : ReturningMethod, ICanError, IReferenceResolving
         "Tried to access the value when the parsing was not successful"
     ];
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new ReferenceArgument<ParseResult>("parsing result"),
         new OptionsArgument("info", 

@@ -12,7 +12,7 @@ internal class FirearmItemInfoMethod : ReturningMethod
 
     public override Type[] ReturnTypes => [typeof(BoolValue), typeof(NumberValue)];
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new ReferenceArgument<FirearmItem>("firearm"),
         new OptionsArgument("property",

@@ -10,7 +10,7 @@ public class FilterPlayersMethod : ReturningMethod<PlayerValue>
 {
     public override string Description => "Returns players which match the value for a given property.";
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new PlayersArgument("players to filter"),
         new EnumArgument<PlayerExpressionToken.PlayerProperty>("player property"),

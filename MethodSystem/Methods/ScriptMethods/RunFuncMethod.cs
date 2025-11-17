@@ -21,7 +21,7 @@ public class RunFuncMethod : SynchronousMethod, ICanError
         "Provided arguments are incompatible with the function"
     ];
 
-    public override Argument[] ExpectedArguments =>
+    public override Argument[] ExpectedArguments { get; } =
     [
         new CreatedScriptArgument("script to run"),
         new AnyValueArgument("values to pass")

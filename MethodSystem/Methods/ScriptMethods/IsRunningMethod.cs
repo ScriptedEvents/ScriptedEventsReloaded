@@ -10,7 +10,7 @@ public class IsRunningMethod : ReturningMethod<BoolValue>
 {
     public override string Description => "Returns true if given script is running";
 
-    public override Argument[] ExpectedArguments => 
+    public override Argument[] ExpectedArguments { get; } = 
     [
         new TextArgument("script name")
     ];

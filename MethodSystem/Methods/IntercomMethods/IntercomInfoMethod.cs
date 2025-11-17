@@ -10,7 +10,7 @@ namespace SER.MethodSystem.Methods.IntercomMethods;
 
 public class IntercomInfoMethod : ReturningMethod
 {
-    public override string? Description => "Returns info about the Intercom.";
+    public override string Description => "Returns info about the Intercom.";
 
     public override Argument[] ExpectedArguments { get; } =
     [

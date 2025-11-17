@@ -126,9 +126,9 @@ public class PlayerExpressionToken : ExpressionToken
                 {
                     return (decimal)man.CurrentAux;
                 }
-                else return -1;
             }
-            else return -1;
+
+            return -1;
         }, "Returns player Aux power if he is SCP-079, otherwise returns -1"),
         [PlayerProperty.Experience] = new Info<NumberValue>(plr =>
         {
@@ -138,9 +138,9 @@ public class PlayerExpressionToken : ExpressionToken
                 {
                     return tier.TotalExp;
                 }
-                else return -1;
             }
-            else return -1;
+
+            return -1;
         }, "Returns player EXP if he is SCP-079, otherwise returns -1"),
         [PlayerProperty.Emotion] = new Info<TextValue>(plr => plr.Emotion.ToString(), "Current emotion (e.g. Neutral, Chad)"),
         [PlayerProperty.MaxAuxiliaryPower] = new Info<NumberValue>(plr =>
@@ -151,9 +151,9 @@ public class PlayerExpressionToken : ExpressionToken
                 {
                     return (decimal)man.MaxAux;
                 }
-                else return -1;
             }
-            else return -1;
+
+            return -1;
         }, "Returns the player's Maximum Auxiliary Power if they are SCP-079, otherwise returns -1"),
         [PlayerProperty.SizeX] = new Info<NumberValue>(plr => (decimal)plr.Scale.x, null),
         [PlayerProperty.SizeY] = new Info<NumberValue>(plr => (decimal)plr.Scale.y, null),
@@ -166,9 +166,9 @@ public class PlayerExpressionToken : ExpressionToken
                 {
                     return tier.AccessTierLevel;
                 }
-                else return -1;
             }
-            else return -1;
+
+            return -1;
         }, "Returns the player's Access Tier Level if they are SCP-079, otherwise returns -1"),
         [PlayerProperty.RelativeX] = new Info<NumberValue>(plr => (decimal)plr.RelativeRoomPosition().x, "Returns the player's x relative to the current room or 0 if in no room"),
         [PlayerProperty.RelativeY] = new Info<NumberValue>(plr => (decimal)plr.RelativeRoomPosition().y, "Returns the player's y relative to the current room or 0 if in no room"),

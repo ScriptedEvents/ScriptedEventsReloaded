@@ -18,7 +18,8 @@ public class IntercomInfoMethod : ReturningMethod
             "state",
             "speaker",
             "cooldown",
-            "speechTimeLeft")
+            "speechTimeLeft",
+            "textOverride")
     ];
 
     public override Type[] ReturnTypes => [typeof(TextValue), typeof(PlayerValue), typeof(DurationValue)];
@@ -31,6 +32,7 @@ public class IntercomInfoMethod : ReturningMethod
             "speaker" => new PlayerValue(Player.ReadyList.ToList().Where(plr => plr.ReferenceHub == Intercom._singleton._curSpeaker)),
             "cooldown" => new DurationValue(TimeSpan.FromSeconds(Intercom.State == IntercomState.Cooldown ? Intercom._singleton.RemainingTime : 0)),
             "speechtimeleft" => new DurationValue(TimeSpan.FromSeconds(Intercom.State == IntercomState.InUse ? Intercom._singleton.RemainingTime : 0)),
+            "textoverride" => new TextValue(IntercomDisplay._singleton._overrideText),
             _ => throw new TosoksFuckedUpException("out of range")
         };
     }

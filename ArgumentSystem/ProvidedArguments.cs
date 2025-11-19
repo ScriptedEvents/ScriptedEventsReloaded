@@ -13,6 +13,7 @@ using SER.TokenSystem.Tokens;
 using SER.TokenSystem.Tokens.VariableTokens;
 using SER.ValueSystem;
 using SER.VariableSystem.Bases;
+using SER.VariableSystem.Variables;
 using UnityEngine;
 
 namespace SER.ArgumentSystem;
@@ -177,6 +178,11 @@ public class ProvidedArguments(Method method)
     public string GetOption(string argName)
     {
         return GetValue<string, OptionsArgument>(argName).ToLower();
+    }
+
+    public CollectionVariable GetCollectionVariable(string argName)
+    {
+        return GetValue<CollectionVariable, CollectionVariableArgument>(argName);
     }
 
     /// <summary>

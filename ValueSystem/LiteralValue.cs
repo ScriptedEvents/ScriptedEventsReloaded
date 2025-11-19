@@ -24,23 +24,6 @@ public abstract class LiteralValue(object value) : Value
         return $"Value is not of type {typeof(T).FriendlyTypeName()}, but {Value.FriendlyTypeName()}.";
     }
 
-    public override bool Equals(object? obj)
-    {
-        var objIsCorrectValue = Value.Equals(obj);
-        var objIsCorrectLiteral = obj is LiteralValue other && Equals(other);
-        return objIsCorrectValue || objIsCorrectLiteral;
-    }
-
-    protected bool Equals(LiteralValue other)
-    {
-        return Value == other.Value;
-    }
-
-    public override int GetHashCode()
-    {
-        return Value.GetHashCode();
-    }
-
     public string Serialize() => Value.ToString();
 }
 

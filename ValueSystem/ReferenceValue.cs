@@ -12,20 +12,4 @@ public class ReferenceValue(object? value) : Value
     {
         return $"<{Value.GetType().GetAccurateName()} reference | {Value.GetHashCode()}>";
     }
-
-    public override bool Equals(object? obj)
-    {
-        if (obj is not ReferenceValue other) return false;
-        return Equals(other);
-    }
-
-    protected bool Equals(ReferenceValue other)
-    {
-        return Value == other.Value;
-    }
-
-    public override int GetHashCode()
-    {
-        return Value.GetHashCode();
-    }
 }

@@ -3,7 +3,7 @@ using SER.ArgumentSystem.BaseArguments;
 using SER.MethodSystem.BaseMethods;
 using SER.ValueSystem;
 
-namespace SER.MethodSystem.Methods.PlayerMethods;
+namespace SER.MethodSystem.Methods.PlayerVariableMethods;
 
 public class AmountOfMethod : ReturningMethod<NumberValue>
 {

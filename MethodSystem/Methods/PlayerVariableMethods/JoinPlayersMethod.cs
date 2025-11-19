@@ -23,7 +23,7 @@ public class JoinPlayersMethod : ReturningMethod<PlayerValue>
     public override void Execute()
     {
         ReturnValue = new PlayerValue(Args
-            .GetRemainingArguments<List<Player>, PlayersArgument>("players")
+            .GetRemainingArguments<Player[], PlayersArgument>("players")
             .Flatten()
             .Distinct()
             .ToArray()

@@ -13,3 +13,8 @@ public class ReferenceValue(object? value) : Value
         return $"<{Value.GetType().GetAccurateName()} reference | {Value.GetHashCode()}>";
     }
 }
+
+public class ReferenceValue<T>(T? value) : ReferenceValue(value)
+{
+    public new T Value => (T) base.Value;
+}

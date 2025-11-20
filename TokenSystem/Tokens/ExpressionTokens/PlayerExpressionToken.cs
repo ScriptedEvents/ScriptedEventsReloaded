@@ -88,7 +88,7 @@ public class PlayerExpressionToken : ExpressionToken
         [PlayerProperty.Role] = new Info<TextValue>(plr => plr.Role.ToString(), $"Player role type ({nameof(RoleTypeId)} enum value)"),
         [PlayerProperty.RoleRef] = new Info<ReferenceValue>(plr => new(plr.RoleBase), $"Reference to {nameof(PlayerRoleBase)}"),
         [PlayerProperty.Team] = new Info<TextValue>(plr => plr.Team.ToString(), $"Player team ({nameof(Team)} enum value)"),
-        [PlayerProperty.Inventory] = new Info<CollectionValue>(plr => new(plr.Inventory.UserInventory.Items.Values.ToArray()), $"A collection of references to {nameof(ItemBase)} objects"),
+        [PlayerProperty.Inventory] = new Info<CollectionValue>(plr => new(plr.Inventory.UserInventory.Items.Values.Select(Item.Get).RemoveNulls()), $"A collection of references to {nameof(Item)} objects"),
         [PlayerProperty.ItemCount] = new Info<NumberValue>(plr => (decimal)plr.Inventory.UserInventory.Items.Count, null),
         [PlayerProperty.HeldItemRef] = new Info<ReferenceValue>(plr => new(plr.CurrentItem), "A reference to the item the player is holding"),
         [PlayerProperty.IsAlive] = new Info<BoolValue>(plr => plr.IsAlive, null),

@@ -48,10 +48,10 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
     [
         new(Instance.Author, Contribution.LeadDeveloper),
         new("Whitty985playz", Contribution.QualityAssurance | Contribution.EarlyAdopter),
+        new("Tosoks67", Contribution.Developer | Contribution.Betatester),
         new("Krzysiu Wojownik", Contribution.QualityAssurance | Contribution.Developer),
         new("Jraylor", Contribution.Sponsor),
         new("Luke", Contribution.Sponsor | Contribution.Betatester),
-        new("Tosoks67", Contribution.Developer | Contribution.Betatester),
         new("Raging Tornado", Contribution.Betatester),
         new("Saskyc", Contribution.TechSupport)
     ];

@@ -171,12 +171,13 @@ public static class EventHandler
         {
             Result rs = $"Failed to run script '{scrName}' connected to event '{evName}'";
             Log.Debug($"Running script '{scrName}' for event '{evName}'");
+            
             if (Script.CreateByScriptName(scrName, ScriptExecutor.Get()).HasErrored(out var error, out var script))
             {
                 Log.CompileError(scrName, rs + error);
                 continue;
             }
-
+            
             script.AddVariables(variables);
             var isAllowed = script.RunForEvent();
             if (isAllowed.HasValue && ev is ICancellableEvent cancellable1)

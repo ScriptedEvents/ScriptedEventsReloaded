@@ -1,4 +1,6 @@
 ﻿using LabApi.Features.Wrappers;
+using SER.Helpers.Exceptions;
+using SER.Helpers.Extensions;
 
 namespace SER.ValueSystem;
 
@@ -18,5 +20,8 @@ public class PlayerValue : Value
 
     public override bool EqualCondition(Value other) => other is PlayerValue otherP && Players.SequenceEqual(otherP.Players);
     
-    public override int HashCode => Players.GetHashCode();
+    public override int HashCode =>
+        Players.Select(plr => plr.UserId).GetEnumerableHashCode().HasErrored(out var error, out var val)
+        ? throw new TosoksFuckedUpException(error)
+        : val;
 }

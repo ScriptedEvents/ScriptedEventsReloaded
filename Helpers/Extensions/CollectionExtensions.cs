@@ -1,4 +1,5 @@
-﻿using Random = UnityEngine.Random;
+﻿using SER.Helpers.ResultSystem;
+using Random = UnityEngine.Random;
 
 namespace SER.Helpers.Extensions;
 
@@ -34,6 +35,20 @@ public static class CollectionExtensions
     public static string JoinStrings(this IEnumerable<string> source, string separator)
     {
         return string.Join(separator, source);
+    }
+    public static TryGet<int> GetEnumerableHashCode<T>(this IEnumerable<T> enumerable)
+    {
+        if (enumerable is null) return $"{nameof(enumerable)} is null.";
+
+        unchecked
+        {
+            var hashCode = 17;
+            foreach (var item in enumerable)
+            {
+                hashCode = hashCode * 31 + (item?.GetHashCode() ?? 0);
+            }
+            return hashCode;
+        }
     }
 
     extension<T>(List<T> list)

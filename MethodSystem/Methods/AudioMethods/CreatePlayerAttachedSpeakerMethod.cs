@@ -1,6 +1,7 @@
 ﻿using SER.ArgumentSystem.Arguments;
 using SER.ArgumentSystem.BaseArguments;
 using SER.Helpers.Exceptions;
+using SER.Helpers.Extensions;
 using SER.MethodSystem.BaseMethods;
 using SER.MethodSystem.MethodDescriptors;
 using UnityEngine;
@@ -37,7 +38,7 @@ public class CreatePlayerAttachedSpeakerMethod : SynchronousMethod, ICanError
         },
         new BoolArgument("is stereo")
         {
-            DefaultValue = new(null, "true"),
+            DefaultValue = new(true, null),
             Description = "Whether the audio will be 3D."
         },
         new PlayersArgument("target players")
@@ -55,23 +56,18 @@ public class CreatePlayerAttachedSpeakerMethod : SynchronousMethod, ICanError
         var minDistance = Args.GetFloat("min distance");
         var maxDistance = Args.GetFloat("max distance");
         var isStereo = Args.GetBool("is stereo");
-        var targetPlayers = Args.GetPlayers("target players");
+        var targetPlayers = Args.GetPlayers("target players").MaybeNull();
         
         AudioPlayer.Create(
             speakerName, 
-            condition: hub =>
-            {
-                if (targetPlayers is null) return true;
-                
-                return targetPlayers.Any(p => p.ReferenceHub == hub);
-            },
+            condition: hub => targetPlayers is null || targetPlayers.Any(p => p.ReferenceHub == hub),
             onIntialCreation: p =>
             {        
                 p.transform.parent = player.GameObject?.transform 
                                      ?? throw new ScriptRuntimeError(
                                          $"Player '{player.Nickname}' does not have a model to attach a speaker to.");
                 
-                Speaker speaker = p.AddSpeaker("Main", volume, isStereo, minDistance, maxDistance);
+                var speaker = p.AddSpeaker("Main", volume, isStereo, minDistance, maxDistance);
                 
                 speaker.transform.parent = player.GameObject.transform;
                 speaker.transform.localPosition = Vector3.zero;

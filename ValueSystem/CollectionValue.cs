@@ -2,6 +2,7 @@
 using SER.Helpers.Extensions;
 using SER.Helpers.ResultSystem;
 using System.Collections;
+using System.Diagnostics;
 
 namespace SER.ValueSystem;
 
@@ -62,7 +63,10 @@ public class CollectionValue(IEnumerable value) : Value
         return !CastedValues.Where((val, i) => !val.EqualCondition(otherP.CastedValues[i])).Any();
     }
 
-    public override int HashCode => CastedValues.GetHashCode();
+    public override int HashCode =>
+        CastedValues.GetEnumerableHashCode().HasErrored(out var error, out var val)
+        ? throw new TosoksFuckedUpException(error)
+        : val;
 
     public TryGet<Value> GetAt(int index)
     {

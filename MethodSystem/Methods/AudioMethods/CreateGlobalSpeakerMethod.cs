@@ -1,5 +1,6 @@
 ﻿using SER.ArgumentSystem.Arguments;
 using SER.ArgumentSystem.BaseArguments;
+using SER.Helpers.Extensions;
 using SER.MethodSystem.BaseMethods;
 
 namespace SER.MethodSystem.Methods.AudioMethods;
@@ -25,16 +26,11 @@ public class CreateGlobalSpeakerMethod : SynchronousMethod
 
     public override void Execute()
     {
-        var targetPlayers = Args.GetPlayers("target players");
+        var targetPlayers = Args.GetPlayers("target players").MaybeNull();
         
         AudioPlayer.Create(
             Args.GetText("speaker name"), 
-            condition: hub =>
-            {
-                if (targetPlayers is null) return true;
-                
-                return targetPlayers.Any(p => p.ReferenceHub == hub);
-            },
+            condition: hub => targetPlayers is null || targetPlayers.Any(p => p.ReferenceHub == hub),
             onIntialCreation: p =>
             {
                 p.AddSpeaker("Main", Args.GetFloat("volume"), isSpatial: false, maxDistance: 5000f);

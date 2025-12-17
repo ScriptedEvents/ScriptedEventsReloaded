@@ -1,6 +1,5 @@
 ﻿using CommandSystem;
 using LabApi.Features.Permissions;
-using LabApi.Features.Wrappers;
 using SER.FlagSystem;
 using SER.Plugin.Commands.Interfaces;
 
@@ -12,8 +11,7 @@ public class ReloadCommand : ICommand, IUsePermissions
 {
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        var player = Player.Get(sender);
-        if (player is not null && player.HasPermissions(Permission))
+        if (!sender.HasPermissions(Permission))
         {
             response = "You do not have permission to reload scripts.";
             return false;

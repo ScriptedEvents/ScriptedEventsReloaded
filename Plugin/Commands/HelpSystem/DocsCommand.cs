@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using CommandSystem;
 using LabApi.Features.Permissions;
-using LabApi.Features.Wrappers;
 using SER.Helpers.Exceptions;
 using SER.Plugin.Commands.Interfaces;
 
@@ -13,8 +12,7 @@ public class DocsCommand : ICommand, IUsePermissions
 {
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        var player = Player.Get(sender);
-        if (player is not null && player.HasPermissions(Permission))
+        if (!sender.HasPermissions(Permission))
         {
             response = "You do not have permission to create documentation.";
             return false;

@@ -24,7 +24,8 @@ public class ForeachLoopContext : LoopContext
 
     public override string KeywordName => "foreach";
     public override string Description =>
-        "Repeats its body for each player in the player variable, assigning it its own custom variable.";
+        "Repeats its body for each player in the player variable or a value in a collection variable, " +
+        "assigning it its own custom variable.";
     public override string[] Arguments => ["[variable to assign the item]", "in", "[player/collection variable]"];
 
     public override Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = new();

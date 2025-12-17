@@ -1,6 +1,5 @@
 ﻿using CommandSystem;
 using LabApi.Features.Permissions;
-using LabApi.Features.Wrappers;
 using SER.Plugin.Commands.Interfaces;
 using SER.ScriptSystem;
 
@@ -12,8 +11,7 @@ public class StopAllCommand : ICommand, IUsePermissions
 {
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        var player = Player.Get(sender);
-        if (player is not null && player.HasPermissions(Permission))
+        if (!sender.HasPermissions(Permission))
         {
             response = "You do not have permission to stop scripts.";
             return false;

@@ -1,6 +1,5 @@
 ﻿using CommandSystem;
 using LabApi.Features.Permissions;
-using LabApi.Features.Wrappers;
 using SER.Plugin.Commands.Interfaces;
 using SER.ScriptSystem;
 using SER.ScriptSystem.Structures;
@@ -13,8 +12,7 @@ public class RunCommand : ICommand, IUsePermissions
 {
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        var player = Player.Get(sender);
-        if (player is not null && player.HasPermissions(Permission))
+        if (!sender.HasPermissions(Permission))
         {
             response = "You do not have permission to run scripts.";
             return false;

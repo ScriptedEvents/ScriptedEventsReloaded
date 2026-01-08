@@ -1,5 +1,4 @@
-﻿using InventorySystem.Items.Pickups;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using LabApi.Features.Wrappers;
 using SER.ArgumentSystem.Arguments;
 using SER.ArgumentSystem.BaseArguments;
@@ -7,7 +6,7 @@ using SER.Helpers.Exceptions;
 using SER.MethodSystem.BaseMethods;
 using SER.MethodSystem.MethodDescriptors;
 
-namespace SER.MethodSystem.Methods.ProjectileMethods;
+namespace SER.MethodSystem.Methods.PickupMethods;
 
 [UsedImplicitly]
 public class SpawnProjectileMethod : ReferenceReturningMethod<Pickup>, ICanError

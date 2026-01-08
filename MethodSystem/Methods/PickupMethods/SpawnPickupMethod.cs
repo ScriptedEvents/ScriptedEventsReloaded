@@ -10,7 +10,7 @@ using UnityEngine;
 namespace SER.MethodSystem.Methods.PickupMethods;
 
 [UsedImplicitly]
-public class SpawnPickupMethod : SynchronousMethod, ICanError
+public class SpawnPickupMethod : ReferenceReturningMethod<Pickup>, ICanError
 {
     public override string Description => "Spawns an item pickup at a given position.";
 
@@ -45,5 +45,6 @@ public class SpawnPickupMethod : SynchronousMethod, ICanError
 
         if (pickup is null) throw new ScriptRuntimeError(ErrorReasons[0]);
         pickup.Spawn();
+        ReturnValue = pickup;
     }
 }

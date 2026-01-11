@@ -18,4 +18,6 @@ public static class ObjectExtensions
     {
         return obj.GetType().FriendlyTypeName();
     }
+
+    public static T WithCurrent<T>(this T obj, Func<T, T> func) => func(obj);
 }

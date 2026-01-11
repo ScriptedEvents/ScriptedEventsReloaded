@@ -3,6 +3,7 @@ using SER.Code.ArgumentSystem;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Helpers;
 using SER.Code.Helpers.Exceptions;
+using SER.Code.Helpers.Extensions;
 using SER.Code.ScriptSystem;
 
 namespace SER.Code.MethodSystem.BaseMethods;
@@ -19,7 +20,12 @@ public abstract class Method
     protected Method()
     {
         var type = GetType();
-        Subgroup = type.Namespace?.Split('.').LastOrDefault()?.Replace("Methods", "") ?? "Unknown";
+        
+        Subgroup = type.Namespace?
+            .Split('.')
+            .LastOrDefault()?
+            .WithCurrent(name => name.Substring(0, name.Length - "Methods".Length)) 
+                   ?? "Unknown";
         
         var name = type.Name;
         if (!name.EndsWith("Method"))
@@ -33,7 +39,7 @@ public abstract class Method
 
     public readonly string Name;
     
-    public abstract string? Description { get; }
+    public abstract string Description { get; }
     
     public abstract Argument[] ExpectedArguments { get; }
     

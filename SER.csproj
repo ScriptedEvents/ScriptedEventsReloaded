@@ -46,7 +46,6 @@
             <HintPath>$(SL_DEV_REFERENCES)\CommandSystem.Core.dll</HintPath>
             <Private>true</Private>
         </Reference>
-        <Reference Include="Microsoft.CSharp" />
         <Reference Include="Mirror">
             <HintPath>$(SL_DEV_REFERENCES)\Mirror.dll</HintPath>
         </Reference>

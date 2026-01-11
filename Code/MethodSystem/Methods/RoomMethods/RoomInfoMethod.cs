@@ -15,17 +15,18 @@ namespace SER.Code.MethodSystem.Methods.RoomMethods;
 public class RoomInfoMethod : LiteralValueReturningMethod, IReferenceResolvingMethod
 {
     public Type ReferenceType => typeof(Room);
+    
     public override Type[] LiteralReturnTypes => [typeof(TextValue), typeof(NumberValue)];
 
-    public override string Description => null!;
+    public override string Description => IReferenceResolvingMethod.Desc.Get(this);
 
     public override Argument[] ExpectedArguments { get; } =
     [
         new ReferenceArgument<Room>("room"),
         new OptionsArgument("property",
-            Option.Enum<RoomShape>(),
-            Option.Enum<RoomName>(), 
-            Option.Enum<FacilityZone>(),
+            Option.Enum<RoomShape>("shape"),
+            Option.Enum<RoomName>("name"), 
+            Option.Enum<FacilityZone>("zone"),
             "xPos",
             "yPos",
             "zPos"
@@ -37,9 +38,9 @@ public class RoomInfoMethod : LiteralValueReturningMethod, IReferenceResolvingMe
         var room = Args.GetReference<Room>("room");
         ReturnValue = Args.GetOption("property") switch
         {
-            "roomshape" => new TextValue(room.Shape.ToString()),
-            "roomname" => new TextValue(room.Name.ToString()),
-            "facilityzone" => new TextValue(room.Zone.ToString()),
+            "shape" => new TextValue(room.Shape.ToString()),
+            "name" => new TextValue(room.Name.ToString()),
+            "zone" => new TextValue(room.Zone.ToString()),
             "xpos" => new NumberValue((decimal)room.Position.x),
             "ypos" => new NumberValue((decimal)room.Position.y),
             "zpos" => new NumberValue((decimal)room.Position.z),

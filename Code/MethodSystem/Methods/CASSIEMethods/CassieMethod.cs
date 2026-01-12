@@ -17,7 +17,7 @@ public class CassieMethod : SynchronousMethod
             "noJingle"
         ),
         new TextArgument("message"),
-        new TextArgument("translation")
+        new TextArgument("subtitles")
         {
             DefaultValue = new("", "empty"),
         },
@@ -32,9 +32,10 @@ public class CassieMethod : SynchronousMethod
     {
         var isNoisy = Args.GetOption("mode") == "jingle";
         var message = Args.GetText("message");
-        var translation = Args.GetText("translation");
+        var subtitles = Args.GetText("subtitles");
         var glitch = Args.GetBool("should glitch");
 
+        // todo: check if this is still needed
         if (glitch)
         {
             // taken from Respawning.Announcements.WaveAnnouncementBase.PlayAnnouncement()
@@ -66,23 +67,11 @@ public class CassieMethod : SynchronousMethod
             }
         }
 
-        if (string.IsNullOrEmpty(translation))
-        {
-            LabApi.Features.Wrappers.Cassie.Message(
-                message, 
-                true, 
-                isNoisy
-            );
-        }
-        else
-        {
-            LabApi.Features.Wrappers.Cassie.Message(
-                message, 
-                true, 
-                isNoisy, 
-                true,
-                translation
-            );
-        }
+        // todo: check how to make the cassie silent again
+        LabApi.Features.Wrappers.Cassie.Message(
+            message,
+            subtitles,
+            glitchScale: isNoisy ? 1f : 0f
+        );
     }
 }

@@ -3,6 +3,7 @@ using LabApi.Features;
 using LabApi.Features.Console;
 using MEC;
 using SER.Code.FlagSystem.Flags;
+using SER.Code.Helpers;
 using SER.Code.Helpers.Extensions;
 using SER.Code.MethodSystem;
 using SER.Code.MethodSystem.Methods.PlayerDataMethods;
@@ -21,11 +22,11 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
     public override string Author => "Elektryk_Andrzej";
     public override Version RequiredApiVersion => LabApiProperties.CurrentVersion;
     public override Version Version => new(0, 13, 0);
-    
+
     public static string GitHubLink => "https://github.com/ScriptedEvents/ScriptedEventsReloaded";
     public static string DocsLink => "https://scriptedeventsreloaded.gitbook.io/docs/tutorial";
     public static string DiscordLink => "https://discord.gg/3j54zBnbbD";
-    
+
     public static string HelpCommandName => "serhelp";
     public static MainPlugin Instance { get; private set; } = null!;
 
@@ -34,17 +35,17 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
     [Flags]
     public enum Contribution
     {
-        None             = 0,
-        LeadDeveloper    = 1 << 1,
-        Developer        = 1 << 2,
+        None = 0,
+        LeadDeveloper = 1 << 1,
+        Developer = 1 << 2,
         QualityAssurance = 1 << 3,
-        Sponsor          = 1 << 4,
-        Betatester       = 1 << 5,
-        EarlyAdopter     = 1 << 6,
-        TechSupport      = 1 << 7,
+        Sponsor = 1 << 4,
+        Betatester = 1 << 5,
+        EarlyAdopter = 1 << 6,
+        TechSupport = 1 << 7,
     }
 
-    public static Contributor[] Contributors => 
+    public static Contributor[] Contributors =>
     [
         new(Instance.Author, Contribution.LeadDeveloper),
         new("Whitty985playz", Contribution.QualityAssurance | Contribution.EarlyAdopter),
@@ -59,18 +60,19 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
     public override void Enable()
     {
         Instance = this;
-        
+
         Script.StopAll();
         EventHandler.Initialize();
         MethodIndex.Initialize();
         VariableIndex.Initialize();
         Flag.RegisterFlags();
         CommandEvents.Initialize();
+        ExiledHelper.ExiledAwaiter().RunCoroutine();
         SendLogo();
-        
+
         Events.ServerEvents.WaitingForPlayers += OnServerFullyInit;
         Events.ServerEvents.RoundRestarted += Disable;
-        
+
         Timing.CallDelayed(1.5f, FileSystem.FileSystem.Initialize);
     }
 
@@ -79,11 +81,11 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
         Script.StopAll();
         SetPlayerDataMethod.PlayerData.Clear();
     }
-    
+
     private void OnServerFullyInit()
     {
         if (Config?.SendHelpMessageOnServerInitialization is false) return;
-        
+
         Logger.Raw(
             $"""
              Thank you for using ### Scripted Events Reloaded ### by {Author}!
@@ -102,7 +104,7 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
         Logger.Raw(
             """
             #####################################
-            
+
               █████████  ██████████ ███████████  
              ███░░░░░███░░███░░░░░█░░███░░░░░███ 
             ░███    ░░░  ░███  █ ░  ░███    ░███ 

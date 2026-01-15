@@ -136,9 +136,8 @@ public static class Contexter
         {
             return rs + "The beginning of the line is incorrectly strucutred.";
         }
-        
-        if (contextable.TryGetContext(scr).HasErrored(out var contextError, out var context))
-            return rs + contextError;
+
+        var context = contextable.GetContext(scr);
 
         foreach (var token in tokens.Skip(1))
         {

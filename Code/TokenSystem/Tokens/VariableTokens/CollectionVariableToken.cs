@@ -11,7 +11,7 @@ public class CollectionVariableToken : VariableToken<CollectionVariable, Collect
 {
     public static string Example => "&collection";
 
-    public override TryGet<Context> TryGetContext(Script scr)
+    public override Context GetContext(Script scr)
     {
         return new CollectionVariableDefinitionContext(this)
         {

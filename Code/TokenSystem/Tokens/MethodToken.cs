@@ -24,7 +24,7 @@ public class MethodToken : BaseToken, IContextableToken
         return new Success();
     }
 
-    public TryGet<Context> TryGetContext(Script scr)
+    public Context GetContext(Script scr)
     {
         return new MethodContext(this)
         {

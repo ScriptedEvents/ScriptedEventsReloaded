@@ -9,7 +9,7 @@ namespace SER.Code.TokenSystem.Tokens.VariableTokens;
 
 public class ReferenceVariableToken : VariableToken<ReferenceVariable, ReferenceValue>
 {
-    public override TryGet<Context> TryGetContext(Script scr)
+    public override Context GetContext(Script scr)
     {
         return new ReferenceVariableDefinitionContext(this)
         {

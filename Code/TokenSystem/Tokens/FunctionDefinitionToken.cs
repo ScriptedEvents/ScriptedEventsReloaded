@@ -8,9 +8,9 @@ namespace SER.Code.TokenSystem.Tokens;
 
 public class FunctionDefinitionToken : BaseToken, IContextableToken
 {
-    public TryGet<Context> TryGetContext(Script scr)
+    public Context GetContext(Script scr)
     {
-        return new FunctionDefinitionContext
+        return new RunFunctionContext
         {
             LineNum = LineNum,
             Script = scr
@@ -19,7 +19,7 @@ public class FunctionDefinitionToken : BaseToken, IContextableToken
 
     protected override IParseResult InternalParse(Script scr)
     {
-        if (RawRep != "func")
+        if (RawRep != "run")
         {
             return new Ignore();
         }

@@ -11,14 +11,13 @@ using SER.Code.ValueSystem;
 namespace SER.Code.ContextSystem.Contexts;
 
 [UsedImplicitly]
-public class RunFunctionContext : YieldingContext, IKeywordContext
+public class RunFunctionContext : YieldingContext, IMayReturnValueContext
 {
     private FunctionDefinitionContext? _functionDefinitionContext;
     private readonly List<IValueToken> _providedValues = [];
-    
-    public string KeywordName => "run";
-    public string Description => "Runs a local function with a given name.";
-    public string[] Arguments => ["[function name]"];
+
+    public TypeOfValue? Returns => _functionDefinitionContext?.Returns;
+    public Value? ReturnedValue => _functionDefinitionContext?.ReturnedValue;
     
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

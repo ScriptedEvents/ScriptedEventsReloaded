@@ -15,7 +15,7 @@ public class FlagArgumentToken : BaseToken, IContextableToken
             : new Ignore();
     }
 
-    public TryGet<Context> TryGetContext(Script scr)
+    public Context GetContext(Script scr)
     {
         return new NoOperationContext
         {

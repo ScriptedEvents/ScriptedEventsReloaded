@@ -6,6 +6,7 @@ using SER.Code.Helpers.Exceptions;
 using SER.Code.Helpers.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
@@ -71,7 +72,7 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
             return TryAddTokenRes.End();
         }
 
-        if (token is MethodToken methodToken)
+        if (token is IContextableToken contextable)
         {
             if (methodToken.Method is not ReturningMethod)
             {

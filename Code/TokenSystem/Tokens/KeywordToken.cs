@@ -32,7 +32,7 @@ public class KeywordToken : BaseToken, IContextableToken
             : new Ignore();
     }
 
-    public TryGet<Context> TryGetContext(Script scr)
+    public Context GetContext(Script scr)
     {
         return Context.Create(_keywordType!, (scr, LineNum));
     }

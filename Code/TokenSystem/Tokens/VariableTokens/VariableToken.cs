@@ -17,8 +17,8 @@ public abstract class VariableToken : BaseToken, IContextableToken
     public abstract Type VariableType { get; }
     
     public abstract Type ValueType { get; }
-    
-    public abstract TryGet<Context> TryGetContext(Script scr);
+
+    public abstract Context GetContext(Script scr);
 
     public static readonly (char prefix, Type varTypeToken)[] VariablePrefixes =
     [

@@ -27,7 +27,7 @@ public class RemovePlayersMethod : ReturningMethod<PlayerValue>
     {
         var originalPlayers = Args.GetPlayers("original players");
         var playersToRemove = Args
-            .GetRemainingArguments<List<Player>, PlayersArgument>("players to remove")
+            .GetRemainingArguments<Player[], PlayersArgument>("players to remove")
             .Flatten();
 
         ReturnValue = new PlayerValue(originalPlayers.Where(p => !playersToRemove.Contains(p)));

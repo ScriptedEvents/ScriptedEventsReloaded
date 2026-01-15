@@ -63,7 +63,7 @@ public class SpawnProjectileMethod : ReferenceReturningMethod<Pickup>, ICanError
 
         if (Pickup.Get(pickupBase) is not { } pickup)
         {
-            throw new ScriptRuntimeError(ErrorReasons[0]);
+            throw new ScriptRuntimeError(this, ErrorReasons[0]);
         }
 
         ReturnValue = pickup;

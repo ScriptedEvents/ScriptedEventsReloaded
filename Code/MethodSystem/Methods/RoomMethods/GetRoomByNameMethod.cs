@@ -32,7 +32,7 @@ public class GetRoomByNameMethod : ReferenceReturningMethod, IAdditionalDescript
         var room = Room.List.Where(r => r.Name == roomName).GetRandomValue();
         if (room is null)
         {
-            throw new ScriptRuntimeError($"No room found with the provided name '{roomName}'.");
+            throw new ScriptRuntimeError(this, $"No room found with the provided name '{roomName}'.");
         }
         
         ReturnValue = new ReferenceValue(room);

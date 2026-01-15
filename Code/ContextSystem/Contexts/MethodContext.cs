@@ -23,7 +23,12 @@ public class MethodContext(MethodToken methodToken) : YieldingContext, IMayRetur
         : null;
     
     public Value? ReturnedValue { get; set; }
-    
+
+    public string MissingValueHint => "This method did not return a value. This may be a SER bug.";
+    public string UndefinedReturnsHint => "This method does not define a return type. This may be a SER bug.";
+
+    protected override string FriendlyName => $"'{Method.Name}' method call";
+
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
         Log.Debug($"'{Method.Name}' method is now receiving token '{token.RawRep}' ({token.GetType().AccurateName})");

@@ -34,6 +34,8 @@ public class ForeachLoopContext : LoopContext, IAcceptOptionalVariableDefinition
 
     public override Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = new();
 
+    protected override string FriendlyName => "'foreach' loop statement";
+
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
         if (token is not IValueToken valToken)
@@ -47,7 +49,7 @@ public class ForeachLoopContext : LoopContext, IAcceptOptionalVariableDefinition
             {
                 if (getPlayer().HasErrored(out var error, out var value))
                 {
-                    throw new ScriptRuntimeError(error);
+                    throw new ScriptRuntimeError(this, error);
                 }
 
                 return value.Players.Select(p => new PlayerValue(p)).ToArray();
@@ -62,7 +64,7 @@ public class ForeachLoopContext : LoopContext, IAcceptOptionalVariableDefinition
             {
                 if (getCollection().HasErrored(out var error, out var value))
                 {
-                    throw new ScriptRuntimeError(error);
+                    throw new ScriptRuntimeError(this, error);
                 }
 
                 return value.CastedValues;

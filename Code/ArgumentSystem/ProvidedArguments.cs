@@ -20,7 +20,7 @@ namespace SER.Code.ArgumentSystem;
 
 public class ProvidedArguments(Method method)
 {
-    private Dictionary<(string name, Type type), List<DynamicTryGet>> Arguments { get; } = [];
+    private Dictionary<(string name, Type type), List<DynamicTryGet>> ArgumentValues { get; } = [];
 
     public Database GetDatabase(string argName)
     {
@@ -211,7 +211,7 @@ public class ProvidedArguments(Method method)
         {
             if (evaluator.Result.HasErrored(out var error))
             {
-                throw new ScriptRuntimeError(mainErr + error);
+                throw new CustomScriptRuntimeError(mainErr + error);
             }
 
             if (evaluator is not DynamicTryGet<TValue> argEvalRes)
@@ -226,7 +226,7 @@ public class ProvidedArguments(Method method)
 
     private List<DynamicTryGet> GetValueInternal<TValue, TArg>(string argName)
     {
-        if (Arguments.TryGetValue((argName, typeof(TArg)), out var value))
+        if (ArgumentValues.TryGetValue((argName, typeof(TArg)), out var value))
         {
             return value;
         }
@@ -239,18 +239,28 @@ public class ProvidedArguments(Method method)
 
         if (foundArg.DefaultValue is null)
         {
-            throw new ScriptRuntimeError($"Method '{method.Name}' is missing required argument '{argName}'.");
+            throw new CustomScriptRuntimeError($"{method} is missing a required argument '{argName}'.");
         }
 
         return foundArg.DefaultValue.Value switch
         {
-            TValue argValue => [new DynamicTryGet<TValue>(argValue)],
-            IEnumerable<TValue> listValue => listValue.Select(DynamicTryGet (v) => new DynamicTryGet<TValue>(v)).ToList(),
-            null => [new DynamicTryGet<TValue>((TValue)(object)null!)], // magik
+            TValue argValue => [
+                new DynamicTryGet<TValue>(argValue)
+            ],
+            
+            IEnumerable<TValue> listValue => listValue
+                .Select(DynamicTryGet (v) => new DynamicTryGet<TValue>(v))
+                .ToList(),
+            
+            null => [
+                new DynamicTryGet<TValue>((TValue)(object)null!)
+            ], // magik
+            
             _ => throw new AndrzejFuckedUpException(
                 $"Argument {argName} for method {method.Name} has its default value set to type " +
                 $"{foundArg.DefaultValue?.GetType().AccurateName ?? "null"}, expected of type {typeof(TValue).Name} or a list of " +
-                $"{typeof(TValue).Name}s.")
+                $"{typeof(TValue).Name}s."
+            )
         };
     }
 
@@ -259,10 +269,10 @@ public class ProvidedArguments(Method method)
         Log.Debug($"adding {valueInfo.Name} for method {method.Name} ({method.GetHashCode()})");
         if (!valueInfo.IsPartOfCollection)
         {
-            Arguments.Add((valueInfo.Name, valueInfo.ArgumentType), [valueInfo.Evaluator]);
+            ArgumentValues.Add((valueInfo.Name, valueInfo.ArgumentType), [valueInfo.Evaluator]);
             return;
         }
         
-        Arguments.AddOrInitListWithKey((valueInfo.Name, valueInfo.ArgumentType), valueInfo.Evaluator);
+        ArgumentValues.AddOrInitListWithKey((valueInfo.Name, valueInfo.ArgumentType), valueInfo.Evaluator);
     }
 }

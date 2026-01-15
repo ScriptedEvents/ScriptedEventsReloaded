@@ -28,7 +28,7 @@ public class GetPlayerDataMethod : ReturningMethod
         if (!SetPlayerDataMethod.PlayerData.TryGetValue(player, out var dict) || 
             !dict.TryGetValue(key, out var value))
         {
-            throw new ScriptRuntimeError($"Key '{key}' was not found for player '{player.Nickname}'.");
+            throw new ScriptRuntimeError(this, $"Key '{key}' was not found for player '{player.Nickname}'.");
         }
 
         ReturnValue = value;

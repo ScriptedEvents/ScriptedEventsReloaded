@@ -13,7 +13,7 @@ using SER.Code.ValueSystem;
 namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 
 [UsedImplicitly]
-public class RepeatLoopContext : LoopSingleIterationVariableContext<NumberValue>, IKeywordContext, IAcceptOptionalVariableDefinitions
+public class RepeatLoopContext : LoopContextWithSingleIterationVariable<NumberValue>, IKeywordContext, IAcceptOptionalVariableDefinitions
 {
     private readonly Result _rs = "Cannot create 'repeat' loop.";
     private Func<TryGet<uint>>? _repeatCountExpression = null;
@@ -24,6 +24,8 @@ public class RepeatLoopContext : LoopSingleIterationVariableContext<NumberValue>
     public override string KeywordName => "repeat";
     public override string Description => "Repeats everything inside its body a given amount of times.";
     public override string[] Arguments => ["[number]"];
+
+    protected override string FriendlyName => "'repeat' loop statement";
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
@@ -86,7 +88,7 @@ public class RepeatLoopContext : LoopSingleIterationVariableContext<NumberValue>
 
             if (_repeatCountExpression().HasErrored(out var error, out var val))
             {
-                throw new ScriptRuntimeError(error);
+                throw new ScriptRuntimeError(this,  error);
             }
             
             _repeatCount = val;

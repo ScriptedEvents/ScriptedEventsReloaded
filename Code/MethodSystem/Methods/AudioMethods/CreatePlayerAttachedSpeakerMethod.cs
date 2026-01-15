@@ -66,7 +66,7 @@ public class CreatePlayerAttachedSpeakerMethod : SynchronousMethod, ICanError
             onIntialCreation: p =>
             {        
                 p.transform.parent = player.GameObject?.transform 
-                                     ?? throw new ScriptRuntimeError(
+                                     ?? throw new ScriptRuntimeError(this, 
                                          $"Player '{player.Nickname}' does not have a model to attach a speaker to.");
                 
                 var speaker = p.AddSpeaker("Main", volume, isStereo, minDistance, maxDistance);

@@ -14,7 +14,9 @@ public class StopScriptContext: StandardContext, IKeywordContext
         "Stops the script from executing.";
 
     public string[] Arguments => [];
-    
+
+    protected override string FriendlyName => "'stop' keyword";
+
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
         return TryAddTokenRes.Error(

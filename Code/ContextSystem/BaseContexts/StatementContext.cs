@@ -10,7 +10,7 @@ public abstract class StatementContext : YieldingContext
     
     public void SendControlMessage(ParentContextControlMessage msg)
     {
-        Log.Debug($"{Name} context has received control message: {msg}");
+        Log.Debug($"{this} has received control message: {msg}");
         OnReceivedControlMessageFromChild(msg);
     }
 

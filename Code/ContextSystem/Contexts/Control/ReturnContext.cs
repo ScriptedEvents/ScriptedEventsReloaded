@@ -15,7 +15,9 @@ public class ReturnContext : StandardContext, IKeywordContext
     public string KeywordName => "return";
     public string Description => "Returns value when in a function.";
     public string[] Arguments => ["[return value]"];
-    
+
+    protected override string FriendlyName => "'return' keyword";
+
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
         if (token is not IValueToken valToken)
@@ -41,7 +43,7 @@ public class ReturnContext : StandardContext, IKeywordContext
     {
         if (_returnValueToken!.Value().HasErrored(out var error, out var value))
         {
-            throw new ScriptRuntimeError(error);
+            throw new ScriptRuntimeError(this, error);
         }
         
         ParentContext?.SendControlMessage(new Return(value));

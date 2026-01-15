@@ -25,7 +25,9 @@ public class ElifStatementContext : StatementContext, IStatementExtender, IExten
     private readonly List<BaseToken> _condition = [];
     
     private NumericExpressionReslover.CompiledExpression _expression;
-    
+
+    protected override string FriendlyName => "'elif' statement";
+
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
         _condition.Add(token);
@@ -51,12 +53,12 @@ public class ElifStatementContext : StatementContext, IStatementExtender, IExten
     {
         if (_expression.Evaluate().HasErrored(out var error, out var objResult))
         {
-            throw new ScriptRuntimeError(error);
+            throw new ScriptRuntimeError(this, error);
         }
 
         if (objResult is not bool result)
         {
-            throw new ScriptRuntimeError($"An elif statement condition must evaluate to a boolean value, but received {objResult.FriendlyTypeName()}");
+            throw new ScriptRuntimeError(this, $"An elif statement condition must evaluate to a boolean value, but received {objResult.FriendlyTypeName()}");
         }
         
         if (!result)

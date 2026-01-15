@@ -1,5 +1,4 @@
 ﻿using SER.Code.ContextSystem.Structures;
-using SER.Code.Helpers.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Tokens;
@@ -8,13 +7,13 @@ namespace SER.Code.ContextSystem.BaseContexts;
 
 public abstract class Context
 {
-    public string Name => GetType().FriendlyTypeName();
-    
     public required Script Script { get; set; } = null!;
-    
+
     public required uint? LineNum { get; set; }
 
     public StatementContext? ParentContext { get; set; } = null;
+
+    protected abstract string FriendlyName { get; }
 
     public abstract TryAddTokenRes TryAddToken(BaseToken token);
 
@@ -30,6 +29,9 @@ public abstract class Context
 
     public override string ToString()
     {
-        return Name;
+        if (LineNum.HasValue) 
+            return $"{FriendlyName} at line {LineNum}";
+        
+        return FriendlyName;
     }
 }

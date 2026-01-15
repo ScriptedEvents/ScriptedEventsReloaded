@@ -30,7 +30,7 @@ public class GetFromDBMethod : ReturningMethod, ICanError
     {
         if (Args.GetDatabase("database").Get(Args.GetText("key")).HasErrored(out var err, out var value))
         {
-            throw new ScriptRuntimeError(err);
+            throw new ScriptRuntimeError(this, err);
         }
 
         ReturnValue = value;

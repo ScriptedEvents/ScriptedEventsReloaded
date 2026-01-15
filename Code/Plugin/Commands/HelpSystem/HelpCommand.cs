@@ -565,7 +565,7 @@ public class HelpCommand : ICommand
             
             sb.AppendLine($" - Expected value: {argument.InputDescription.Replace("\n", "\n\t")}");
 
-            if (argument.DefaultValue is {} defVal)
+            if (argument.DefaultValue is { } defVal)
             {
                 sb.AppendLine($" - Default value: {defVal.StringRep ?? defVal.Value?.ToString() ?? "unknown"}");
             }

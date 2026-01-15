@@ -43,7 +43,7 @@ public class SpawnPickupMethod : ReferenceReturningMethod<Pickup>, ICanError
             )
         );
 
-        if (pickup is null) throw new ScriptRuntimeError(ErrorReasons[0]);
+        if (pickup is null) throw new ScriptRuntimeError(this, ErrorReasons[0]);
         pickup.Spawn();
         ReturnValue = pickup;
     }

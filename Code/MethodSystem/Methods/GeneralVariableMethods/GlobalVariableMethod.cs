@@ -29,7 +29,7 @@ public class GlobalVariableMethod : SynchronousMethod, ICanError
         var variableToken = Args.GetToken<VariableToken>("variable to make global");
         if (variableToken.TryGetVariable().HasErrored(out var error, out var variable))
         {
-            throw new ScriptRuntimeError(error);
+            throw new ScriptRuntimeError(this, error);
         }
 
         VariableIndex.GlobalVariables.RemoveAll(existingVar => existingVar.Name == variable.Name);

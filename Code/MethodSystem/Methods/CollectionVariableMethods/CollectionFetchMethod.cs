@@ -29,7 +29,7 @@ public class CollectionFetchMethod : ReturningMethod
         
         if (coll.GetAt(index).HasErrored(out var error, out var value))
         {
-            throw new ScriptRuntimeError(error);
+            throw new ScriptRuntimeError(this, error);
         }
 
         ReturnValue = Value.Parse(value);

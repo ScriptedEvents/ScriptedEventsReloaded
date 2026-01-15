@@ -49,9 +49,17 @@ public class FunctionDefinitionContext :
 
     public Value? ReturnedValue { get; private set; }
 
+    public string MissingValueHint => "Maybe you forgot to use the 'return' keyword?";
+    public string UndefinedReturnsHint => "Maybe you forgot to define the return type in the function name?";
+
+    protected override string FriendlyName =>
+        FunctionName is not null
+            ? $"'{FunctionName}' function definition statement"
+            : "function definition statement";
+
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
-        if (token.GetType() != typeof(BaseToken))
+        if (token.GetType() != typeof(BaseToken) && token is not VariableToken)
         {
             return TryAddTokenRes.Error(
                 $"Value '{token.RawRep}' cannot represent a function name, " +
@@ -85,7 +93,7 @@ public class FunctionDefinitionContext :
 
         if (values.Length != _expectedVariables.Length)
         {
-            throw new ScriptRuntimeError(
+            throw new ScriptRuntimeError(this, 
                 $"Provided [{values.Length}] values, but [{_expectedVariables.Length}] were expected."
             );
         }
@@ -94,7 +102,7 @@ public class FunctionDefinitionContext :
         {
             if (!variableToken.ValueType.IsInstanceOfType(value))
             {
-                throw new ScriptRuntimeError(
+                throw new ScriptRuntimeError(this, 
                     $"Provided variable '{variableToken.Name}' of type '{value.FriendlyTypeName()}' " +
                     $"does not match expected type '{variableToken.ValueType.FriendlyTypeName()}'"
                 );

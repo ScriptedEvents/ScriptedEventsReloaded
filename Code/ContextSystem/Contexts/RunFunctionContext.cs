@@ -18,7 +18,15 @@ public class RunFunctionContext : YieldingContext, IMayReturnValueContext
 
     public TypeOfValue? Returns => _functionDefinitionContext?.Returns;
     public Value? ReturnedValue => _functionDefinitionContext?.ReturnedValue;
-    
+
+    public string MissingValueHint => _functionDefinitionContext?.MissingValueHint ?? "Function is not defined.";
+    public string UndefinedReturnsHint => _functionDefinitionContext?.UndefinedReturnsHint ?? "Function is not defined.";
+
+    protected override string FriendlyName =>
+        _functionDefinitionContext is not null
+            ? $"'{_functionDefinitionContext.FunctionName}' function call"
+            : "function call";
+
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
         if (_functionDefinitionContext is null)
@@ -61,8 +69,8 @@ public class RunFunctionContext : YieldingContext, IMayReturnValueContext
         {
             if (valToken.Value().HasErrored(out var error, out var variable))
             {
-                throw new ScriptRuntimeError(
-                    $"Cannot run function '{_functionDefinitionContext!.FunctionName}': {error}"
+                throw new ScriptRuntimeError(this, 
+                    $"Cannot run {_functionDefinitionContext!}: {error}"
                 );
             }
             

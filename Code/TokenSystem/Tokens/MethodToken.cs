@@ -20,6 +20,7 @@ public class MethodToken : BaseToken, IContextableToken
 
         Method = (Method)Activator.CreateInstance(method.GetType());
         Method.Script = scr;
+        Method.LineNum = LineNum;
         return new Success();
     }
 

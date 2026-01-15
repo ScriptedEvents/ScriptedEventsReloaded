@@ -7,7 +7,7 @@ using SER.Code.VariableSystem.Bases;
 
 namespace SER.Code.ContextSystem.BaseContexts;
 
-public abstract class LoopSingleIterationVariableContext<TVal> : LoopContext, IAcceptOptionalVariableDefinitions 
+public abstract class LoopContextWithSingleIterationVariable<TVal> : LoopContext, IAcceptOptionalVariableDefinitions 
     where TVal : Value
 {
     private VariableToken? _iterationVariableToken;

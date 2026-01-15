@@ -43,6 +43,4 @@ public class WarheadInfoMethod : ReturningMethod
             _ => throw new KrzysiuFuckedUpException()
         };
     }
-
-    
 }

@@ -12,7 +12,7 @@ using SER.Code.ValueSystem;
 namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 
 [UsedImplicitly]
-public class WhileLoopContext : LoopSingleIterationVariableContext<NumberValue>, IExtendableStatement
+public class WhileLoopContext : LoopContextWithSingleIterationVariable<NumberValue>, IExtendableStatement
 {
     private readonly Result _rs = "Cannot create 'while' loop.";
     private readonly List<BaseToken> _condition = []; 
@@ -24,6 +24,8 @@ public class WhileLoopContext : LoopSingleIterationVariableContext<NumberValue>,
     public override string[] Arguments => ["[condition...]"];
 
     public override Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = [];
+
+    protected override string FriendlyName => "'while' loop statement";
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
@@ -76,12 +78,12 @@ public class WhileLoopContext : LoopSingleIterationVariableContext<NumberValue>,
     {
         if (_expression.Evaluate().HasErrored(out var error, out var objResult))
         {
-            throw new ScriptRuntimeError(error);
+            throw new ScriptRuntimeError(this, error);
         }
 
         if (objResult is not bool result)
         {
-            throw new ScriptRuntimeError($"A while statement condition must evaluate to a boolean value, but received {objResult.FriendlyTypeName()}");
+            throw new ScriptRuntimeError(this, $"A while statement condition must evaluate to a boolean value, but received {objResult.FriendlyTypeName()}");
         }
 
         return result;

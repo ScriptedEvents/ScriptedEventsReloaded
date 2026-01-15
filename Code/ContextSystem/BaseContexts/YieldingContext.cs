@@ -13,7 +13,7 @@ public abstract class YieldingContext : Context
         }
         
         var prof = Script.Profile is not null 
-            ? new Profile(Script.Profile, $"running YieldingContext {Name}")
+            ? new Profile(Script.Profile, $"running YieldingContext {this}")
             : null;
         
         if (LineNum.HasValue)

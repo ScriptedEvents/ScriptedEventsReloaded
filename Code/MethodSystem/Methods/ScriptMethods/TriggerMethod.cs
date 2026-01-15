@@ -29,7 +29,7 @@ public class TriggerMethod : SynchronousMethod
         {
             if (ScriptSystem.Script.CreateByScriptName(scriptName, ScriptExecutor.Get()).HasErrored(out var error, out var script))
             {
-                throw new ScriptRuntimeError(error);
+                throw new ScriptRuntimeError(this, error);
             }
             
             script.Run();

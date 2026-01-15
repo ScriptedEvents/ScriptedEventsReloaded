@@ -13,17 +13,7 @@ public abstract class LiteralValue(object value) : Value
 
     public override string ToString()
     {
-        return StringRep;
-    }
-
-    public TryGet<T> TryGetValue<T>() where T : Value
-    {
-        if (this is T tValue)
-        {
-            return tValue;
-        }
-
-        return $"Value is not of type {typeof(T).FriendlyTypeName()}, but {Value.FriendlyTypeName()}.";
+        return $"{StringRep} ({base.ToString()})";
     }
 
     public override int HashCode => Value.GetHashCode();

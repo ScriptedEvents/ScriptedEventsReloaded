@@ -8,6 +8,8 @@ namespace SER.Code.ContextSystem.Contexts;
 
 public class NoOperationContext : StandardContext, INotRunningContext
 {
+    protected override string FriendlyName => "no operation";
+
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
         return TryAddTokenRes.Continue();

@@ -66,7 +66,7 @@ public static class Contexter
             {
                 if (statementStack.Count == 0)
                 {
-                    return rs + $"{context.Name} expected to be inside a statement, but it isn't.";
+                    return rs + $"{context} expected to be inside a statement, but it isn't.";
                 }
 
                 if (rqsContext.AcceptStatement(statementStack.Peek()).HasErrored(out var asError))

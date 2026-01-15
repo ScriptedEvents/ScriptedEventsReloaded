@@ -10,7 +10,7 @@ using SER.Code.ValueSystem;
 namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 
 [UsedImplicitly]
-public class ForeverLoopContext : LoopSingleIterationVariableContext<NumberValue>, IKeywordContext, IAcceptOptionalVariableDefinitions
+public class ForeverLoopContext : LoopContextWithSingleIterationVariable<NumberValue>, IKeywordContext
 {
     private readonly Result _mainErr = "Cannot create 'forever' loop.";
 
@@ -20,6 +20,8 @@ public class ForeverLoopContext : LoopSingleIterationVariableContext<NumberValue
     public override string KeywordName => "forever";
     public override string Description => "Makes the code inside the statement run indefinitely.";
     public override string[] Arguments => [];
+
+    protected override string FriendlyName => "'forever' loop statement";
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

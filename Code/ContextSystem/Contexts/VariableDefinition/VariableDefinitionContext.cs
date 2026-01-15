@@ -29,7 +29,9 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
     private bool _equalSignSet = false;
     private (Context main, IMayReturnValueContext returner)? _returnContext = null; 
     private Func<TValue>? _parser = null;
-    
+
+    protected override string FriendlyName => $"'{varToken.RawRep}' variable definition";
+
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
         if (!_equalSignSet)
@@ -63,7 +65,7 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
             {
                 if (get().HasErrored(out var error, out var value))
                 {
-                    throw new ScriptRuntimeError(error);
+                    throw new ScriptRuntimeError(this, error);
                 }
 
                 return value;
@@ -72,20 +74,28 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
         }
 
         if (token is IContextableToken contextable && 
-            contextable.GetContext(Script) is {} mainContext and IMayReturnValueContext returnValueContext)
+            contextable.GetContext(Script) is { } mainContext and IMayReturnValueContext returnValueContext)
         {
             _returnContext = (mainContext, returnValueContext);
             return TryAddTokenRes.Continue();
         }
         
         Log.D("set parser using additional");
-        var res = AdditionalParsing(token);
-        _parser = res.parser;
-        return res.result;
+        var (result, receivedParser) = AdditionalParsing(token);
+        _parser = receivedParser;
+        return result;
     }
 
     public override Result VerifyCurrentState()
     {
+        if (_returnContext is {
+            main: var main, 
+            returner: { Returns: null } returner
+        })
+        {
+            return $"{main} does not return a value. {returner.UndefinedReturnsHint}";
+        }
+        
         return Result.Assert(
             _returnContext is not null ||
             _parser is not null,
@@ -108,16 +118,17 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
             Log.D("checking for returned value");
             if (returner.ReturnedValue is not { } value)
             {
-                throw new ScriptRuntimeError($"Context {main.Name} has not returned a value!");
+                throw new ScriptRuntimeError(this, $"{main} has not returned a value! {returner.MissingValueHint}");
             }
 
-            if (value is not TValue tValue)
+            if (value.TryCast<Value, TValue>().HasErrored(out var error, out var tValue))
             {
-                throw new ScriptRuntimeError(
-                    $"Value returned by '{main.Name}' cannot be assigned to the {varToken.RawRep} variable");
+                throw new ScriptRuntimeError(this, 
+                    $"Value returned by {main} cannot be assigned to the '{varToken.RawRep}' variable: {error}"
+                );
             }
         
-            Script.AddVariable(Variable.Create(varToken.Name, Value.Parse(tValue)));
+            Script.AddVariable(Variable.Create(varToken.Name, tValue));
         }
         else if (_parser is not null)
         {

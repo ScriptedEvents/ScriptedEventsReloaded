@@ -24,12 +24,14 @@ public class WithContext : StandardContext, IKeywordContext, INotRunningContext,
     {
         if (context is not IAcceptOptionalVariableDefinitions receiver)
         {
-            return $"{context.Name} does not accept variable definitions.";
+            return $"{context} does not accept variable definitions.";
         }
 
         _receiver = receiver;
         return true;
     }
+
+    protected override string FriendlyName => "'with' keyword";
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

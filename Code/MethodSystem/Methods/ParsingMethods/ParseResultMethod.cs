@@ -38,7 +38,7 @@ public class ParseResultMethod : ReturningMethod, ICanError, IReferenceResolving
         ReturnValue = Args.GetOption("info") switch
         {
             "success" => new BoolValue(parseResult.Success),
-            "value" => parseResult.Value ?? throw new ScriptRuntimeError(ErrorReasons[0]),
+            "value" => parseResult.Value ?? throw new ScriptRuntimeError(this, ErrorReasons[0]),
             _ => throw new AndrzejFuckedUpException()
         };
     }

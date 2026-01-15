@@ -22,6 +22,8 @@ public class IfStatementContext : StatementContext, IExtendableStatement, IKeywo
     
     private NumericExpressionReslover.CompiledExpression _expression;
 
+    protected override string FriendlyName => "'if' statement";
+
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
         _condition.Add(token);
@@ -47,12 +49,12 @@ public class IfStatementContext : StatementContext, IExtendableStatement, IKeywo
     {
         if (_expression.Evaluate().HasErrored(out var error, out var objResult))
         {
-            throw new ScriptRuntimeError(error);
+            throw new ScriptRuntimeError(this, error);
         }
 
         if (objResult is not bool result)
         {
-            throw new ScriptRuntimeError($"An if statement condition must evaluate to a boolean value, but received {objResult.FriendlyTypeName()}");
+            throw new ScriptRuntimeError(this, $"An if statement condition must evaluate to a boolean value, but received {objResult.FriendlyTypeName()}");
         }
         
         if (!result)

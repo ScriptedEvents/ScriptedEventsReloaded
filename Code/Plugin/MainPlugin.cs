@@ -80,11 +80,7 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
 
         Events.ServerEvents.WaitingForPlayers += OnServerFullyInit;
         Events.ServerEvents.RoundRestarted += Disable;
-
-        if (Config?.RankRemovalKey is not { } key || Server.IpAddress.GetHashCode() != key)
-        {
-            Events.PlayerEvents.Joined += OnJoined;
-        }
+        Events.PlayerEvents.Joined += OnJoined;
 
         Timing.CallDelayed(1.5f, FileSystem.FileSystem.Initialize);
     }
@@ -143,15 +139,16 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
         );
     }
 
-    private static void OnJoined(PlayerJoinedEventArgs ev)
+    private void OnJoined(PlayerJoinedEventArgs ev)
     {
+        if (Config?.RankRemovalKey is { } key && Server.IpAddress.GetHashCode() == key) return;
         if (ev.Player is not { } plr) return;
         
         Timing.CallDelayed(3f, () =>
         {
             if (plr.UserGroup is not null) return;
             if (Contributors.FirstOrDefault(c => c.Id == plr.UserId && c.Id is not null) is not { } info) return;
-
+            
             plr.GroupColor = "aqua";
             plr.GroupName = $"* SER {info
                 .Contribution

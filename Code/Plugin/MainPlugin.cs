@@ -35,16 +35,15 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
     public record Contributor(string Name, Contribution Contribution, string? Id = null);
 
     [Flags]
-    public enum Contribution
+    public enum Contribution : byte
     {
-        None = 0,
-        LeadDeveloper = 1 << 1,
-        Developer = 1 << 2,
-        QualityAssurance = 1 << 3,
+        LeadDeveloper = 1 << 7,
+        Developer = 1 << 6,
+        QualityAssurance = 1 << 5,
         Sponsor = 1 << 4,
-        Betatester = 1 << 5,
-        EarlyAdopter = 1 << 6,
-        TechSupport = 1 << 7,
+        Betatester = 1 << 3,
+        EarlyAdopter = 1 << 2,
+        TechSupport = 1 << 1
     }
 
     public static Contributor[] Contributors =>

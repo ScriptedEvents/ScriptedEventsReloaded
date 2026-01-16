@@ -22,10 +22,10 @@ public class CassieMethod : SynchronousMethod
         {
             DefaultValue = new("", "empty"),
         },
-        new BoolArgument("should glitch")
+        new FloatArgument("glitch scale", 0, 1)
         {
-            Description = "If true, SER will add random glitch effects to the announcement.",
-            DefaultValue = new(false, null),
+            DefaultValue = new(0f, "0%"),
+            Description = "The amount of glitching to apply to the announcement, from 0% to 100%"
         }
     ];
     
@@ -34,45 +34,13 @@ public class CassieMethod : SynchronousMethod
         var isNoisy = Args.GetOption("mode") == "jingle";
         var message = Args.GetText("message");
         var subtitles = Args.GetText("subtitles");
-        var glitch = Args.GetBool("should glitch");
-
-        // todo: check if this is still needed
-        if (glitch)
-        {
-            // taken from Respawning.Announcements.WaveAnnouncementBase.PlayAnnouncement()
-            var chanceMultiplier = AlphaWarheadController.Detonated ? 2.5f : 1;
-            var glitchChance = UnityEngine.Random.Range(0.08f, 0.1f) * chanceMultiplier;
-            var jamChance = UnityEngine.Random.Range(0.07f, 0.09f) * chanceMultiplier;
-            
-            var strArray = message.Split([' '], StringSplitOptions.None);
-            message = "";
-            // taken from NineTailedFoxAnnouncer.ServerOnlyAddGlitchyPhrase()
-            for (var index = 0; index < strArray.Length; index++)
-            {
-                message += $"{strArray[index]} ";
-                
-                if (index >= strArray.Length - 1)
-                {
-                    continue;
-                }
-                
-                if (UnityEngine.Random.value < glitchChance)
-                {
-                    message += $".G{UnityEngine.Random.Range(1, 7)} ";
-                }
-                
-                if (UnityEngine.Random.value < jamChance)
-                {
-                    message += $"jam_{UnityEngine.Random.Range(0, 70):000}_{UnityEngine.Random.Range(2, 6)} ";
-                }
-            }
-        }
+        var glitch = Args.GetFloat("glitch scale");
         
-        // todo: check if this glitchScale works as intended
         Announcer.Message(
             message, 
             subtitles,
-            glitchScale: isNoisy ? 1 : 0
+            isNoisy,
+            glitchScale: glitch
         );
     }
 }

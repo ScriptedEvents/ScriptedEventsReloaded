@@ -59,7 +59,7 @@ public static class BetterCoros
                 scr.Error($"Coroutine failed with {ex.GetType().AccurateName}: {ex.Message}\n{ex.StackTrace}");
                 goto End;
             }
-
+            
             yield return routine.Current;
         }
 

@@ -1,6 +1,8 @@
 ﻿using JetBrains.Annotations;
+using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Features;
 using LabApi.Features.Console;
+using LabApi.Features.Wrappers;
 using MEC;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.Helpers;
@@ -30,7 +32,7 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
     public static string HelpCommandName => "serhelp";
     public static MainPlugin Instance { get; private set; } = null!;
 
-    public record struct Contributor(string Name, Contribution Contribution);
+    public record Contributor(string Name, Contribution Contribution, string? Id = null);
 
     [Flags]
     public enum Contribution
@@ -47,7 +49,7 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
 
     public static Contributor[] Contributors =>
     [
-        new(Instance.Author, Contribution.LeadDeveloper),
+        new(Instance.Author, Contribution.LeadDeveloper, "76561198361176072@steam"),
         new("Whitty985playz", Contribution.QualityAssurance | Contribution.EarlyAdopter),
         new("Tosoks67", Contribution.Developer | Contribution.Betatester),
         new("Krzysiu Wojownik", Contribution.QualityAssurance | Contribution.Developer),
@@ -79,6 +81,11 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
         Events.ServerEvents.WaitingForPlayers += OnServerFullyInit;
         Events.ServerEvents.RoundRestarted += Disable;
 
+        if (Config?.RankRemovalKey is not { } key || Server.IpAddress.GetHashCode() != key)
+        {
+            Events.PlayerEvents.Joined += OnJoined;
+        }
+
         Timing.CallDelayed(1.5f, FileSystem.FileSystem.Initialize);
     }
 
@@ -90,7 +97,7 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
 
     private void OnServerFullyInit()
     {
-        if (Config?.SendHelpMessageOnServerInitialization is false) return;
+        if (Config?.SendInitMessage is false) return;
 
         Logger.Raw(
             $"""
@@ -134,5 +141,25 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
                 .JoinStrings("\n"),
             ConsoleColor.Cyan
         );
+    }
+
+    private static void OnJoined(PlayerJoinedEventArgs ev)
+    {
+        if (ev.Player is not { } plr) return;
+        
+        Timing.CallDelayed(3f, () =>
+        {
+            if (plr.UserGroup is not null) return;
+            if (Contributors.FirstOrDefault(c => c.Id == plr.UserId && c.Id is not null) is not { } info) return;
+
+            plr.GroupColor = "aqua";
+            plr.GroupName = $"* SER {info
+                .Contribution
+                .GetFlags()
+                .OrderByDescending(f => f)
+                .First()
+                .ToString()
+                .Spaceify()} *";
+        });
     }
 }

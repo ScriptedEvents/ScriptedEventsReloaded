@@ -1,4 +1,5 @@
-﻿using LabApi.Features;
+﻿using JetBrains.Annotations;
+using LabApi.Features;
 using LabApi.Features.Console;
 using MEC;
 using SER.Code.FlagSystem.Flags;

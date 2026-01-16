@@ -1,4 +1,5 @@
-﻿using EventHandler = SER.Code.EventSystem.EventHandler;
+﻿using JetBrains.Annotations;
+using EventHandler = SER.Code.EventSystem.EventHandler;
 
 namespace SER.Code.FlagSystem.Flags;
 

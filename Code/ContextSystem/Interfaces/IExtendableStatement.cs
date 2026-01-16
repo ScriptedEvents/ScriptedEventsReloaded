@@ -1,4 +1,6 @@
-﻿namespace SER.Code.ContextSystem.Interfaces;
+﻿using JetBrains.Annotations;
+
+namespace SER.Code.ContextSystem.Interfaces;
 
 public interface IExtendableStatement
 {

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using SER.Code.Helpers.Exceptions;
 
 namespace SER.Code.Helpers.ResultSystem;

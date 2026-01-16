@@ -1,4 +1,5 @@
-﻿using SER.Code.Helpers.ResultSystem;
+﻿using JetBrains.Annotations;
+using SER.Code.Helpers.ResultSystem;
 
 namespace SER.Code.Helpers.Extensions;
 

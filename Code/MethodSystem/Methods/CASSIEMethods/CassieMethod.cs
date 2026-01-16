@@ -71,7 +71,7 @@ public class CassieMethod : SynchronousMethod
         // todo: check if this glitchScale works as intended
         Announcer.Message(
             message, 
-            translation,
+            subtitles,
             glitchScale: isNoisy ? 1 : 0
         );
     }

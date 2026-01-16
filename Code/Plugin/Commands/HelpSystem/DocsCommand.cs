@@ -12,7 +12,7 @@ public class DocsCommand : ICommand, IUsePermissions
 {
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        if (!sender.HasPermissions(Permission))
+        if (!sender.HasAnyPermission(Permission))
         {
             response = "You do not have permission to create documentation.";
             return false;

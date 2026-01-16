@@ -14,7 +14,7 @@ public class MethodCommand : ICommand, IUsePermissions
     
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        if (!sender.HasPermissions(RunPermission))
+        if (!sender.HasAnyPermission(RunPermission))
         {
             response = "You do not have permission to run scripts.";
             return false;

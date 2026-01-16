@@ -11,7 +11,7 @@ public class StopAllCommand : ICommand, IUsePermissions
 {
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        if (!sender.HasPermissions(Permission))
+        if (!sender.HasAnyPermission(Permission))
         {
             response = "You do not have permission to stop scripts.";
             return false;

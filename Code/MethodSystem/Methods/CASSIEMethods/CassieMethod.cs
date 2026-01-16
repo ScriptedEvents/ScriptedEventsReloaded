@@ -67,12 +67,12 @@ public class CassieMethod : SynchronousMethod
                 }
             }
         }
-
-        // todo: check how to make the cassie silent again
+        
+        // todo: check if this glitchScale works as intended
         Announcer.Message(
-            message,
-            subtitles,
-            glitchScale: isNoisy ? 1f : 0f
+            message, 
+            translation,
+            glitchScale: isNoisy ? 1 : 0
         );
     }
 }

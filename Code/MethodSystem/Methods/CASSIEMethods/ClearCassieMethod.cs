@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods;
 
@@ -13,6 +14,6 @@ public class ClearCassieMethod : SynchronousMethod
     
     public override void Execute()
     {
-        LabApi.Features.Wrappers.Cassie.Clear();
+        Announcer.Clear();
     }
 }

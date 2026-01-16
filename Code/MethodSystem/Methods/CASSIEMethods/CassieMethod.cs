@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods;
@@ -68,7 +69,7 @@ public class CassieMethod : SynchronousMethod
         }
 
         // todo: check how to make the cassie silent again
-        LabApi.Features.Wrappers.Cassie.Message(
+        Announcer.Message(
             message,
             subtitles,
             glitchScale: isNoisy ? 1f : 0f

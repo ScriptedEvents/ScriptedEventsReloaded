@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.ValueSystem;
@@ -14,6 +15,6 @@ public class IsCassieSpeakingMethod : ReturningMethod<BoolValue>
     
     public override void Execute()
     {
-        ReturnValue = LabApi.Features.Wrappers.Cassie.IsSpeaking;
+        ReturnValue = Announcer.IsSpeaking;
     }
 }

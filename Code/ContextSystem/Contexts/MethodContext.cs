@@ -1,4 +1,5 @@
-﻿using SER.Code.ArgumentSystem;
+﻿using MEC;
+using SER.Code.ArgumentSystem;
 using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
@@ -6,6 +7,7 @@ using SER.Code.Helpers;
 using SER.Code.Helpers.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.Plugin;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.ValueSystem;
 using MethodToken = SER.Code.TokenSystem.Tokens.MethodToken;
@@ -56,6 +58,11 @@ public class MethodContext(MethodToken methodToken) : YieldingContext, IMayRetur
     {
         Log.Debug($"'{Method.Name}' method is now running..");
 
+        if (MainPlugin.Instance.Config?.SafeScripts is true)
+        {
+            yield return Timing.WaitForOneFrame;
+        }
+        
         switch (Method)
         {
             case SynchronousMethod stdAct:

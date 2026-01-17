@@ -133,7 +133,7 @@ public static class Contexter
         
         if (firstToken is not IContextableToken contextable)
         {
-            return rs + "The beginning of the line is incorrectly strucutred.";
+            return rs + $"{firstToken} is not a valid way to start a line. Maybe you made a typo?";
         }
 
         var context = contextable.GetContext(scr);

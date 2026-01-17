@@ -12,7 +12,7 @@ using ThrowableItem = InventorySystem.Items.ThrowableProjectiles.ThrowableItem;
 namespace SER.Code.MethodSystem.Methods.PickupMethods;
 
 [UsedImplicitly]
-public class GrenadeMethod : ReferenceReturningMethod<Projectile>, IAdditionalDescription
+public class CreateGrenadeMethod : ReferenceReturningMethod<Projectile>, IAdditionalDescription
 {
     public override string Description => "Creates a new grenade projectile to later spawn.";
 
@@ -22,7 +22,8 @@ public class GrenadeMethod : ReferenceReturningMethod<Projectile>, IAdditionalDe
     [
         new OptionsArgument("grenade type",
             "GrenadeHE",
-            "GrenadeFlash"),
+            "GrenadeFlash"
+        ),
     ];
 
     public override void Execute()
@@ -31,7 +32,8 @@ public class GrenadeMethod : ReferenceReturningMethod<Projectile>, IAdditionalDe
             !InventoryItemLoader.TryGetItem<ThrowableItem>(itemType, out var throwable))
             throw new TosoksFuckedUpException("Either Northwood fucked up or you're a wizard. Congratulations!");
         
-        var item = Object.Instantiate(throwable.Projectile) ?? throw new TosoksFuckedUpException("Somehow the prefab failed to copy??? I don't even know who to blame tbh");
+        var item = Object.Instantiate(throwable.Projectile) 
+                   ?? throw new TosoksFuckedUpException("Somehow the prefab failed to copy??? I don't even know who to blame tbh");
         item.Info = new(itemType, throwable.Weight);
         item.PreviousOwner = new(Server.Host?.ReferenceHub);
         

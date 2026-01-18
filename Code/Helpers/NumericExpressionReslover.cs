@@ -83,7 +83,7 @@ public static class NumericExpressionReslover
                     break;
                 }
                 // great addition XD
-                case { RawRep: "isnt" }:
+                case { RawRep: "isnt" or "isn't" or "isnot" }:
                 {
                     AppendRaw("!=");
                     break;

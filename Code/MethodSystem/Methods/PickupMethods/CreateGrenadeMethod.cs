@@ -21,8 +21,8 @@ public class CreateGrenadeMethod : ReferenceReturningMethod<Projectile>, IAdditi
     public override Argument[] ExpectedArguments { get; } =
     [
         new OptionsArgument("grenade type",
-            "GrenadeHE",
-            "GrenadeFlash"
+            nameof(ItemType.GrenadeHE),
+            nameof(ItemType.GrenadeFlash)
         ),
     ];
 

@@ -19,7 +19,7 @@ public class CreateGrenadeMethod : ReferenceReturningMethod<Projectile>, IAdditi
     public string AdditionalDescription => 
         "To spawn SCP-018, SCP-2176 or the grenades' unactivated versions, use the Pickup method. " +
         "IMPORTANT: Northwood had a very bright idea of making the grenades not damage people when " +
-        "not provided with an attacker. In order to have the granades kill anyone, you HAVE to provide an attacker. " +
+        "not provided with an attacker. In order to have the grenades kill anyone, you HAVE to provide an attacker. " +
         "We know this is stupid, but for now we can't do anything about it.";
 
     public override Argument[] ExpectedArguments { get; } =

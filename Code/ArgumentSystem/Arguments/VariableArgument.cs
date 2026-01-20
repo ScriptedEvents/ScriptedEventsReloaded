@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.Helpers.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
@@ -23,5 +24,24 @@ public class VariableArgument(string name) : Argument(name)
         }
 
         return new(() => variableToken.TryGetVariable());
+    }
+}
+
+public class VariableArgument<T>(string name) : Argument(name) where T : Variable
+{
+    public override string InputDescription => $"A {typeof(T).FriendlyTypeName()}";
+
+    [UsedImplicitly]
+    public DynamicTryGet<T> GetConvertSolution(BaseToken token)
+    {
+        if (token is not VariableToken variableToken)
+        {
+            return $"Value '{token.RawRep}' is not a variable.";
+        }
+
+        return new(() => variableToken
+                .TryGetVariable()
+                .SuccessTryCast<Variable, T>()
+        );
     }
 }

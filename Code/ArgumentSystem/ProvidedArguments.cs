@@ -22,6 +22,11 @@ public class ProvidedArguments(Method method)
 {
     private Dictionary<(string name, Type type), List<DynamicTryGet>> ArgumentValues { get; } = [];
 
+    public T GetVariable<T>(string argName) where T : Variable
+    {
+        return GetValue<T, VariableArgument<T>>(argName);
+    }
+    
     public Database GetDatabase(string argName)
     {
         return GetValue<Database, DatabaseArgument>(argName);

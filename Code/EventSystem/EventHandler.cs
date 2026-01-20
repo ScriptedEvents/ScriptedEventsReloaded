@@ -241,7 +241,7 @@ public static class EventHandler
                     continue;
                 default:
                 {
-                    variables.Add(Variable.CreateVariable(GetName(), Value.Parse(value)));
+                    variables.Add(Variable.Create(GetName(), Value.Parse(value)));
                     continue;
                 }
             }

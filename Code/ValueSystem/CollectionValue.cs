@@ -19,7 +19,7 @@ public class CollectionValue(IEnumerable value) : Value
             var types = list.Select(i => i.GetType()).Distinct().ToArray();
             if (types.Length > 1)
             {
-                throw new ScriptRuntimeError("Collection was detected with mixed types.");
+                throw new CustomScriptRuntimeError("Collection was detected with mixed types.");
             }
             
             Type = types.FirstOrDefault();
@@ -48,9 +48,11 @@ public class CollectionValue(IEnumerable value) : Value
 
             return types.Length switch
             {
-                > 1 => throw new ScriptRuntimeError("Collection was detected with mixed types."),
+                > 1 => throw new CustomScriptRuntimeError("Collection was detected with mixed types."),
                 1 => field = types.First(),
-                < 1 => throw new Exception("if you see this, the fabric of the universe is collapsing, seek shelter from the darkness")
+                < 1 => throw new Exception(
+                    "if you see this, the fabric of the universe is collapsing, seek shelter from the darkness"
+                )
             };
         }
         private set;
@@ -93,7 +95,9 @@ public class CollectionValue(IEnumerable value) : Value
             return new CollectionValue(collection.CastedValues.Append(value));
         }
 
-        throw new ScriptRuntimeError($"Inserted value {value.FriendlyName()} has to be the same type as the collection ({FriendlyName(type)}).");
+        throw new CustomScriptRuntimeError(
+            $"Inserted value '{value}' has to be the same type as the collection ({FriendlyName(type)})."
+        );
     }
     public CollectionValue Insert(Value val) => CollectionValue.Insert(this, val);
 
@@ -104,12 +108,12 @@ public class CollectionValue(IEnumerable value) : Value
     {
         if (collection.Type is not { } type)
         {
-            throw new ScriptRuntimeError("Collection is empty");
+            throw new CustomScriptRuntimeError("Collection is empty");
         }
         
         if (type.IsInstanceOfType(value))
         {
-            throw new ScriptRuntimeError($"Value {value.FriendlyName()} has to be the same type as the collection ({FriendlyName(type)}).");
+            throw new CustomScriptRuntimeError($"Value {value.FriendlyName()} has to be the same type as the collection ({FriendlyName(type)}).");
         }
 
         var values = collection.CastedValues.ToList();
@@ -140,7 +144,7 @@ public class CollectionValue(IEnumerable value) : Value
     {
         if (lhs.Type != rhs.Type)
         {
-            throw new ScriptRuntimeError(
+            throw new CustomScriptRuntimeError(
                 $"Both collections have to be of same type. " +
                 $"Provided types: {lhs.GetType().AccurateName} and {rhs.Type?.AccurateName ?? "none"}"
             );
@@ -153,7 +157,7 @@ public class CollectionValue(IEnumerable value) : Value
     {
         if (lhs.Type != rhs.Type)
         {
-            throw new ScriptRuntimeError(
+            throw new CustomScriptRuntimeError(
                 $"Both collections have to be of same type. " +
                 $"Provided types: {lhs.Type?.AccurateName ?? "none"} and {rhs.Type?.AccurateName ?? "none"}"
             );

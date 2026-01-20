@@ -1,7 +1,9 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.CommunicationInterfaces;
 using SER.Code.ContextSystem.Contexts.Control;
-using SER.Code.ContextSystem.Structures;
+using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Helpers;
+using SER.Code.Helpers.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Structures;
@@ -16,7 +18,7 @@ public static class Contexter
 {
     public static TryGet<Context[]> ContextLines(Line[] lines, Script scr)
     {
-        List<StatementContext> statementStack = [];
+        Stack<StatementContext> statementStack = [];
         List<Context> contexts = [];
         
         foreach (var line in lines)
@@ -34,6 +36,7 @@ public static class Contexter
             {
                 return mainErr + addError;
             }
+            Log.Debug($"current statement stack: {statementStack.Select(s => s.GetType().Name).JoinStrings(" -> ")}");
         }
         
         return contexts.ToArray();
@@ -42,21 +45,40 @@ public static class Contexter
     private static Result TryAddResult(
         Context context,
         uint lineNum, 
-        List<StatementContext> statementStack, 
+        Stack<StatementContext> statementStack, 
         List<Context> contexts
     ) {
         Result rs = $"Invalid context {context} in line {lineNum}.";
 
-        if (context is EndStatementContext)
+        Log.Debug($"Trying to add context {context} in line {lineNum}");
+        
+        switch (context)
         {
-            if (statementStack.Count == 0) 
-                return rs + "There is no statement to close with the 'end' keyword!";
+            case EndStatementContext:
+            {
+                if (statementStack.Count == 0) 
+                    return rs + "There is no statement to close with the 'end' keyword!";
 
-            statementStack.RemoveAt(statementStack.Count - 1);
-            return true;
+                statementStack.Pop();
+                return true;
+            }
+            case IRequireCurrentStatement rqsContext:
+            {
+                if (statementStack.Count == 0)
+                {
+                    return rs + $"{context} expected to be inside a statement, but it isn't.";
+                }
+
+                if (rqsContext.AcceptStatement(statementStack.Peek()).HasErrored(out var asError))
+                {
+                    return rs + asError;
+                }
+
+                break;
+            }
         }
 
-        var currentStatement = statementStack.LastOrDefault();
+        var currentStatement = statementStack.FirstOrDefault();
         if (context is StatementContext treeExtenderContext and IStatementExtender treeExtenderInfo)
         {
             if (currentStatement is null)
@@ -75,8 +97,8 @@ public static class Contexter
             }
 
             extendable.RegisteredSignals[treeExtenderInfo.Extends] = treeExtenderContext.Run;
-            statementStack.RemoveAt(statementStack.Count - 1);
-            statementStack.Add(treeExtenderContext);
+            statementStack.Pop();
+            statementStack.Push(treeExtenderContext);
             return true;
         }
 
@@ -96,7 +118,7 @@ public static class Contexter
         }
 
         if (context is StatementContext treeContext) 
-            statementStack.Add(treeContext);
+            statementStack.Push(treeContext);
 
         Log.Debug($"Line {lineNum} has been contexted to {context}");
         return true;
@@ -111,11 +133,10 @@ public static class Contexter
         
         if (firstToken is not IContextableToken contextable)
         {
-            return rs + "The beginning of the line is incorrectly strucutred.";
+            return rs + $"{firstToken} is not a valid way to start a line. Maybe you made a typo?";
         }
-        
-        if (contextable.TryGetContext(scr).HasErrored(out var contextError, out var context))
-            return rs + contextError;
+
+        var context = contextable.GetContext(scr);
 
         foreach (var token in tokens.Skip(1))
         {
@@ -130,7 +151,7 @@ public static class Contexter
 
     private static Result HandleCurrentContext(BaseToken token, Context context, out bool endLineContexting)
     {
-        Result rs = $"Cannot add token {token} to context {context}";
+        Result rs = $"Cannot add '{token.RawRep}' to {context}";
         Log.Debug($"Handling token {token} in context {context}");
 
         var result = context.TryAddToken(token);

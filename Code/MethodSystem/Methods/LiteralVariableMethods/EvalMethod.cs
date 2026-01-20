@@ -13,7 +13,8 @@ public class EvalMethod : ReturningMethod
 {
     public override string Description => 
         "Evaluates the provided expression and returns the result. Used for math operations.";
-    public override Type[]? ReturnTypes => null;
+    
+    public override TypeOfValue Returns => new UnknownTypeOfValue();
 
     public override Argument[] ExpectedArguments { get; } =
     [
@@ -25,12 +26,12 @@ public class EvalMethod : ReturningMethod
         var value = Args.GetText("value");
         if (NumericExpressionReslover.CompileExpression(value, Script).HasErrored(out var error, out var expression))
         {
-            throw new ScriptRuntimeError(error);
+            throw new ScriptRuntimeError(this, error);
         }
 
         if (expression.Evaluate().HasErrored(out var error2, out var result))
         {
-            throw new ScriptRuntimeError(error2);
+            throw new ScriptRuntimeError(this, error2);
         }
         
         ReturnValue = Value.Parse(result);

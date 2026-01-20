@@ -21,11 +21,16 @@ public class IntercomInfoMethod : ReturningMethod
             "speaker",
             "cooldown",
             "speechTimeLeft",
-            "textOverride")
+            "textOverride"
+        )
     ];
 
-    public override Type[] ReturnTypes => [typeof(TextValue), typeof(PlayerValue), typeof(DurationValue)];
-
+    public override TypeOfValue Returns => new TypesOfValue([
+        typeof(TextValue),
+        typeof(PlayerValue),
+        typeof(DurationValue)
+    ]);
+    
     public override void Execute()
     {
         ReturnValue = (Args.GetOption("mode")) switch

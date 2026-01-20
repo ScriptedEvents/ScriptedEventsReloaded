@@ -10,13 +10,24 @@ namespace SER.Code.TokenSystem.Tokens.VariableTokens;
 
 public abstract class VariableToken : BaseToken, IContextableToken
 {
-    public abstract char Prefix { get; }
     public abstract string Name { get; protected set; }
+    
     public abstract Type VariableType { get; }
+    
     public abstract Type ValueType { get; }
 
-    public abstract TryGet<Context> TryGetContext(Script scr);
+    public abstract Context GetContext(Script scr);
 
+    public static readonly (char prefix, Type varTypeToken)[] VariablePrefixes =
+    [
+        ('$', typeof(LiteralVariableToken)),
+        ('@', typeof(PlayerVariableToken)),
+        ('*', typeof(ReferenceVariableToken)),
+        ('&', typeof(CollectionVariableToken))
+    ];
+    
+    public char Prefix => VariablePrefixes.First(pair => pair.varTypeToken == GetType()).prefix;
+    
     public TryGet<Variable> TryGetVariable()
     {
         return Script.TryGetVariable<Variable>(this);
@@ -62,6 +73,7 @@ public abstract class VariableToken<TVariable, TValue> : VariableToken, IValueTo
         return TryGetVariable().OnSuccess(Value (variable) => variable.Value, null);
     }
 
-    public Type[] PossibleValueTypes => [typeof(TValue)];
+    public TypeOfValue PossibleValues => new TypeOfValue<TValue>();
+    
     public bool IsConstant => false;
 }

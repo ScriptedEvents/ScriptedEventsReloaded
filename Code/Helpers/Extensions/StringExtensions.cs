@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.Contracts;
+﻿using JetBrains.Annotations;
 using SER.Code.Helpers.ResultSystem;
 
 namespace SER.Code.Helpers.Extensions;

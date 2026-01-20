@@ -1,9 +1,11 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.Extensions;
+using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Helpers.Exceptions;
 using SER.Code.Helpers.Extensions;
 using SER.Code.Helpers.ResultSystem;
-using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
@@ -12,7 +14,7 @@ using Log = SER.Code.Helpers.Log;
 
 namespace SER.Code.ContextSystem.Contexts.VariableDefinition;
 
-public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TVarToken varToken) : StandardContext 
+public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TVarToken varToken) : YieldingContext 
     where TVarToken : VariableToken<TVariable, TValue>
     where TValue    : Value
     where TVariable : Variable<TValue>
@@ -25,9 +27,11 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
     protected Func<BaseToken, Func<TValue>?>? AdditionalTokenParser = null;
     
     private bool _equalSignSet = false;
-    private MethodContext? _methodContext = null; 
+    private (Context main, IMayReturnValueContext returner)? _returnContext = null; 
     private Func<TValue>? _parser = null;
-    
+
+    protected override string FriendlyName => $"'{varToken.RawRep}' variable definition";
+
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
         if (!_equalSignSet)
@@ -35,17 +39,16 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
             if (token is not SymbolToken { RawRep: "=" })
             {
                 return TryAddTokenRes.Error(
-                    "After a variable, an equals sign is expected to set a value to said variable."
-                );
+                    "After a variable, an equals sign is expected to set a value to said variable.");
             }
             
             _equalSignSet = true;
             return TryAddTokenRes.Continue();
         }
 
-        if (_methodContext != null)
+        if (_returnContext != null)
         {
-            return _methodContext.TryAddToken(token);
+            return _returnContext.Value.main.TryAddToken(token);
         }
 
         var parser = AdditionalTokenParser?.Invoke(token);
@@ -62,7 +65,7 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
             {
                 if (get().HasErrored(out var error, out var value))
                 {
-                    throw new ScriptRuntimeError(error);
+                    throw new ScriptRuntimeError(this, error);
                 }
 
                 return value;
@@ -70,58 +73,66 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
             return TryAddTokenRes.End();
         }
 
-        if (token is MethodToken methodToken)
+        if (token is IContextableToken contextable && 
+            contextable.GetContext(Script) is { } mainContext and IMayReturnValueContext returnValueContext)
         {
-            if (methodToken.Method is not ReturningMethod)
-            {
-                return TryAddTokenRes.Error($"Method '{token.RawRep}' does not return a value");
-            }
-            
-            _methodContext = new MethodContext(methodToken)
-            {
-                Script = Script,
-                LineNum = LineNum,
-            };
+            _returnContext = (mainContext, returnValueContext);
             return TryAddTokenRes.Continue();
         }
-
+        
         Log.D("set parser using additional");
-        var res = AdditionalParsing(token);
-        _parser = res.parser;
-        return res.result;
+        var (result, receivedParser) = AdditionalParsing(token);
+        _parser = receivedParser;
+        return result;
     }
 
     public override Result VerifyCurrentState()
     {
+        if (_returnContext is {
+            main: var main, 
+            returner: { Returns: null } returner
+        })
+        {
+            return $"{main} does not return a value. {returner.UndefinedReturnsHint}";
+        }
+        
         return Result.Assert(
-            _methodContext is not null ||
+            _returnContext is not null ||
             _parser is not null,
             $"Value for variable '{varToken.RawRep}' was not provided."
         );
     }
 
-    protected override void Execute()
+    protected override IEnumerator<float> Execute()
     {
-        if (_methodContext is { Method: ReturningMethod method })
+        if (_returnContext.HasValue)
         {
-            method.Execute();
-            Log.D("checking for returned value");
-            if (method.ReturnValue is not { } value)
+            var (main, returner) = _returnContext.Value;
+            
+            var coro = main.ExecuteBaseContext();
+            while (coro.MoveNext())
             {
-                throw new AndrzejFuckedUpException($"Method '{method.Name}' did not return a value ({method.ReturnValue}).");
+                yield return coro.Current;
+            }
+            
+            Log.D("checking for returned value");
+            if (returner.ReturnedValue is not { } value)
+            {
+                throw new ScriptRuntimeError(this, $"{main} has not returned a value! {returner.MissingValueHint}");
             }
 
-            if (value is not TValue tValue)
+            if (value.TryCast<Value, TValue>().HasErrored(out var error, out var tValue))
             {
-                throw new ScriptRuntimeError(
-                    $"Value returned by the '{method.Name}' method cannot be assigned to the {varToken.RawRep} variable");
+                throw new ScriptRuntimeError(this, 
+                    $"Value returned by {main} cannot be assigned to the '{varToken.RawRep}' variable: {error}"
+                );
             }
         
-            Script.AddVariable(Variable.CreateVariable(varToken.Name, Value.Parse(tValue)));
+            Script.AddVariable(Variable.Create(varToken.Name, tValue));
         }
         else if (_parser is not null)
         {
-            Script.AddVariable(Variable.CreateVariable(varToken.Name, Value.Parse(_parser())));
+            Script.AddVariable(Variable.Create(varToken.Name, Value.Parse(_parser())));
         }
         else
         {

@@ -33,7 +33,7 @@ public class PlayAudioMethod : SynchronousMethod, ICanError
         var clipName = Args.GetText("clip name");
         
         if (!AudioPlayer.TryGet(speakerName, out AudioPlayer audioPlayer))
-            throw new ScriptRuntimeError($"Speaker with name '{speakerName}' does not exist.");
+            throw new ScriptRuntimeError(this, $"Speaker with name '{speakerName}' does not exist.");
         
         audioPlayer.AddClip(clipName, loop: Args.GetBool("loop music"));
     }

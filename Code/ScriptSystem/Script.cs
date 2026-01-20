@@ -4,6 +4,7 @@ using LabApi.Features.Wrappers;
 using MEC;
 using SER.Code.ContextSystem;
 using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.Contexts;
 using SER.Code.ContextSystem.Extensions;
 using SER.Code.FlagSystem;
 using SER.Code.Helpers;
@@ -62,7 +63,11 @@ public class Script
     public ReadOnlyCollection<Variable> Variables => _variables.ToList().AsReadOnly();
     
     private CoroutineHandle _scriptCoroutine;
+    
     private bool? _isEventAllowed;
+
+    private readonly Dictionary<string, FunctionDefinitionContext> _definedFunctions = [];
+    public ReadOnlyDictionary<string, FunctionDefinitionContext> DefinedFunctions => new(_definedFunctions);
 
     public void Reply(string message)
     {
@@ -242,6 +247,9 @@ public class Script
         return true;
     }
     
+    public void DefineFunction(string name, FunctionDefinitionContext context) 
+        => _definedFunctions.Add(name, context);
+    
     private Result ContextLines()
     {
         var prof = Profile is not null 
@@ -268,7 +276,7 @@ public class Script
             ContextLines().HasErrored(out err)
         )
         {
-            throw new ScriptRuntimeError(err);
+            throw new ScriptCompileError(err);
         }
         
         foreach (var context in Contexts)

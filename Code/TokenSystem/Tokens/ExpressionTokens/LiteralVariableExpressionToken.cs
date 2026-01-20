@@ -22,5 +22,5 @@ public class LiteralVariableExpressionToken : ExpressionToken
 
     public override TryGet<Value> Value() => _varToken.Value.Value();
 
-    public override Type[] PossibleValueTypes => [typeof(LiteralValue)];
+    public override TypeOfValue PossibleValues => new TypeOfValue<LiteralValue>();
 }

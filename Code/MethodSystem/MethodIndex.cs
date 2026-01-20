@@ -1,13 +1,16 @@
 ﻿using System.Reflection;
 using LabApi.Features.Console;
+using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem;
 
 public static class MethodIndex
 {
-    private static readonly Dictionary<string, Method> NameToMethodIndex = new();
+    private static readonly Dictionary<string, Method> NameToMethodIndex = [];
+    private static readonly HashSet<Type> ExiledMethods = [];
     
     /// <summary>
     /// Initializes the method index.
@@ -15,8 +18,16 @@ public static class MethodIndex
     internal static void Initialize()
     {
         NameToMethodIndex.Clear();
-
+        
         AddAllDefinedMethodsInAssembly();
+        
+        ExiledHelper.OnExiledDetected += () =>
+        {
+            foreach (var method in ExiledMethods)
+            {
+                AddMethod((Method)Activator.CreateInstance(method));
+            }
+        };
     }
     
     /// <summary>
@@ -38,6 +49,13 @@ public static class MethodIndex
         assembly ??= Assembly.GetCallingAssembly();
         var definedMethods = assembly.GetTypes()
             .Where(t => t.IsClass && !t.IsAbstract && typeof(Method).IsAssignableFrom(t))
+            .Where(t =>
+            {
+                if (!typeof(IExiledMethod).IsAssignableFrom(t)) return true;
+                
+                ExiledMethods.Add(t);
+                return false;
+            })
             .Select(t => Activator.CreateInstance(t) as Method)
             .ToList();
         
@@ -60,7 +78,7 @@ public static class MethodIndex
             Logger.Error($"Tried to register an already existing method '{method.Name}'!");
             return;
         }
-
+        
         NameToMethodIndex.Add(method.Name, method);
     }
 
@@ -81,7 +99,7 @@ public static class MethodIndex
         
         var closestMethod = NameToMethodIndex.Keys
             .OrderBy(x => LevenshteinDistance(x, name))
-            .First();
+            .FirstOrDefault();
         
         return $"There is no method with name '{name}'. Did you mean '{closestMethod ?? "<error>"}'?";
     }

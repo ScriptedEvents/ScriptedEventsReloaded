@@ -13,7 +13,7 @@ public interface IValueToken
     /// <summary>
     /// A signature of all possible return values. Null if return signature unknown.
     /// </summary>
-    public Type[]? PossibleValueTypes { get; }
+    public TypeOfValue PossibleValues { get; }
     
     /// <summary>
     /// Whether the value is a constant and can be cached.

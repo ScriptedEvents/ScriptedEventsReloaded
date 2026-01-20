@@ -25,6 +25,6 @@ public class SpawnPickupPlayerMethod : SynchronousMethod, ICanError
         var obj = Args.GetReference<Pickup>("pickup/projectile reference");
         var plr = Args.GetPlayer("player to spawn pickup on");
 
-        SpawnPickupPosMethod.SpawnPickup(obj, plr.Position);
+        SpawnPickupPosMethod.SpawnPickup(obj, plr.Position, this);
     }
 }

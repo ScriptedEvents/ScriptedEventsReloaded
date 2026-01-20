@@ -37,9 +37,14 @@ public abstract class Value
             _                       => new ReferenceValue(obj),
         };
     }
-    
+
     public static string FriendlyName(Type type) => type.Name.Replace("Value", "").ToLower();
     public string FriendlyName() => FriendlyName(GetType());
+
+    public override string ToString()
+    {
+        return $"value of type {FriendlyName()}";
+    }
 
     public override int GetHashCode() => HashCode;
 

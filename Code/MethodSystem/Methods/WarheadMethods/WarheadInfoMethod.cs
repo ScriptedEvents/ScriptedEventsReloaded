@@ -13,7 +13,10 @@ public class WarheadInfoMethod : ReturningMethod
 {
     public override string Description => "Returns information about Alpha Warhead";
 
-    public override Type[] ReturnTypes => [typeof(BoolValue), typeof(DurationValue)];
+    public override TypeOfValue Returns => new TypesOfValue([
+        typeof(BoolValue),
+        typeof(DurationValue)
+    ]);
 
     public override Argument[] ExpectedArguments { get; } =
     [

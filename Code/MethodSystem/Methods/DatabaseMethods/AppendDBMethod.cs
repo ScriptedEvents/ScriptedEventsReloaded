@@ -36,7 +36,7 @@ public class AppendDBMethod : SynchronousMethod, ICanError
 
         if (res.HasErrored(out var error))
         {
-            throw new ScriptRuntimeError(error);
+            throw new ScriptRuntimeError(this, error);
         }
     }
 }

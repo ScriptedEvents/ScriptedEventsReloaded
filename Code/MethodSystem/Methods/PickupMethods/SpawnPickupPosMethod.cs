@@ -37,19 +37,22 @@ public class SpawnPickupPosMethod : SynchronousMethod, ICanError
             Args.GetFloat("y position"),
             Args.GetFloat("z position"));
 
-        SpawnPickup(obj, pos);
+        SpawnPickup(obj, pos, this);
     }
 
     // this is here just to make the ErrorReasons universal across all the pickup-spawning methods
-    public static SpawnPickupPosMethod Singleton => field is null ? field = new SpawnPickupPosMethod() : field;
+    public static SpawnPickupPosMethod Singleton
+    {
+        get => field is null ? field = new SpawnPickupPosMethod() : field;
+    } = null!;
 
-    public static void SpawnPickup(Pickup obj, Vector3 pos)
+    public static void SpawnPickup(Pickup obj, Vector3 pos, Method caller)
     {
         obj.Position = pos;
         obj.Rotation = Quaternion.identity;
         obj.GameObject.SetActive(true);
         if (NetworkServer.spawned.ContainsValue(obj.NetworkIdentity))
-            throw new ScriptRuntimeError(Singleton.ErrorReasons[0]);
+            throw new ScriptRuntimeError(caller, Singleton.ErrorReasons[0]);
         NetworkServer.Spawn(obj.GameObject);
         if (obj is Projectile projectile)
             projectile.Base.ServerActivate();

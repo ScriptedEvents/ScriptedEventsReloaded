@@ -4,6 +4,7 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Helpers.Exceptions;
 using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.MethodSystem.MethodDescriptors;
+using SER.Code.ValueSystem;
 
 namespace SER.Code.MethodSystem.Methods.DatabaseMethods;
 
@@ -12,7 +13,7 @@ public class GetFromDBMethod : ReturningMethod, ICanError
 {
     public override string Description => "Returns the value of a given key in the database.";
 
-    public override Type[]? ReturnTypes => null;
+    public override TypeOfValue Returns => new UnknownTypeOfValue();
 
     public string[] ErrorReasons =>
     [
@@ -29,7 +30,7 @@ public class GetFromDBMethod : ReturningMethod, ICanError
     {
         if (Args.GetDatabase("database").Get(Args.GetText("key")).HasErrored(out var err, out var value))
         {
-            throw new ScriptRuntimeError(err);
+            throw new ScriptRuntimeError(this, err);
         }
 
         ReturnValue = value;

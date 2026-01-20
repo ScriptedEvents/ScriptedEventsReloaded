@@ -48,6 +48,8 @@ public abstract class Method
     public Script Script { get; set; } = null!;
 
     public readonly string Subgroup;
+
+    public uint? LineNum { get; set; }
     
     private readonly List<CoroutineHandle> _coroutines = [];
     
@@ -56,5 +58,12 @@ public abstract class Method
         var handle = coro.Run(Script);
         _coroutines.Add(handle);
         return handle;
+    }
+
+    public override string ToString()
+    {
+        return LineNum.HasValue
+            ? $"{Name} method in line {LineNum}"
+            : $"{Name} method";
     }
 }

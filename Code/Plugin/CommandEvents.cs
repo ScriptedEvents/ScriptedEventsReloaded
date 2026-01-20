@@ -3,7 +3,6 @@ using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.Handlers;
 using LabApi.Features.Enums;
 using LabApi.Features.Permissions;
-using LabApi.Features.Wrappers;
 using SER.Code.Helpers.Extensions;
 using SER.Code.Plugin.Commands;
 using SER.Code.ScriptSystem;
@@ -27,14 +26,14 @@ public static class CommandEvents
     {
         UsedCommandTypes[ev.Sender] = ev.CommandType;
         
-        if (MainPlugin.Instance.Config?.SerMethodsAsCommands != true)
+        if (MainPlugin.Instance.Config?.MethodCommandPrefix is not true)
         {
             return;
         }
         
-        if (Player.Get(ev.Sender) is { } player && player.HasPermissions(MethodCommand.RunPermission))
+        if (!ev.Sender.HasPermissions(MethodCommand.RunPermission))
         {
-            return ;
+            return;
         }
 
         if (!ev.CommandName.StartsWith(">"))
@@ -72,6 +71,7 @@ public static class CommandEvents
             return;
         }
 
+        ev.Sender.Respond($"Running method '{methodName}'!");
         ev.IsAllowed = false;
         script.Run();
     }

@@ -3,6 +3,7 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Helpers.Exceptions;
 using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.ValueSystem;
 
 namespace SER.Code.MethodSystem.Methods.PlayerDataMethods;
 
@@ -11,7 +12,7 @@ public class GetPlayerDataMethod : ReturningMethod
 {
     public override string Description => "Gets player data from the key.";
 
-    public override Type[]? ReturnTypes => null;
+    public override TypeOfValue Returns => new UnknownTypeOfValue();
     
     public override Argument[] ExpectedArguments { get; } =
     [
@@ -27,7 +28,7 @@ public class GetPlayerDataMethod : ReturningMethod
         if (!SetPlayerDataMethod.PlayerData.TryGetValue(player, out var dict) || 
             !dict.TryGetValue(key, out var value))
         {
-            throw new ScriptRuntimeError($"Key '{key}' was not found for player '{player.Nickname}'.");
+            throw new ScriptRuntimeError(this, $"Key '{key}' was not found for player '{player.Nickname}'.");
         }
 
         ReturnValue = value;

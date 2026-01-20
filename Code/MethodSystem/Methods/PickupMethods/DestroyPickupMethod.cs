@@ -10,9 +10,9 @@ using SER.Code.MethodSystem.MethodDescriptors;
 namespace SER.Code.MethodSystem.Methods.PickupMethods;
 
 [UsedImplicitly]
-public class DeletePickupMethod : SynchronousMethod, ICanError
+public class DestroyPickupMethod : SynchronousMethod, ICanError
 {
-    public override string Description => "Removes a pickup / grenade from the ground.";
+    public override string Description => "Destroys a pickup / grenade from the map.";
 
     public string[] ErrorReasons =>
     [
@@ -29,7 +29,7 @@ public class DeletePickupMethod : SynchronousMethod, ICanError
         var obj = Args.GetReference<Pickup>("pickup/projectile reference");
         
         if (!NetworkServer.spawned.ContainsValue(obj.NetworkIdentity))
-            throw new ScriptRuntimeError(ErrorReasons[0]);
+            throw new ScriptRuntimeError(this, ErrorReasons[0]);
         
         obj.Destroy();
     }

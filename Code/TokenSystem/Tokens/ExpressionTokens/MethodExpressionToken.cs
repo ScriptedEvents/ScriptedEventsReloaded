@@ -39,5 +39,5 @@ public class MethodExpressionToken : ExpressionToken
         return _method.ReturnValue ?? throw new AndrzejFuckedUpException();
     }
 
-    public override Type[]? PossibleValueTypes => null;
+    public override TypeOfValue PossibleValues => new UnknownTypeOfValue();
 }

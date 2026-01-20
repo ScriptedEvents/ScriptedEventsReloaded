@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 namespace SER.Code.MethodSystem.Methods.PickupMethods;
 
 [UsedImplicitly]
-public class PickupMethod : ReferenceReturningMethod<Pickup>
+public class CreatePickupMethod : ReferenceReturningMethod<Pickup>
 {
     public override string Description => "Creates a new item pickup to later spawn.";
 

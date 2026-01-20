@@ -2,7 +2,7 @@
 using System.Text;
 using CommandSystem;
 using SER.Code.ContextSystem.BaseContexts;
-using SER.Code.ContextSystem.Structures;
+using SER.Code.ContextSystem.Interfaces;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.Helpers.Exceptions;
 using SER.Code.Helpers.Extensions;
@@ -63,7 +63,7 @@ public class HelpCommand : ICommand
             return true;
         }
         
-        var keyword = KeywordToken.KeywordTypes
+        var keyword = KeywordToken.KeywordContextTypes
             .Select(kType => kType.CreateInstance<IKeywordContext>())
             .FirstOrDefault(keyword => keyword.KeywordName == arg);
         
@@ -492,7 +492,7 @@ public class HelpCommand : ICommand
             case LiteralValueReturningMethod ret:
             {
                 string typeReturn;
-                if (ret.LiteralReturnTypes is { } types)
+                if (ret.LiteralReturnTypes.AreKnown(out var types))
                 {
                     typeReturn = types
                         .Select(Value.FriendlyName)
@@ -524,9 +524,9 @@ public class HelpCommand : ICommand
             case ReturningMethod ret:
             {
                 string typeReturn;
-                if (ret.ReturnTypes is { } types)
+                if (ret.Returns.AreKnown(out var returnTypes))
                 {
-                    typeReturn = types
+                    typeReturn = returnTypes
                         .Select(Value.FriendlyName)
                         .JoinStrings(" or ") + " value";
                 }
@@ -565,7 +565,7 @@ public class HelpCommand : ICommand
             
             sb.AppendLine($" - Expected value: {argument.InputDescription.Replace("\n", "\n\t")}");
 
-            if (argument.DefaultValue is {} defVal)
+            if (argument.DefaultValue is { } defVal)
             {
                 sb.AppendLine($" - Default value: {defVal.StringRep ?? defVal.Value?.ToString() ?? "unknown"}");
             }
@@ -610,7 +610,7 @@ public class HelpCommand : ICommand
         var properties = PlayerExpressionToken.PropertyInfoMap;
         foreach (var (property, info) in properties.Select(kvp => (kvp.Key, kvp.Value)))
         {
-            sb.Append($"{property.ToString().LowerFirst()} -> {info.ReturnType.Name}");
+            sb.Append($"{property.ToString().LowerFirst()} -> {info.ReturnType}");
             sb.Append(info.Description is not null ? $" | {info.Description}\n" : "\n");
         }
 

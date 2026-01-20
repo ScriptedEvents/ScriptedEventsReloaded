@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 using SER.Code.Helpers.Exceptions;
 
 namespace SER.Code.Helpers.ResultSystem;

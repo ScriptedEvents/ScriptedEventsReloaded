@@ -1,14 +1,15 @@
 ﻿using JetBrains.Annotations;
 using SER.Code.ContextSystem.BaseContexts;
-using SER.Code.ContextSystem.Extensions;
+using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
+using SER.Code.ValueSystem;
 
 namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 
 [UsedImplicitly]
-public class ForeverLoopContext : LoopContext, IKeywordContext
+public class ForeverLoopContext : LoopContextWithSingleIterationVariable<NumberValue>, IKeywordContext
 {
     private readonly Result _mainErr = "Cannot create 'forever' loop.";
 
@@ -18,6 +19,8 @@ public class ForeverLoopContext : LoopContext, IKeywordContext
     public override string KeywordName => "forever";
     public override string Description => "Makes the code inside the statement run indefinitely.";
     public override string[] Arguments => [];
+
+    protected override string FriendlyName => "'forever' loop statement";
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
@@ -31,22 +34,18 @@ public class ForeverLoopContext : LoopContext, IKeywordContext
 
     protected override IEnumerator<float> Execute()
     {
+        ulong iteration = 0;
         while (true)
         {
-            foreach (var coro in Children.Select(child => child.ExecuteBaseContext()))
+            SetVariable(++iteration);
+            var coro = RunChildren();
+            while (coro.MoveNext())
             {
-                if (ExitLoop) yield break;
-                
-                while (coro.MoveNext())
-                {
-                    yield return coro.Current;
-                }
-
-                if (!SkipThisIteration) continue;
-
-                SkipThisIteration = false;
-                break;
+                yield return coro.Current;
             }
+            RemoveVariable();
+            
+            if (ReceivedBreak) break;
         }
     }
 }

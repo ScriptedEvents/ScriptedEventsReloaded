@@ -43,12 +43,12 @@ public class RunFuncMethod : SynchronousMethod, ICanError
         if (ScriptFlagHandler.GetScriptFlags(scriptToRun.Name).FirstOrDefault(f => f.GetType() == typeof(FunctionFlag))
             is not FunctionFlag functionFlag)
         {
-            throw new ScriptRuntimeError($"Script '{scriptToRun.Name}' is not a function.");
+            throw new ScriptRuntimeError(this, $"Script '{scriptToRun.Name}' is not a function.");
         }
 
         if (valuesToPass.Length != functionFlag.ExpectedVarTokens.Count)
         {
-            throw new ScriptRuntimeError(
+            throw new ScriptRuntimeError(this, 
                 $"Function expects {functionFlag.ExpectedVarTokens.Count} arguments, but {valuesToPass.Length} were provided."
             );
         }
@@ -66,14 +66,14 @@ public class RunFuncMethod : SynchronousMethod, ICanError
             
             if (!varToken.ValueType.IsInstanceOfType(value))
             {
-                throw new ScriptRuntimeError(
+                throw new ScriptRuntimeError(this, 
                     $"Function '{scriptToRun.Name}' expects argument {i + 1} to be of type " +
                     $"{varToken.ValueType.FriendlyTypeName()}, but {value.GetType().FriendlyTypeName()} " +
                     $"was provided."
                 );
             }
             
-            var variable = Variable.CreateVariable(varToken.Name, value);
+            var variable = Variable.Create(varToken.Name, value);
             if (variable.GetType() != varToken.VariableType)
             {
                 throw new AndrzejFuckedUpException();

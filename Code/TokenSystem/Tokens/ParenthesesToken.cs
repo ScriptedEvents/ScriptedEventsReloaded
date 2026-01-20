@@ -78,6 +78,6 @@ public class ParenthesesToken : BaseToken, IValueToken
         return literalValue;
     }
 
-    public Type[] PossibleValueTypes => [typeof(LiteralValue)];
+    public TypeOfValue PossibleValues => new TypeOfValue<LiteralValue>();
     public bool IsConstant => false;
 }

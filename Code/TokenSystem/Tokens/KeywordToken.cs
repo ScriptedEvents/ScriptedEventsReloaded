@@ -1,8 +1,7 @@
 ﻿using System.Reflection;
 using SER.Code.ContextSystem.BaseContexts;
-using SER.Code.ContextSystem.Structures;
+using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Helpers.Extensions;
-using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Structures;
 
@@ -12,7 +11,7 @@ public class KeywordToken : BaseToken, IContextableToken
 {
     private Type? _keywordType = null;
     
-    public static readonly Type[] KeywordTypes = Assembly.GetExecutingAssembly().GetTypes()
+    public static readonly Type[] KeywordContextTypes = Assembly.GetExecutingAssembly().GetTypes()
         .Where(t => 
             t.IsClass && 
             !t.IsAbstract && 
@@ -23,7 +22,7 @@ public class KeywordToken : BaseToken, IContextableToken
     
     protected override IParseResult InternalParse(Script scr)
     {
-        _keywordType = KeywordTypes.FirstOrDefault(
+        _keywordType = KeywordContextTypes.FirstOrDefault(
             keyword => keyword.CreateInstance<IKeywordContext>().KeywordName == RawRep);
 
         return _keywordType is not null
@@ -31,7 +30,7 @@ public class KeywordToken : BaseToken, IContextableToken
             : new Ignore();
     }
 
-    public TryGet<Context> TryGetContext(Script scr)
+    public Context GetContext(Script scr)
     {
         return Context.Create(_keywordType!, (scr, LineNum));
     }

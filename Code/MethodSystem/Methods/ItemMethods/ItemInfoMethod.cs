@@ -14,10 +14,15 @@ namespace SER.Code.MethodSystem.Methods.ItemMethods;
 public class ItemInfoMethod : ReturningMethod, IReferenceResolvingMethod
 {
     public override string Description => IReferenceResolvingMethod.Desc.Get(this);
-
-    public override Type[] ReturnTypes => [typeof(TextValue), typeof(PlayerValue), typeof(BoolValue)];
-    public Type ReferenceType => typeof(Item);
     
+    public Type ReferenceType => typeof(Item);
+
+    public override TypeOfValue Returns => new TypesOfValue([
+        typeof(TextValue),
+        typeof(PlayerValue),
+        typeof(BoolValue)
+    ]);
+
     public override Argument[] ExpectedArguments { get; } =
     [
         new ReferenceArgument<Item>("reference"),
@@ -28,7 +33,7 @@ public class ItemInfoMethod : ReturningMethod, IReferenceResolvingMethod
             "isEquipped"
         )
     ];
-    
+
     public override void Execute()
     {
         var item = Args.GetReference<Item>("reference");

@@ -214,7 +214,7 @@ public class CustomCommandFlag : Flag
             {
                 if (token.TryGetLiteralValue<LiteralValue>().WasSuccessful(out var value))
                 {
-                    script.AddVariable(Variable.CreateVariable(name, value));
+                    script.AddVariable(Variable.Create(name, value));
                     continue;
                 }
             }

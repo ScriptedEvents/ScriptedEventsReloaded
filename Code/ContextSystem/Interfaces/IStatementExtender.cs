@@ -1,4 +1,4 @@
-﻿namespace SER.Code.ContextSystem.Structures;
+﻿namespace SER.Code.ContextSystem.Interfaces;
 
 public interface IStatementExtender
 {

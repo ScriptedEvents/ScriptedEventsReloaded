@@ -41,6 +41,6 @@ public class SpawnPickupRoomMethod : SynchronousMethod, ICanError
             Args.GetFloat("relative y"),
             Args.GetFloat("relative z")));
 
-        SpawnPickupPosMethod.SpawnPickup(obj, pos);
+        SpawnPickupPosMethod.SpawnPickup(obj, pos, this);
     }
 }

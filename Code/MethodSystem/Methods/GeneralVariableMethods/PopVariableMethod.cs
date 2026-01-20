@@ -2,6 +2,7 @@
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.ValueSystem;
 using SER.Code.VariableSystem;
 
 namespace SER.Code.MethodSystem.Methods.GeneralVariableMethods;
@@ -11,7 +12,7 @@ public class PopVariableMethod : ReturningMethod
 {
     public override string Description => "Erases a given variable, returning its value.";
 
-    public override Type[]? ReturnTypes => null;
+    public override TypeOfValue Returns => new UnknownTypeOfValue();
 
     public override Argument[] ExpectedArguments { get; } =
     [  

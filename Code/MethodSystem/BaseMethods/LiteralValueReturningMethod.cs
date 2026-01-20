@@ -4,6 +4,6 @@ namespace SER.Code.MethodSystem.BaseMethods;
 
 public abstract class LiteralValueReturningMethod : ReturningMethod<LiteralValue>
 {
-    public abstract Type[] LiteralReturnTypes { get; }
-    public override Type[] ReturnTypes => LiteralReturnTypes;
+    public abstract TypeOfValue LiteralReturnTypes { get; }
+    public override TypeOfValue Returns => LiteralReturnTypes;
 }

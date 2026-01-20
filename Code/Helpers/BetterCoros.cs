@@ -39,12 +39,12 @@ public static class BetterCoros
             {
                 onException?.Invoke(compErr);
                 scr.Error(compErr.Message);
+                goto End;
             }
             catch (ScriptRuntimeError runErr)
             {
                 onException?.Invoke(runErr);
-                scr.Error($"SER was not able to predict this error before running the script: " +
-                          $"{runErr.Message ?? "ERROR UNSPECIFIED"}");
+                scr.Error(runErr.Message);
                 goto End;
             }
             catch (DeveloperFuckedUpException devErr)
@@ -59,7 +59,7 @@ public static class BetterCoros
                 scr.Error($"Coroutine failed with {ex.GetType().AccurateName}: {ex.Message}\n{ex.StackTrace}");
                 goto End;
             }
-
+            
             yield return routine.Current;
         }
 

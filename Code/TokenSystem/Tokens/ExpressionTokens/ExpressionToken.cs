@@ -49,8 +49,6 @@ public abstract class ExpressionToken : BaseToken, IValueToken
     protected abstract IParseResult InternalParse(BaseToken[] tokens);
 
     public abstract TryGet<Value> Value();
-
-    public abstract Type[]? PossibleValueTypes { get; }
-    
+    public abstract TypeOfValue PossibleValues { get; }
     public bool IsConstant => false;
 }

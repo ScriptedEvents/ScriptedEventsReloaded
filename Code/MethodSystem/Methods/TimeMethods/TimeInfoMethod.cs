@@ -12,7 +12,10 @@ public class TimeInfoMethod : LiteralValueReturningMethod
 {
     public override string Description => "Returns information about current time.";
 
-    public override Type[] LiteralReturnTypes => [typeof(NumberValue), typeof(TextValue)];
+    public override TypeOfValue LiteralReturnTypes => new TypesOfValue([
+        typeof(NumberValue), 
+        typeof(TextValue)
+    ]);
     
     public override Argument[] ExpectedArguments { get; } =
     [

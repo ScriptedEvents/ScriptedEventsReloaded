@@ -36,6 +36,6 @@ public class LoadAudioMethod : SynchronousMethod, IAdditionalDescription, ICanEr
         if (!AudioClipStorage.LoadClip(
             Args.GetText("file path"), 
             Args.GetText("clip name")
-        )) throw new ScriptRuntimeError("Audio has failed to load");
+        )) throw new ScriptRuntimeError(this, "Audio has failed to load. Check the ");
     }
 }

@@ -15,14 +15,13 @@ public class PickupInfoMethod : ReturningMethod, IReferenceResolvingMethod
 {
     public override string Description => "Returns information about a pickup.";
 
-    public override Type[] ReturnTypes => 
-    [
+    public override TypeOfValue Returns => new TypesOfValue([
         typeof(PlayerValue),
         typeof(BoolValue),
         typeof(TextValue),
         typeof(ReferenceValue<Room>),
         typeof(NumberValue)
-    ];
+    ]);
 
     public Type ReferenceType => typeof(Pickup);
 

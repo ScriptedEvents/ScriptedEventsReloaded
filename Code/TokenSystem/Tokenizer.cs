@@ -26,7 +26,8 @@ public static class Tokenizer
         typeof(LiteralVariableToken),
         typeof(CollectionVariableToken),
         typeof(ReferenceVariableToken),
-        typeof(DurationToken)
+        typeof(DurationToken),
+        typeof(RunFunctionToken)
     ];
     
     public static readonly Type[] OrderedImportanceTokensFromCollectionSlices =
@@ -34,10 +35,8 @@ public static class Tokenizer
         typeof(PlayerExpressionToken),
         typeof(MethodExpressionToken),
         typeof(LiteralVariableExpressionToken),
-        
         typeof(ParenthesesToken),
-        
-        typeof(TextToken),
+        typeof(TextToken)
     ];
     
     public static TryGet<Line[]> GetInfoFromMultipleLines(string content)

@@ -1,5 +1,5 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
-using SER.Code.ContextSystem.Extensions;
+using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Helpers;
 using SER.Code.Helpers.Exceptions;
@@ -21,6 +21,8 @@ public class IfStatementContext : StatementContext, IExtendableStatement, IKeywo
     private readonly List<BaseToken> _condition = [];
     
     private NumericExpressionReslover.CompiledExpression _expression;
+
+    protected override string FriendlyName => "'if' statement";
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
@@ -47,12 +49,12 @@ public class IfStatementContext : StatementContext, IExtendableStatement, IKeywo
     {
         if (_expression.Evaluate().HasErrored(out var error, out var objResult))
         {
-            throw new ScriptRuntimeError(error);
+            throw new ScriptRuntimeError(this, error);
         }
 
         if (objResult is not bool result)
         {
-            throw new ScriptRuntimeError($"An if statement condition must evaluate to a boolean value, but received {objResult.FriendlyTypeName()}");
+            throw new ScriptRuntimeError(this, $"An if statement condition must evaluate to a boolean value, but received {objResult.FriendlyTypeName()}");
         }
         
         if (!result)
@@ -62,37 +64,19 @@ public class IfStatementContext : StatementContext, IExtendableStatement, IKeywo
                 yield break;
             }
             
-            var coro = enumerator();
-            while (coro.MoveNext())
+            var didntExecuteCoro = enumerator();
+            while (didntExecuteCoro.MoveNext())
             {
-                if (!Script.IsRunning)
-                {
-                    yield break;
-                }
-                
-                yield return coro.Current;
+                yield return didntExecuteCoro.Current;
             }
 
             yield break;
         }
         
-        foreach (var child in Children)
+        var coro = RunChildren();
+        while (coro.MoveNext())
         {
-            if (!Script.IsRunning)
-            {
-                yield break;
-            }
-            
-            var coro = child.ExecuteBaseContext();
-            while (coro.MoveNext())
-            {
-                if (!Script.IsRunning)
-                {
-                    yield break;
-                }
-                
-                yield return coro.Current;
-            }
+            yield return coro.Current;
         }
     }
 }

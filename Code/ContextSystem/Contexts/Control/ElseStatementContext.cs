@@ -1,4 +1,5 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Helpers.Exceptions;
 using SER.Code.Helpers.ResultSystem;
@@ -14,6 +15,8 @@ public class ElseStatementContext : StatementContext, IStatementExtender, IKeywo
     public string[] Arguments => [];
     
     public IExtendableStatement.Signal Extends => IExtendableStatement.Signal.DidntExecute;
+
+    protected override string FriendlyName => "'else' statement";
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

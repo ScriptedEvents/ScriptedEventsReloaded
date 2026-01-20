@@ -68,7 +68,7 @@ public class PlayerExpressionToken : ExpressionToken
     public abstract class Info
     {
         public abstract Func<Player, Value> Handler { get; }
-        public abstract Type ReturnType { get; }
+        public abstract SingleTypeOfValue ReturnType { get; }
         public abstract string? Description { get; }
     }
 
@@ -76,7 +76,7 @@ public class PlayerExpressionToken : ExpressionToken
         where T : Value
     {
         public override Func<Player, Value> Handler => handler;
-        public override Type ReturnType => typeof(T);
+        public override SingleTypeOfValue ReturnType => new(typeof(T));
         public override string? Description => description;
     }
 
@@ -217,5 +217,5 @@ public class PlayerExpressionToken : ExpressionToken
         };
     }
 
-    public override Type[]? PossibleValueTypes => null;
+    public override TypeOfValue PossibleValues => new UnknownTypeOfValue();
 }

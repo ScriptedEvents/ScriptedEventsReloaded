@@ -17,8 +17,11 @@ public static class FileSystem
 
     public static void UpdateScriptPathCollection()
     {
-        RegisteredScriptPaths = Directory
-            .GetFiles(MainDirPath, "*.txt", SearchOption.AllDirectories)
+        List<string> paths = [];
+        paths.AddRange(Directory.GetFiles(MainDirPath, "*.txt", SearchOption.AllDirectories));
+        paths.AddRange(Directory.GetFiles(MainDirPath, "*.ser", SearchOption.AllDirectories));
+        
+        RegisteredScriptPaths = paths
             // ignore files with a pound sign at the start
             .Where(path => Path.GetFileName(path).FirstOrDefault() != '#')
             .ToArray();
@@ -66,7 +69,6 @@ public static class FileSystem
 
             ScriptFlagHandler.RegisterScript(lines, scriptName);
         }
-
     }
     
     public static string GetScriptPath(ScriptName scriptName)

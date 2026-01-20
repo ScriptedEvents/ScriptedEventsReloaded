@@ -11,7 +11,7 @@ namespace SER.Code.MethodSystem.Methods.CollectionVariableMethods;
 public class CollectionFetchMethod : ReturningMethod
 {
     public override string Description => "Returns a value from a collection variable at a given position.";
-    public override Type[]? ReturnTypes => null;
+    public override TypeOfValue Returns => new UnknownTypeOfValue();
     
     public override Argument[] ExpectedArguments { get; } =
     [
@@ -29,7 +29,7 @@ public class CollectionFetchMethod : ReturningMethod
         
         if (coll.GetAt(index).HasErrored(out var error, out var value))
         {
-            throw new ScriptRuntimeError(error);
+            throw new ScriptRuntimeError(this, error);
         }
 
         ReturnValue = Value.Parse(value);

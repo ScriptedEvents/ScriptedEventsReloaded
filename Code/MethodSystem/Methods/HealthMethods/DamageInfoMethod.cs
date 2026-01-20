@@ -16,10 +16,13 @@ public class DamageInfoMethod : ReturningMethod, IReferenceResolvingMethod, IAdd
 {
     public Type ReferenceType => typeof(DamageHandlerBase);
     
-    public override Type[] ReturnTypes => [typeof(TextValue), typeof(ReferenceValue)];
-
+    public override TypeOfValue Returns => new TypesOfValue([
+        typeof(TextValue), 
+        typeof(ReferenceValue)
+    ]);
+    
     public override string Description => IReferenceResolvingMethod.Desc.Get(this);
-
+    
     public string AdditionalDescription =>
         "A lot of options here might not be available depending on which DamageHandler is used in game. " +
         "It's advised you check every accessed value for 'none' before using it.";
@@ -31,7 +34,8 @@ public class DamageInfoMethod : ReturningMethod, IReferenceResolvingMethod, IAdd
             "damage",
             Option.Enum<HitboxType>("hitbox"), 
             Option.Reference<Item>("firearmUsed"), 
-            Option.Reference<Player>("attacker"))
+            Option.Reference<Player>("attacker")
+        )
     ];
 
     public override void Execute()

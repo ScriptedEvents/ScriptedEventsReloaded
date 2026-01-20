@@ -1,6 +1,5 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Contexts;
-using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem;
 using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.ScriptSystem;
@@ -21,10 +20,11 @@ public class MethodToken : BaseToken, IContextableToken
 
         Method = (Method)Activator.CreateInstance(method.GetType());
         Method.Script = scr;
+        Method.LineNum = LineNum;
         return new Success();
     }
 
-    public TryGet<Context> TryGetContext(Script scr)
+    public Context GetContext(Script scr)
     {
         return new MethodContext(this)
         {

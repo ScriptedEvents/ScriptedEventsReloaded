@@ -1,4 +1,5 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
@@ -13,7 +14,9 @@ public class StopScriptContext: StandardContext, IKeywordContext
         "Stops the script from executing.";
 
     public string[] Arguments => [];
-    
+
+    protected override string FriendlyName => "'stop' keyword";
+
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
         return TryAddTokenRes.Error(

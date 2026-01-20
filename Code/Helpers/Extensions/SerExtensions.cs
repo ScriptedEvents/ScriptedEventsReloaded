@@ -48,8 +48,8 @@ public static class SerExtensions
     {
         get = valToken.TryGet<T>;
         
-        if (valToken.PossibleValueTypes is null) return true;
-        return valToken.PossibleValueTypes.Any(type => typeof(T).IsAssignableFrom(type) || type.IsAssignableFrom(typeof(T)));
+        if (!valToken.PossibleValues.AreKnown(out var knownReturnTypes)) return true;
+        return knownReturnTypes.Any(type => typeof(T).IsAssignableFrom(type) || type.IsAssignableFrom(typeof(T)));
     }
     
     public static TryGet<T> TryGet<T>(this BaseToken token) where T : Value

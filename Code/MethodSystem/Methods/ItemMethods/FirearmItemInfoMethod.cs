@@ -10,7 +10,10 @@ internal class FirearmItemInfoMethod : ReturningMethod
 {
     public override string Description => "Returns info about provided firearm";
 
-    public override Type[] ReturnTypes => [typeof(BoolValue), typeof(NumberValue)];
+    public override TypeOfValue Returns => new TypesOfValue([
+        typeof(BoolValue),
+        typeof(NumberValue)
+    ]);
 
     public override Argument[] ExpectedArguments { get; } =
     [

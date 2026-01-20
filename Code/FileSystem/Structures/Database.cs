@@ -119,7 +119,7 @@ public class Database
             return Value.Parse(Player.List.Where(p => playerIds.Contains(p.UserId)));
         }
 
-        if (Value.Parse(val.Value) is {} value && value.GetType().GetAccurateName() == val.Type)
+        if (Value.Parse(val.Value) is { } value && value.GetType().GetAccurateName() == val.Type)
         {
             return value;
         }

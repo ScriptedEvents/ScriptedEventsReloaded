@@ -68,7 +68,7 @@ public class BaseToken
 
     public override string ToString()
     {
-        return GetType().AccurateName;
+        return $"token '{RawRep}' ({GetType().AccurateName})";
     }
 
     public TryGet<T> TryGetLiteralValue<T>() where T : LiteralValue

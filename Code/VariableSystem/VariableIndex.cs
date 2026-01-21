@@ -1,6 +1,7 @@
 ﻿using LabApi.Features.Wrappers;
 using MapGeneration;
 using PlayerRoles;
+using PlayerRoles.PlayableScps.Scp173;
 using SER.Code.Helpers.Extensions;
 using SER.Code.VariableSystem.Bases;
 using SER.Code.VariableSystem.Variables;
@@ -20,7 +21,14 @@ public static class VariableIndex
             new("all", Player.ReadyList.ToList, "Other"),
             new("alivePlayers", () => Player.ReadyList.Where(plr => plr.IsAlive).ToList(), "Other"),
             new("npcPlayers", () => Player.ReadyList.Where(plr => plr.IsNpc).ToList(), "Other"),
-            new("empty", () => [], "Other")
+            new("empty", () => [], "Other"),
+            new("scp173Observers", () => Player.ReadyList
+                    .Select(plr => plr.RoleBase is Scp173Role peanut ? peanut.ObservingPlayers : null)
+                    .RemoveNulls()
+                    .Flatten()
+                    .ToList(),
+                "SCP Specific")
+
         ];
 
         allApiVariables.AddRange(

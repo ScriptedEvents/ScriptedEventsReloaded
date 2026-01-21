@@ -74,7 +74,8 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
         ),
         new(
             "Luke", 
-            Contribution.Sponsor | Contribution.Betatester
+            Contribution.Sponsor | Contribution.Betatester,
+            "76561197961020347@steam"
         ),
         new(
             "Raging Tornado", 

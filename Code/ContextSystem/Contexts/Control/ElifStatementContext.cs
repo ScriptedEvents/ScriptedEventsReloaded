@@ -7,6 +7,7 @@ using SER.Code.Helpers.Exceptions;
 using SER.Code.Helpers.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
+using UnityEngine;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
 
@@ -46,7 +47,8 @@ public class ElifStatementContext : StatementContext, IStatementExtender, IExten
 
         return Result.Assert(
             _condition.Count > 0,
-            "An elif statement expects to have a condition, but none was provided!");
+            "An elif statement expects to have a condition, but none was provided!"
+        );
     }
 
     protected override IEnumerator<float> Execute()

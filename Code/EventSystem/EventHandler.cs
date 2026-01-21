@@ -145,7 +145,7 @@ public static class EventHandler
                 continue;
             }
 
-            script.Run();
+            script.Run(RunContext.Event);
         }
     }
 
@@ -179,7 +179,7 @@ public static class EventHandler
             }
             
             script.AddVariables(variables);
-            var isAllowed = script.RunForEvent();
+            var isAllowed = script.RunForEvent(RunContext.Event);
             if (isAllowed.HasValue && ev is ICancellableEvent cancellable1)
                 cancellable1.IsAllowed = isAllowed.Value;
         }

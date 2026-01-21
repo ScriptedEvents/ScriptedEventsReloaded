@@ -2,6 +2,7 @@
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.ScriptSystem;
 using SER.Code.VariableSystem.Bases;
 
 namespace SER.Code.MethodSystem.Methods.ScriptMethods;
@@ -28,6 +29,6 @@ public class RunScriptMethod : SynchronousMethod
         var variables = Args.GetRemainingArguments<Variable, VariableArgument>("variables to pass");
         
         script.AddVariables(variables);
-        script.Run();
+        script.Run(RunContext.Script, Script);
     }
 }

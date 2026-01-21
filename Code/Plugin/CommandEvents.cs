@@ -74,6 +74,6 @@ public static class CommandEvents
 
         ev.Sender.Respond($"Running method '{methodName}'!");
         ev.IsAllowed = false;
-        script.Run();
+        script.Run(RunContext.Command);
     }
 }

@@ -4,6 +4,7 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.Helpers.Exceptions;
 using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.ScriptMethods;
@@ -27,12 +28,12 @@ public class TriggerMethod : SynchronousMethod
 
         foreach (var scriptName in scripts)
         {
-            if (ScriptSystem.Script.CreateByScriptName(scriptName, ScriptExecutor.Get()).HasErrored(out var error, out var script))
+            if (Script.CreateByScriptName(scriptName, ScriptExecutor.Get()).HasErrored(out var error, out var script))
             {
                 throw new ScriptRuntimeError(this, error);
             }
             
-            script.Run();
+            script.Run(RunContext.Script, Script);
         }
     }
 }

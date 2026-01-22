@@ -20,10 +20,8 @@ public class DurationToken : LiteralValueToken<DurationValue>
         {
             return new Ignore();
         }
-
-        var valuePart = value.Take(unitIndex).ToArray();
-        string numberString = string.Join("", valuePart);
         
+        string numberString = string.Join("", value.Take(unitIndex).ToArray());
         if (!double.TryParse(numberString, NumberStyles.Any, CultureInfo.InvariantCulture, out var valueAsDouble))
         {
             return new Ignore();

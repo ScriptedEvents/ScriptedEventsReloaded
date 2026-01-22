@@ -1,7 +1,7 @@
-﻿using SER.Code.Helpers.ResultSystem;
+﻿using SER.Code.Helpers.Extensions;
+using SER.Code.Helpers.ResultSystem;
 using SER.Code.ValueSystem;
 using SER.Code.VariableSystem.Bases;
-using SER.Code.Helpers.Extensions;
 
 namespace SER.Code.VariableSystem.Variables;
 

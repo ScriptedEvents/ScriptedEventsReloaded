@@ -1,8 +1,8 @@
 ﻿using SER.Code.Helpers.Exceptions;
+using SER.Code.Helpers.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
-using SER.Code.Helpers.Extensions;
 
 namespace SER.Code.TokenSystem.Tokens;
 

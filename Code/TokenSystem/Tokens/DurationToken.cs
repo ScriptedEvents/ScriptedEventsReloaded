@@ -1,4 +1,5 @@
-﻿using SER.Code.ScriptSystem;
+﻿using System.Globalization;
+using SER.Code.ScriptSystem;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.TokenSystem.Tokens;
@@ -8,7 +9,7 @@ public class DurationToken : LiteralValueToken<DurationValue>
     protected override IParseResult InternalParse(Script scr)
     {
         var value = RawRep;
-        if (TimeSpan.TryParse(value, out var result) && result.TotalMilliseconds > 0)
+        if (TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out var result) && result.TotalMilliseconds > 0)
         {
             Value = result;
             return new Success();
@@ -21,7 +22,9 @@ public class DurationToken : LiteralValueToken<DurationValue>
         }
 
         var valuePart = value.Take(unitIndex).ToArray();
-        if (!double.TryParse(string.Join("", valuePart), out var valueAsDouble))
+        string numberString = string.Join("", valuePart);
+        
+        if (!double.TryParse(numberString, NumberStyles.Any, CultureInfo.InvariantCulture, out var valueAsDouble))
         {
             return new Ignore();
         }

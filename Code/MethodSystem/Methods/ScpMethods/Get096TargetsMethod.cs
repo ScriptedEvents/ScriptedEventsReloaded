@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 using LabApi.Features.Wrappers;
-using PlayerRoles.PlayableScps.Scp173;
+using PlayerRoles.PlayableScps.Scp096;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Helpers.Exceptions;
@@ -12,39 +12,39 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.ScpMethods;
 
 [UsedImplicitly]
-public class Get173ObserversMethod : ReturningMethod<PlayerValue>, ICanError
+public class Get096TargetsMethod : ReturningMethod<PlayerValue>, ICanError
 {
-    public override string Description => "Returns the people that are looking at the specified SCP-173";
+    public override string Description => "Returns the targets of the specified SCP-096";
 
     public string[] ErrorReasons =>
     [
-        "The specified player isn't SCP-173."
+        "The specified player isn't SCP-096."
     ];
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new PlayerArgument("peanut")
+        new PlayerArgument("shy guy")
         {
-            DefaultValue = new(null, "Every observer from every SCP-173")
+            DefaultValue = new(null, "Every target from every SCP-096")
         }
     ];
 
     public override void Execute()
     {
-        var peanut = Args.GetPlayer("peanut").MaybeNull();
+        var shyGuy = Args.GetPlayer("shy guy").MaybeNull();
 
-        if (peanut is null)
+        if (shyGuy is null)
         {
             ReturnValue = new PlayerValue(Player.ReadyList
-                .Select(plr => plr.RoleBase is Scp173Role sculpture ? sculpture.ObservingPlayers : null)
+                .Select(plr => plr.RoleBase is Scp096Role paleGuy ? paleGuy.Targets : null)
                 .RemoveNulls()
                 .Flatten());
             return;
         }
         
-        if (peanut.RoleBase is not Scp173Role pnutRole)
+        if (shyGuy.RoleBase is not Scp096Role shyGuyRole)
             throw new ScriptRuntimeError(this, ErrorReasons[0]);
         
-        ReturnValue = new PlayerValue(pnutRole.ObservingPlayers);
+        ReturnValue = new PlayerValue(shyGuyRole.Targets);
     }
 }

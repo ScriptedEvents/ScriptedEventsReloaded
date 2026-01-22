@@ -1,4 +1,5 @@
 ﻿using LabApi.Features.Wrappers;
+using PlayerRoles.PlayableScps.Scp096;
 using PlayerRoles.PlayableScps.Scp173;
 using UnityEngine;
 
@@ -22,5 +23,18 @@ public static class PlayerExtensions
             .Select(Player.Get)
             .RemoveNulls()
             .ToArray();
+    }
+
+    extension(Scp096Role shyGuy)
+    {
+        public Scp096TargetsTracker TargetsTracker =>
+            !shyGuy.SubroutineModule.TryGetSubroutine(out Scp096TargetsTracker targetsTracker)
+                ? throw new Exception("My hatred towards Northwood's code grows stronger with each day.")
+                : targetsTracker;
+        
+        public Player[] Targets => shyGuy.TargetsTracker.Targets
+            .Select(Player.Get)
+            .RemoveNulls()
+            .ToArray(); 
     }
 }

@@ -21,14 +21,7 @@ public static class VariableIndex
             new("all", Player.ReadyList.ToList, "Other"),
             new("alivePlayers", () => Player.ReadyList.Where(plr => plr.IsAlive).ToList(), "Other"),
             new("npcPlayers", () => Player.ReadyList.Where(plr => plr.IsNpc).ToList(), "Other"),
-            new("empty", () => [], "Other"),
-            new("scp173Observers", () => Player.ReadyList
-                    .Select(plr => plr.RoleBase is Scp173Role peanut ? peanut.ObservingPlayers : null)
-                    .RemoveNulls()
-                    .Flatten()
-                    .ToList(),
-                "SCP Specific")
-
+            new("empty", () => [], "Other")
         ];
 
         allApiVariables.AddRange(

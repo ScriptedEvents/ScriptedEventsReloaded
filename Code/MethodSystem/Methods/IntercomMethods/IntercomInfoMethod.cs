@@ -3,6 +3,7 @@ using LabApi.Features.Wrappers;
 using PlayerRoles.Voice;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.ArgumentSystem.Structures;
 using SER.Code.Helpers.Exceptions;
 using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.ValueSystem;
@@ -17,7 +18,7 @@ public class IntercomInfoMethod : ReturningMethod
     public override Argument[] ExpectedArguments { get; } =
     [
         new OptionsArgument("mode",
-            "state",
+            Option.Enum<IntercomState>("state"),
             "speaker",
             "cooldown",
             "speechTimeLeft",

@@ -19,10 +19,11 @@ public static class CommandEvents
     public static void Initialize()
     {
         UsedCommandTypes.Clear();
-        ServerEvents.CommandExecuting += CaptureComamnd;
+        ServerEvents.CommandExecuting += CaptureCommand;
     }
 
-    public static void CaptureComamnd(CommandExecutingEventArgs ev)
+    // for reference this method was once called CaptureComamnd
+    public static void CaptureCommand(CommandExecutingEventArgs ev)
     {
         UsedCommandTypes[ev.Sender] = ev.CommandType;
         
@@ -73,6 +74,6 @@ public static class CommandEvents
 
         ev.Sender.Respond($"Running method '{methodName}'!");
         ev.IsAllowed = false;
-        script.Run();
+        script.Run(RunContext.Command);
     }
 }

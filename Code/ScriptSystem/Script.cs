@@ -22,6 +22,14 @@ using SER.Code.VariableSystem.Variables;
 
 namespace SER.Code.ScriptSystem;
 
+public enum RunContext
+{
+    Unknown,
+    Script,
+    Event,
+    Command
+}
+
 public class Script
 {
     public required ScriptName Name { get; init; }
@@ -49,8 +57,12 @@ public class Script
     
     public Line[] Lines = [];
     public Context[] Contexts = [];
+    
+    public Script? Caller { get; private set; }
 
     public Profile? Profile { get; private set; }
+    
+    public RunContext Context { get; private set; }
     
     public uint CurrentLine { get; set; } = 0;
     
@@ -61,6 +73,10 @@ public class Script
     
     private readonly HashSet<Variable> _variables = [];
     public ReadOnlyCollection<Variable> Variables => _variables.ToList().AsReadOnly();
+
+    public DateTime StartTime { get; private set; }
+
+    public TimeSpan TimeRunning => IsRunning ? DateTime.Now - StartTime : TimeSpan.Zero;
     
     private CoroutineHandle _scriptCoroutine;
     
@@ -140,16 +156,16 @@ public class Script
     /// <summary>
     /// Executes the script.
     /// </summary>
-    public void Run()
+    public void Run(RunContext context = RunContext.Unknown, Script? caller = null)
     {
-        RunForEvent();
+        RunForEvent(context, caller);
     }
 
     /// <summary>
     /// Executes the script.
     /// </summary>
     /// <returns>Returns a boolean indicating whether the event is allowed.</returns>
-    public bool? RunForEvent()
+    public bool? RunForEvent(RunContext context, Script? caller = null)
     {
         if (string.IsNullOrWhiteSpace(Content))
         {
@@ -164,6 +180,9 @@ public class Script
         
         RunningScriptsList.Add(this);
         //Profile = new Profile(this);
+        StartTime = DateTime.Now;
+        Context = context;
+        Caller = caller;
         _scriptCoroutine = InternalExecute().Run(
             this, 
             _ => _scriptCoroutine.Kill()

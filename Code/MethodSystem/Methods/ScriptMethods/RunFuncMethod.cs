@@ -7,6 +7,7 @@ using SER.Code.Helpers.Exceptions;
 using SER.Code.Helpers.Extensions;
 using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.MethodSystem.MethodDescriptors;
+using SER.Code.ScriptSystem;
 using SER.Code.ValueSystem;
 using SER.Code.VariableSystem.Bases;
 
@@ -82,6 +83,6 @@ public class RunFuncMethod : SynchronousMethod, ICanError
             scriptToRun.AddVariable(variable);
         }
         
-        scriptToRun.Run();
+        scriptToRun.Run(RunContext.Script, Script);
     }
 }

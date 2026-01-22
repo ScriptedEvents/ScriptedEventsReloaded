@@ -79,6 +79,7 @@ public static class Contexter
         }
 
         var currentStatement = statementStack.FirstOrDefault();
+        string error;
         if (context is StatementContext treeExtenderContext and IStatementExtender treeExtenderInfo)
         {
             if (currentStatement is null)
@@ -99,10 +100,10 @@ public static class Contexter
             extendable.RegisteredSignals[treeExtenderInfo.Extends] = treeExtenderContext.Run;
             statementStack.Pop();
             statementStack.Push(treeExtenderContext);
-            return true;
+            return context.VerifyCurrentState().HasErrored(out error) ? rs + error : true;
         }
 
-        if (context.VerifyCurrentState().HasErrored(out var error)) 
+        if (context.VerifyCurrentState().HasErrored(out error)) 
             return rs + error;
 
         if (currentStatement is not null)

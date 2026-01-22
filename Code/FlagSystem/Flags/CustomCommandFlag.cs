@@ -222,7 +222,7 @@ public class CustomCommandFlag : Flag
             script.AddVariable(new LiteralVariable<TextValue>(name, slice.Value));
         }
 
-        script.Run();
+        script.Run(RunContext.Command);
         return true;
     }
     

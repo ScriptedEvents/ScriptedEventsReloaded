@@ -53,7 +53,7 @@ public class SpawnPickupPosMethod : SynchronousMethod, ICanError
         obj.GameObject.SetActive(true);
         if (NetworkServer.spawned.ContainsValue(obj.NetworkIdentity))
             throw new ScriptRuntimeError(caller, Singleton.ErrorReasons[0]);
-        NetworkServer.Spawn(obj.GameObject);
+        obj.Spawn();
         if (obj is Projectile projectile)
             projectile.Base.ServerActivate();
     }

@@ -8,6 +8,9 @@ using SER.Code.Helpers.Exceptions;
 using SER.Code.Helpers.Extensions;
 using SER.Code.MethodSystem;
 using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.MethodSystem.BaseMethods.Interfaces;
+using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.BaseMethods.Yielding;
 using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.Plugin.Commands.Interfaces;
 using SER.Code.TokenSystem.Tokens;
@@ -507,21 +510,21 @@ public class HelpCommand : ICommand
                 sb.AppendLine($"This method returns a {typeReturn}, which can be saved or used directly. ");
                 break;
             }
-            case ReturningMethod<CollectionValue>:
+            case IReturningMethod<CollectionValue>:
                 sb.AppendLine();
                 sb.AppendLine("This method returns a collection of values, which can be saved or used directly.");
                 break;
-            case ReturningMethod<PlayerValue>:
+            case IReturningMethod<PlayerValue>:
                 sb.AppendLine();
                 sb.AppendLine("This method returns players, which can be saved or used directly.");
                 break;
-            case ReferenceReturningMethod refMethod:
+            case IReferenceReturningMethod refMethod:
                 sb.AppendLine();
                 sb.AppendLine($"This method returns a reference to {refMethod.ReturnType.GetAccurateName()} object, which can be saved or used directly.\n" +
                               $"References represent an object which cannot be fully represented in text.\n" +
                               $"If you wish to use that reference further, find methods supporting references of this type.");
                 break;
-            case ReturningMethod ret:
+            case IReturningMethod ret:
             {
                 string typeReturn;
                 if (ret.Returns.AreKnown(out var returnTypes))

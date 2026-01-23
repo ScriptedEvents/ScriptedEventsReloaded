@@ -1,7 +1,7 @@
 ﻿using SER.Code.ContextSystem;
 using SER.Code.Helpers.Exceptions;
 using SER.Code.Helpers.ResultSystem;
-using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.TokenSystem.Tokens.ExpressionTokens;
@@ -9,6 +9,9 @@ namespace SER.Code.TokenSystem.Tokens.ExpressionTokens;
 public class MethodExpressionToken : ExpressionToken
 {
     private ReturningMethod? _method = null!;
+
+    //public override TypeOfValue PossibleValues => new UnknownTypeOfValue();
+    public override TypeOfValue PossibleValues => _method!.Returns;
 
     protected override IParseResult InternalParse(BaseToken[] tokens)
     {
@@ -38,6 +41,4 @@ public class MethodExpressionToken : ExpressionToken
         _method.Execute();
         return _method.ReturnValue ?? throw new AndrzejFuckedUpException();
     }
-
-    public override TypeOfValue PossibleValues => new UnknownTypeOfValue();
 }

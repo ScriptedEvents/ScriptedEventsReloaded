@@ -3,7 +3,7 @@ using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Helpers.Extensions;
-using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.MethodSystem.BaseMethods.Synchronous;
 
 namespace SER.Code.MethodSystem.Methods.ItemMethods;
 

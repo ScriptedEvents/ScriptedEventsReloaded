@@ -3,7 +3,7 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.Helpers.Exceptions;
-using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 

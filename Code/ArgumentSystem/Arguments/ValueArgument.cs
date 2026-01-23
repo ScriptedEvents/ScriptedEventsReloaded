@@ -19,6 +19,6 @@ public class ValueArgument<T>(string name) : Argument(name) where T : Value
             return $"Value '{token.RawRep}' cannot represent {InputDescription}";
         }
         
-        return new(() => get());
+        return new(get);
     }
 }

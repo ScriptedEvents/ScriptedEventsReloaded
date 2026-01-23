@@ -13,43 +13,6 @@ namespace SER.Code.TokenSystem.Tokens;
 
 public class TextToken : LiteralValueToken<TextValue>
 {
-    private static readonly Regex ExpressionRegex = new(@"~?\{.*?\}", RegexOptions.Compiled);
-
-    public string ParsedValue() => ContainsExpressions ? ParseValue(Value, Script) : Value;
-
-    public bool ContainsExpressions => ExpressionRegex.IsMatch(Value);
-
-    public static string ParseValue(string text, Script script) => ExpressionRegex.Replace(text, match =>
-    {
-        if (match.Value.StartsWith("~")) return match.Value.Substring(1);
-        
-        if (Tokenizer.SliceLine(match.Value).HasErrored(out var error, out var slices))
-        {
-            Log.Warn(script, error);
-            return "<error>";
-        }
-
-        if (slices.FirstOrDefault() is not CollectionSlice { Type: CollectionBrackets.Curly } collection)
-        {
-            throw new AndrzejFuckedUpException();
-        }
-        
-        // ReSharper disable once DuplicatedSequentialIfBodies
-        if (ExpressionToken.TryParse(collection, script).HasErrored(out error, out var token))
-        {
-            Log.Warn(script, error);
-            return "<error>";
-        }
-
-        if (((BaseToken)token).TryGet<LiteralValue>().HasErrored(out error, out var value))
-        {
-            Log.Warn(script, error);
-            return "<error>";
-        }
-            
-        return value.StringRep;
-    });
-
     protected override IParseResult InternalParse(Script scr)
     {
         if (Slice is not CollectionSlice { Type: CollectionBrackets.Quotes })
@@ -63,7 +26,9 @@ public class TextToken : LiteralValueToken<TextValue>
 
     public DynamicTryGet<string> GetDynamicResolver()
     {
-        if (ContainsExpressions) return new(() => TryGet<string>.Success(ParsedValue()));
+        if (Value.ContainsExpressions) 
+            return new(() => TryGet<string>.Success(Value.ParsedValue(Script)));
+        
         return DynamicTryGet.Success(Value.Value);
     }
 }

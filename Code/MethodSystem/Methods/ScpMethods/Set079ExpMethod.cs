@@ -3,9 +3,9 @@ using LabApi.Features.Wrappers;
 using PlayerRoles.PlayableScps.Scp079;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
-using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.MethodSystem.BaseMethods.Synchronous;
 
-namespace SER.Code.MethodSystem.Methods.Scp079Methods;
+namespace SER.Code.MethodSystem.Methods.ScpMethods;
 
 [UsedImplicitly]
 public class Set079ExpMethod : SynchronousMethod

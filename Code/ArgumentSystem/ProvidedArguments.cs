@@ -1,5 +1,6 @@
 ﻿using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
+using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ArgumentSystem.Structures;
 using SER.Code.FileSystem.Structures;
 using SER.Code.Helpers;
@@ -194,12 +195,12 @@ public class ProvidedArguments(Method method)
     /// Retrieves a list of remaining arguments based on the specified argument name.
     /// The method resolves provided arguments into a typed list of values.
     /// </summary>
-    public TValue[] GetRemainingArguments<TValue, TArg>(string argName)
+    public TValue[] GetRemainingArguments<TValue, TArg>(string argName) where TArg : Argument
     {
         return GetEvaluators<TValue, TArg>(argName).Select(dtg => dtg.Invoke().Value!).ToArray();
     }
 
-    public TValue GetValue<TValue, TArg>(string argName)
+    public TValue GetValue<TValue, TArg>(string argName) where TArg : Argument
     {
         return GetEvaluators<TValue, TArg>(argName).First().Invoke().Value!;
     }
@@ -244,7 +245,7 @@ public class ProvidedArguments(Method method)
 
         if (foundArg.DefaultValue is null)
         {
-            throw new CustomScriptRuntimeError($"{method} is missing a required argument '{argName}'.");
+            throw new ScriptRuntimeError(method, $"Method is missing a required argument '{argName}'.");
         }
 
         return foundArg.DefaultValue.Value switch

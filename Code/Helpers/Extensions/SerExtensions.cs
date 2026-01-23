@@ -48,7 +48,10 @@ public static class SerExtensions
     {
         get = valToken.TryGet<T>;
         
+        // if unknown, its always assumed that it may return T
         if (!valToken.PossibleValues.AreKnown(out var knownReturnTypes)) return true;
+        
+        // if any of known types is assignable to T, or T to type, then it may return T
         return knownReturnTypes.Any(type => typeof(T).IsAssignableFrom(type) || type.IsAssignableFrom(typeof(T)));
     }
     

@@ -14,7 +14,7 @@ public class LiteralVariableDefinitionContext :
         {
             if (token is TextToken textToken)
             {
-                return () => new TextValue(textToken.ParsedValue());
+                return () => textToken.Value;
             }
 
             return null;

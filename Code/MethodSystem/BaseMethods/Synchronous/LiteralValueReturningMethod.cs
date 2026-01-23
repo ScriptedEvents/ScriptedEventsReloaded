@@ -1,9 +1,9 @@
 ﻿using SER.Code.ValueSystem;
 
-namespace SER.Code.MethodSystem.BaseMethods;
+namespace SER.Code.MethodSystem.BaseMethods.Synchronous;
 
 public abstract class LiteralValueReturningMethod : ReturningMethod<LiteralValue>
 {
     public abstract TypeOfValue LiteralReturnTypes { get; }
-    public override TypeOfValue Returns => LiteralReturnTypes;
+    public sealed override TypeOfValue Returns => LiteralReturnTypes;
 }

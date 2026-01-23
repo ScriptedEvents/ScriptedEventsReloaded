@@ -1,4 +1,4 @@
-﻿namespace SER.Code.MethodSystem.BaseMethods;
+﻿namespace SER.Code.MethodSystem.BaseMethods.Yielding;
 
 /// <summary>
 ///     Represents a SER method that can stop the execution of a script using its <see cref="IEnumerable{Float}" />.

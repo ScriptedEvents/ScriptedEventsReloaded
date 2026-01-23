@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Cassie.Interpreters;
 using JetBrains.Annotations;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;

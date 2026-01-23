@@ -4,7 +4,7 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ArgumentSystem.Structures;
 using SER.Code.FlagSystem;
 using SER.Code.Helpers.Exceptions;
-using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.ScriptSystem;
 using SER.Code.ValueSystem;
 

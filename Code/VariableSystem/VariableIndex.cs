@@ -1,7 +1,6 @@
 ﻿using LabApi.Features.Wrappers;
 using MapGeneration;
 using PlayerRoles;
-using PlayerRoles.PlayableScps.Scp173;
 using SER.Code.Helpers.Extensions;
 using SER.Code.VariableSystem.Bases;
 using SER.Code.VariableSystem.Variables;

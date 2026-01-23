@@ -7,10 +7,14 @@ using SER.Code.Helpers;
 using SER.Code.Helpers.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.MethodSystem.BaseMethods.Interfaces;
+using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.BaseMethods.Yielding;
 using SER.Code.Plugin;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.ValueSystem;
 using MethodToken = SER.Code.TokenSystem.Tokens.MethodToken;
+using ReturningMethod = SER.Code.MethodSystem.BaseMethods.Synchronous.ReturningMethod;
 
 namespace SER.Code.ContextSystem.Contexts;
 
@@ -20,7 +24,7 @@ public class MethodContext(MethodToken methodToken) : YieldingContext, IMayRetur
     public readonly MethodArgumentDispatcher Dispatcher = new(methodToken.Method);
     private int _providedArguments = 0;
     
-    public TypeOfValue? Returns => Method is ReturningMethod returningMethod 
+    public TypeOfValue? Returns => Method is IReturningMethod returningMethod 
         ? returningMethod.Returns 
         : null;
     
@@ -78,7 +82,7 @@ public class MethodContext(MethodToken methodToken) : YieldingContext, IMayRetur
                 break;
         }
 
-        ReturnedValue = Method is ReturningMethod returningMethod
+        ReturnedValue = Method is IReturningMethod returningMethod
             ? returningMethod.ReturnValue
             : null;
     }

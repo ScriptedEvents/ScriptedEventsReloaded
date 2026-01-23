@@ -2,7 +2,7 @@
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.FileSystem.Structures;
-using SER.Code.MethodSystem.BaseMethods;
+using SER.Code.MethodSystem.BaseMethods.Synchronous;
 
 namespace SER.Code.MethodSystem.Methods.DatabaseMethods;
 

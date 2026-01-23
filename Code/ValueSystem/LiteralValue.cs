@@ -4,7 +4,7 @@ public abstract class LiteralValue(object value) : Value
 {
     public abstract string StringRep { get; }
 
-    public object Value => value;
+    public readonly object Value = value;
 
     public override bool EqualCondition(Value other) => other is LiteralValue otherP && Value.Equals(otherP.Value);
 

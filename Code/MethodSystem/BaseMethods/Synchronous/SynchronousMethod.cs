@@ -1,4 +1,4 @@
-﻿namespace SER.Code.MethodSystem.BaseMethods;
+﻿namespace SER.Code.MethodSystem.BaseMethods.Synchronous;
 
 /// <summary>
 ///     Represents a standard SER method.

@@ -1,11 +1,12 @@
-﻿using SER.Code.ValueSystem;
+﻿using SER.Code.MethodSystem.BaseMethods.Interfaces;
+using SER.Code.ValueSystem;
 
-namespace SER.Code.MethodSystem.BaseMethods;
+namespace SER.Code.MethodSystem.BaseMethods.Synchronous;
 
 /// <summary>
 /// Represents a method that returns a reference to an object that cannot be represented fully in text form (not counting players.)
 /// </summary>
-public abstract class ReferenceReturningMethod : ReturningMethod<ReferenceValue>
+public abstract class ReferenceReturningMethod : ReturningMethod<ReferenceValue>, IReferenceReturningMethod
 {
     public abstract Type ReturnType { get; }
 }

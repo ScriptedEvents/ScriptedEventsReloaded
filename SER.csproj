@@ -61,7 +61,7 @@
         <Reference Include="UnityEngine.PhysicsModule">
             <HintPath>$(SL_DEV_REFERENCES)\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.PhysicsModule">
+        <Reference Include="UnityEngine.UnityWebRequestModule">
             <HintPath>$(SL_DEV_REFERENCES)\UnityEngine.UnityWebRequestModule.dll</HintPath>
         </Reference>
     </ItemGroup>

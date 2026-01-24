@@ -6,6 +6,8 @@ public abstract class Argument(string name)
 {
     public string Name { get; } = name;
     
+    public bool IsRequired => DefaultValue is null;
+    
     /// <summary>
     /// Allows for this argument to get an unlimited amount of values of this type
     /// Every value after this argument also counts towards this one.

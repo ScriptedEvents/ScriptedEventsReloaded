@@ -48,9 +48,9 @@ public static class Contexter
         Stack<StatementContext> statementStack, 
         List<Context> contexts
     ) {
-        Result rs = $"Invalid context {context} in line {lineNum}.";
+        Result rs = $"Invalid context {context}";
 
-        Log.Debug($"Trying to add context {context} in line {lineNum}");
+        Log.Debug($"Trying to add context {context}");
         
         switch (context)
         {

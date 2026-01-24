@@ -1,4 +1,5 @@
-﻿using MEC;
+﻿using JetBrains.Annotations;
+using MEC;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SER.Code.ArgumentSystem.Arguments;
@@ -10,6 +11,7 @@ using UnityEngine.Networking;
 
 namespace SER.Code.MethodSystem.Methods.HTTPMethods;
 
+[UsedImplicitly]
 // ReSharper disable once InconsistentNaming
 public class HTTPGetMethod : YieldingReferenceReturningMethod<JObject>, ICanError
 {

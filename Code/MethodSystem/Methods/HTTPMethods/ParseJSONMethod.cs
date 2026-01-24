@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using JetBrains.Annotations;
+using Newtonsoft.Json.Linq;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Helpers.Exceptions;
@@ -7,6 +8,7 @@ using SER.Code.MethodSystem.MethodDescriptors;
 
 namespace SER.Code.MethodSystem.Methods.HTTPMethods;
 
+[UsedImplicitly]
 // ReSharper disable once InconsistentNaming
 public class ParseJSONMethod : ReferenceReturningMethod<JObject>, ICanError
 {

@@ -1,5 +1,8 @@
-﻿namespace SER.Code.Examples;
+﻿using JetBrains.Annotations;
 
+namespace SER.Code.Examples;
+
+[UsedImplicitly]
 public class DoorRestartScript : Example
 {
     public override string Name => "doorRestart";
@@ -11,7 +14,7 @@ public class DoorRestartScript : Example
 
         # wait for cassie to finish before restarting doors
         Wait 1s
-        WaitUntil ({IsCassieSpeaking} == false)
+        WaitUntil ({IsCassieSpeaking} is false)
 
         # restart effects
         LightsOut * 15s
@@ -20,7 +23,7 @@ public class DoorRestartScript : Example
 
         # cassie for spooky effect
         repeat 2
-            Cassie noJingle "pitch_{RandomNum 0.15 0.25} .g{RandomNum 1 6 int}"
+            Cassie noJingle "pitch_{RandomNum 0.15 0.25 real} .g{RandomNum 1 6 int}"
         end
 
         # duration of the restart

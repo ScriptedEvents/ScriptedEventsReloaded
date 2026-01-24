@@ -63,6 +63,8 @@ public class PlayerExpressionToken : ExpressionToken
         RelativeX,
         RelativeY,
         RelativeZ,
+        IsNpc,
+        IsDummy,
     }
 
     public abstract class Info
@@ -172,6 +174,8 @@ public class PlayerExpressionToken : ExpressionToken
         [PlayerProperty.RelativeX] = new Info<NumberValue>(plr => (decimal)plr.RelativeRoomPosition().x, "Returns the player's x relative to the current room or 0 if in no room"),
         [PlayerProperty.RelativeY] = new Info<NumberValue>(plr => (decimal)plr.RelativeRoomPosition().y, "Returns the player's y relative to the current room or 0 if in no room"),
         [PlayerProperty.RelativeZ] = new Info<NumberValue>(plr => (decimal)plr.RelativeRoomPosition().z, "Returns the player's z relative to the current room or 0 if in no room"),
+        [PlayerProperty.IsNpc] = new Info<BoolValue>(plr => plr.IsNpc, "True if it's a player without any client connected to it"),
+        [PlayerProperty.IsDummy] = new Info<BoolValue>(plr => plr.IsDummy, null)
     };
 
     protected override IParseResult InternalParse(BaseToken[] tokens)

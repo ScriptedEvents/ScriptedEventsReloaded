@@ -115,7 +115,7 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
         Events.ServerEvents.RoundRestarted += Disable;
         Events.PlayerEvents.Joined += OnJoined;
 
-        Timing.CallDelayed(1.5f, FileSystem.FileSystem.Initialize);
+        FileSystem.FileSystem.Initialize();
     }
 
     public override void Disable()

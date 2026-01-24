@@ -40,7 +40,11 @@ public class SendDiscordMessageMethod : SynchronousMethod, ICanError
         
         JObject json = new()
         {
-            ["content"] = messageContent
+            ["content"] = messageContent,
+            ["allowed_mentions"] = new JObject
+            {
+                ["parse"] = new JArray("roles", "users", "everyone")
+            }
         };
 
         if (webhookName != null) json["username"] = webhookName;

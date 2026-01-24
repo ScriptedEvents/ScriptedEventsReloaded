@@ -148,8 +148,15 @@
               return null;
           };
 
+          try
+          {
           // 2. Attach Resolver
           AppDomain.CurrentDomain.AssemblyResolve += resolver;
+          }
+          catch (Exception e)
+          {
+          Log.LogMessage(MessageImportance.High, e);
+          }
 
           try 
           {

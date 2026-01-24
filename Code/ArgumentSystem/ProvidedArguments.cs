@@ -78,9 +78,9 @@ public class ProvidedArguments(Method method)
         return GetValue<Elevator[], ElevatorsArgument>(argName);
     }
     
-    public LiteralVariableToken GetLiteralVariable(string argName)
+    public LiteralVariable GetLiteralVariable(string argName)
     {
-        return GetValue<LiteralVariableToken, LiteralVariableArgument>(argName);
+        return GetValue<LiteralVariable, LiteralVariableArgument>(argName);
     }
     
     public Item[] GetItems(string argName)

@@ -1,13 +1,13 @@
-﻿using SER.Code.Helpers;
+﻿using System.Text.RegularExpressions;
+using SER.Code.Helpers;
 using SER.Code.Helpers.Exceptions;
 using SER.Code.Helpers.Extensions;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem;
 using SER.Code.TokenSystem.Slices;
+using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.ExpressionTokens;
-using System.Text.RegularExpressions;
-using SER.Code.TokenSystem.Structures;
 
 namespace SER.Code.ValueSystem;
 

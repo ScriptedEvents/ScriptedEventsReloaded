@@ -68,4 +68,6 @@ public abstract class Method
             ? $"{Name} method in line {LineNum}"
             : $"{Name} method";
     }
+    
+    public static string GetFriendlyName(Type type) => type.Name[..^"Method".Length];
 }

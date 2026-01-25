@@ -1,9 +1,7 @@
 ﻿using JetBrains.Annotations;
 using MEC;
-using Newtonsoft.Json.Linq;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
-using SER.Code.Helpers.Extensions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.MethodSystem.Methods.HTTPMethods;
@@ -20,36 +18,14 @@ public class SendDiscordMessageMethod : SynchronousMethod, ICanError
     public override Argument[] ExpectedArguments { get; } =
     [
         new TextArgument("webhook url"),
-        new TextArgument("message content"),
-        new TextArgument("webhook name")
-        {
-            DefaultValue = new(null, "default")
-        },
-        new TextArgument("avatar url")
-        {
-            DefaultValue = new(null, "default")
-        }
+        new ReferenceArgument<CreateDiscordMessageMethod.DMessage>("message object")
     ];
 
     public override void Execute()
     {
         var webhookUrl = Args.GetText("webhook url");
-        var messageContent = Args.GetText("message content");
-        var webhookName = Args.GetText("webhook name").MaybeNull();
-        var avatarUrl = Args.GetText("avatar url").MaybeNull();
-        
-        JObject json = new()
-        {
-            ["content"] = messageContent,
-            ["allowed_mentions"] = new JObject
-            {
-                ["parse"] = new JArray("roles", "users", "everyone")
-            }
-        };
+        var messageObject = Args.GetReference<CreateDiscordMessageMethod.DMessage>("message object");
 
-        if (webhookName != null) json["username"] = webhookName;
-        if (avatarUrl != null) json["avatar_url"] = avatarUrl;
-
-        Timing.RunCoroutine(HTTPPostMethod.SendPost(this, webhookUrl, json.ToString()));
+        Timing.RunCoroutine(HTTPPostMethod.SendPost(this, webhookUrl, messageObject));
     }
 }

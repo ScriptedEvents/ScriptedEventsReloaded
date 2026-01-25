@@ -3,43 +3,44 @@ using Newtonsoft.Json.Linq;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
-using SER.Code.MethodSystem.Methods.DiscordMethods.Structures;
 
 namespace SER.Code.MethodSystem.Methods.DiscordMethods;
 
 [UsedImplicitly]
-public class CreateDiscordEmbedAuthorMethod : ReferenceReturningMethod<DEmbedAuthor>
+public class CreateDiscordEmbedAuthorMethod : ReferenceReturningMethod<CreateDiscordEmbedAuthorMethod.DEmbedAuthor>
 {
+    public class DEmbedAuthor : JObject;
+    
     public override string Description => "Creates an author object that can be used in discord embeds.";
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new TextArgument("name"),
-        new TextArgument("url")
+        new TextArgument("name")
         {
-            DefaultValue = new(null, "none")
+            Description = "Small text at the top of the embed."
         },
         new TextArgument("icon url")
         {
-            DefaultValue = new(null, "none")
+            DefaultValue = new(null, "none"), 
+            Description = "Small round image next to the author name."
         },
-        new TextArgument("proxy icon url")
+        new TextArgument("clickable url")
         {
-            DefaultValue = new(null, "none")
-        }
+            DefaultValue = new(null, "none"),
+            Description = "Link that turns the author name into a hyperlink."
+        },
     ];
     
     public override void Execute()
     {
-        var author = new JObject
+        var author = new DEmbedAuthor
         {
             ["name"] = Args.GetText("name")
         };
         
-        if (Args.GetText("url") is {} url) author["url"] = url;
+        if (Args.GetText("clickable url") is {} url) author["url"] = url;
         if (Args.GetText("icon url") is {} iconUrl) author["icon_url"] = iconUrl;
-        if (Args.GetText("proxy icon url") is {} proxyIconUrl) author["proxy_icon_url"] = proxyIconUrl;
         
-        ReturnValue = new(author);
+        ReturnValue = author;
     }
 }

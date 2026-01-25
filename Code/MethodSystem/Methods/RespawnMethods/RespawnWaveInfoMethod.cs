@@ -35,7 +35,7 @@ public class RespawnWaveInfoMethod : LiteralValueReturningMethod, IReferenceReso
             "maxWaveSize",
             "respawnTokens",
             "influence",
-            "secondsLeft"
+            "timeleft"
         )
     ];
 

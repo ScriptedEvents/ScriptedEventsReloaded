@@ -28,7 +28,7 @@ public class ChaosCoinScript : Example
         end
 
         # 50% chance to lose the coin
-        if {RandomNum 1 2 int} == 1
+        if {Chance 50%}
             Hint @evPlayer 3s "{$hintInfo}Your coin has turned into dust..."
             AdvDestroyItem {@evPlayer heldItemRef}
         end

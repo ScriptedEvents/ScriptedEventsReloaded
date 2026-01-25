@@ -38,7 +38,7 @@ public class MethodContext(MethodToken methodToken) : YieldingContext, IMayRetur
     {
         Log.Debug($"'{Method.Name}' method is now receiving token '{token.RawRep}' ({token.GetType().AccurateName})");
 
-        if (Dispatcher.TryGetValueInfo(token, _providedArguments)
+        if (Dispatcher.TryGetValueInfo(token, _providedArguments++)
             .HasErrored(out var error, out var possibleArgumentInfo))
         {
             return TryAddTokenRes.Error($"Value '{token.RawRep}' is not a valid argument: {error}");
@@ -50,7 +50,6 @@ public class MethodContext(MethodToken methodToken) : YieldingContext, IMayRetur
         Log.Debug($"skeleton {argInfo.Name} {argInfo.ArgumentType} registered");
         
         Method.Args.Add(argInfo);
-        _providedArguments++;
         return TryAddTokenRes.Continue();
     }
 

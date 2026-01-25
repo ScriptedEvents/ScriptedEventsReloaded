@@ -80,9 +80,10 @@
         <None Include="THIRD_PARTY_LICENSES.txt" CopyToOutputDirectory="Always" />
     </ItemGroup>
 
-    <!-- ignore warnings about mismatch between versions of core libs -->
+    <!-- ignore warnings about mismatch between versions of core libs
+        and unreachable code because compiler is stupid -->
     <PropertyGroup>
-        <NoWarn>$(NoWarn);MSB3277</NoWarn>
+        <NoWarn>$(NoWarn);MSB3277;CS0162</NoWarn>
     </PropertyGroup>
 
     <!-- nuget refs -->
@@ -130,6 +131,7 @@
             <Using Namespace="System.Reflection" />
             <Code Type="Fragment" Language="cs">
                 <![CDATA[
+          #nullable enable annotations
           // 1. Resolver for SCP:SL Dependencies
           ResolveEventHandler resolver = (sender, args) => {
               try {
@@ -144,14 +146,18 @@
                       return Assembly.LoadFrom(fullPath);
                   }
               }
-              catch { /* Safe verify, ignore errors */ }
+              catch (Exception e)
+              {
+                  Log.LogError("Resolver Error: " + e.ToString());
+              }
+
               return null;
           };
 
+        try
+        {
           AppDomain.CurrentDomain.AssemblyResolve += resolver;
 
-          try 
-          {
               if (!File.Exists(AssemblyPath)) {
                   Log.LogError("Target DLL not found: " + AssemblyPath);
                   return false;
@@ -163,7 +169,7 @@
               
               {
                   // 4. Find the class (Namespace.ClassName)
-                  Type targetType = assembly.GetType("SER.Code.MethodSystem.MethodIndex");
+                  Type? targetType = assembly.GetType("SER.Code.MethodSystem.MethodIndex");
                   if (targetType == null) 
                   {
                       Log.LogError("Validation Error: Type 'SER.Code.MethodSystem.MethodIndex' not found.");
@@ -171,20 +177,23 @@
                   }
     
                   // 5. Find the method
-                  MethodInfo method = targetType.GetMethod("AddAllDefinedMethodsInAssembly", BindingFlags.Public | BindingFlags.Static);
+                MethodInfo? method = targetType.GetMethod(
+                    "AddAllDefinedMethodsInAssembly",
+                    BindingFlags.Public | BindingFlags.Static
+                );
                   if (method == null)
                   {
                       Log.LogError("Validation Error: Static method 'AddAllDefinedMethodsInAssembly()' not found.");
                       return false;
                   }
    
-                  method.Invoke(null, [assembly]);
+                  method.Invoke(null, new object[] { assembly });
                   Log.LogMessage(MessageImportance.High, ">>> Loaded methods.");
               }
               
               {
                   // 4. Find the class (Namespace.ClassName)
-                  Type targetType = assembly.GetType("SER.Code.Examples.Example");
+                  Type? targetType = assembly.GetType("SER.Code.Examples.Example");
                   if (targetType == null) 
                   {
                       Log.LogError("Validation Error: Type 'SER.Code.Examples.Example' not found.");
@@ -192,7 +201,10 @@
                   }
     
                   // 5. Find the method
-                  MethodInfo method = targetType.GetMethod("Verify", BindingFlags.Public | BindingFlags.Static);
+                MethodInfo? method = targetType.GetMethod(
+                    "Verify",
+                    BindingFlags.Public | BindingFlags.Static
+                );
                   if (method == null)
                   {
                       Log.LogError("Validation Error: Static method 'Verify()' not found.");
@@ -214,24 +226,34 @@
                   return true;
               }
           }
+          catch (OperationCanceledException)
+          {
+              throw;
+          }
+          catch (ReflectionTypeLoadException re)
+          {
+              foreach (var loaderEx in re.LoaderExceptions)
+              {
+                  Log.LogError("Loader Error: " + loaderEx.ToString());
+              }
+              return false;
+          }
+          catch (TargetInvocationException tie)
+          {
+              Log.LogError("Invocation Error: " +
+                  (tie.InnerException != null ? tie.InnerException.ToString() : tie.ToString()));
+              return false;
+          }
           catch (Exception ex) 
           {
-              if (ex is ReflectionTypeLoadException re) {
-                  foreach (var loaderEx in re.LoaderExceptions) {
-                      Log.LogError("Loader Error: " + loaderEx.Message);
-                  }
-              }
-              else if (ex.InnerException != null) {
-                   Log.LogError("Runtime Error: " + ex.InnerException.Message);
-              }
-              else {
-                  Log.LogError("Task Error: " + ex.ToString());
-              }
+              Log.LogError("Task Error: " + ex.ToString());
+              return false;
           }
           finally {
               // 7. Detach Resolver to keep build process clean
               AppDomain.CurrentDomain.AssemblyResolve -= resolver;
           }
+          #nullable disable annotations
         ]]>
             </Code>
         </Task>

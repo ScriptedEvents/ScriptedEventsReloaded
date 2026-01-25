@@ -7,7 +7,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.DiscordMethods;
 
 [UsedImplicitly]
-public class CreateDiscordEmbedFooterMethod : ReferenceReturningMethod<CreateDiscordEmbedFooterMethod.DEmbedFooter>
+public class EmbedFooterMethod : ReferenceReturningMethod<EmbedFooterMethod.DEmbedFooter>
 {
     public class DEmbedFooter : JObject;
     

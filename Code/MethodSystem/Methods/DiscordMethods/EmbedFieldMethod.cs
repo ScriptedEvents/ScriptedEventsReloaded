@@ -7,7 +7,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.DiscordMethods;
 
 [UsedImplicitly]
-public class CreateDiscordEmbedFieldMethod : ReferenceReturningMethod<CreateDiscordEmbedFieldMethod.DEmbedField>
+public class EmbedFieldMethod : ReferenceReturningMethod<EmbedFieldMethod.DEmbedField>
 {
     public class DEmbedField : JObject;
     

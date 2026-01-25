@@ -10,7 +10,7 @@ using UnityEngine;
 namespace SER.Code.MethodSystem.Methods.DiscordMethods;
 
 [UsedImplicitly]
-public class CreateDiscordEmbedMethod : ReferenceReturningMethod<CreateDiscordEmbedMethod.DEmbed>, IAdditionalDescription
+public class DiscordEmbedMethod : ReferenceReturningMethod<DiscordEmbedMethod.DEmbed>, IAdditionalDescription
 {
     public class DEmbed : JObject;
     
@@ -36,15 +36,15 @@ public class CreateDiscordEmbedMethod : ReferenceReturningMethod<CreateDiscordEm
             DefaultValue = new(new Color(0, 0, 0, 0), "none"),
             Description = "The vertical sidebar color."
         },
-        new ReferenceArgument<CreateDiscordEmbedAuthorMethod.DEmbedAuthor>("author")
+        new ReferenceArgument<EmbedAuthorMethod.DEmbedAuthor>("author")
         {
             DefaultValue = new(null, "none"),
-            Description = $"Created using {GetFriendlyName(typeof(CreateDiscordEmbedAuthorMethod))}"
+            Description = $"Created using {GetFriendlyName(typeof(EmbedAuthorMethod))}"
         },
-        new ReferenceArgument<CreateDiscordEmbedFooterMethod.DEmbedFooter>("footer")
+        new ReferenceArgument<EmbedFooterMethod.DEmbedFooter>("footer")
         {
             DefaultValue = new(null, "none"),
-            Description = $"Created using {GetFriendlyName(typeof(CreateDiscordEmbedFooterMethod))}"
+            Description = $"Created using {GetFriendlyName(typeof(EmbedFooterMethod))}"
         },
         new TextArgument("thumbnail url")
         {
@@ -61,11 +61,11 @@ public class CreateDiscordEmbedMethod : ReferenceReturningMethod<CreateDiscordEm
             DefaultValue = new(null, "none"),
             Description = "Makes the title a clickable hyperlink."
         },
-        new ReferenceArgument<CreateDiscordEmbedFieldMethod.DEmbedField>("fields")
+        new ReferenceArgument<EmbedFieldMethod.DEmbedField>("fields")
         {
-            DefaultValue = new(Array.Empty<CreateDiscordEmbedFieldMethod.DEmbedField>(), "none"),
+            DefaultValue = new(Array.Empty<EmbedFieldMethod.DEmbedField>(), "none"),
             ConsumesRemainingValues = true,
-            Description = $"List of fields, created using {GetFriendlyName(typeof(CreateDiscordEmbedFieldMethod))}"
+            Description = $"List of fields, created using {GetFriendlyName(typeof(EmbedFieldMethod))}"
         }
     ];
 
@@ -86,9 +86,9 @@ public class CreateDiscordEmbedMethod : ReferenceReturningMethod<CreateDiscordEm
             embed["color"] = (r << 16) | (g << 8) | b;
         }
 
-        if (Args.GetReference<CreateDiscordEmbedAuthorMethod.DEmbedAuthor>("author") is { } author) embed["author"] = author;
+        if (Args.GetReference<EmbedAuthorMethod.DEmbedAuthor>("author") is { } author) embed["author"] = author;
         
-        if (Args.GetReference<CreateDiscordEmbedFooterMethod.DEmbedFooter>("footer") is { } footer) embed["footer"] = footer;
+        if (Args.GetReference<EmbedFooterMethod.DEmbedFooter>("footer") is { } footer) embed["footer"] = footer;
         
         if (Args.GetText("thumbnail url") is { } thumbnailUrl) embed["thumbnail"] = new JObject {{"url", thumbnailUrl}};
         
@@ -96,7 +96,7 @@ public class CreateDiscordEmbedMethod : ReferenceReturningMethod<CreateDiscordEm
 
         if (Args.GetText("clickable url") is { } url) embed["url"] = url;
 
-        var fields = Args.GetRemainingArguments<CreateDiscordEmbedFieldMethod.DEmbedField, ReferenceArgument<CreateDiscordEmbedFieldMethod.DEmbedField>>("fields");
+        var fields = Args.GetRemainingArguments<EmbedFieldMethod.DEmbedField, ReferenceArgument<EmbedFieldMethod.DEmbedField>>("fields");
         Log.Signal(fields.Length);
         if (fields is { Length: > 0 })
         {

@@ -10,7 +10,7 @@ using SER.Code.MethodSystem.MethodDescriptors;
 namespace SER.Code.MethodSystem.Methods.DiscordMethods;
 
 [UsedImplicitly]
-public class CreateDiscordMessageMethod : ReferenceReturningMethod<CreateDiscordMessageMethod.DMessage>, IAdditionalDescription, ICanError
+public class DiscordMessageMethod : ReferenceReturningMethod<DiscordMessageMethod.DMessage>, IAdditionalDescription, ICanError
 {
     public class DMessage : JObject;
     
@@ -41,11 +41,11 @@ public class CreateDiscordMessageMethod : ReferenceReturningMethod<CreateDiscord
             Description = "Overrides the webhook's default profile picture.",
             DefaultValue = new(null, "default")
         },
-        new ReferenceArgument<CreateDiscordEmbedMethod.DEmbed>("embeds")
+        new ReferenceArgument<DiscordEmbedMethod.DEmbed>("embeds")
         {
             Description = "An list containing up to 10 rich embed objects.",
             // i dont know if we can use both at the same time lmao - andrzej
-            DefaultValue = new(Array.Empty<CreateDiscordEmbedMethod.DEmbed>(), "none"),
+            DefaultValue = new(Array.Empty<DiscordEmbedMethod.DEmbed>(), "none"),
             ConsumesRemainingValues = true
         }
     ];
@@ -55,7 +55,7 @@ public class CreateDiscordMessageMethod : ReferenceReturningMethod<CreateDiscord
         var messageContent = Args.GetText("message content").MaybeNull();
         var webhookName = Args.GetText("sender name").MaybeNull();
         var avatarUrl = Args.GetText("sender avatar url").MaybeNull();
-        var embeds = Args.GetRemainingArguments<CreateDiscordEmbedMethod.DEmbed, ReferenceArgument<CreateDiscordEmbedMethod.DEmbed>>("embeds");
+        var embeds = Args.GetRemainingArguments<DiscordEmbedMethod.DEmbed, ReferenceArgument<DiscordEmbedMethod.DEmbed>>("embeds");
 
         DMessage json = new();
 

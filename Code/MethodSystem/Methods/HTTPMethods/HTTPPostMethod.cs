@@ -37,12 +37,12 @@ public class HTTPPostMethod : SynchronousMethod, ICanError
         var address = Args.GetText("address");
         var jsonData = Args.GetReference<JObject>("json data to post");
         
-        Timing.RunCoroutine(SendPost(this, address, jsonData));
+        Timing.RunCoroutine(RequestSend(this, address, jsonData));
     }
     
-    public static IEnumerator<float> SendPost(Method caller, string url, JObject jsonData)
+    public static IEnumerator<float> RequestSend(Method caller, string url, JObject jsonData, string method = "POST")
     {
-        using UnityWebRequest request = new UnityWebRequest(url, "POST");
+        using UnityWebRequest request = new UnityWebRequest(url, method);
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData.ToString());
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();

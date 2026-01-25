@@ -7,7 +7,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.DiscordMethods;
 
 [UsedImplicitly]
-public class CreateDiscordEmbedAuthorMethod : ReferenceReturningMethod<CreateDiscordEmbedAuthorMethod.DEmbedAuthor>
+public class EmbedAuthorMethod : ReferenceReturningMethod<EmbedAuthorMethod.DEmbedAuthor>
 {
     public class DEmbedAuthor : JObject;
     

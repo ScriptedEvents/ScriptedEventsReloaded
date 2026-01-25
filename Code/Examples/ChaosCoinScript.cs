@@ -166,7 +166,7 @@ public class ChaosCoinScript : Example
         # change size
         if $effect == 8
             # set player size in every direction to a random number between 10% and 100%
-            SetSize @evPlayer {RandomNum 0.1 1} {RandomNum 0.1 1} {RandomNum 0.1 1}
+            SetSize @evPlayer {RandomNum 0.1 1 real} {RandomNum 0.1 1 real} {RandomNum 0.1 1 real}
 
             Broadcast @evPlayer 5s "{$baseText}Your size has changed a little!"
             stop

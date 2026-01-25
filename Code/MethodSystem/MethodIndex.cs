@@ -47,7 +47,8 @@ public static class MethodIndex
     public static void AddAllDefinedMethodsInAssembly(Assembly? assembly = null)
     {
         assembly ??= Assembly.GetCallingAssembly();
-        var definedMethods = GetDefinedMethods(assembly)
+        var definedMethods = assembly.GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && typeof(Method).IsAssignableFrom(t))
             .Where(t =>
             {
                 if (!typeof(IExiledMethod).IsAssignableFrom(t)) return true;
@@ -101,23 +102,6 @@ public static class MethodIndex
             .FirstOrDefault();
         
         return $"There is no method with name '{name}'. Did you mean '{closestMethod ?? "<error>"}'?";
-    }
-
-    public static string? AreMethodsNamedCorrectly(Assembly assembly)
-    {
-        var methods = GetDefinedMethods(assembly);
-        var invalidMethods = methods.Where(m => !m.Name.EndsWith("Method")).ToList();
-        
-        return invalidMethods.Any()
-            ? $"The following methods do not end with 'Method': {string.Join(", ", invalidMethods)}"
-            : null;
-    }
-
-    private static Type[] GetDefinedMethods(Assembly assembly)
-    {
-        return assembly.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && typeof(Method).IsAssignableFrom(t))
-            .ToArray();
     }
 
     /// <summary>

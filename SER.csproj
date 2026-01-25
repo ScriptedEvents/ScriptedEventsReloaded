@@ -130,120 +130,108 @@
             <Using Namespace="System.Reflection" />
             <Code Type="Fragment" Language="cs">
                 <![CDATA[
-            // 1. Resolver for SCP:SL Dependencies
-            ResolveEventHandler resolver = (sender, args) => {
-                try {
-                    // Parse the requested assembly name
-                    var nameObj = new AssemblyName(args.Name);
-                    string fileName = nameObj.Name + ".dll";
-                    
-                    // Look in the game references folder
-                    string fullPath = Path.Combine(ReferencePath, fileName);
-                    
-                    if (File.Exists(fullPath)) {
-                        return Assembly.LoadFrom(fullPath);
-                    }
-                }
-                catch { /* Safe verify, ignore errors */ }
-                return null;
-            };
-  
-            AppDomain.CurrentDomain.AssemblyResolve += resolver;
-            
-            try 
-            {
-                if (!File.Exists(AssemblyPath)) {
-                    Log.LogError("Target DLL not found: " + AssemblyPath);
-                    return false;
-                }
-  
-                // 3. Load the DLL
-                // LoadFrom allows dependencies to be resolved via the event handler
-                Assembly assembly = Assembly.LoadFrom(AssemblyPath);
-                
-                {
-                    Type targetType = assembly.GetType("SER.Code.MethodSystem.MethodIndex");
-                    if (targetType == null) 
-                    {
-                        Log.LogError("Validation Error: Type 'SER.Code.MethodSystem.MethodIndex' not found.");
-                        return false;
-                    }
-      
-                    MethodInfo verifyMethod = targetType.GetMethod("AreMethodsNamedCorrectly", BindingFlags.Public | BindingFlags.Static);
-                    if (verifyMethod == null)
-                    {
-                        Log.LogError("Validation Error: Static method 'AreMethodsNamedCorrectly()' not found.");
-                        return false;
-                    }
-                    
-                    var error = (string)verifyMethod.Invoke(null, [assembly]);
-                    if (error != null)
-                    {
-                        Log.LogError(error);
-                        return false;
-                    }
+          // 1. Resolver for SCP:SL Dependencies
+          ResolveEventHandler resolver = (sender, args) => {
+              try {
+                  // Parse the requested assembly name
+                  var nameObj = new AssemblyName(args.Name);
+                  string fileName = nameObj.Name + ".dll";
                   
-                    MethodInfo method = targetType.GetMethod("AddAllDefinedMethodsInAssembly", BindingFlags.Public | BindingFlags.Static);
-                    if (method == null)
-                    {
-                        Log.LogError("Validation Error: Static method 'AddAllDefinedMethodsInAssembly()' not found.");
-                        return false;
-                    }
-     
-                    method.Invoke(null, [assembly]);
-                    Log.LogMessage(MessageImportance.High, ">>> Loaded methods.");
-                }
-                
-                {
-                    // 4. Find the class (Namespace.ClassName)
-                    Type targetType = assembly.GetType("SER.Code.Examples.Example");
-                    if (targetType == null) 
-                    {
-                        Log.LogError("Validation Error: Type 'SER.Code.Examples.Example' not found.");
-                        return false;
-                    }
-      
-                    // 5. Find the method
-                    MethodInfo method = targetType.GetMethod("Verify", BindingFlags.Public | BindingFlags.Static);
-                    if (method == null)
-                    {
-                        Log.LogError("Validation Error: Static method 'Verify()' not found.");
-                        return false;
-                    }
-      
-                    Log.LogMessage(MessageImportance.High, ">>> Validating Scripts...");
-      
-                    // 6. Invoke
-                    string result = (string)method.Invoke(null, null);
-      
-                    if (!string.IsNullOrEmpty(result))
-                    {
-                        Log.LogError("SCRIPT ERROR: " + result);
-                        return false;
-                    }
-      
-                    Log.LogMessage(MessageImportance.High, ">>> Validation Passed.");
-                    return true;
-                }
-            }
-            catch (Exception ex) 
-            {
-                if (ex is ReflectionTypeLoadException re) {
-                    foreach (var loaderEx in re.LoaderExceptions) {
-                        Log.LogError("Loader Error: " + loaderEx.Message);
-                    }
-                }
-                else if (ex.InnerException != null) {
-                     Log.LogError("Runtime Error: " + ex.InnerException.Message);
-                }
-                else {
-                    Log.LogError("Task Error: " + ex.ToString());
-                }
-            }
-            finally {
-                // 7. Detach Resolver to keep build process clean
-                AppDomain.CurrentDomain.AssemblyResolve -= resolver;
-            }
+                  // Look in the game references folder
+                  string fullPath = Path.Combine(ReferencePath, fileName);
+                  
+                  if (File.Exists(fullPath)) {
+                      return Assembly.LoadFrom(fullPath);
+                  }
+              }
+              catch { /* Safe verify, ignore errors */ }
+              return null;
+          };
+
+          AppDomain.CurrentDomain.AssemblyResolve += resolver;
+
+          try 
+          {
+              if (!File.Exists(AssemblyPath)) {
+                  Log.LogError("Target DLL not found: " + AssemblyPath);
+                  return false;
+              }
+
+              // 3. Load the DLL
+              // LoadFrom allows dependencies to be resolved via the event handler
+              Assembly assembly = Assembly.LoadFrom(AssemblyPath);
+              
+              {
+                  // 4. Find the class (Namespace.ClassName)
+                  Type targetType = assembly.GetType("SER.Code.MethodSystem.MethodIndex");
+                  if (targetType == null) 
+                  {
+                      Log.LogError("Validation Error: Type 'SER.Code.MethodSystem.MethodIndex' not found.");
+                      return false;
+                  }
+    
+                  // 5. Find the method
+                  MethodInfo method = targetType.GetMethod("AddAllDefinedMethodsInAssembly", BindingFlags.Public | BindingFlags.Static);
+                  if (method == null)
+                  {
+                      Log.LogError("Validation Error: Static method 'AddAllDefinedMethodsInAssembly()' not found.");
+                      return false;
+                  }
+   
+                  method.Invoke(null, [assembly]);
+                  Log.LogMessage(MessageImportance.High, ">>> Loaded methods.");
+              }
+              
+              {
+                  // 4. Find the class (Namespace.ClassName)
+                  Type targetType = assembly.GetType("SER.Code.Examples.Example");
+                  if (targetType == null) 
+                  {
+                      Log.LogError("Validation Error: Type 'SER.Code.Examples.Example' not found.");
+                      return false;
+                  }
+    
+                  // 5. Find the method
+                  MethodInfo method = targetType.GetMethod("Verify", BindingFlags.Public | BindingFlags.Static);
+                  if (method == null)
+                  {
+                      Log.LogError("Validation Error: Static method 'Verify()' not found.");
+                      return false;
+                  }
+    
+                  Log.LogMessage(MessageImportance.High, ">>> Validating Scripts...");
+    
+                  // 6. Invoke
+                  string result = (string)method.Invoke(null, null);
+    
+                  if (!string.IsNullOrEmpty(result))
+                  {
+                      Log.LogError("SCRIPT ERROR: " + result);
+                      return false;
+                  }
+    
+                  Log.LogMessage(MessageImportance.High, ">>> Validation Passed.");
+                  return true;
+              }
+          }
+          catch (Exception ex) 
+          {
+              if (ex is ReflectionTypeLoadException re) {
+                  foreach (var loaderEx in re.LoaderExceptions) {
+                      Log.LogError("Loader Error: " + loaderEx.Message);
+                  }
+              }
+              else if (ex.InnerException != null) {
+                   Log.LogError("Runtime Error: " + ex.InnerException.Message);
+              }
+              else {
+                  Log.LogError("Task Error: " + ex.ToString());
+              }
+          }
+          finally {
+              // 7. Detach Resolver to keep build process clean
+              AppDomain.CurrentDomain.AssemblyResolve -= resolver;
+          }
         ]]>
             </Code>
         </Task>

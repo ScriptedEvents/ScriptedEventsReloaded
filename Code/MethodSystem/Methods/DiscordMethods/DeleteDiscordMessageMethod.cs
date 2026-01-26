@@ -10,9 +10,9 @@ using SER.Code.MethodSystem.Methods.HTTPMethods;
 namespace SER.Code.MethodSystem.Methods.DiscordMethods;
 
 [UsedImplicitly]
-public class EditDiscordMessageMethod : SynchronousMethod, ICanError
+public class DeleteDiscordMessageMethod : SynchronousMethod, ICanError
 {
-    public override string Description => "Edits a message sent by a discord webhook (with that same webhook).";
+    public override string Description => "Deletes a message sent by a discord webhook (with that same webhook).";
 
     public string[] ErrorReasons =>
     [
@@ -27,15 +27,13 @@ public class EditDiscordMessageMethod : SynchronousMethod, ICanError
         new TextArgument("message id")
         {
             Description = "You can get it by right-clicking on a message and clicking \"Copy message ID\""
-        },
-        new ReferenceArgument<DiscordMessageMethod.DMessage>("message object")
+        }
     ];
 
     public override void Execute()
     {
         var webhookUrl = Args.GetText("webhook url");
         var messageId = Args.GetText("message id");
-        var messageObject = Args.GetReference<DiscordMessageMethod.DMessage>("message object");
         
         if (messageId.IsEmpty())
             throw new ScriptRuntimeError(this, ErrorReasons[^2]);
@@ -45,6 +43,6 @@ public class EditDiscordMessageMethod : SynchronousMethod, ICanError
         
         var messageURL = webhookUrl + "/messages/" + messageId;
 
-        Timing.RunCoroutine(HTTPPostMethod.RequestSend(this, messageURL, messageObject, "PATCH"));
+        Timing.RunCoroutine(HTTPPostMethod.RequestSend(this, messageURL, null, "DELETE"));
     }
 }

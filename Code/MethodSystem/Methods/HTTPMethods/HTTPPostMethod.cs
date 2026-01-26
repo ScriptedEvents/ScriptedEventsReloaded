@@ -40,13 +40,16 @@ public class HTTPPostMethod : SynchronousMethod, ICanError
         Timing.RunCoroutine(RequestSend(this, address, jsonData));
     }
     
-    public static IEnumerator<float> RequestSend(Method caller, string url, JObject jsonData, string method = "POST")
+    public static IEnumerator<float> RequestSend(Method caller, string url, JObject? jsonData, string method = "POST")
     {
-        using UnityWebRequest request = new UnityWebRequest(url, method);
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData.ToString());
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
+        using var request = new UnityWebRequest(url, method);
+
+        if (jsonData is not null)
+        {
+            var bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData.ToString());
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.SetRequestHeader("Content-Type", "application/json");   
+        }
 
         yield return Timing.WaitUntilDone(request.SendWebRequest());
         

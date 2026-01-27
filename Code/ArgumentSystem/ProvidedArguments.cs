@@ -264,7 +264,7 @@ public class ProvidedArguments(Method method)
             
             _ => throw new AndrzejFuckedUpException(
                 $"Argument {argName} for method {method.Name} has its default value set to type " +
-                $"{foundArg.DefaultValue?.GetType().AccurateName ?? "null"}, expected of type {typeof(TValue).Name} or a list of " +
+                $"{foundArg.DefaultValue?.Value.GetType().AccurateName ?? "null"}, expected of type {typeof(TValue).Name} or a list of " +
                 $"{typeof(TValue).Name}s."
             )
         };

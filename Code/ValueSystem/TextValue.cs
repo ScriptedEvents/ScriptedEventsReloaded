@@ -30,11 +30,6 @@ public abstract class TextValue : LiteralValue<string>
         return value.Value;
     }
 
-    public static implicit operator TextValue(string text)
-    {
-        return new StaticTextValue(text);
-    }
-
     public override string StringRep => Value;
     
     public static string ParseValue(string text, Script script) => ExpressionRegex.Replace(text, match =>

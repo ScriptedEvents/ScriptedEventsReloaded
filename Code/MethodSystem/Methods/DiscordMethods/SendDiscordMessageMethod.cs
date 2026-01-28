@@ -23,17 +23,25 @@ public class SendDiscordMessageMethod : SynchronousMethod, ICanError
     public override Argument[] ExpectedArguments { get; } =
     [
         new TextArgument("webhook url"),
-        new ReferenceArgument<DiscordMessageMethod.DMessage>("message object")
+        new ReferenceArgument<DiscordMessageMethod.DMessage>("message object"),
+        new TextArgument("thread id")
+        {
+            DefaultValue = new(string.Empty, "no thread")
+        }
     ];
 
     public override void Execute()
     {
         var webhookUrl = Args.GetText("webhook url");
         var messageObject = Args.GetReference<DiscordMessageMethod.DMessage>("message object");
+        var threadId = Args.GetText("thread id");
         
         if (!webhookUrl.StartsWith("https://discord.com/api/webhooks/"))
             throw new ScriptRuntimeError(this, ErrorReasons.Last());
 
-        Timing.RunCoroutine(HTTPPostMethod.RequestSend(this, webhookUrl, messageObject));
+        Timing.RunCoroutine(HTTPPostMethod.RequestSend(
+            this, 
+            webhookUrl + (!threadId.IsEmpty() ? $"?thread_id={threadId}" : ""), 
+            messageObject));
     }
 }

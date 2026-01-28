@@ -27,18 +27,25 @@ public class SendDiscordMessageAndWaitMethod : YieldingReturningMethod<TextValue
     public override Argument[] ExpectedArguments { get; } =
     [
         new TextArgument("webhook url"),
-        new ReferenceArgument<DiscordMessageMethod.DMessage>("message object")
+        new ReferenceArgument<DiscordMessageMethod.DMessage>("message object"),
+        new TextArgument("thread id")
+        {
+            DefaultValue = new(string.Empty, "no thread")
+        }
     ];
 
     public override IEnumerator<float> Execute()
     {
         var webhookUrl = Args.GetText("webhook url");
         var messageObject = Args.GetReference<DiscordMessageMethod.DMessage>("message object");
+        var threadId = Args.GetText("thread id");
         
         if (!webhookUrl.StartsWith("https://discord.com/api/webhooks/"))
             throw new ScriptRuntimeError(this, ErrorReasons.Last());
         
-        using UnityWebRequest request = new UnityWebRequest(webhookUrl + "?wait=true", "POST");
+        using UnityWebRequest request = new UnityWebRequest(
+            webhookUrl + "?wait=true" + (!threadId.IsEmpty() ? $"&thread_id={threadId}" : ""), 
+            "POST");
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(messageObject.ToString());
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();

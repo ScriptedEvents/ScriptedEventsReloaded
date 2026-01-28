@@ -26,7 +26,12 @@ public class DeleteDiscordMessageMethod : SynchronousMethod, ICanError
         new TextArgument("webhook url"),
         new TextArgument("message id")
         {
-            Description = "You can get it by right-clicking on a message and clicking \"Copy message ID\""
+            Description = "You can get it by right-clicking on a message and clicking \"Copy message ID\" " +
+                          $"or with the {GetFriendlyName(typeof(SendDiscordMessageAndWaitMethod))} method"
+        },
+        new TextArgument("thread id")
+        {
+            DefaultValue = new(string.Empty, "no thread")
         }
     ];
 
@@ -34,6 +39,7 @@ public class DeleteDiscordMessageMethod : SynchronousMethod, ICanError
     {
         var webhookUrl = Args.GetText("webhook url");
         var messageId = Args.GetText("message id");
+        var threadId = Args.GetText("thread id");
         
         if (messageId.IsEmpty())
             throw new ScriptRuntimeError(this, ErrorReasons[^2]);
@@ -41,7 +47,8 @@ public class DeleteDiscordMessageMethod : SynchronousMethod, ICanError
         if (!webhookUrl.StartsWith("https://discord.com/api/webhooks/"))
             throw new ScriptRuntimeError(this, ErrorReasons.Last());
         
-        var messageURL = webhookUrl + "/messages/" + messageId;
+        var messageURL = webhookUrl + "/messages/" + messageId +
+                         (!threadId.IsEmpty() ? $"?thread_id={threadId}" : "");
 
         Timing.RunCoroutine(HTTPPostMethod.RequestSend(this, messageURL, null, "DELETE"));
     }

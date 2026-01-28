@@ -4,7 +4,6 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.MethodDescriptors;
-using UnityEngine;
 
 namespace SER.Code.MethodSystem.Methods.AdminToysMethods;
 
@@ -19,13 +18,15 @@ public class TeleportToyPlayerMethod : SynchronousMethod, IAdditionalDescription
     [
         new ReferenceArgument<AdminToy>("toy reference"),
         new PlayerArgument("player to teleport toy to"),
+        new BoolArgument("align toy rotation to player?"),
     ];
 
     public override void Execute()
     {
         var toy = Args.GetReference<AdminToy>("toy reference");
         var plr = Args.GetPlayer("player to teleport toy to");
+        var alignRotation = Args.GetBool("align toy rotation to player?");
         
-        TeleportToyPosMethod.TeleportOrSpawn(toy, plr.Position);
+        TeleportToyPosMethod.TeleportOrSpawn(toy, plr.Position, alignRotation ? plr.Rotation : null);
     }
 }

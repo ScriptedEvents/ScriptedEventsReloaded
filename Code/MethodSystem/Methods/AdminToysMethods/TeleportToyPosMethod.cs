@@ -3,9 +3,7 @@ using LabApi.Features.Wrappers;
 using Mirror;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
-using SER.Code.Helpers.Exceptions;
 using SER.Code.Helpers.Extensions;
-using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.MethodDescriptors;
 using UnityEngine;
@@ -53,8 +51,12 @@ public class TeleportToyPosMethod : SynchronousMethod, IAdditionalDescription
         get => field is null ? field = new TeleportToyPosMethod() : field;
     } = null!;
 
-    public static void TeleportOrSpawn(AdminToy toy, Vector3 position)
+    public static void TeleportOrSpawn(AdminToy toy, Vector3 position, Quaternion? rotation = null)
     {
+        if (rotation is not null)
+        {
+            toy.Rotation = rotation.Value;
+        }
         toy.Position = position;
         toy.GameObject.SetActive(true);
         if (!NetworkServer.spawned.ContainsValue(toy.GameObject.NetworkIdentity))

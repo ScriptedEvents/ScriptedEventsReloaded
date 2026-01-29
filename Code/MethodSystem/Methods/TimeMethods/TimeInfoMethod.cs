@@ -23,20 +23,24 @@ public class TimeInfoMethod : LiteralValueReturningMethod
             "second",
             "minute",
             "hour",
+            "month",
             "year",
             "dayOfWeek",
             new("dayOfWeekNumber", "Instead of returning e.g. 'Monday', will return 1"),
             "dayOfMonth",
-            "dayOfYear")
+            "dayOfYear",
+            new("unixTimeUtc","Useful for making discord timestamps "),
+            "unixTimeLocal")
     ];
     
     public override void Execute()
     {
-        ReturnValue = Args.GetOption("options").ToLower() switch
+        ReturnValue = Args.GetOption("options") switch
         {
             "second" => new NumberValue(DateTime.Now.Second),
             "minute" => new NumberValue(DateTime.Now.Minute),
             "hour" => new NumberValue(DateTime.Now.Hour),
+            "month" => new NumberValue(DateTime.Now.Month),
             "year" => new NumberValue(DateTime.Now.Year),
             "dayofweek" => new StaticTextValue(DateTime.Now.DayOfWeek.ToString()),
             "dayofweeknumber" => (uint)DateTime.Now.DayOfWeek == 0
@@ -44,6 +48,8 @@ public class TimeInfoMethod : LiteralValueReturningMethod
                 : new NumberValue((uint)DateTime.Now.DayOfWeek),
             "dayofmonth" => new NumberValue(DateTime.Now.Day),
             "dayofyear" => new NumberValue(DateTime.Now.DayOfYear),
+            "unixtimeutc" => new NumberValue(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
+            "unixtimelocal" => new NumberValue(DateTimeOffset.Now.ToUnixTimeSeconds()),
             _ => throw new AndrzejFuckedUpException()
         };
     }

@@ -408,7 +408,7 @@ public class HelpCommand : ICommand
     private static string GetMethodList()
     {
         var methods = MethodIndex.GetMethods();
-        const string retsPrefix = " [rets]";
+        const string retsSuffix = " [rets]";
         
         Dictionary<string, List<Method>> methodsByCategory = new();
         foreach (var method in methods)
@@ -424,13 +424,13 @@ public class HelpCommand : ICommand
         }
         
         var sb = new StringBuilder($"Hi! There are {methods.Length} methods available for your use!\n");
-        sb.AppendLine("If a method has [rets], it means that this method returns a value.");
+        sb.AppendLine($"If a method has {retsSuffix.TrimStart()}, it means that this method returns a value.");
         sb.AppendLine("If you want to get specific information about a given method, just do 'serhelp <MethodName>'!");
         
         foreach (var kvp in methodsByCategory.Reverse())
         {
             var descDistance = kvp.Value
-                .Select(m => m.Name.Length + (m is ReturningMethod ? retsPrefix.Length : 0))
+                .Select(m => m.Name.Length + (m is ReturningMethod ? retsSuffix.Length : 0))
                 .Max() + 1;
             
             sb.AppendLine();
@@ -440,14 +440,11 @@ public class HelpCommand : ICommand
                 var name = method.Name;
                 if (method is ReturningMethod)
                 {
-                    name += " [rets]";
+                    name += retsSuffix;
                 }
 
-                var descDistanceString = new string(' ', descDistance - name.Length);
-                var desc = method.Description 
-                           ?? $"Extracts information from {((IReferenceResolvingMethod)method).ResolvesReference.Name} objects.";
-                
-                sb.AppendLine($"> {name}{descDistanceString}~ {desc}");
+                var descPadding = new string(' ', descDistance - name.Length);
+                sb.AppendLine($"> {name}{descPadding}~ {method.Description}");
             }
         }
         
@@ -569,7 +566,7 @@ public class HelpCommand : ICommand
 
             if (argument.DefaultValue is { } defVal)
             {
-                sb.AppendLine($" - Default value: {defVal.StringRep ?? defVal.Value?.ToString() ?? "unknown"}");
+                sb.AppendLine($" - Default value/behavior: {defVal.StringRep ?? defVal.Value?.ToString() ?? "unknown"}");
             }
 
             if (argument.ConsumesRemainingValues)

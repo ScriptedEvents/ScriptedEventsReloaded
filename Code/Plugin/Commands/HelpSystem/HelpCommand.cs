@@ -424,7 +424,7 @@ public class HelpCommand : ICommand
         }
         
         var sb = new StringBuilder($"Hi! There are {methods.Length} methods available for your use!\n");
-        sb.AppendLine("If a method has [rets], it means that this method returns a value.");
+        sb.AppendLine($"If a method has {retsSuffix.TrimStart()}, it means that this method returns a value.");
         sb.AppendLine("If you want to get specific information about a given method, just do 'serhelp <MethodName>'!");
         
         foreach (var kvp in methodsByCategory.Reverse())

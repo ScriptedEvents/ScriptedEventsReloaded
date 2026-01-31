@@ -8,7 +8,7 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.TextMethods;
 
 [UsedImplicitly]
-public class SubtextMethod : ReturningMethod<TextValue>
+public class SubTextMethod : ReturningMethod<TextValue>
 {
     public override string Description => 
         "Removes certain amount of characters from beginning and end of a text value.";

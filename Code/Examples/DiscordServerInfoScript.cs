@@ -12,7 +12,7 @@ public class DiscordServerInfoScript : Example
         !-- OnEvent WaitingForPlayers
         
         # this is the webhook URL, please set one here in order for this script to work
-        $url = "https://discord.com/api/webhooks/1464230955945431217/jzQw9SZCFc3yhLf22yzsgiktbQk0Ra4J-_kuVqADOgNNKERSTw9qlHmVjRJz3DKj7vVi"
+        $url = ""
         
         func SetDiscordMessage
             # get player amount

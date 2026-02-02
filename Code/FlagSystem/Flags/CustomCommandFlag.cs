@@ -1,6 +1,7 @@
 ﻿using CommandSystem;
 using JetBrains.Annotations;
 using LabApi.Features.Permissions;
+using LabApi.Features.Wrappers;
 using RemoteAdmin;
 using SER.Code.Helpers.Exceptions;
 using SER.Code.Helpers.Extensions;
@@ -8,6 +9,7 @@ using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem;
+using SER.Code.TokenSystem.Tokens;
 using SER.Code.ValueSystem;
 using SER.Code.VariableSystem.Bases;
 using SER.Code.VariableSystem.Variables;
@@ -80,6 +82,12 @@ public class CustomCommandFlag : Flag
             "The required remote admin rank in order to have access to this command. " +
             "You can provide multiple ranks, and if the player has any of the listed ranks, they will be able to use the command.",
             AddNeededRank,
+            false
+        ),
+        new(
+            "cooldown",
+            "The time the player has to wait before being able to use the command again.",
+            AddCooldown,
             false
         )
     ];
@@ -169,6 +177,8 @@ public class CustomCommandFlag : Flag
         public ConsoleType ConsoleTypes { get; set; } = ConsoleType.Server;
         public string[] Usage { get; set; } = [];
         public string[] NeededRanks { get; set; } = [];
+        public TimeSpan PlayerCooldown { get; set; } = TimeSpan.Zero;
+        public Dictionary<Player, DateTime> NextEligableDateForPlayer { get; } = [];
         public string GetHelp(ArraySegment<string> arguments)
         {
             return $"Description: {Description}\n" +
@@ -180,18 +190,14 @@ public class CustomCommandFlag : Flag
 
     public CustomCommand Command = null!;
 
-    public static Result RunAttachedScript(CustomCommand requestingCommand, ScriptExecutor sender, string[] args)
+    public static Result RunAttachedScript(CustomCommand cmd, ScriptExecutor sender, string[] args)
     {
-        if (requestingCommand.NeededRanks.Any() && sender is IPlayerExecutor { Player: { } player })
+        if (sender is IPlayerExecutor { Player: { } player } && HandlePlayer(cmd, player) is { } plrErr)
         {
-            if (player.UserGroup is not { } group || requestingCommand.NeededRanks.All(rank => group.Name != rank))
-            {
-                return "This command is reserved for players with a rank: " +
-                       $"{requestingCommand.NeededRanks.JoinStrings(", ")}";
-            }
+            return plrErr;
         }
         
-        if (!ScriptCommands.TryGetValue(requestingCommand, out var flag))
+        if (!ScriptCommands.TryGetValue(cmd, out var flag))
         {
             return "The script that was supposed to handle this command was not found.";
         }
@@ -203,16 +209,16 @@ public class CustomCommandFlag : Flag
         }
 
         var slices = outSlices.ToArray();
-        if (slices.Length < requestingCommand.Usage.Length)
+        if (slices.Length < cmd.Usage.Length)
         {
             return "Not enough arguments. " +
-                   $"Expected {requestingCommand.Usage.Length} but got {slices.Length}.";
+                   $"Expected {cmd.Usage.Length} but got {slices.Length}.";
         }
 
-        if (slices.Length > requestingCommand.Usage.Length)
+        if (slices.Length > cmd.Usage.Length)
         {
             return "Too many arguments. " +
-                   $"Expected {requestingCommand.Usage.Length} but got {slices.Length}.";
+                   $"Expected {cmd.Usage.Length} but got {slices.Length}.";
         }
 
         if (Script.CreateByScriptName(flag.ScriptName, sender)
@@ -221,10 +227,10 @@ public class CustomCommandFlag : Flag
             return error;
         }
 
-        for (var index = 0; index < requestingCommand.Usage.Length; index++)
+        for (var index = 0; index < cmd.Usage.Length; index++)
         {
             var slice = slices[index];
-            var argVariable = requestingCommand.Usage[index];
+            var argVariable = cmd.Usage[index];
             var name = argVariable[0].ToString().ToLower() + argVariable[1..];
 
             if (Tokenizer.GetTokenFromSlice(slice, null!, 0)
@@ -242,6 +248,30 @@ public class CustomCommandFlag : Flag
 
         script.Run(RunContext.Command);
         return true;
+    }
+
+    private static string? HandlePlayer(CustomCommand cmd, Player plr)
+    {
+        var hasRank = plr.UserGroup is not { } group || cmd.NeededRanks.All(rank => group.Name != rank);
+        if (cmd.NeededRanks.Any() && hasRank)
+        {
+            return "This command is reserved for players with a rank: " +
+                   $"{cmd.NeededRanks.JoinStrings(", ")}";
+        }
+
+        if (cmd.PlayerCooldown <= TimeSpan.Zero)
+        {
+            return null;
+        }
+
+        if (cmd.NextEligableDateForPlayer.TryGetValue(plr, out var nextEligableDate) && nextEligableDate < DateTime.UtcNow)
+        {
+            return $"You are on cooldown! You can use this command in " +
+                   $"{(nextEligableDate - DateTime.UtcNow).Seconds} seconds.";
+        }
+        
+        cmd.NextEligableDateForPlayer[plr] = DateTime.UtcNow + cmd.PlayerCooldown;
+        return null;
     }
     
     private Result AddArguments(string[] args)
@@ -286,6 +316,25 @@ public class CustomCommandFlag : Flag
     private Result AddNeededRank(string[] args)
     {
         Command.NeededRanks = args;
+        return true;
+    }
+    
+    private Result AddCooldown(string[] args)
+    {
+        switch (args.Length)
+        {
+            case < 1: return "Cooldown requires a duration value.";
+            case > 2: return $"Cooldown expects only a single duration value, got given {args.Length} instead.";
+        }
+
+        var rawValue = args[0];
+        if (Tokenizer.GetTokenFromString(rawValue, null, null).HasErrored(out _, out var token) 
+            || token is not DurationToken durationToken)
+        {
+            return $"Value '{rawValue}' is not a valid duration.";
+        }
+
+        Command.PlayerCooldown = durationToken.Value;
         return true;
     }
 }

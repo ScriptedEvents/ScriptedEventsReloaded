@@ -158,7 +158,7 @@ public static class Tokenizer
         return tokens.Select(t => t.Value!).ToArray();
     }
 
-    public static TryGet<BaseToken> GetTokenFromSlice(Slice slice, Script scr, uint? lineNum)
+    public static TryGet<BaseToken> GetTokenFromSlice(Slice slice, Script? scr, uint? lineNum)
     {
         var tokenCollection = slice is CollectionSlice 
             ? OrderedImportanceTokensFromCollectionSlices 
@@ -167,7 +167,7 @@ public static class Tokenizer
         foreach (var tokenType in tokenCollection)
         {
             var token = tokenType.CreateInstance<BaseToken>();
-            switch (token.TryInit(slice, scr, lineNum))
+            switch (token.TryInit(slice, scr!, lineNum))
             {
                 case BaseToken.Success: return token;
                 case BaseToken.Ignore: continue;
@@ -177,7 +177,23 @@ public static class Tokenizer
         }
 
         var unspecified = new BaseToken();
-        unspecified.TryInit(slice, scr, lineNum);
+        unspecified.TryInit(slice, scr!, lineNum);
         return unspecified;
+    }
+
+    public static TryGet<BaseToken> GetTokenFromString(string str, Script? scr, uint? lineNum)
+    {
+        if (SliceLine(str).HasErrored(out var err, out var slices))
+        {
+            return err;
+        }
+
+        var bettaSlices = slices as Slice[] ?? slices.ToArray();
+        if (bettaSlices.Length > 1)
+        {
+            return $"Value '{str}' contains multiple slices.";
+        }
+        
+        return GetTokenFromSlice(bettaSlices.First(), scr, lineNum);
     }
 }

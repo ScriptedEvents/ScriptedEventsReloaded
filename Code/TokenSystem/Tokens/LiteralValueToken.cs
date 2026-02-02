@@ -19,8 +19,7 @@ public abstract class LiteralValueToken<T> : BaseToken, IValueToken
             field = value;
         }
     } = null!;
-
-    public TryGet<LiteralValue> ExactValue => Value;
+    
     TryGet<Value> IValueToken.Value() => Value;
     public TypeOfValue PossibleValues => new TypeOfValue<T>();
     public bool IsConstant => true;

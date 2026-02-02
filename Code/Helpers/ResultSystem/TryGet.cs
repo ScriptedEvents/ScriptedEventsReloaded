@@ -12,6 +12,12 @@ public sealed class TryGet<TValue>(TValue? value, string? errorMsg)
     public Result Result => new(WasSuccess, ErrorMsg ?? "");
 
     [Pure]
+    public bool HasErrored()
+    {
+        return !WasSuccess;
+    }
+    
+    [Pure]
     public bool HasErrored([NotNullWhen(true)] out string? error)
     {
         error = ErrorMsg;

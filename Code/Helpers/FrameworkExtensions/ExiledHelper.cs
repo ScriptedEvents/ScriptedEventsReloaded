@@ -2,7 +2,7 @@
 using MEC;
 using Logger = LabApi.Features.Console.Logger;
 
-namespace SER.Code.Helpers;
+namespace SER.Code.Helpers.FrameworkExtensions;
 
 public static class ExiledHelper
 {

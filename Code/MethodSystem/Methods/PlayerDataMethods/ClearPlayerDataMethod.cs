@@ -26,8 +26,8 @@ public class ClearPlayerDataMethod : SynchronousMethod
         var players = Args.GetPlayers("players");
         var key = Args.GetText("key to clear");
         
-        var func = key.IsEmpty()
-            ? (Action<Dictionary<string, Value>>)(dict => dict.Clear()) 
+        Action<Dictionary<string, Value>> func = key.IsEmpty()
+            ? dict => dict.Clear()
             : dict => dict.Remove(key);
         
         players.ForEach(p =>

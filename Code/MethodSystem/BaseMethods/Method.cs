@@ -26,7 +26,12 @@ public abstract class Method
         Subgroup = type.Namespace?
             .Split('.')
             .LastOrDefault()?
-            .WithCurrent(name => name[..^"Methods".Length]) 
+            .WithCurrent(name =>
+            {
+                if (name.EndsWith("Methods")) return name[..^"Methods".Length];
+                return name;
+            })
+            .Replace("_", " ")
                    ?? "Unknown";
         
         var name = type.Name;

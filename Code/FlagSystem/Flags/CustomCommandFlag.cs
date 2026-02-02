@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using LabApi.Features.Permissions;
 using LabApi.Features.Wrappers;
 using RemoteAdmin;
+using SER.Code.Helpers;
 using SER.Code.Helpers.Exceptions;
 using SER.Code.Helpers.Extensions;
 using SER.Code.Helpers.ResultSystem;
@@ -13,6 +14,7 @@ using SER.Code.TokenSystem.Tokens;
 using SER.Code.ValueSystem;
 using SER.Code.VariableSystem.Bases;
 using SER.Code.VariableSystem.Variables;
+using UnityEngine;
 using Console = GameCore.Console;
 
 namespace SER.Code.FlagSystem.Flags;
@@ -252,22 +254,25 @@ public class CustomCommandFlag : Flag
 
     private static string? HandlePlayer(CustomCommand cmd, Player plr)
     {
-        var hasRank = plr.UserGroup is not { } group || cmd.NeededRanks.All(rank => group.Name != rank);
-        if (cmd.NeededRanks.Any() && hasRank)
+        Log.Debug($"handling player in command {cmd.Command}");
+        if (cmd.NeededRanks.Any())
         {
-            return "This command is reserved for players with a rank: " +
-                   $"{cmd.NeededRanks.JoinStrings(", ")}";
+            if (plr.UserGroup is not { } group || cmd.NeededRanks.All(rank => group.Name != rank))
+            {
+                return "This command is reserved for players with a rank: " +
+                       $"{cmd.NeededRanks.Select(r => $"'{r}'").JoinStrings(" or ")}";
+            }
         }
 
         if (cmd.PlayerCooldown <= TimeSpan.Zero)
         {
             return null;
         }
-
-        if (cmd.NextEligableDateForPlayer.TryGetValue(plr, out var nextEligableDate) && nextEligableDate < DateTime.UtcNow)
+        
+        if (cmd.NextEligableDateForPlayer.TryGetValue(plr, out var nextEligableDate) && nextEligableDate > DateTime.UtcNow)
         {
             return $"You are on cooldown! You can use this command in " +
-                   $"{(nextEligableDate - DateTime.UtcNow).Seconds} seconds.";
+                   $"{Math.Round((nextEligableDate - DateTime.UtcNow).TotalSeconds, MidpointRounding.AwayFromZero)} seconds.";
         }
         
         cmd.NextEligableDateForPlayer[plr] = DateTime.UtcNow + cmd.PlayerCooldown;

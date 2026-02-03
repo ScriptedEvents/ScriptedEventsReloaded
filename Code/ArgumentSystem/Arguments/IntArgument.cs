@@ -30,19 +30,19 @@ public class IntArgument : Argument
         {
             if (_minValue.HasValue && _maxValue.HasValue)
             {
-                return $"Value must be at least {_minValue} and most {_maxValue} e.g. " +
+                return $"Value must be at least {_minValue} and at most {_maxValue} e.g. " +
                        $"{UnityEngine.Random.Range(_minValue.Value, _maxValue.Value + 1)}";
             }
 
             if (_minValue.HasValue)
             {
-                return $"Value must be at least {_minValue} e.g. {_minValue + 420}";
+                return $"Value must be at least {_minValue} e.g. {_minValue + 2}";
             }
 
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (_maxValue.HasValue)
             {
-                return $"Value must be at most {_maxValue} e.g. {_maxValue - 42}";
+                return $"Value must be at most {_maxValue} e.g. {_maxValue - 2}";
             }
 
             return "Any number e.g. 2";

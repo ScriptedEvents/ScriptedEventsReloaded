@@ -1,8 +1,8 @@
 ﻿using Mirror;
-using SER.Code.Helpers.Exceptions;
+using SER.Code.Exceptions;
 using UnityEngine;
 
-namespace SER.Code.Helpers.Extensions;
+namespace SER.Code.Extensions;
 
 public static class ObjectExtensions
 {

@@ -1,11 +1,11 @@
 ﻿using JetBrains.Annotations;
-using SER.Code.Helpers.Exceptions;
+using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 
-namespace SER.Code.Helpers.Extensions;
+namespace SER.Code.Extensions;
 
 public static class SerExtensions
 {

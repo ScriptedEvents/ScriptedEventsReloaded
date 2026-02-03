@@ -1,4 +1,4 @@
-﻿namespace SER.Code.Helpers.Exceptions;
+﻿namespace SER.Code.Exceptions;
 
 public class NotOurFaultException(string msg) : SystemException(msg)
 {

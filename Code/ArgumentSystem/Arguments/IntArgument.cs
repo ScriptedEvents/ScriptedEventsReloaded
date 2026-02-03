@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 using SER.Code.ArgumentSystem.BaseArguments;
-using SER.Code.Helpers.Exceptions;
+using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.ValueSystem;

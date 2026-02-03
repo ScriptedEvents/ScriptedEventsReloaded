@@ -3,7 +3,7 @@ using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.Handlers;
 using LabApi.Features.Enums;
 using LabApi.Features.Permissions;
-using SER.Code.Helpers.Extensions;
+using SER.Code.Extensions;
 using SER.Code.Plugin.Commands;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;

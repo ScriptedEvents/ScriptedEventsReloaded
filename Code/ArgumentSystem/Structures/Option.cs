@@ -1,4 +1,4 @@
-﻿using SER.Code.Helpers.Extensions;
+﻿using SER.Code.Extensions;
 using SER.Code.Plugin.Commands.HelpSystem;
 
 namespace SER.Code.ArgumentSystem.Structures;

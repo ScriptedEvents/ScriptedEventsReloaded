@@ -3,8 +3,8 @@ using LabApi.Features.Wrappers;
 using MEC;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.Extensions;
 using SER.Code.Helpers;
-using SER.Code.Helpers.Extensions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using UnityEngine;
 

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SER.Code.Helpers.Extensions;
+namespace SER.Code.Extensions;
 
 public static class TypeExtensions
 {

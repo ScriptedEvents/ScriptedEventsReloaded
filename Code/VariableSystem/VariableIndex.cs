@@ -1,7 +1,7 @@
 ﻿using LabApi.Features.Wrappers;
 using MapGeneration;
 using PlayerRoles;
-using SER.Code.Helpers.Extensions;
+using SER.Code.Extensions;
 using SER.Code.VariableSystem.Bases;
 using SER.Code.VariableSystem.Variables;
 

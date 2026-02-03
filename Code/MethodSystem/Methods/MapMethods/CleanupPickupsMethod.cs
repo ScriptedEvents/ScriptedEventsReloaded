@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
 using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.BaseArguments;
-using SER.Code.Helpers.Extensions;
+using SER.Code.Extensions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 
 namespace SER.Code.MethodSystem.Methods.MapMethods;

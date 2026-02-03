@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using LabApi.Features.Console;
-using SER.Code.Helpers.Extensions;
+using SER.Code.Extensions;
 using SER.Code.ScriptSystem;
 
 namespace SER.Code.Helpers;

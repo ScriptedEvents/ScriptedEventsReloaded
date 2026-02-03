@@ -2,8 +2,8 @@
 using LabApi.Features.Console;
 using LabApi.Loader.Features.Paths;
 using SER.Code.Examples;
+using SER.Code.Extensions;
 using SER.Code.FlagSystem;
-using SER.Code.Helpers.Extensions;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 

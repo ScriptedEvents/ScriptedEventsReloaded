@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using LabApi.Features.Console;
-using SER.Code.Helpers.Extensions;
+using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;

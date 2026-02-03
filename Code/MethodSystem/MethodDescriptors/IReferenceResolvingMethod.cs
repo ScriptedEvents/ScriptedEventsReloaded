@@ -1,4 +1,4 @@
-﻿using SER.Code.Helpers.Extensions;
+﻿using SER.Code.Extensions;
 
 namespace SER.Code.MethodSystem.MethodDescriptors;
 

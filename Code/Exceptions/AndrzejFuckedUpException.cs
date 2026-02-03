@@ -1,4 +1,4 @@
-﻿namespace SER.Code.Helpers.Exceptions;
+﻿namespace SER.Code.Exceptions;
 
 public class AndrzejFuckedUpException : DeveloperFuckedUpException
 {

@@ -1,6 +1,6 @@
 ﻿using MEC;
-using SER.Code.Helpers.Exceptions;
-using SER.Code.Helpers.Extensions;
+using SER.Code.Exceptions;
+using SER.Code.Extensions;
 using SER.Code.ScriptSystem;
 
 namespace SER.Code.Helpers;

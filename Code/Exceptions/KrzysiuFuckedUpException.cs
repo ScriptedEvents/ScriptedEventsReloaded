@@ -1,4 +1,4 @@
-﻿namespace SER.Code.Helpers.Exceptions;
+﻿namespace SER.Code.Exceptions;
 public class KrzysiuFuckedUpException : DeveloperFuckedUpException
 {
     public KrzysiuFuckedUpException() : base("krzysiu")

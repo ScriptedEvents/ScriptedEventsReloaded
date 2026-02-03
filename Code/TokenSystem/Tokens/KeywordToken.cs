@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
-using SER.Code.Helpers.Extensions;
+using SER.Code.Extensions;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Structures;
 

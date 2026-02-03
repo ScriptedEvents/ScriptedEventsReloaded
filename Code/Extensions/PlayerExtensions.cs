@@ -1,10 +1,10 @@
 ﻿using LabApi.Features.Wrappers;
 using PlayerRoles.PlayableScps.Scp096;
 using PlayerRoles.PlayableScps.Scp173;
-using SER.Code.Helpers.Exceptions;
+using SER.Code.Exceptions;
 using UnityEngine;
 
-namespace SER.Code.Helpers.Extensions;
+namespace SER.Code.Extensions;
 
 public static class PlayerExtensions
 {

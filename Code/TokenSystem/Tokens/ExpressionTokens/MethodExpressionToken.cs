@@ -1,5 +1,5 @@
 ﻿using SER.Code.ContextSystem;
-using SER.Code.Helpers.Exceptions;
+using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.ValueSystem;

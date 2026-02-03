@@ -1,7 +1,7 @@
 ﻿using SER.Code.Helpers.ResultSystem;
 using Random = UnityEngine.Random;
 
-namespace SER.Code.Helpers.Extensions;
+namespace SER.Code.Extensions;
 
 public static class CollectionExtensions
 {

@@ -2,7 +2,7 @@
 using MEC;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
-using SER.Code.Helpers.Exceptions;
+using SER.Code.Exceptions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.MethodSystem.Methods.HTTPMethods;

@@ -1,7 +1,7 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.MethodSystem.BaseMethods;
 
-namespace SER.Code.Helpers.Exceptions;
+namespace SER.Code.Exceptions;
 
 public class ScriptRuntimeError : SystemException
 {

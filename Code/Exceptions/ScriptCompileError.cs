@@ -1,3 +1,3 @@
-﻿namespace SER.Code.Helpers.Exceptions;
+﻿namespace SER.Code.Exceptions;
 
 public class ScriptCompileError(string error) : SystemException(error);

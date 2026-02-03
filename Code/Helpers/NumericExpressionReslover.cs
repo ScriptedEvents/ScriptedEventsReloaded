@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 using NCalc;
-using SER.Code.Helpers.Extensions;
+using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem;

@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using LabApi.Features.Wrappers;
-using SER.Code.Helpers.Exceptions;
+using SER.Code.Exceptions;
 using SER.Code.ScriptSystem;
 
 namespace SER.Code.ValueSystem;

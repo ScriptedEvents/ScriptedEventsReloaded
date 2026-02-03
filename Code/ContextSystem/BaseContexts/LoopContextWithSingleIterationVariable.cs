@@ -1,5 +1,5 @@
 ﻿using SER.Code.ContextSystem.CommunicationInterfaces;
-using SER.Code.Helpers.Extensions;
+using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;

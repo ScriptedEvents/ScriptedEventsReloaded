@@ -1,4 +1,4 @@
-﻿using SER.Code.Helpers.Exceptions;
+﻿using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Structures;
 using StringBuilder = System.Text.StringBuilder;

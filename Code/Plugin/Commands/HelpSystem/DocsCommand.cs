@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using CommandSystem;
 using LabApi.Features.Permissions;
-using SER.Code.Helpers.Exceptions;
+using SER.Code.Exceptions;
 using SER.Code.Plugin.Commands.Interfaces;
 
 namespace SER.Code.Plugin.Commands.HelpSystem;

@@ -1,7 +1,7 @@
 ﻿using CommandSystem;
 using LabApi.Features.Enums;
 using RemoteAdmin;
-using SER.Code.Helpers.Exceptions;
+using SER.Code.Exceptions;
 using SER.Code.Plugin;
 using Logger = LabApi.Features.Console.Logger;
 

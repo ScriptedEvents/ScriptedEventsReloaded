@@ -11,7 +11,8 @@ using UnityEngine;
 namespace SER.Code.MethodSystem.Methods.AdminToysMethods;
 
 [UsedImplicitly]
-public class TeleportToyPosMethod : SynchronousMethod, IAdditionalDescription
+// ReSharper disable InconsistentNaming
+public class TPToyPosMethod : SynchronousMethod, IAdditionalDescription
 {
     public override string Description => "Teleports an Admin Toy to the given absolute coordinates";
 
@@ -46,9 +47,9 @@ public class TeleportToyPosMethod : SynchronousMethod, IAdditionalDescription
     }
 
     // Once again the singleton is there just to make the ErrorReasons universal
-    public static TeleportToyPosMethod Singleton
+    public static TPToyPosMethod Singleton
     {
-        get => field is null ? field = new TeleportToyPosMethod() : field;
+        get => field is null ? field = new TPToyPosMethod() : field;
     } = null!;
 
     public static void TeleportOrSpawn(AdminToy toy, Vector3 position, Quaternion? rotation = null)

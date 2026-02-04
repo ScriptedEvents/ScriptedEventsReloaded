@@ -4,6 +4,7 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ArgumentSystem.Structures;
 using SER.Code.Exceptions;
+using SER.Code.FlagSystem.Flags;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.MethodDescriptors;
 using CapybaraToy = LabApi.Features.Wrappers.CapybaraToy;
@@ -43,12 +44,19 @@ public class CreateToyMethod : ReferenceReturningMethod<AdminToy>, IAdditionalDe
             "primitiveobject" => PrimitiveObjectToy.Create(networkSpawn: false),
             "lightsource"     => LightSourceToy.Create(networkSpawn: false),
             "shootingtarget"  => ShootingTargetToy.Create(networkSpawn: false),
-            "interactable"    => InteractableToy.Create(networkSpawn: false),
+            "interactable"    => CreateInteractable(),
             "camera"          => CameraToy.Create(networkSpawn: false),
             "capybara"        => CapybaraToy.Create(networkSpawn: false),
             "text"            => TextToy.Create(networkSpawn: false),
             "waypoint"        => WaypointToy.Create(networkSpawn: false),
             _                 => throw new TosoksFuckedUpException("out of order")
         };
+    }
+
+    public static InteractableToy CreateInteractable()
+    {
+        var toy = InteractableToy.Create(networkSpawn: false);
+        toy.OnInteracted += plr => InteractableToyEventFlag.RunBoundScripts(plr, toy);
+        return toy;
     }
 }

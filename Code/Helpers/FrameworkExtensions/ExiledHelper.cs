@@ -10,14 +10,14 @@ public static class ExiledHelper
 
     public static event Action? OnExiledDetected;
     
-    public static IEnumerator<float> ExiledAwaiter()
+    public static IEnumerator<float> Awaiter()
     {
         uint attempts = 0;
         while (PluginLoader.EnabledPlugins.All(p => p.Name != ExiledLoaderName))
         {
             if (attempts++ > 20)
             {
-                Logger.Raw("SER <-> EXILED bind failed. EXILED specific methods will NOT be loaded.", ConsoleColor.DarkYellow);
+                Logger.Debug("SER <-> EXILED bind failed. EXILED specific methods will NOT be loaded.");
                 yield break;
             }
                 

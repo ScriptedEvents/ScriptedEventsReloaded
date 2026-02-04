@@ -1,16 +1,19 @@
 ﻿using System.Reflection;
+using Exiled.API.Features;
 using LabApi.Features.Console;
+using SER.Code.Extensions;
 using SER.Code.Helpers.FrameworkExtensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.MethodSystem.Structures;
+using Log = SER.Code.Helpers.Log;
 
 namespace SER.Code.MethodSystem;
 
 public static class MethodIndex
 {
     private static readonly Dictionary<string, Method> NameToMethodIndex = [];
-    private static readonly HashSet<Type> ExiledMethods = [];
+    private static readonly Dictionary<IDependOnFramework.Type, List<Type>> FrameworkDependentMethods = [];
     
     /// <summary>
     /// Initializes the method index.
@@ -21,13 +24,8 @@ public static class MethodIndex
         
         AddAllDefinedMethodsInAssembly();
         
-        ExiledHelper.OnExiledDetected += () =>
-        {
-            foreach (var method in ExiledMethods)
-            {
-                AddMethod((Method)Activator.CreateInstance(method));
-            }
-        };
+        ExiledHelper.OnExiledDetected += () => LoadMethodsOfFramework(IDependOnFramework.Type.Exiled);
+        CallVoteHelper.OnCallvoteDetected += () => LoadMethodsOfFramework(IDependOnFramework.Type.Callvote);
     }
     
     /// <summary>
@@ -51,10 +49,12 @@ public static class MethodIndex
             .Where(t => t.IsClass && !t.IsAbstract && typeof(Method).IsAssignableFrom(t))
             .Where(t =>
             {
-                if (!typeof(IExiledMethod).IsAssignableFrom(t)) return true;
+                if (!typeof(IDependOnFramework).IsAssignableFrom(t)) return true;
                 
-                ExiledMethods.Add(t);
+                var framework = t.CreateInstance<IDependOnFramework>().DependsOn;
+                FrameworkDependentMethods.AddOrInitListWithKey(framework, t);
                 return false;
+
             })
             .Select(t => Activator.CreateInstance(t) as Method)
             .ToList();
@@ -102,6 +102,14 @@ public static class MethodIndex
             .FirstOrDefault();
         
         return $"There is no method with name '{name}'. Did you mean '{closestMethod ?? "<error>"}'?";
+    }
+
+    private static void LoadMethodsOfFramework(IDependOnFramework.Type framework)
+    {
+        foreach (var method in FrameworkDependentMethods.TryGetValue(framework, out var methods) ? methods : [])
+        {
+            AddMethod((Method)Activator.CreateInstance(method));
+        }
     }
 
     /// <summary>

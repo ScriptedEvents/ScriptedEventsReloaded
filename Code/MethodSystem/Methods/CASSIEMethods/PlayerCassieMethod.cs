@@ -1,5 +1,6 @@
 ﻿using Exiled.API.Extensions;
 using Exiled.API.Features;
+using JetBrains.Annotations;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
@@ -7,8 +8,11 @@ using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.CASSIEMethods;
 
-public class PlayerCassieMethod : SynchronousMethod, IExiledMethod
+[UsedImplicitly]
+public class PlayerCassieMethod : SynchronousMethod, IDependOnFramework
 {
+    public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Exiled;
+    
     public override string Description => "Makes a CASSIE announcement to specified players only.";
 
     public override Argument[] ExpectedArguments { get; } =

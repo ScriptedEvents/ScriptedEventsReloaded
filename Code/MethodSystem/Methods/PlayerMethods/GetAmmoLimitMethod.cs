@@ -10,10 +10,12 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.PlayerMethods;
 
 [UsedImplicitly]
-public class GetAmmoLimitMethod : ReturningMethod<NumberValue>, IExiledMethod
+public class GetAmmoLimitMethod : ReturningMethod<NumberValue>, IDependOnFramework
 {
+    public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Exiled;
+    
     public override string Description => "Gets the player's limit on a certain ammunition type";
-
+    
     public override Argument[] ExpectedArguments { get; } =
     [
         new PlayerArgument("player to get the limit from"),

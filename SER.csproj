@@ -64,6 +64,9 @@
         <Reference Include="UnityEngine.UnityWebRequestModule">
             <HintPath>$(SL_DEV_REFERENCES)\UnityEngine.UnityWebRequestModule.dll</HintPath>
         </Reference>
+        <Reference Include="Callvote-LabAPI">
+            <HintPath>$(SL_DEV_REFERENCES)\Callvote-LabAPI.dll</HintPath>
+        </Reference>
     </ItemGroup>
     
     <!-- QoL moving the dll -->

@@ -4,13 +4,11 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ArgumentSystem.Structures;
 using SER.Code.Exceptions;
-using SER.Code.Extensions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.MethodDescriptors;
 using CapybaraToy = LabApi.Features.Wrappers.CapybaraToy;
 using LightSourceToy = LabApi.Features.Wrappers.LightSourceToy;
 using PrimitiveObjectToy = LabApi.Features.Wrappers.PrimitiveObjectToy;
-using SpeakerToy = LabApi.Features.Wrappers.SpeakerToy;
 using TextToy = LabApi.Features.Wrappers.TextToy;
 using WaypointToy = LabApi.Features.Wrappers.WaypointToy;
 

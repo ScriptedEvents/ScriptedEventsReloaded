@@ -8,23 +8,25 @@ using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.Arguments;
 
-public class TextArgument(string name, bool needsQuotes = true) : Argument(name)
+public class TextArgument(string name, bool needsQuotes = true, bool allowsSpaces = true) : Argument(name)
 {
-    public override string InputDescription => "Any text e.g. \"Hello, World!\"";
+    public override string InputDescription => "Any text e.g. \"Hello, World!\""
+        + (needsQuotes ? " (it can be without the quotes)" : "")
+        + (!allowsSpaces ? " but it CANNOT contain spaces!" : "");
 
     [UsedImplicitly]
     public DynamicTryGet<string> GetConvertSolution(BaseToken token)
     {
         if (token is TextToken textToken)
         {
-            return textToken.GetDynamicResolver();
+            return new(() => textToken.GetDynamicResolver().Invoke().OnSuccess(SpaceCheck, null));
         }    
         
         if (token is not IValueToken valToken || !valToken.CanReturn<LiteralValue>(out var get))
         {
             if (!needsQuotes)
             {
-                return token.GetBestTextRepresentation(null).AsSuccess();
+                return SpaceCheck(token.GetBestTextRepresentation(null));
             }
             
             return DynamicTryGet.Error($"Value '{token.RawRep}' cannot represent text.");
@@ -32,9 +34,19 @@ public class TextArgument(string name, bool needsQuotes = true) : Argument(name)
 
         if (valToken.IsConstant)
         {
-            return get().OnSuccess(v => v.StringRep, null);
+            return SpaceCheck(get().OnSuccess(v => v.StringRep, null));
         }
 
-        return new(() => get().OnSuccess(v => v.StringRep, null));
+        return new(() => get().OnSuccess(v => SpaceCheck(v.StringRep), null));
+        
+        TryGet<string> SpaceCheck(string value)
+        {
+            if (!allowsSpaces && value.Any(char.IsWhiteSpace))
+            {
+                return $"Value '{token.RawRep}' contains spaces, which are not allowed!".AsError();
+            }
+            
+            return value.AsSuccess();
+        }
     }
 }

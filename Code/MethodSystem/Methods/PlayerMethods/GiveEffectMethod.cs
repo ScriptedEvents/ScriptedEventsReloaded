@@ -9,8 +9,10 @@ using SER.Code.MethodSystem.Structures;
 namespace SER.Code.MethodSystem.Methods.PlayerMethods;
 
 [UsedImplicitly]
-public class GiveEffectMethod : SynchronousMethod, IExiledMethod
+public class GiveEffectMethod : SynchronousMethod, IDependOnFramework
 {
+    public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Exiled;
+    
     public override string Description => "Adds a provided effect to a player.";
 
     public override Argument[] ExpectedArguments { get; } =
@@ -30,7 +32,7 @@ public class GiveEffectMethod : SynchronousMethod, IExiledMethod
             DefaultValue = new(false, null)
         }
     ];
-    
+
     public override void Execute()
     {
         var players = Args.GetPlayers("players");

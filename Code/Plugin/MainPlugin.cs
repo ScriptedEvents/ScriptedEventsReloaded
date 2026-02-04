@@ -108,7 +108,8 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
         VariableIndex.Initialize();
         Flag.RegisterFlags();
         CommandEvents.Initialize();
-        ExiledHelper.ExiledAwaiter().RunCoroutine();
+        ExiledHelper.Awaiter().RunCoroutine();
+        CallVoteHelper.Awaiter().RunCoroutine();
         SendLogo();
 
         Events.ServerEvents.WaitingForPlayers += OnServerFullyInit;

@@ -9,10 +9,12 @@ using SER.Code.MethodSystem.Structures;
 namespace SER.Code.MethodSystem.Methods.PlayerMethods;
 
 [UsedImplicitly]
-public class SetAmmoLimitMethod : SynchronousMethod, IExiledMethod
+public class SetAmmoLimitMethod : SynchronousMethod, IDependOnFramework
 {
+    public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Exiled;
+    
     public override string Description => "Sets the players' limit on a certain ammunition type";
-
+    
     public override Argument[] ExpectedArguments { get; } =
     [
         new PlayersArgument("players to set the limit to"),

@@ -427,7 +427,7 @@ public class HelpCommand : ICommand
         sb.AppendLine($"If a method has {retsSuffix.TrimStart()}, it means that this method returns a value.");
         sb.AppendLine("If you want to get specific information about a given method, just do 'serhelp <MethodName>'!");
         
-        foreach (var kvp in methodsByCategory.Reverse())
+        foreach (var kvp in methodsByCategory.OrderBy(kvp => kvp.Key[0]))
         {
             var descDistance = kvp.Value
                 .Select(m => m.Name.Length + (m is ReturningMethod ? retsSuffix.Length : 0))

@@ -14,11 +14,11 @@ public class ElseStatementContext : StatementContext, IStatementExtender, IKeywo
         "If the statement above it didn't execute, 'else' statement will execute instead.";
     public string[] Arguments => [];
     
-    public IExtendableStatement.Signal Extends => IExtendableStatement.Signal.DidntExecute;
+    public IExtendableStatement.Signal ListensTo => IExtendableStatement.Signal.DidntExecute;
 
     protected override string FriendlyName => "'else' statement";
 
-    public override TryAddTokenRes TryAddToken(BaseToken token)
+    public override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         return TryAddTokenRes.Error("There should be no arguments after `else` keyword");
     }

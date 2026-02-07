@@ -1,11 +1,10 @@
-﻿using SER.Code.ScriptSystem;
-using SER.Code.ValueSystem;
+﻿using SER.Code.ValueSystem;
 
 namespace SER.Code.TokenSystem.Tokens;
 
 public class NumberToken : LiteralValueToken<NumberValue>
 {
-    protected override IParseResult InternalParse(Script scr)
+    protected override IParseResult InternalParse()
     {
         if (decimal.TryParse(RawRep, out var value))
         {

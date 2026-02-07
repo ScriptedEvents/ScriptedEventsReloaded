@@ -5,5 +5,5 @@ namespace SER.Code.TokenSystem.Structures;
 
 public interface IContextableToken
 {
-    public Context GetContext(Script scr);
+    public Context? GetContext(Script? scr);
 }

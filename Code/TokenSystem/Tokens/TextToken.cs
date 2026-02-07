@@ -1,5 +1,4 @@
 ﻿using SER.Code.Helpers.ResultSystem;
-using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Slices;
 using SER.Code.TokenSystem.Structures;
 using SER.Code.ValueSystem;
@@ -8,14 +7,14 @@ namespace SER.Code.TokenSystem.Tokens;
 
 public class TextToken : LiteralValueToken<TextValue>
 {
-    protected override IParseResult InternalParse(Script scr)
+    protected override IParseResult InternalParse()
     {
         if (Slice is not CollectionSlice { Type: CollectionBrackets.Quotes })
         {
             return new Ignore();
         }
         
-        Value = new DynamicTextValue(Slice.Value, scr);
+        Value = new DynamicTextValue(Slice.Value, Script!);
         return new Success();
     }
     
@@ -26,4 +25,6 @@ public class TextToken : LiteralValueToken<TextValue>
         
         return DynamicTryGet.Success(Value.Value);
     }
+    
+    public static TextToken GetToken(string content) => GetToken<TextToken>($"\"{content}\"");
 }

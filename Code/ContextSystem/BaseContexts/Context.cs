@@ -7,7 +7,7 @@ namespace SER.Code.ContextSystem.BaseContexts;
 
 public abstract class Context
 {
-    public required Script Script { get; set; } = null!;
+    public required Script? Script { get; set; } = null!;
 
     public required uint? LineNum { get; set; }
 
@@ -15,15 +15,29 @@ public abstract class Context
 
     protected abstract string FriendlyName { get; }
 
-    public abstract TryAddTokenRes TryAddToken(BaseToken token);
+    private readonly List<BaseToken> _tokens = [];
+    public BaseToken[] Tokens => _tokens.ToArray();
+
+    public TryAddTokenRes TryAddToken(BaseToken token)
+    {
+        var result = OnAddingToken(token);
+        if (!result.HasErrored)
+        {
+            _tokens.Add(token);
+        }
+        
+        return result;
+    }
+    
+    protected abstract TryAddTokenRes OnAddingToken(BaseToken token);
 
     public abstract Result VerifyCurrentState();
 
-    public static Context Create(Type contextType, (Script scr, uint? lineNum) info)
+    public static Context Create(Type contextType, Script? scr, uint? lineNum)
     {
         var context = (Context)Activator.CreateInstance(contextType);
-        context.Script = info.scr;
-        context.LineNum = info.lineNum;
+        context.Script = scr;
+        context.LineNum = lineNum;
         return context;
     }
 

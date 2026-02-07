@@ -1,5 +1,4 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
-using SER.Code.ContextSystem.CommunicationInterfaces;
 using SER.Code.ContextSystem.Contexts.Control;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Extensions;
@@ -92,12 +91,12 @@ public static class Contexter
                 return rs + "The statement to extend is not extendable.";
             }
             
-            if (!extendable.AllowedSignals.HasFlag(treeExtenderInfo.Extends))
+            if (!extendable.Exports.HasFlag(treeExtenderInfo.ListensTo))
             {
                 return rs + "The statement to extend does not support this type of extension.";
             }
 
-            extendable.RegisteredSignals[treeExtenderInfo.Extends] = treeExtenderContext.Run;
+            extendable.RegisteredSignals[treeExtenderInfo.ListensTo] = treeExtenderContext.Run;
             statementStack.Pop();
             statementStack.Push(treeExtenderContext);
             return context.VerifyCurrentState().HasErrored(out error) ? rs + error : true;
@@ -125,19 +124,24 @@ public static class Contexter
         return true;
     }
 
-    public static TryGet<Context?> ContextLine(BaseToken[] tokens, uint? lineNum, Script scr)
+    public static TryGet<Context?> ContextLine(BaseToken[] tokens, uint? lineNum, Script? scr)
     {
         Result rs = $"Line {(lineNum.HasValue ? $"{lineNum.Value} " : "")}cannot execute";
         
-        var firstToken = tokens.FirstOrDefault();
-        if (firstToken is null) return null as Context;
-        
+        if (tokens.FirstOrDefault() is not { } firstToken)
+        {
+            return null as Context;
+        }
+
         if (firstToken is not IContextableToken contextable)
         {
             return rs + $"{firstToken} is not a valid way to start a line. Maybe you made a typo?";
         }
 
-        var context = contextable.GetContext(scr);
+        if (contextable.GetContext(scr) is not { } context)
+        {
+            return null as Context;
+        }
 
         foreach (var token in tokens.Skip(1))
         {

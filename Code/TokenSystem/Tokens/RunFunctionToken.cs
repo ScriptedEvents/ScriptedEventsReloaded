@@ -7,7 +7,7 @@ namespace SER.Code.TokenSystem.Tokens;
 
 public class RunFunctionToken : BaseToken, IContextableToken
 {
-    public Context GetContext(Script scr)
+    public Context? GetContext(Script? scr)
     {
         return new RunFunctionContext
         {
@@ -16,7 +16,7 @@ public class RunFunctionToken : BaseToken, IContextableToken
         };
     }
 
-    protected override IParseResult InternalParse(Script scr)
+    protected override IParseResult InternalParse()
     {
         if (RawRep != "run")
         {

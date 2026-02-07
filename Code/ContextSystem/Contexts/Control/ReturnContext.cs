@@ -23,7 +23,7 @@ public class ReturnContext : StandardContext, IKeywordContext
 
     protected override string FriendlyName => "'return' keyword";
 
-    public override TryAddTokenRes TryAddToken(BaseToken token)
+    public override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         if (_returnContext.HasValue)
         {

@@ -134,7 +134,7 @@ public static class Tokenizer
         return true;
     }
 
-    public static TryGet<BaseToken[]> TokenizeLine(string line, Script scr, uint? lineNum)
+    public static TryGet<BaseToken[]> TokenizeLine(string line, Script? scr, uint? lineNum)
     {
         if (SliceLine(line)
             .HasErrored(out var sliceError, out var slices))
@@ -145,7 +145,7 @@ public static class Tokenizer
         return TokenizeLine(slices, scr, lineNum);
     }
 
-    public static TryGet<BaseToken[]> TokenizeLine(IEnumerable<Slice> slices, Script scr, uint? lineNum)
+    public static TryGet<BaseToken[]> TokenizeLine(IEnumerable<Slice> slices, Script? scr, uint? lineNum)
     {
         var sliceArray = slices.ToArray();
         var tokens = sliceArray.Select(slice => GetTokenFromSlice(slice, scr, lineNum)).ToArray();
@@ -168,7 +168,7 @@ public static class Tokenizer
         foreach (var tokenType in tokenCollection)
         {
             var token = tokenType.CreateInstance<BaseToken>();
-            switch (token.TryInit(slice, scr!, lineNum))
+            switch (token.TryInit(slice, scr, lineNum))
             {
                 case BaseToken.Success: return token;
                 case BaseToken.Ignore: continue;
@@ -178,7 +178,7 @@ public static class Tokenizer
         }
 
         var unspecified = new BaseToken();
-        unspecified.TryInit(slice, scr!, lineNum);
+        unspecified.TryInit(slice, scr, lineNum);
         return unspecified;
     }
 
@@ -196,5 +196,16 @@ public static class Tokenizer
         }
         
         return GetTokenFromSlice(bettaSlices.First(), scr, lineNum);
+    }
+    
+    public static TryGet<T> GetTokenFromString<T>(string str, Script? scr, uint? lineNum) where T : BaseToken
+    {
+        if (GetTokenFromString(str, scr, lineNum).HasErrored(out var error, out var token) 
+            || token.TryCast<T>().HasErrored(out error, out var castToken))
+        {
+            return error;
+        }
+
+        return castToken;;
     }
 }

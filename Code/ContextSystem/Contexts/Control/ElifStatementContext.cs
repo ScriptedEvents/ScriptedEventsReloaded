@@ -1,4 +1,5 @@
-﻿using SER.Code.ContextSystem.BaseContexts;
+﻿using JetBrains.Annotations;
+using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Extensions;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
@@ -10,16 +11,20 @@ using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
 
+[UsedImplicitly]
 public class ElifStatementContext : StatementContext, IStatementExtender, IExtendableStatement, IKeywordContext
 {
     public string KeywordName => "elif";
     public string Description =>
         "If the statement above it didn't execute, 'elif' statement will try to execute if the provided condition is met.";
     public string[] Arguments => ["[condition]"];
-
-    public IExtendableStatement.Signal Extends => IExtendableStatement.Signal.DidntExecute;
     
-    public IExtendableStatement.Signal AllowedSignals => IExtendableStatement.Signal.DidntExecute;
+    public string ExampleUsage { get; }
+
+    public IExtendableStatement.Signal ListensTo => IExtendableStatement.Signal.DidntExecute;
+    
+    public IExtendableStatement.Signal Exports => IExtendableStatement.Signal.DidntExecute;
+    
     public Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = new();
 
     private readonly List<BaseToken> _condition = [];
@@ -28,7 +33,7 @@ public class ElifStatementContext : StatementContext, IStatementExtender, IExten
 
     protected override string FriendlyName => "'elif' statement";
 
-    public override TryAddTokenRes TryAddToken(BaseToken token)
+    public override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         if (NumericExpressionReslover.IsValidForExpression(token).HasErrored(out var error))
         {

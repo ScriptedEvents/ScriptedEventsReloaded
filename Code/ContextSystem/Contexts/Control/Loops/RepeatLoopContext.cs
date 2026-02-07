@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using SER.Code.ContextSystem.BaseContexts;
-using SER.Code.ContextSystem.CommunicationInterfaces;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
@@ -27,7 +26,7 @@ public class RepeatLoopContext : LoopContextWithSingleIterationVariable<NumberVa
 
     protected override string FriendlyName => "'repeat' loop statement";
 
-    public override TryAddTokenRes TryAddToken(BaseToken token)
+    public override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         switch (token)
         {

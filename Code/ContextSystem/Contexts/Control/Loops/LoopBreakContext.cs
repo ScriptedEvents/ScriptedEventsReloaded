@@ -17,7 +17,7 @@ public class LoopBreakContext : StandardContext, IKeywordContext
 
     protected override string FriendlyName => "'break' keyword";
 
-    public override TryAddTokenRes TryAddToken(BaseToken token)
+    public override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         return TryAddTokenRes.Error("The 'break' keyword does not expect arguments after it.");
     }

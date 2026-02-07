@@ -6,6 +6,7 @@ using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.FlagSystem.Flags;
+using SER.Code.Helpers.Interfaces;
 using SER.Code.MethodSystem;
 using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.MethodSystem.BaseMethods.Interfaces;
@@ -148,9 +149,9 @@ public class HelpCommand : ICommand
         var usageInfo = Activator.CreateInstance(type) is IStatementExtender extender
             ? $"""
                --- Usage ---
-               This statement can ONLY be used after a statement supporting the "{extender.Extends}" signal!
+               This statement can ONLY be used after a statement supporting the "{extender.ListensTo}" signal!
 
-               # example usage (assuming "somekeyword" supports "{extender.Extends}" signal)
+               # example usage (assuming "somekeyword" supports "{extender.ListensTo}" signal)
                
                somekeyword
                    # some code
@@ -168,7 +169,7 @@ public class HelpCommand : ICommand
             ? $"""
                --- This statement is extendable! ---
                Other statements can be added after this one, provided they support one of the following signal(s):
-               {extendable.AllowedSignals.GetFlags().Select(f => $"> {f}").JoinStrings("\n")}
+               {extendable.Exports.GetFlags().Select(f => $"> {f}").JoinStrings("\n")}
                """
             : string.Empty;
         

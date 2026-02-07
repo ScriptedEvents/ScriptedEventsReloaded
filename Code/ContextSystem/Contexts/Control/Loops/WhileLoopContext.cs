@@ -27,7 +27,7 @@ public class WhileLoopContext : LoopContextWithSingleIterationVariable<NumberVal
 
     protected override string FriendlyName => "'while' loop statement";
 
-    public override TryAddTokenRes TryAddToken(BaseToken token)
+    public override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         _condition.Add(token);
         return TryAddTokenRes.Continue();

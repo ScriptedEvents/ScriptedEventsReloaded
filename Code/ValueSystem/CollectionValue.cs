@@ -99,6 +99,7 @@ public class CollectionValue(IEnumerable value) : Value
             $"Inserted value '{value}' has to be the same type as the collection ({FriendlyName(type)})."
         );
     }
+
     public CollectionValue Insert(Value val) => CollectionValue.Insert(this, val);
 
     /// <summary>
@@ -129,15 +130,18 @@ public class CollectionValue(IEnumerable value) : Value
 
         return new CollectionValue(values);
     }
+
     public CollectionValue Remove(Value val, int amountToRemove = -1) => CollectionValue.Remove(this, val, amountToRemove);
 
     public static CollectionValue RemoveAt(CollectionValue collection, int index)
     {
         return new CollectionValue(collection.CastedValues.Where((_, i) => i != index - 1));
     }
+
     public CollectionValue RemoveAt(int index) => CollectionValue.RemoveAt(this, index);
 
     public static bool Contains(CollectionValue collection, Value value) => collection.CastedValues.Contains(value);
+
     public bool Contains(Value val) => CollectionValue.Contains(this, val);
 
     public static CollectionValue operator +(CollectionValue lhs, CollectionValue rhs)

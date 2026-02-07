@@ -11,7 +11,7 @@ public class MethodToken : BaseToken, IContextableToken
 {
     public Method Method { get; private set; } = null!;
     
-    protected override IParseResult InternalParse(Script scr)
+    protected override IParseResult InternalParse()
     {
         if (MethodIndex.TryGetMethod(Slice.RawRep).HasErrored(out _, out var method))
         {
@@ -19,12 +19,12 @@ public class MethodToken : BaseToken, IContextableToken
         }
 
         Method = (Method)Activator.CreateInstance(method.GetType());
-        Method.Script = scr;
+        Method.Script = Script;
         Method.LineNum = LineNum;
         return new Success();
     }
 
-    public Context GetContext(Script scr)
+    public Context? GetContext(Script? scr)
     {
         return new MethodContext(this)
         {

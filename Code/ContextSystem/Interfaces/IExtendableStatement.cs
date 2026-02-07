@@ -2,6 +2,9 @@
 
 namespace SER.Code.ContextSystem.Interfaces;
 
+/// <summary>
+/// Defines this context as a statement that can be extended by other statements.
+/// </summary>
 public interface IExtendableStatement
 {
     [Flags]
@@ -13,6 +16,10 @@ public interface IExtendableStatement
         EndedExecution = 1 << 1,
     }
 
-    public abstract Signal AllowedSignals { get; }
+    /// <summary>
+    /// Defines the "signals" that the following statements can use to chain to this statement.
+    /// </summary>
+    public abstract Signal Exports { get; }
+    
     public Dictionary<Signal, Func<IEnumerator<float>>> RegisteredSignals { get; }
 }

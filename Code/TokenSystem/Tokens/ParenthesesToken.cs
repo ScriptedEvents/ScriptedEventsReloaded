@@ -1,7 +1,6 @@
 ﻿using SER.Code.Exceptions;
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
-using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Slices;
 using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens.Interfaces;
@@ -37,7 +36,7 @@ public class ParenthesesToken : BaseToken, IValueToken
         return _tokens = tokens.ToArray();
     }
 
-    protected override IParseResult InternalParse(Script scr)
+    protected override IParseResult InternalParse()
     {
         if (Slice is CollectionSlice { Type: CollectionBrackets.Round } slice)
         {

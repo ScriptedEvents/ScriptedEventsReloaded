@@ -17,7 +17,7 @@ public class LoopContinueContext : StandardContext, IKeywordContext
 
     protected override string FriendlyName => "'continue' keyword";
 
-    public override TryAddTokenRes TryAddToken(BaseToken token)
+    public override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         return TryAddTokenRes.Error("The continue keyword does not expect arguments after it.");
     }

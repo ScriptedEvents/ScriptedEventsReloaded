@@ -17,7 +17,7 @@ public class StopScriptContext: StandardContext, IKeywordContext
 
     protected override string FriendlyName => "'stop' keyword";
 
-    public override TryAddTokenRes TryAddToken(BaseToken token)
+    public override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         return TryAddTokenRes.Error(
             "'stop' keyword is not expecting any arguments after it.");

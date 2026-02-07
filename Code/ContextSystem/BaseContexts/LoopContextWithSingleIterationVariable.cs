@@ -1,4 +1,4 @@
-﻿using SER.Code.ContextSystem.CommunicationInterfaces;
+﻿using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
@@ -21,7 +21,7 @@ public abstract class LoopContextWithSingleIterationVariable<TVal> :
 
         if (!varToken.ValueType.IsAssignableFrom(typeof(TVal)))
         {
-            return $"Provided variable '{varToken.RawRepr}' cannot be used for this loop, " +
+            return $"Provided variable '{varToken.RawRep}' cannot be used for this loop, " +
                    $"as it cannot hold a {typeof(TVal).FriendlyTypeName()}";
         }
         

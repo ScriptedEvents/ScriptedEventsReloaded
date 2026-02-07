@@ -20,7 +20,7 @@ public class KeywordToken : BaseToken, IContextableToken
         )
         .ToArray();
     
-    protected override IParseResult InternalParse(Script scr)
+    protected override IParseResult InternalParse()
     {
         _keywordType = KeywordContextTypes.FirstOrDefault(
             keyword => keyword.CreateInstance<IKeywordContext>().KeywordName == RawRep);
@@ -30,8 +30,14 @@ public class KeywordToken : BaseToken, IContextableToken
             : new Ignore();
     }
 
-    public Context GetContext(Script scr)
+    public Context? GetContext(Script? scr)
     {
-        return Context.Create(_keywordType!, (scr, LineNum));
+        return Context.Create(_keywordType!, scr, LineNum);
+    }
+
+    public KeywordToken Get(string representation)
+    {
+        return Tokenizer.GetTokenFromString<KeywordToken>(representation, null, null).Value
+            ?? throw new Exception($"Token {representation} not found");
     }
 }

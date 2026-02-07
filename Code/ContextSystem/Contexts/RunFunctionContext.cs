@@ -27,7 +27,7 @@ public class RunFunctionContext : YieldingContext, IMayReturnValueContext
             ? $"'{_functionDefinitionContext.FunctionName}' function call"
             : "function call";
 
-    public override TryAddTokenRes TryAddToken(BaseToken token)
+    public override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         if (_functionDefinitionContext is null)
         {

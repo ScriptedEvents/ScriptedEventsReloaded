@@ -14,7 +14,7 @@ public class EndStatementContext : StandardContext, IKeywordContext
 
     protected override string FriendlyName => "'end' keyword";
 
-    public override TryAddTokenRes TryAddToken(BaseToken token)
+    public override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         return TryAddTokenRes.Error("There can't be anything else on the same line as the 'end' keyword.");
     }

@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using SER.Code.ContextSystem.BaseContexts;
-using SER.Code.ContextSystem.CommunicationInterfaces;
 using SER.Code.ContextSystem.Extensions;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
@@ -57,7 +56,7 @@ public class FunctionDefinitionContext :
             ? $"'{FunctionName}' function definition statement"
             : "function definition statement";
 
-    public override TryAddTokenRes TryAddToken(BaseToken token)
+    public override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         if (token.GetType() != typeof(BaseToken) && token is not VariableToken)
         {

@@ -15,7 +15,7 @@ public class IfStatementContext : StatementContext, IExtendableStatement, IKeywo
     public string Description => "This statement will execute only if the provided condition is met.";
     public string[] Arguments => ["[condition]"];
     
-    public IExtendableStatement.Signal AllowedSignals => IExtendableStatement.Signal.DidntExecute;
+    public IExtendableStatement.Signal Exports => IExtendableStatement.Signal.DidntExecute;
     public Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = [];
 
     private readonly List<BaseToken> _condition = [];
@@ -24,7 +24,7 @@ public class IfStatementContext : StatementContext, IExtendableStatement, IKeywo
 
     protected override string FriendlyName => "'if' statement";
 
-    public override TryAddTokenRes TryAddToken(BaseToken token)
+    public override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         if (NumericExpressionReslover.IsValidForExpression(token).HasErrored(out var error))
         {

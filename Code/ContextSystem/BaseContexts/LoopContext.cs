@@ -1,17 +1,21 @@
 ﻿using SER.Code.ContextSystem.Extensions;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
+using SER.Code.Exceptions;
+using SER.Code.Helpers.Documentation;
 
 namespace SER.Code.ContextSystem.BaseContexts;
 
 public abstract class LoopContext : StatementContext, IExtendableStatement, IKeywordContext
 {
-    public IExtendableStatement.Signal AllowedSignals => IExtendableStatement.Signal.DidntExecute;
+    public IExtendableStatement.Signal Exports => IExtendableStatement.Signal.DidntExecute;
     public abstract Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; }
     
     public abstract string KeywordName { get; }
     public abstract string Description { get; }
     public abstract string[] Arguments { get; }
+    
+    public abstract DocComponent[] ExampleUsage { get; }
 
     protected bool ReceivedContinue;
     protected bool ReceivedBreak;
@@ -33,6 +37,8 @@ public abstract class LoopContext : StatementContext, IExtendableStatement, IKey
 
     protected override IEnumerator<float> RunChildren()
     {
+        if (Script is null) throw new AnonymousUseException("LoopContext.cs");
+        
         foreach (var coro in Children
                      .TakeWhile(_ => !ReceivedBreak)
                      .TakeWhile(_ => Script.IsRunning)

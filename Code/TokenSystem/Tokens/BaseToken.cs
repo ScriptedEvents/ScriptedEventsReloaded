@@ -1,4 +1,5 @@
-﻿using SER.Code.Extensions;
+﻿using SER.Code.Exceptions;
+using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Slices;
@@ -13,16 +14,25 @@ public class BaseToken
 {
     public string RawRep { get; private set; } = null!;
     protected Slice Slice { get; private set; } = null!;
-    public Script Script { get; private set; } = null!;
+    public Script? Script { get; private set; } = null!;
     protected uint? LineNum { get; private set; } = null;
     
-    public IParseResult TryInit(Slice slice, Script script, uint? lineNum)
+    public IParseResult TryInit(Slice slice, Script? script, uint? lineNum)
     {
         RawRep = slice.RawRep;
         Slice = slice;
         Script = script;
         LineNum = lineNum;
-        return InternalParse(script);
+        return InternalParse();
+    }
+    
+    public IParseResult AnonymousInit(string rawRep)
+    {
+        RawRep = rawRep;
+        Slice = null!;
+        Script = null;
+        LineNum = null;
+        return InternalParse();
     }
 
     public interface IParseResult;
@@ -42,7 +52,7 @@ public class BaseToken
     /// </summary>
     public record struct Error(string Message) : IParseResult;
 
-    protected virtual IParseResult InternalParse(Script scr)
+    protected virtual IParseResult InternalParse()
     {
         return new Success();
     }
@@ -122,12 +132,12 @@ public class BaseToken
 
             if (variable is not LiteralVariable litVariable)
             {
-                return $"Variable '{varToken.RawRep}' is not a literal variable, but a {variable.GetType().AccurateName}"; 
+                return $"Variable '{((BaseToken)varToken).RawRep}' is not a literal variable, but a {variable.GetType().AccurateName}"; 
             }
 
             if (litVariable.Value is not T tValue)
             {
-                return $"Value of variable '{varToken.RawRep}' is not a '{typeof(T).Name}' value, " +
+                return $"Value of variable '{((BaseToken)varToken).RawRep}' is not a '{typeof(T).Name}' value, " +
                        $"but a {litVariable.Value.GetType().AccurateName}.";
             }
 
@@ -155,5 +165,18 @@ public class BaseToken
         }
 
         return tToken;
+    }
+    
+    /// <summary>
+    /// Used to get a token in a safe way for documentation purposes.
+    /// </summary>
+    /// <param name="representation">The text representation</param>
+    /// <typeparam name="T">The type of the expected token.</typeparam>
+    /// <returns>The expected token.</returns>
+    /// <exception cref="InvalidDocsSymbolException">Representation did not return the expected token.</exception>
+    public static T GetToken<T>(string representation) where T : BaseToken, new()
+    {
+        return Tokenizer.GetTokenFromString<T>(representation, null, null).Value
+               ?? throw new InvalidDocsSymbolException($"Token {representation} not found");
     }
 }

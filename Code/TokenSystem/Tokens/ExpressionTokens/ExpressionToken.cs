@@ -10,7 +10,7 @@ namespace SER.Code.TokenSystem.Tokens.ExpressionTokens;
 
 public abstract class ExpressionToken : BaseToken, IValueToken
 {
-    protected override IParseResult InternalParse(Script scr)
+    protected override IParseResult InternalParse()
     {
         if (Slice is not CollectionSlice { Type: CollectionBrackets.Curly } collection)
         {

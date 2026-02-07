@@ -1,7 +1,7 @@
 ﻿using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.Helpers.Interfaces;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
-using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.MethodSystem.Methods.TimeMethods;

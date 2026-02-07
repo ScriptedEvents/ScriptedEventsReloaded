@@ -1,12 +1,11 @@
 ﻿using System.Globalization;
-using SER.Code.ScriptSystem;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.TokenSystem.Tokens;
 
 public class DurationToken : LiteralValueToken<DurationValue>
 {
-    protected override IParseResult InternalParse(Script scr)
+    protected override IParseResult InternalParse()
     {
         var value = RawRep;
         if (TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out var result) && result.TotalMilliseconds > 0)
@@ -51,4 +50,6 @@ public class DurationToken : LiteralValueToken<DurationValue>
         Value = timeSpan.Value;
         return new Success();
     }
+    
+    public static DurationToken GetToken(string representation) => GetToken<DurationToken>(representation);
 }

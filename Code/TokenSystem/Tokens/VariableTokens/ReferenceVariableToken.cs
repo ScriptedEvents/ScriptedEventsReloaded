@@ -8,7 +8,7 @@ namespace SER.Code.TokenSystem.Tokens.VariableTokens;
 
 public class ReferenceVariableToken : VariableToken<ReferenceVariable, ReferenceValue>
 {
-    public override Context GetContext(Script scr)
+    public override Context? GetContext(Script? scr)
     {
         return new ReferenceVariableDefinitionContext(this)
         {

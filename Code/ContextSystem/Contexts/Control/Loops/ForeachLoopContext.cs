@@ -100,7 +100,7 @@ public class ForeachLoopContext : LoopContext, IAcceptOptionalVariableDefinition
 
         if (!indexToken.ValueType.IsAssignableFrom(typeof(NumberValue)))
         {
-            return $"Provided variable '{indexToken.RawRepr}' cannot be used for this loop, " +
+            return $"Provided variable '{indexToken.RawRep}' cannot be used for this loop, " +
                    $"as it cannot hold a {typeof(NumberValue).FriendlyTypeName()}";
         }
 

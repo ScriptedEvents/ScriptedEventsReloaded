@@ -12,8 +12,13 @@ public class ReferenceVariableToken : VariableToken<ReferenceVariable, Reference
     {
         return new ReferenceVariableDefinitionContext(this)
         {
-            Script = scr,
+            Script = scr!,
             LineNum = LineNum,
         };
+    }
+
+    public static ReferenceVariableToken GetToken(string representation)
+    {
+        return GetToken<ReferenceVariableToken>(representation);
     }
 }

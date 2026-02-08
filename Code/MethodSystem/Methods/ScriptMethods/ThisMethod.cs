@@ -35,6 +35,8 @@ public class ThisMethod : ReturningMethod
 
     public override void Execute()
     {
+        if (Script is null) throw new AnonymousUseException("ThisMethod.cs");
+        
         ReturnValue = Args.GetOption("info to receive") switch
         {
             "flags" => new CollectionValue(ScriptFlagHandler.GetScriptFlags(Script.Name)

@@ -24,7 +24,7 @@ public class IfStatementContext : StatementContext, IExtendableStatement, IKeywo
 
     protected override string FriendlyName => "'if' statement";
 
-    public override TryAddTokenRes OnAddingToken(BaseToken token)
+    protected override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         if (NumericExpressionReslover.IsValidForExpression(token).HasErrored(out var error))
         {

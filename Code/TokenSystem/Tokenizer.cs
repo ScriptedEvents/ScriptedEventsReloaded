@@ -134,7 +134,7 @@ public static class Tokenizer
         return true;
     }
 
-    public static TryGet<BaseToken[]> TokenizeLine(string line, Script? scr, uint? lineNum)
+    public static TryGet<BaseToken[]> TokenizeLine(string line, Script scr, uint? lineNum)
     {
         if (SliceLine(line)
             .HasErrored(out var sliceError, out var slices))
@@ -145,7 +145,7 @@ public static class Tokenizer
         return TokenizeLine(slices, scr, lineNum);
     }
 
-    public static TryGet<BaseToken[]> TokenizeLine(IEnumerable<Slice> slices, Script? scr, uint? lineNum)
+    public static TryGet<BaseToken[]> TokenizeLine(IEnumerable<Slice> slices, Script scr, uint? lineNum)
     {
         var sliceArray = slices.ToArray();
         var tokens = sliceArray.Select(slice => GetTokenFromSlice(slice, scr, lineNum)).ToArray();
@@ -159,7 +159,7 @@ public static class Tokenizer
         return tokens.Select(t => t.Value!).ToArray();
     }
 
-    public static TryGet<BaseToken> GetTokenFromSlice(Slice slice, Script? scr, uint? lineNum)
+    public static TryGet<BaseToken> GetTokenFromSlice(Slice slice, Script scr, uint? lineNum)
     {
         var tokenCollection = slice is CollectionSlice 
             ? OrderedImportanceTokensFromCollectionSlices 
@@ -182,7 +182,7 @@ public static class Tokenizer
         return unspecified;
     }
 
-    public static TryGet<BaseToken> GetTokenFromString(string str, Script? scr, uint? lineNum)
+    public static TryGet<BaseToken> GetTokenFromString(string str, Script scr, uint? lineNum)
     {
         if (SliceLine(str).HasErrored(out var err, out var slices))
         {
@@ -198,7 +198,7 @@ public static class Tokenizer
         return GetTokenFromSlice(bettaSlices.First(), scr, lineNum);
     }
     
-    public static TryGet<T> GetTokenFromString<T>(string str, Script? scr, uint? lineNum) where T : BaseToken
+    public static TryGet<T> GetTokenFromString<T>(string str, Script scr, uint? lineNum) where T : BaseToken
     {
         if (GetTokenFromString(str, scr, lineNum).HasErrored(out var error, out var token) 
             || token.TryCast<T>().HasErrored(out error, out var castToken))

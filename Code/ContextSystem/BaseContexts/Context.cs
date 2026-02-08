@@ -7,7 +7,7 @@ namespace SER.Code.ContextSystem.BaseContexts;
 
 public abstract class Context
 {
-    public required Script? Script { get; set; } = null!;
+    public required Script Script { get; set; } = null!;
 
     public required uint? LineNum { get; set; }
 
@@ -36,7 +36,7 @@ public abstract class Context
     public static Context Create(Type contextType, Script? scr, uint? lineNum)
     {
         var context = (Context)Activator.CreateInstance(contextType);
-        context.Script = scr;
+        context.Script = scr!;
         context.LineNum = lineNum;
         return context;
     }

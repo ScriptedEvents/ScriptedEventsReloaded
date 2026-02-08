@@ -14,10 +14,10 @@ public class BaseToken
 {
     public string RawRep { get; private set; } = null!;
     protected Slice Slice { get; private set; } = null!;
-    public Script? Script { get; private set; } = null!;
+    public Script Script { get; private set; } = null!;
     protected uint? LineNum { get; private set; } = null;
     
-    public IParseResult TryInit(Slice slice, Script? script, uint? lineNum)
+    public IParseResult TryInit(Slice slice, Script script, uint? lineNum)
     {
         RawRep = slice.RawRep;
         Slice = slice;
@@ -30,7 +30,7 @@ public class BaseToken
     {
         RawRep = rawRep;
         Slice = null!;
-        Script = null;
+        Script = Script.CreateAnonymous();
         LineNum = null;
         return InternalParse();
     }
@@ -132,12 +132,12 @@ public class BaseToken
 
             if (variable is not LiteralVariable litVariable)
             {
-                return $"Variable '{((BaseToken)varToken).RawRep}' is not a literal variable, but a {variable.GetType().AccurateName}"; 
+                return $"Variable '{varToken.RawRep}' is not a literal variable, but a {variable.GetType().AccurateName}"; 
             }
 
             if (litVariable.Value is not T tValue)
             {
-                return $"Value of variable '{((BaseToken)varToken).RawRep}' is not a '{typeof(T).Name}' value, " +
+                return $"Value of variable '{varToken.RawRep}' is not a '{typeof(T).Name}' value, " +
                        $"but a {litVariable.Value.GetType().AccurateName}.";
             }
 

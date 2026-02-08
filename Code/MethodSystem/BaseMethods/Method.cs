@@ -54,7 +54,7 @@ public abstract class Method
     
     public ProvidedArguments Args { get; }
     
-    public Script? Script { get; set; } = null;
+    public Script Script { get; set; } = null!;
 
     public readonly string Subgroup;
 

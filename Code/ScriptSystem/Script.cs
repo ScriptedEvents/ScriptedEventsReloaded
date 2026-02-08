@@ -124,7 +124,7 @@ public class Script
         Executor = executor ?? ScriptExecutor.Get()
     };
 
-    public static Script CreateAnonymous(string name, string content) => new()
+    public static Script CreateAnonymous(string name = "temporary script", string content = "") => new()
     {
         Name = ScriptName.InitUnchecked(name),
         Content = content,

@@ -20,7 +20,7 @@ public class ForeverLoopContext : LoopContextWithSingleIterationVariable<NumberV
     public override string Description => "Makes the code inside the statement run indefinitely.";
     public override string[] Arguments => [];
 
-    public override string ExampleUsage => GetDoc().ToString();
+    public override DocComponent[] GetExampleUsage() => throw new NotImplementedException();
 
     public static DocStatement GetDoc(params DocComponent[] body)
     {

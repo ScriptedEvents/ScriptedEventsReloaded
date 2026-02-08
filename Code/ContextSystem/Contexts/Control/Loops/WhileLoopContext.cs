@@ -5,6 +5,7 @@ using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
+using SER.Code.Helpers.Documentation;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.ValueSystem;
@@ -22,12 +23,17 @@ public class WhileLoopContext : LoopContextWithSingleIterationVariable<NumberVal
     public override string Description =>
         "A statement which will execute its body as long as the provided condition is evaluated to true.";
     public override string[] Arguments => ["[condition...]"];
+    
+    public override DocComponent[] GetExampleUsage()
+    {
+        throw new NotImplementedException();
+    }
 
     public override Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = [];
 
     protected override string FriendlyName => "'while' loop statement";
 
-    public override TryAddTokenRes OnAddingToken(BaseToken token)
+    protected override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         _condition.Add(token);
         return TryAddTokenRes.Continue();

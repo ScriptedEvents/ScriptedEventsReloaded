@@ -27,8 +27,11 @@ public class RunFunctionContext : YieldingContext, IMayReturnValueContext
             ? $"'{_functionDefinitionContext.FunctionName}' function call"
             : "function call";
 
-    public override TryAddTokenRes OnAddingToken(BaseToken token)
+    protected override TryAddTokenRes OnAddingToken(BaseToken token)
     {
+        if (Script is null) 
+            throw new AnonymousUseException("RunFunctionContext.cs cannot add token, requires script");
+        
         if (_functionDefinitionContext is null)
         {
             var name = token.GetBestTextRepresentation(Script);

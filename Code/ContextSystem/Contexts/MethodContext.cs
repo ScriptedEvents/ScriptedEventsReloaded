@@ -34,7 +34,7 @@ public class MethodContext(MethodToken methodToken) : YieldingContext, IMayRetur
 
     protected override string FriendlyName => $"'{Method.Name}' method call";
 
-    public override TryAddTokenRes OnAddingToken(BaseToken token)
+    protected override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         Log.Debug($"'{Method.Name}' method is now receiving token '{token.RawRep}' ({token.GetType().AccurateName})");
 

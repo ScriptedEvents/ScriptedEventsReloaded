@@ -13,7 +13,7 @@ public class LiteralVariableToken : VariableToken<LiteralVariable, LiteralValue>
     {
         return new LiteralVariableDefinitionContext(this)
         {
-            Script = scr,
+            Script = scr!,
             LineNum = LineNum,
         };
     }

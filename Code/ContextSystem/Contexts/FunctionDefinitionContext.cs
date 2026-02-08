@@ -56,7 +56,7 @@ public class FunctionDefinitionContext :
             ? $"'{FunctionName}' function definition statement"
             : "function definition statement";
 
-    public override TryAddTokenRes OnAddingToken(BaseToken token)
+    protected override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         if (token.GetType() != typeof(BaseToken) && token is not VariableToken)
         {
@@ -85,8 +85,12 @@ public class FunctionDefinitionContext :
         return true;
     }
 
+    public TypeOfValue[]? OptionalVariableTypes => null;
+
     public IEnumerator<float> RunProperly(params Value[] values)
     {
+        if (Script is null) throw new AnonymousUseException("FunctionDefinitionContext.cs");
+        
         if (LineNum.HasValue)
             Script.CurrentLine = LineNum.Value;
 
@@ -135,6 +139,8 @@ public class FunctionDefinitionContext :
 
     protected override IEnumerator<float> Execute()
     {
+        if (Script is null) throw new AnonymousUseException("FunctionDefinitionContext.cs");
+        
         foreach (var coro in Children
              .TakeWhile(_ => Script.IsRunning)
              .Select(child => child.ExecuteBaseContext())

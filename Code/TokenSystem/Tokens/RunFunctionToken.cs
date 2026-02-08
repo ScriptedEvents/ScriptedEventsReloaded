@@ -12,7 +12,7 @@ public class RunFunctionToken : BaseToken, IContextableToken
         return new RunFunctionContext
         {
             LineNum = LineNum,
-            Script = scr
+            Script = scr!
         };
     }
 

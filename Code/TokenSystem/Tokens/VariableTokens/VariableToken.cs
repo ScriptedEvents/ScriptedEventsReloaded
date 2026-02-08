@@ -65,12 +65,12 @@ public abstract class VariableToken<TVariable, TValue> : VariableToken, IValueTo
 
     protected override IParseResult InternalParse()
     {
-        if (((BaseToken)this).RawRep.Length < 2 || ((BaseToken)this).RawRep.FirstOrDefault() != Prefix)
+        if (this.RawRep.Length < 2 || this.RawRep.FirstOrDefault() != Prefix)
         {
             return new Ignore();
         }
 
-        Name = ((BaseToken)this).RawRep[1..];
+        Name = this.RawRep[1..];
         if (Name.Any(c => !char.IsLetter(c) && !char.IsDigit(c) && c != '_'))
         {
             return new Ignore();

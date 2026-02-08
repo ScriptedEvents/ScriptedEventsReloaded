@@ -30,9 +30,9 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
     private (Context main, IMayReturnValueContext returner)? _returnContext = null; 
     private Func<TValue>? _parser = null;
 
-    protected override string FriendlyName => $"'{((BaseToken)varToken).RawRep}' variable definition";
+    protected override string FriendlyName => $"'{varToken.RawRep}' variable definition";
 
-    public override TryAddTokenRes OnAddingToken(BaseToken token)
+    protected override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         if (!_equalSignSet)
         {
@@ -99,12 +99,14 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
         return Result.Assert(
             _returnContext is not null ||
             _parser is not null,
-            $"Value for variable '{((BaseToken)varToken).RawRep}' was not provided."
+            $"Value for variable '{varToken.RawRep}' was not provided."
         );
     }
 
     protected override IEnumerator<float> Execute()
     {
+        if (Script is null) throw new AnonymousUseException("FunctionDefinitionContext.cs");
+        
         if (_returnContext.HasValue)
         {
             var (main, returner) = _returnContext.Value;
@@ -124,7 +126,7 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
             if (value.TryCast<TValue>().HasErrored(out var error, out var tValue))
             {
                 throw new ScriptRuntimeError(this, 
-                    $"Value returned by {main} cannot be assigned to the '{((BaseToken)varToken).RawRep}' variable: {error}"
+                    $"Value returned by {main} cannot be assigned to the '{varToken.RawRep}' variable: {error}"
                 );
             }
         

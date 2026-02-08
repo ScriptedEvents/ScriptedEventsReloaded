@@ -4,6 +4,7 @@ using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
+using SER.Code.Helpers.Documentation;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.Interfaces;
@@ -12,7 +13,7 @@ using SER.Code.ValueSystem;
 namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 
 [UsedImplicitly]
-public class RepeatLoopContext : LoopContextWithSingleIterationVariable<NumberValue>, IKeywordContext, IAcceptOptionalVariableDefinitions
+public class RepeatLoopContext : LoopContextWithSingleIterationVariable<NumberValue>
 {
     private readonly Result _rs = "Cannot create 'repeat' loop.";
     private Func<TryGet<ulong>>? _repeatCountExpression = null;
@@ -23,10 +24,15 @@ public class RepeatLoopContext : LoopContextWithSingleIterationVariable<NumberVa
     public override string KeywordName => "repeat";
     public override string Description => "Repeats everything inside its body a given amount of times.";
     public override string[] Arguments => ["[number]"];
+    
+    public override DocComponent[] GetExampleUsage()
+    {
+        throw new NotImplementedException();
+    }
 
     protected override string FriendlyName => "'repeat' loop statement";
 
-    public override TryAddTokenRes OnAddingToken(BaseToken token)
+    protected override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         switch (token)
         {

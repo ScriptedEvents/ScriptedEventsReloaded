@@ -53,7 +53,7 @@ public class WithContext : StandardContext, IKeywordContext, INotRunningContext,
 
     protected override string FriendlyName => "'with' keyword";
 
-    public override TryAddTokenRes OnAddingToken(BaseToken token)
+    protected override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         if (token is not VariableToken vToken)
         {

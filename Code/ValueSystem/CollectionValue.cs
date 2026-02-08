@@ -5,7 +5,7 @@ using SER.Code.Helpers.ResultSystem;
 
 namespace SER.Code.ValueSystem;
 
-public class CollectionValue(IEnumerable value) : Value
+public class CollectionValue(IEnumerable value) : TraversableValue
 {
     public Value[] CastedValues
     {
@@ -174,6 +174,8 @@ public class CollectionValue(IEnumerable value) : Value
     {
         return $"[{string.Join(", ", CastedValues.Select(v => v.ToString()))}]";
     }
+
+    public override Value[] TraversableValues => CastedValues;
 }
 
 public class CollectionValue<T>(IEnumerable<T> value) : CollectionValue(value) where T : Value

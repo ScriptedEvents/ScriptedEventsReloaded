@@ -5,4 +5,8 @@ public class DocComment : DocComponent
     public DocComment(string comment)
     {
     }
+    
+    public DocComment(params object[] comment)
+    {
+    }
 }

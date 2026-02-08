@@ -14,8 +14,8 @@ public abstract class LoopContext : StatementContext, IExtendableStatement, IKey
     public abstract string KeywordName { get; }
     public abstract string Description { get; }
     public abstract string[] Arguments { get; }
-    
-    public abstract DocComponent[] ExampleUsage { get; }
+
+    public abstract DocComponent[] GetExampleUsage();
 
     protected bool ReceivedContinue;
     protected bool ReceivedBreak;

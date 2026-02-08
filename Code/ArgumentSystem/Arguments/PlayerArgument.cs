@@ -32,7 +32,7 @@ public class PlayerArgument(string name) : Argument(name)
         var plrs = variable.Players;
         if (plrs.Len != 1)
         {
-            return $"The player variable '{((BaseToken)token).RawRep}' must have exactly 1 player, but has {plrs.Len} instead.";
+            return $"The player variable '{token.RawRep}' must have exactly 1 player, but has {plrs.Len} instead.";
         }
 
         return plrs.First();

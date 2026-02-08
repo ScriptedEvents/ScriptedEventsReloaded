@@ -1,4 +1,5 @@
-﻿using SER.Code.ContextSystem.BaseContexts;
+﻿using JetBrains.Annotations;
+using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Helpers.ResultSystem;
@@ -6,6 +7,7 @@ using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
 
+[UsedImplicitly]
 public class StopScriptContext: StandardContext, IKeywordContext
 {
     public string KeywordName => "stop";
@@ -17,7 +19,7 @@ public class StopScriptContext: StandardContext, IKeywordContext
 
     protected override string FriendlyName => "'stop' keyword";
 
-    public override TryAddTokenRes OnAddingToken(BaseToken token)
+    protected override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         return TryAddTokenRes.Error(
             "'stop' keyword is not expecting any arguments after it.");
@@ -30,6 +32,6 @@ public class StopScriptContext: StandardContext, IKeywordContext
 
     protected override void Execute()
     {
-        Script.Stop(true);
+        Script?.Stop(true);
     }
 }

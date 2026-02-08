@@ -18,8 +18,6 @@ public class ElifStatementContext : StatementContext, IStatementExtender, IExten
     public string Description =>
         "If the statement above it didn't execute, 'elif' statement will try to execute if the provided condition is met.";
     public string[] Arguments => ["[condition]"];
-    
-    public string ExampleUsage { get; }
 
     public IExtendableStatement.Signal ListensTo => IExtendableStatement.Signal.DidntExecute;
     
@@ -33,7 +31,7 @@ public class ElifStatementContext : StatementContext, IStatementExtender, IExten
 
     protected override string FriendlyName => "'elif' statement";
 
-    public override TryAddTokenRes OnAddingToken(BaseToken token)
+    protected override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         if (NumericExpressionReslover.IsValidForExpression(token).HasErrored(out var error))
         {

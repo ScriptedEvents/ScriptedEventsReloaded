@@ -196,7 +196,7 @@ public class PlayerExpressionToken : ExpressionToken
                     $"A player expression expects to have only one argument, but {tokens.Length - 1} were provided.");
         }
 
-        if (EnumArgument<PlayerProperty>.Convert(tokens.Last(), Script)
+        if (EnumArgument<PlayerProperty>.Convert(tokens.Last(), Script!)
             .HasErrored(out var error, out var property))
         {
             return new Error(error);
@@ -225,4 +225,19 @@ public class PlayerExpressionToken : ExpressionToken
 
     public static PlayerExpressionToken GetToken(PlayerVariableToken pvar, PlayerProperty property)
         => GetToken<PlayerExpressionToken>($"{{{pvar.RawRep} {property.ToString().LowerFirst()}}}");
+
+    public TryGet<Value[]> GetTraversableValues()
+    {
+        if (Value().HasErrored(out var error, out var value))
+        {
+            return error;
+        }
+
+        if (value is not TraversableValue traversable)
+        {
+            return $"{value} is not a traversable value.";
+        }
+
+        return traversable.TraversableValues;
+    }
 }

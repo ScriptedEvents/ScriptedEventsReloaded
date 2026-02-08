@@ -1,4 +1,5 @@
 ﻿using SER.Code.ContextSystem.Interfaces;
+using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
@@ -28,9 +29,12 @@ public abstract class LoopContextWithSingleIterationVariable<TVal> :
         _iterationVariableToken = varToken;
         return true;
     }
-    
+
+    public TypeOfValue[] OptionalVariableTypes => [new TypeOfValue<TVal>()];
+
     protected void SetVariable(TVal value)
     {
+        if (Script is null) throw new AnonymousUseException("LoopContextWithSingleIterationVariable.cs");
         if (_iterationVariableToken is null) return;
         
         _iterationVariable = Variable.Create(_iterationVariableToken.Name, value);
@@ -39,6 +43,7 @@ public abstract class LoopContextWithSingleIterationVariable<TVal> :
 
     protected void RemoveVariable()
     {
+        if (Script is null) throw new AnonymousUseException("LoopContextWithSingleIterationVariable.cs");
         if (_iterationVariable is null) return;
         
         Script.RemoveVariable(_iterationVariable);

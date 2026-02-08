@@ -12,7 +12,7 @@ public class PlayerVariableDefinitionContext(VariableToken<PlayerVariable, Playe
 {
     protected override (TryAddTokenRes result, Func<PlayerValue> parser) AdditionalParsing(BaseToken token)
     {
-        if (token is ParenthesesToken { RawContent: "" })
+        if (token is ParenthesesToken { RawContent: "" } && token.Script is not null)
         {
             Log.ScriptWarn(
                 token.Script, 

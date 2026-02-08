@@ -18,7 +18,7 @@ public class ElseStatementContext : StatementContext, IStatementExtender, IKeywo
 
     protected override string FriendlyName => "'else' statement";
 
-    public override TryAddTokenRes OnAddingToken(BaseToken token)
+    protected override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         return TryAddTokenRes.Error("There should be no arguments after `else` keyword");
     }

@@ -19,7 +19,7 @@ public class MethodToken : BaseToken, IContextableToken
         }
 
         Method = (Method)Activator.CreateInstance(method.GetType());
-        Method.Script = Script;
+        Method.Script = Script!;
         Method.LineNum = LineNum;
         return new Success();
     }
@@ -29,7 +29,7 @@ public class MethodToken : BaseToken, IContextableToken
         return new MethodContext(this)
         {
             LineNum = LineNum,
-            Script = scr,
+            Script = scr!,
         };
     }
 }

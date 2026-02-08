@@ -1,12 +1,10 @@
 ﻿using LabApi.Features.Wrappers;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
-using SER.Code.ValueSystem.Interfaces;
 
 namespace SER.Code.ValueSystem;
 
-public class PlayerValue : Value, ITraversableValue
+public class PlayerValue : TraversableValue
 {
     public PlayerValue(Player? plr)
     {
@@ -29,8 +27,5 @@ public class PlayerValue : Value, ITraversableValue
         ? throw new TosoksFuckedUpException(error)
         : val;
 
-    public TryGet<Value[]> TryGetValues()
-    {
-        return Players.Select(plr => new PlayerValue(plr)).ToArray();
-    }
+    public override Value[] TraversableValues => Players.Select(plr => new PlayerValue(plr)).ToArray();
 }

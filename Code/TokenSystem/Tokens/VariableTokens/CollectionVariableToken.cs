@@ -2,13 +2,12 @@
 using SER.Code.ContextSystem.Contexts.VariableDefinition;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
-using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 using SER.Code.VariableSystem.Variables;
 
 namespace SER.Code.TokenSystem.Tokens.VariableTokens;
 
-public class CollectionVariableToken : VariableToken<CollectionVariable, CollectionValue>, ITraversableValueToken
+public class CollectionVariableToken : VariableToken<CollectionVariable, CollectionValue>
 {
     public static string Example => "&myCollectionVariable";
 
@@ -16,7 +15,7 @@ public class CollectionVariableToken : VariableToken<CollectionVariable, Collect
     {
         return new CollectionVariableDefinitionContext(this)
         {
-            Script = scr,
+            Script = scr!,
             LineNum = LineNum,
         };
     }

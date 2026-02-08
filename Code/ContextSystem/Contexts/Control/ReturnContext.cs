@@ -15,15 +15,15 @@ namespace SER.Code.ContextSystem.Contexts.Control;
 public class ReturnContext : StandardContext, IKeywordContext
 {
     private IValueToken? _returnValueToken;
-    private (Context main, IMayReturnValueContext returner)? _returnContext = null; 
-    
-    public string KeywordName => "return";
-    public string Description => "Returns value when in a function.";
-    public string[] Arguments => ["[return value]"];
+    private (Context main, IMayReturnValueContext returner)? _returnContext = null;
+
+    string IKeywordContext.KeywordName => "return";
+    string IKeywordContext.Description => "Returns value when in a function.";
+    string[] IKeywordContext.Arguments => ["[return value]"];
 
     protected override string FriendlyName => "'return' keyword";
 
-    public override TryAddTokenRes OnAddingToken(BaseToken token)
+    protected override TryAddTokenRes OnAddingToken(BaseToken token)
     {
         if (_returnContext.HasValue)
         {
@@ -62,10 +62,11 @@ public class ReturnContext : StandardContext, IKeywordContext
         if (_returnContext.HasValue)
         {
             value = _returnContext.Value.returner.ReturnedValue
-                    ?? throw new ScriptRuntimeError(this,
-                        $"{_returnContext.Value.main} has not returned a value. " +
-                        $"{_returnContext.Value.returner.MissingValueHint}"
-                    );
+                ?? throw new ScriptRuntimeError(
+                    this,
+                    $"{_returnContext.Value.main} has not returned a value. " +
+                    $"{_returnContext.Value.returner.MissingValueHint}"
+                );
         }
         else if (_returnValueToken!.Value().HasErrored(out var error, out value!))
         {

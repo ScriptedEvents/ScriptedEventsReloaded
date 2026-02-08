@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
@@ -6,7 +7,6 @@ using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers.Documentation;
 using SER.Code.Helpers.ResultSystem;
-using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.MethodSystem.Methods.BroadcastMethods;
 using SER.Code.MethodSystem.Methods.OutputMethods;
 using SER.Code.TokenSystem.Tokens;
@@ -27,69 +27,75 @@ public partial class ForeachLoopContext
         "Repeats its body for each player in the player variable or a value in a collection variable, " +
         "assigning it its own custom variable.";
     
-    public override string[] Arguments => ["[player/collection variable]"];
+    public override string[] Arguments { get; } = ["[player/collection variable]"];
 
-    public override DocComponent[] ExampleUsage
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public override DocComponent[] GetExampleUsage()
     {
-        get
-        {
-            var plr = PlayerVariableToken.GetToken("@plr");
-            var all = PlayerVariableToken.GetToken("@all");
-            var duration = DurationToken.GetToken("10s");
-            var index = LiteralVariableToken.GetToken("$index");
-            return
-            [
-                new DocComment(
-                    "The 'foreach' will repeat the methods inside its body the same amount of times as there are provided players"),
-                new DocComment(
-                    "For example, if there are 5 players on the server, 'detected player' will be printed 5 times"),
-                GetDoc(
-                    all,
-                    null,
-                    null,
-                    new DocMethod<PrintMethod>(
-                        TextToken.GetToken("detected player")
+        var plrPVAR = PlayerVariableToken.GetToken("@plr");
+        var allPVAR = PlayerVariableToken.GetToken("@all");
+        var duration = DurationToken.GetToken("10s");
+        var indexLVAR = LiteralVariableToken.GetToken("$index");
+        var itemRVAR = ReferenceVariableToken.GetToken("*item");
+        return
+        [
+            new DocComment("The 'foreach' will repeat the methods inside the same amount of times as there are players"),
+            new DocComment("Meaning if there are 5 players on the server, 'detected player' will be printed 5 times"),
+            GetDoc(
+                allPVAR,
+                null,
+                null,
+                new DocMethod<PrintMethod>(
+                    TextToken.GetToken("detected player")
+                )
+            ),
+            new DocComment("But we can also check which player we are currently 'going over'"),
+            new DocComment("The order in which that happens is pretty much random"),
+            new DocComment("For example, what will happen if there are 3 players: Player1, Player2 and Player3?"),
+            new DocComment("It will send a broadcast to each player with their specific name!"),
+            GetDoc(
+                allPVAR,
+                plrPVAR,
+                null,
+                new DocMethod<BroadcastMethod>(
+                    plrPVAR,
+                    duration,
+                    TextToken.GetToken(
+                        "Hello",
+                        PlayerExpressionToken.GetToken(plrPVAR, PlayerExpressionToken.PlayerProperty.Name),
+                        "on our server!"
                     )
-                ),
-                new DocComment("But we can also check which player we are currently 'going over'"),
-                new DocComment("The order in which that happens is pretty much random"),
-                new DocComment("For example, what will happen if there are 3 players: Player1, Player2 and Player3?"),
-                new DocComment("It will send a broadcast to each player with their specific name!"),
-                GetDoc(
-                    all,
-                    plr,
-                    null,
-                    new DocMethod<BroadcastMethod>(
-                        plr,
-                        duration,
-                        TextToken.GetToken(
-                            "Hello",
-                            PlayerExpressionToken.GetToken(plr, PlayerExpressionToken.PlayerProperty.Name),
-                            "on our server!"
-                        )
+                )
+            ),
+            new DocComment("This loop supports 1 more argument: the current 'iteration' of the loop"),
+            new DocComment("This is usually called an 'index' in programming"),
+            GetDoc(
+                allPVAR,
+                plrPVAR,
+                indexLVAR,
+                new DocMethod<BroadcastMethod>(
+                    plrPVAR,
+                    duration,
+                    TextToken.GetToken(
+                        "Hello",
+                        PlayerExpressionToken.GetToken(plrPVAR, PlayerExpressionToken.PlayerProperty.Name),
+                        "your index is:",
+                        LiteralVariableExpressionToken.GetToken(indexLVAR)
                     )
-                ),
-                new DocComment("This loop supports 1 more argument: the current 'iteration' of the loop"),
-                new DocComment("This is usually called an 'index' in programming"),
-                GetDoc(
-                    all,
-                    plr,
-                    index,
-                    new DocMethod<BroadcastMethod>(
-                        plr,
-                        duration,
-                        TextToken.GetToken(
-                            "Hello", 
-                            PlayerExpressionToken.GetToken(plr, PlayerExpressionToken.PlayerProperty.Name),
-                            "your index is:",
-                            LiteralVariableExpressionToken.GetToken(index)
-                        )
-                    )
-                ),
-                new DocComment("But players are NOT the only thing you can 'loop over'!"),
-                new DocComment("If you have a collection value, like ")
-            ];
-        }
+                )
+            ),
+            new DocComment("But players are NOT the only thing you can loop over!"),
+            new DocComment(
+                "If you have a collection value, like",
+                PlayerExpressionToken.GetToken(plrPVAR, PlayerExpressionToken.PlayerProperty.Inventory),
+                "so you check each item on its own"
+            ),
+            GetDoc(
+                PlayerExpressionToken.GetToken(plrPVAR, PlayerExpressionToken.PlayerProperty.Inventory),
+                itemRVAR,
+                null
+            )
+        ];
     }
 
     public TypeOfValue[] OptionalVariableTypes =>
@@ -102,19 +108,19 @@ public partial class ForeachLoopContext
 
     protected override string FriendlyName => "'foreach' loop statement";
 
-    public static DocStatement GetDoc<TIteratingVar>(
-        TIteratingVar iteratingVariable, 
-        PlayerVariableToken? playerVar, 
+    public static DocStatement GetDoc<TVal>(
+        TVal iteratingValue, 
+        VariableToken? itemVar, 
         LiteralVariableToken? indexVar,
         params DocComponent[] body
     )
-    where TIteratingVar : VariableToken, ITraversableValueToken, new()
+    where TVal : BaseToken, IValueToken
     {
-        return new DocStatement("foreach", iteratingVariable)
+        return new DocStatement("foreach", iteratingValue)
             .AddRangeIf(() =>
             {
                 List<VariableToken> vars = [];
-                if (playerVar != null) vars.Add(playerVar);
+                if (itemVar != null) vars.Add(itemVar);
                 if (indexVar != null) vars.Add(indexVar);
 
                 if (vars.Count is 0) return null;
@@ -141,7 +147,7 @@ public partial class ForeachLoopContext : LoopContext, IAcceptOptionalVariableDe
 
     protected override TryAddTokenRes OnAddingToken(BaseToken token)
     {
-        if (token is not ITraversableValueToken valToken)
+        if (!token.CanReturn<TraversableValue>(out var func))
         {
             return TryAddTokenRes.Error(
                 "'foreach' loop expected to have either a player value or collection value as its third argument, " +
@@ -151,12 +157,12 @@ public partial class ForeachLoopContext : LoopContext, IAcceptOptionalVariableDe
 
         _values = () =>
         {
-            if (valToken.GetTraversableValues().HasErrored(out var error, out var value))
+            if (func().HasErrored(out var error, out var value))
             {
                 throw new ScriptRuntimeError(this, $"Cannot get value from '{token.RawRep}': {error}");
             }
 
-            return value;
+            return value.TraversableValues;
         };
 
         return TryAddTokenRes.End();

@@ -70,6 +70,9 @@
         <Reference Include="UncomplicatedCustomRoles-LabAPI">
             <HintPath>$(SL_DEV_REFERENCES)\UncomplicatedCustomRoles-LabAPI.dll</HintPath>
         </Reference>
+        <Reference Include="RueI">
+            <HintPath>$(SL_DEV_REFERENCES)\RueI.dll</HintPath>
+        </Reference>
     </ItemGroup>
     
     <!-- QoL moving the dll -->

@@ -111,6 +111,7 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
         new ExiledBridge().Load();
         new CallvoteBridge().Load();
         new UcrBridge().Load();
+        new RueiBridge().Load();
         SendLogo();
 
         Events.ServerEvents.WaitingForPlayers += OnServerFullyInit;

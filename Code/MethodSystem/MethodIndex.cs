@@ -25,6 +25,7 @@ public static class MethodIndex
         ExiledBridge.OnDetected += () => LoadMethodsOfFramework(IDependOnFramework.Type.Exiled);
         CallvoteBridge.OnDetected += () => LoadMethodsOfFramework(IDependOnFramework.Type.Callvote);
         UcrBridge.OnDetected += () => LoadMethodsOfFramework(IDependOnFramework.Type.Ucr);
+        RueiBridge.OnDetected += () => LoadMethodsOfFramework(IDependOnFramework.Type.Ruei);
     }
     
     /// <summary>

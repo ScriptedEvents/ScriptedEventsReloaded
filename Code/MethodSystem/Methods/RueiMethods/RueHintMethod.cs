@@ -11,7 +11,7 @@ using Tag = RueI.API.Elements.Tag;
 
 namespace SER.Code.MethodSystem.Methods.RueiMethods;
 
-public class RueHint : SynchronousMethod, IDependOnFramework
+public class RueHintMethod : SynchronousMethod, IDependOnFramework
 {
     public override string Description { get; } = "Sends or removes hints (in Rue library) of players";
     public override Argument[] ExpectedArguments { get; } = 
@@ -38,7 +38,7 @@ public class RueHint : SynchronousMethod, IDependOnFramework
             },
             new FloatArgument("Position", 0, 1000)
             {
-                DefaultValue  = new(0, null),
+                DefaultValue  = new(0f, null),
                 Description = "The position of hint (Y position), optional in case Option is set to Remove."
             },
             new DurationArgument("Duration")
@@ -60,13 +60,13 @@ public class RueHint : SynchronousMethod, IDependOnFramework
         foreach (var plr in players)
         {
             var display = RueDisplay.Get(plr);
-            if (option == "Remove")
+            if (option == "remove")
             {
                 display.Remove(tag);
                 continue;
             }
 
-            if (option == "Show")
+            if (option == "show")
             {
                 display.Show(tag, new BasicElement(position, message), duration);
             }

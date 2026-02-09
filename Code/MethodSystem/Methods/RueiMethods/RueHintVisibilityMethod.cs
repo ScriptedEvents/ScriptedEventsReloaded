@@ -7,7 +7,7 @@ using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.RueiMethods;
 
-public class RueHintVisibility : SynchronousMethod, IDependOnFramework
+public class RueHintVisibilityMethod : SynchronousMethod, IDependOnFramework
 {
     public override string Description { get; } = "Manages the visibility of already created hints of player";
     public override Argument[] ExpectedArguments { get; } = 

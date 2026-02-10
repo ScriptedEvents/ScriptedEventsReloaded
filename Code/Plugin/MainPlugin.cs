@@ -104,14 +104,18 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
         
         Script.StopAll();
         EventHandler.Initialize();
+        
         MethodIndex.Initialize();
         VariableIndex.Initialize();
         Flag.RegisterFlags();
         CommandEvents.Initialize();
-        new ExiledBridge().Load();
-        new CallvoteBridge().Load();
-        new UcrBridge().Load();
-        new RueiBridge().Load();
+        
+        
+        /*foreach (var i in FrameworkBridge.Registered)
+        {
+            i.Load();
+        }*/
+        
         SendLogo();
 
         Events.ServerEvents.WaitingForPlayers += OnServerFullyInit;
@@ -124,6 +128,9 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
     public override void Disable()
     {
         Script.StopAll();
+        
+        FrameworkBridge.Registered.Clear();
+        
         SetPlayerDataMethod.PlayerData.Clear();
     }
 

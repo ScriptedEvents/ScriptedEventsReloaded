@@ -20,7 +20,7 @@ public abstract class Argument(string name)
     /// </summary>
     public string? Description { get; init; } = null;
 
-    public record Default(object? Value, string? StringRep);
+    public record Default(object? Value, string? StringRep = null);
 
     /// <summary>
     /// Sets the default value for this argument, allowing it to be skipped by the user.

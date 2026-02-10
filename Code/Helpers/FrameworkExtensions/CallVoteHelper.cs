@@ -1,14 +1,15 @@
 ﻿using MEC;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.Helpers.FrameworkExtensions;
 
 public sealed class CallvoteBridge : FrameworkBridge
 {
-    public static event Action? OnDetected;
     protected override string Name => "Callvote";
-    
-    public void Load()
+    public override IDependOnFramework.Type FrameworkType { get; } = IDependOnFramework.Type.Callvote;
+
+    public CallvoteBridge()
     {
-        Await(OnDetected).RunCoroutine();
+        
     }
 }

@@ -33,19 +33,24 @@ public class RueHintMethod : SynchronousMethod, IDependOnFramework
             },
             new TextArgument("Message")
             {
-                DefaultValue = new("", null),
+                DefaultValue = new(""),
                 Description = "The message of hint shown, optional in case Option is set to Remove.",
             },
             new FloatArgument("Position", 0, 1000)
             {
-                DefaultValue  = new(0f, null),
+                DefaultValue  = new(0f),
                 Description = "The position of hint (Y position), optional in case Option is set to Remove."
             },
             new DurationArgument("Duration")
             {
-                DefaultValue = new(TimeSpan.MaxValue, null),
+                DefaultValue = new(TimeSpan.MaxValue),
                 Description = "The duration of hint, optional in case Option is set to Remove."
-            }
+            },
+            new BoolArgument("UseResolution")
+            {
+                DefaultValue = new(false),
+                Description = "Automatically formats hint on the Y position to use resolution player sets (option) (X resolution is unable to be calculated)",
+            },
         ];
     public override void Execute()
     {
@@ -56,6 +61,7 @@ public class RueHintMethod : SynchronousMethod, IDependOnFramework
         var message = Args.GetText("Message");
         var position = Args.GetFloat("Position");
         var duration = Args.GetDuration("Duration");
+        var resolution = Args.GetBool("UseResolution");
         
         foreach (var plr in players)
         {
@@ -68,7 +74,7 @@ public class RueHintMethod : SynchronousMethod, IDependOnFramework
 
             if (option == "show")
             {
-                display.Show(tag, new BasicElement(position, message), duration);
+                display.Show(tag, new BasicElement(position, message) {ResolutionBasedAlign = resolution}, duration);
             }
         }
     }

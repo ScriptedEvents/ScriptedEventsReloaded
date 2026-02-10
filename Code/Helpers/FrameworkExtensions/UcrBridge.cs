@@ -1,14 +1,15 @@
 ﻿using MEC;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.Helpers.FrameworkExtensions;
 
 public sealed class UcrBridge : FrameworkBridge
 {
-    public static event Action? OnDetected;
     protected override string Name => "UncomplicatedCustomRoles";
-    
-    public void Load()
+    public override IDependOnFramework.Type FrameworkType { get; } = IDependOnFramework.Type.Ucr;
+
+    public UcrBridge()
     {
-        Await(OnDetected).RunCoroutine();
+        
     }
 }

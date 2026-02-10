@@ -3,14 +3,15 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
+using SER.Code.ValueSystem;
 
 namespace SER.Code.MethodSystem.Methods.VotingMethods;
 
 [UsedImplicitly]
-public class VoteOptionMethod : ReferenceReturningMethod<VoteOptionMethod.VoteOption>, IDependOnFramework
+public class VoteOptionMethod : ReferenceReturningMethod, IDependOnFramework
 {
     public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Callvote;
-
+    
     public record VoteOption(string Key, string DisplayText);
 
     public override string Description => "Creates a vote option, which can be used in a vote.";
@@ -32,6 +33,8 @@ public class VoteOptionMethod : ReferenceReturningMethod<VoteOptionMethod.VoteOp
         var key = Args.GetText("key");
         var displayText = Args.GetText("display text");
 
-        ReturnValue = new(key, displayText);
+        ReturnValue = new ReferenceValue(new VoteOption(key, displayText));
     }
+
+    public override Type ReturnType { get; } = typeof(VoteOption);
 }

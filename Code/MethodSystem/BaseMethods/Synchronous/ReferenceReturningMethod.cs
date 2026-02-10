@@ -13,7 +13,7 @@ public abstract class ReferenceReturningMethod : ReturningMethod<ReferenceValue>
 
 public abstract class ReferenceReturningMethod<T> : ReferenceReturningMethod
 {
-    public override Type ReturnType => typeof(T);
+    public sealed override Type ReturnType => typeof(T);
 
     protected new T ReturnValue
     {

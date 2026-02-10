@@ -22,12 +22,12 @@ public abstract class TypeOfValue
 
 public class TypesOfValue : TypeOfValue
 {
-    public TypesOfValue(SingleTypeOfValue[] types) : base(types.Select(t => t.Type).ToArray())
+    public TypesOfValue(params SingleTypeOfValue[] types) : base(types.Select(t => t.Type).ToArray())
     {
         _types = types.Select(t => t.Type).ToArray();
     }
 
-    public TypesOfValue(Type[] types) : base(types)
+    public TypesOfValue(params Type[] types) : base(types)
     {
         _types = types;
     }

@@ -15,7 +15,7 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.VotingMethods;
 
 [UsedImplicitly]
-public class StartVoteAndWaitMethod : YieldingReturningMethod<TextValue>, IAdditionalDescription, IDependOnFramework
+public class StartVoteAndWaitMethod : YieldingReturningMethod, IAdditionalDescription, IDependOnFramework
 {
     public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Callvote;
     
@@ -76,4 +76,6 @@ public class StartVoteAndWaitMethod : YieldingReturningMethod<TextValue>, IAddit
             result = topKeys.Length > 1 ? "tie" : topKeys[0];
         }
     }
+    
+    public override TypeOfValue Returns => new TypesOfValue(typeof(TextValue));
 }

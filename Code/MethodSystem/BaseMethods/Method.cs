@@ -1,14 +1,12 @@
 ﻿using MEC;
 using SER.Code.ArgumentSystem;
 using SER.Code.ArgumentSystem.BaseArguments;
-using SER.Code.ContextSystem;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.BaseMethods.Yielding;
 using SER.Code.ScriptSystem;
-using SER.Code.TokenSystem;
 
 namespace SER.Code.MethodSystem.BaseMethods;
 
@@ -79,18 +77,4 @@ public abstract class Method
     }
     
     public static string GetFriendlyName(Type type) => type.Name[..^"Method".Length];
-
-    public static string GetDoc<T>(params string[] arguments) where T : Method, new()
-    {
-        var formatted = $"{GetFriendlyName(typeof(T))} {arguments.JoinStrings(" ")}";
-        
-        if (Tokenizer.TokenizeLine(formatted, null, null).HasErrored(out var error, out var tokens) 
-            || Contexter.ContextLine(tokens, null, null).HasErrored(out error))
-        {
-            Log.Debug(error);
-            throw new Exception($"Method '{formatted}' used in documentation has invalid syntax.");
-        }
-
-        return formatted;
-    }
 }

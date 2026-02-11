@@ -8,6 +8,7 @@ using SER.Code.Extensions;
 using SER.Code.Helpers.Documentation;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem.Methods.BroadcastMethods;
+using SER.Code.MethodSystem.Methods.ItemMethods;
 using SER.Code.MethodSystem.Methods.OutputMethods;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.ExpressionTokens;
@@ -37,6 +38,7 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitions
         var duration = DurationToken.GetToken("10s");
         var indexLVAR = LiteralVariableToken.GetToken("$index");
         var itemRVAR = ReferenceVariableToken.GetToken("*item");
+        var invPEXP = PlayerExpressionToken.GetToken(plrPVAR, PlayerExpressionToken.PlayerProperty.Inventory);
         return
         [
             new DocComment("The 'over' will repeat the methods inside the same amount of times as there are players"),
@@ -90,14 +92,22 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitions
             new DocComment("But players are NOT the only thing you can loop over!"),
             new DocComment(
                 "If you have a collection value, like",
-                PlayerExpressionToken.GetToken(plrPVAR, PlayerExpressionToken.PlayerProperty.Inventory),
+                invPEXP,
                 "so you check each item on its own"
             ),
             GetDoc(
-                PlayerExpressionToken.GetToken(plrPVAR, PlayerExpressionToken.PlayerProperty.Inventory),
+                invPEXP,
                 itemRVAR,
                 null,
-                IfStatement.GetDoc([])
+                IfStatement.GetDoc(
+                    [
+                        new DocMethod<ItemInfoMethod>(
+                            true,
+                            itemRVAR, 
+                            BaseToken.GetToken<BaseToken>("type")
+                        )
+                    ]
+                )
             )
         ];
     }

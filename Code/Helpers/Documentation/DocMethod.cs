@@ -9,12 +9,17 @@ public abstract class DocMethod : DocComponent;
 public class DocMethod<T> : DocMethod where T : Method, new()
 {
     private readonly string _rep;
-    public DocMethod(params BaseToken[] arguments)
+    public DocMethod(bool isExpression, params BaseToken[] arguments)
     {
         _rep = $"{Method.GetFriendlyName(typeof(T))} {string.Join(" ", arguments.Select(a => a.RawRep))}";
         if (Script.VerifyContent(_rep).HasErrored(out var error))
         {
             throw new InvalidOperationException(error);
+        }
+        
+        if (isExpression)
+        {
+            _rep = $"{{{_rep}}}";
         }
     }
 

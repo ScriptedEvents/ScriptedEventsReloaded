@@ -1,6 +1,5 @@
 ﻿using SER.Code.ContextSystem;
 using SER.Code.Exceptions;
-using SER.Code.Helpers.Documentation;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.ValueSystem;
@@ -21,9 +20,9 @@ public class MethodExpressionToken : ExpressionToken
             return new Ignore();
         }
 
-        if (methodToken.Method is not ReturningMethod method)
+        if (methodToken.MethodInstance is not ReturningMethod method)
         {
-            return new Error($"Method '{methodToken.Method.Name}' does not return a value.");
+            return new Error($"Method '{methodToken.MethodInstance.Name}' does not return a value.");
         }
         
         if (Contexter.ContextLine(tokens, null, Script).HasErrored(out var contextError))
@@ -41,10 +40,5 @@ public class MethodExpressionToken : ExpressionToken
         
         _method.Execute();
         return _method.ReturnValue ?? throw new AndrzejFuckedUpException();
-    }
-
-    public static DocComponent GetDoc(MethodToken method, params BaseToken[] args)
-    {
-        
     }
 }

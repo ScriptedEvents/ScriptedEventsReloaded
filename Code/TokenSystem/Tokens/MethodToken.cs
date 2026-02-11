@@ -9,7 +9,7 @@ namespace SER.Code.TokenSystem.Tokens;
 
 public class MethodToken : BaseToken, IContextableToken
 {
-    public Method Method { get; private set; } = null!;
+    public Method MethodInstance { get; private set; } = null!;
     
     protected override IParseResult InternalParse()
     {
@@ -18,9 +18,9 @@ public class MethodToken : BaseToken, IContextableToken
             return new Ignore();
         }
 
-        Method = (Method)Activator.CreateInstance(method.GetType());
-        Method.Script = Script!;
-        Method.LineNum = LineNum;
+        MethodInstance = (Method)Activator.CreateInstance(method.GetType());
+        MethodInstance.Script = Script!;
+        MethodInstance.LineNum = LineNum;
         return new Success();
     }
 

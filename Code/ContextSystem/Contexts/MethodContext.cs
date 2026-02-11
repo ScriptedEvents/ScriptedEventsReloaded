@@ -20,8 +20,8 @@ namespace SER.Code.ContextSystem.Contexts;
 
 public class MethodContext(MethodToken methodToken) : YieldingContext, IMayReturnValueContext
 {
-    public readonly Method Method = methodToken.Method;
-    public readonly MethodArgumentDispatcher Dispatcher = new(methodToken.Method);
+    public readonly Method Method = methodToken.MethodInstance;
+    public readonly MethodArgumentDispatcher Dispatcher = new(methodToken.MethodInstance);
     private int _providedArguments = 0;
     
     public TypeOfValue? Returns => Method is IReturningMethod returningMethod 

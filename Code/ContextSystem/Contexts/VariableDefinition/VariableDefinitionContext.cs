@@ -14,7 +14,12 @@ using Log = SER.Code.Helpers.Log;
 
 namespace SER.Code.ContextSystem.Contexts.VariableDefinition;
 
-public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TVarToken varToken) : YieldingContext 
+public abstract class VariableDefinitionContext : YieldingContext
+{
+    public Variable? DefinedVariable;
+}
+
+public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TVarToken varToken) : VariableDefinitionContext
     where TVarToken : VariableToken<TVariable, TValue>
     where TValue    : Value
     where TVariable : Variable<TValue>
@@ -127,12 +132,14 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
                     $"Value returned by {main} cannot be assigned to the '{varToken.RawRep}' variable: {error}"
                 );
             }
-        
-            Script.AddVariable(Variable.Create(varToken.Name, tValue));
+
+            DefinedVariable = Variable.Create(varToken.Name, tValue);
+            Script.AddVariable(DefinedVariable);
         }
         else if (_parser is not null)
         {
-            Script.AddVariable(Variable.Create(varToken.Name, Value.Parse(_parser(), Script)));
+            DefinedVariable = Variable.Create(varToken.Name, Value.Parse(_parser(), Script));
+            Script.AddVariable(DefinedVariable);
         }
         else
         {

@@ -32,7 +32,7 @@ public class PopVariableMethod : ReturningMethod
                 Script.RemoveVariable(variable);
                 break;
             case "global":
-                VariableIndex.GlobalVariables.RemoveAll(existingVar => existingVar.Name == variable.Name);
+                VariableIndex.RemoveGlobalVariable(variable);
                 break;
         }
         

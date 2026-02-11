@@ -73,4 +73,17 @@ public static class VariableIndex
         
         GlobalVariables.AddRange(allApiVariables);
     }
+
+    public static void AddGlobalVariable(Variable variable)
+    {
+        RemoveGlobalVariable(variable);
+        GlobalVariables.Add(variable);
+    }
+
+    public static void RemoveGlobalVariable(Variable variable)
+    {
+        GlobalVariables.RemoveAll(existingVar => 
+            existingVar.Name == variable.Name &&
+            existingVar.GetType() == variable.GetType());
+    }
 }

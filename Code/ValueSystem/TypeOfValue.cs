@@ -2,7 +2,7 @@
 
 public abstract class TypeOfValue
 {
-    protected TypeOfValue(Type[] required)
+    protected TypeOfValue(params Type[] required)
     {
         Required = required;
     }
@@ -18,16 +18,26 @@ public abstract class TypeOfValue
     public bool AreKnown(out Type[] known) => (known = Required!) is not null;
 
     public abstract override string ToString();
+    
+    /// <summary>
+    /// This fucking pmo, it's literally the same thing :pray:
+    /// </summary>
+    /// <param name="type">fuck documentation</param>
+    /// <returns>nuh uh</returns>
+    public static implicit operator TypeOfValue(Type type)
+    {
+        return new TypesOfValue(type);
+    }
 }
 
 public class TypesOfValue : TypeOfValue
 {
-    public TypesOfValue(SingleTypeOfValue[] types) : base(types.Select(t => t.Type).ToArray())
+    public TypesOfValue(params SingleTypeOfValue[] types) : base(types.Select(t => t.Type).ToArray())
     {
         _types = types.Select(t => t.Type).ToArray();
     }
 
-    public TypesOfValue(Type[] types) : base(types)
+    public TypesOfValue(params Type[] types) : base(types)
     {
         _types = types;
     }

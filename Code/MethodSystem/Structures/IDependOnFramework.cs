@@ -10,7 +10,8 @@ public interface IDependOnFramework
         None,
         Exiled,
         Callvote,
-        Ucr
+        Ucr,
+        Ruei,
     }
     
     public Type DependsOn { get; }

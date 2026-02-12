@@ -1,12 +1,26 @@
 ﻿using LabApi.Features.Console;
 using LabApi.Loader;
 using MEC;
+using PluginSCPSL.Library.Utility;
+using SER.Code.MethodSystem;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.Helpers.FrameworkExtensions;
 
-public abstract class FrameworkBridge
+public abstract class FrameworkBridge : Registerable<FrameworkBridge>
 {
     protected abstract string Name { get; }
+    public abstract IDependOnFramework.Type FrameworkType { get; }
+    public event Action? OnDetected;
+
+    public override bool IsDebug { get; } = true;
+
+    protected override void OnRegistered()
+    {
+        OnDetected += () => MethodIndex.LoadMethodsOfFramework(FrameworkType);
+        Await(OnDetected).RunCoroutine();
+        base.OnRegistered();
+    }
 
     protected IEnumerator<float> Await(Action? onDetected)
     {

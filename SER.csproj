@@ -15,15 +15,15 @@
         <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
         <Configurations>Release;Full Debug;Partial Debug</Configurations>
         <Platforms>AnyCPU</Platforms>
+        <WarningLevel>4</WarningLevel>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Full Debug|AnyCPU'">
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Full Debug|AnyCPU' or '$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <DebugSymbols>true</DebugSymbols>
         <DebugType>embedded</DebugType>
         <Optimize>false</Optimize>
         <DefineConstants>DEBUG;TRACE;HAVE_NULLABLE_ATTRIBUTES</DefineConstants>
         <OutputPath>bin\Debug\</OutputPath>
-        <WarningLevel>4</WarningLevel>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Partial Debug|AnyCPU'">
@@ -32,7 +32,6 @@
         <Optimize>false</Optimize>
         <DefineConstants>TRACE;HAVE_NULLABLE_ATTRIBUTES</DefineConstants>
         <OutputPath>bin\Debug\</OutputPath>
-        <WarningLevel>4</WarningLevel>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -40,15 +39,11 @@
         <Optimize>true</Optimize>
         <DefineConstants>TRACE;HAVE_NULLABLE_ATTRIBUTES</DefineConstants>
         <OutputPath>bin\Release\</OutputPath>
-        <WarningLevel>4</WarningLevel>
     </PropertyGroup>
 
     <ItemGroup>
         <Reference Include="0Harmony">
             <HintPath>$(SL_DEV_REFERENCES)\0Harmony.dll</HintPath>
-        </Reference>
-        <Reference Include="Assembly-CSharp">
-            <HintPath>$(SL_DEV_REFERENCES)\Assembly-CSharp.dll</HintPath>
         </Reference>
         <Reference Include="Assembly-CSharp-firstpass">
             <HintPath>$(SL_DEV_REFERENCES)\Assembly-CSharp-firstpass.dll</HintPath>
@@ -82,8 +77,16 @@
     
     <!-- QoL moving the dll -->
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Copy SourceFiles="$(TargetDir)SER.dll" DestinationFolder="$(LABAPI_PLUGINS)" />
-        <Copy SourceFiles="$(TargetDir)SER.dll" DestinationFolder="$(SL_DEV_REFERENCES)" />
+        <Copy
+            SourceFiles="$(TargetDir)SER.dll"
+            DestinationFolder="$(LABAPI_PLUGINS)"
+            Condition="'$(LABAPI_PLUGINS)' != ''"
+        />
+        <Copy
+            SourceFiles="$(TargetDir)SER.dll"
+            DestinationFolder="$(SL_DEV_REFERENCES)"
+            Condition="'$(SL_DEV_REFERENCES)' != ''" 
+        />
     </Target>
 
     <ItemGroup>

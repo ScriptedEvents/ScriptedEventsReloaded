@@ -4,13 +4,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SER", "SER.csproj", "{FA941
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Partial Debug|Any CPU = Partial Debug|Any CPU
+		Full Debug|Any CPU = Full Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FA94121F-C3B2-462E-A741-9D90790DE268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FA94121F-C3B2-462E-A741-9D90790DE268}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA94121F-C3B2-462E-A741-9D90790DE268}.Partial Debug|Any CPU.ActiveCfg = Partial Debug|Any CPU
+		{FA94121F-C3B2-462E-A741-9D90790DE268}.Partial Debug|Any CPU.Build.0 = Partial Debug|Any CPU
 		{FA94121F-C3B2-462E-A741-9D90790DE268}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA94121F-C3B2-462E-A741-9D90790DE268}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA94121F-C3B2-462E-A741-9D90790DE268}.Full Debug|Any CPU.ActiveCfg = Full Debug|Any CPU
+		{FA94121F-C3B2-462E-A741-9D90790DE268}.Full Debug|Any CPU.Build.0 = Full Debug|Any CPU
 	EndGlobalSection
 EndGlobal

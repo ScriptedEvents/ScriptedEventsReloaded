@@ -13,13 +13,24 @@
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+        <Configurations>Release;Full Debug;Partial Debug</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Full Debug|AnyCPU'">
         <DebugSymbols>true</DebugSymbols>
         <DebugType>embedded</DebugType>
         <Optimize>false</Optimize>
         <DefineConstants>DEBUG;TRACE;HAVE_NULLABLE_ATTRIBUTES</DefineConstants>
+        <OutputPath>bin\Debug\</OutputPath>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Partial Debug|AnyCPU'">
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>embedded</DebugType>
+        <Optimize>false</Optimize>
+        <DefineConstants>TRACE;HAVE_NULLABLE_ATTRIBUTES</DefineConstants>
         <OutputPath>bin\Debug\</OutputPath>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>

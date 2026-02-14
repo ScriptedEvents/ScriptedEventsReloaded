@@ -14,6 +14,8 @@ public class PlayerExpressionToken : ExpressionToken
     private PlayerProperty _property = PlayerProperty.None;
     private PlayerVariableToken _pvarToken = null!;
 
+    public override TypeOfValue PossibleValues => PropertyInfoMap[_property].ReturnType;
+
     public enum PlayerProperty
     {
         None = 0,
@@ -220,6 +222,4 @@ public class PlayerExpressionToken : ExpressionToken
             _ => PropertyInfoMap[_property].Handler(variable.Players.First())
         };
     }
-
-    public override TypeOfValue PossibleValues => new UnknownTypeOfValue();
 }

@@ -1,5 +1,4 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
-using SER.Code.ContextSystem.CommunicationInterfaces;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Helpers.ResultSystem;
@@ -19,6 +18,7 @@ public class WithContext : StandardContext, IKeywordContext, INotRunningContext,
         "This keyword is designed to provide a variable or a collection of variables to a statement.";
 
     public string[] Arguments => ["[variables...]"];
+    public string? Example => throw new NotImplementedException();
 
     public Result AcceptStatement(StatementContext context)
     {

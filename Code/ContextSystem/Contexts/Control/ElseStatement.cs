@@ -1,4 +1,5 @@
-﻿using SER.Code.ContextSystem.BaseContexts;
+﻿using JetBrains.Annotations;
+using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
@@ -7,13 +8,17 @@ using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
 
-public class ElseStatementContext : StatementContext, IStatementExtender, IKeywordContext
+[UsedImplicitly]
+public class ElseStatement : StatementContext, IStatementExtender, IKeywordContext
 {
     public string KeywordName => "else";
     public string Description =>
         "If the statement above it didn't execute, 'else' statement will execute instead.";
     public string[] Arguments => [];
+    public string Example => throw new NotImplementedException();
     
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public IExtendableStatement.Signal Extends => IExtendableStatement.Signal.DidntExecute;
 
     protected override string FriendlyName => "'else' statement";

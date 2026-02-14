@@ -1,4 +1,5 @@
-﻿using SER.Code.ContextSystem.BaseContexts;
+﻿using JetBrains.Annotations;
+using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Helpers.ResultSystem;
@@ -6,13 +7,16 @@ using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
 
-public class EndStatementContext : StandardContext, IKeywordContext
+[UsedImplicitly]
+public class EndKeyword : StandardContext, IKeywordContext
 {
     public string KeywordName => "end";
+    protected override string FriendlyName => "'end' keyword";
     public string Description => "Ends the current statement's body.";
     public string[] Arguments => [];
-
-    protected override string FriendlyName => "'end' keyword";
+    public string? Example => null;
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

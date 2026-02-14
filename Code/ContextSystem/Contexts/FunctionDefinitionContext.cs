@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using SER.Code.ContextSystem.BaseContexts;
-using SER.Code.ContextSystem.CommunicationInterfaces;
 using SER.Code.ContextSystem.Extensions;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
@@ -30,7 +29,8 @@ public class FunctionDefinitionContext :
     public string KeywordName => "func";
     public string Description => "Defines a function.";
     public string[] Arguments => ["[function name]"];
-    
+    public string? Example => throw new NotImplementedException();
+
     // gets the type of value associated with a token type of a variable prefix
     // sketchy!!
     public TypeOfValue? Returns

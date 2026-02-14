@@ -8,18 +8,20 @@ using SER.Code.TokenSystem.Tokens;
 namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 
 [UsedImplicitly]
-public class LoopBreakContext : StandardContext, IKeywordContext
+public class ContinueKeyword : StandardContext, IKeywordContext
 {
-    public string KeywordName => "break";
-    public string Description => "Makes a given loop (that the 'break' keyword is inside) act as it has completely " +
-                                 "ended its execution (\"breaks\" free from the loop)";
+    public string KeywordName => "continue";
+    public string Description =>
+        "Makes a given loop (that the 'continue' keyword is inside) act as it has reached the end of its body.";
     public string[] Arguments => [];
+    
+    public string Example => throw new NotImplementedException();
 
-    protected override string FriendlyName => "'break' keyword";
+    protected override string FriendlyName => "'continue' keyword";
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
-        return TryAddTokenRes.Error("The 'break' keyword does not expect arguments after it.");
+        return TryAddTokenRes.Error("The continue keyword does not expect arguments after it.");
     }
 
     public override Result VerifyCurrentState()
@@ -29,6 +31,6 @@ public class LoopBreakContext : StandardContext, IKeywordContext
 
     protected override void Execute()
     {
-        ParentContext?.SendControlMessage(new Break());
+        ParentContext?.SendControlMessage(new Continue());
     }
 }

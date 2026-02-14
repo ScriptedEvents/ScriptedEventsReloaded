@@ -1,5 +1,4 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
-using SER.Code.ContextSystem.CommunicationInterfaces;
 using SER.Code.ContextSystem.Contexts.Control;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Extensions;
@@ -54,7 +53,7 @@ public static class Contexter
         
         switch (context)
         {
-            case EndStatementContext:
+            case EndKeyword:
             {
                 if (statementStack.Count == 0) 
                     return rs + "There is no statement to close with the 'end' keyword!";

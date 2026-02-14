@@ -12,7 +12,7 @@ using SER.Code.ValueSystem;
 namespace SER.Code.ContextSystem.Contexts.Control;
 
 [UsedImplicitly]
-public class ReturnContext : StandardContext, IKeywordContext
+public class ReturnKeyword : StandardContext, IKeywordContext
 {
     private IValueToken? _returnValueToken;
     private (Context main, IMayReturnValueContext returner)? _returnContext = null; 
@@ -20,8 +20,11 @@ public class ReturnContext : StandardContext, IKeywordContext
     public string KeywordName => "return";
     public string Description => "Returns value when in a function.";
     public string[] Arguments => ["[return value]"];
+    public string? Example => throw new NotImplementedException();
 
     protected override string FriendlyName => "'return' keyword";
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

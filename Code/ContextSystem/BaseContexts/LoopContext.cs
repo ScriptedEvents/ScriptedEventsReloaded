@@ -12,9 +12,22 @@ public abstract class LoopContext : StatementContext, IExtendableStatement, IKey
     public abstract string KeywordName { get; }
     public abstract string Description { get; }
     public abstract string[] Arguments { get; }
+    
+    protected abstract string Usage { get; }
+
+    public string Example =>
+        $"""
+         {Usage}
+
+         # ========================================
+         # "break" and "continue" keywords work as usual and you are free to use them inside "{KeywordName}" loops
+         """;
 
     protected bool ReceivedContinue;
     protected bool ReceivedBreak;
+
+    protected sealed override string FriendlyName => $"'{KeywordName}' loop statement";
+
     protected override void OnReceivedControlMessageFromChild(ParentContextControlMessage msg)
     {
         switch (msg)

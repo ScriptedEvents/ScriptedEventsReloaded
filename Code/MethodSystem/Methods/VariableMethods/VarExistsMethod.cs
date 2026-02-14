@@ -5,7 +5,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
 
-namespace SER.Code.MethodSystem.Methods.GeneralVariableMethods;
+namespace SER.Code.MethodSystem.Methods.VariableMethods;
 
 [UsedImplicitly]
 public class VarExistsMethod : ReturningMethod<BoolValue>

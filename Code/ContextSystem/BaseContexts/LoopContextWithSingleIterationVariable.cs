@@ -1,4 +1,4 @@
-﻿using SER.Code.ContextSystem.CommunicationInterfaces;
+﻿using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens.VariableTokens;

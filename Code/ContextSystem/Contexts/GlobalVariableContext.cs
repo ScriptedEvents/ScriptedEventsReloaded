@@ -20,7 +20,8 @@ public class GlobalVariableContext : YieldingContext, IKeywordContext
     public string KeywordName => "global";
     public string Description => "Creates/modifies a global variable.";
     public string[] Arguments => ["[variable prefix and name]", "=", "[value]"];
-    
+    public string? Example => throw new NotImplementedException();
+
     private VariableDefinitionContext _variableContext = null!;
     private VariableToken? _variableToken;
     

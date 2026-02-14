@@ -1,4 +1,5 @@
-﻿using SER.Code.ContextSystem.BaseContexts;
+﻿using JetBrains.Annotations;
+using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
@@ -9,12 +10,16 @@ using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
 
-public class IfStatementContext : StatementContext, IExtendableStatement, IKeywordContext
+[UsedImplicitly]
+public class IfStatement : StatementContext, IExtendableStatement, IKeywordContext
 {
     public string KeywordName => "if";
     public string Description => "This statement will execute only if the provided condition is met.";
     public string[] Arguments => ["[condition]"];
+    public string? Example => throw new NotImplementedException();
     
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public IExtendableStatement.Signal AllowedSignals => IExtendableStatement.Signal.DidntExecute;
     public Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = [];
 

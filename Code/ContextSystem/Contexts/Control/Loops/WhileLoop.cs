@@ -12,7 +12,7 @@ using SER.Code.ValueSystem;
 namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 
 [UsedImplicitly]
-public class WhileLoopContext : LoopContextWithSingleIterationVariable<NumberValue>, IExtendableStatement
+public class WhileLoop : LoopContextWithSingleIterationVariable<NumberValue>, IExtendableStatement
 {
     private readonly Result _rs = "Cannot create 'while' loop.";
     private readonly List<BaseToken> _condition = []; 
@@ -22,10 +22,12 @@ public class WhileLoopContext : LoopContextWithSingleIterationVariable<NumberVal
     public override string Description =>
         "A statement which will execute its body as long as the provided condition is evaluated to true.";
     public override string[] Arguments => ["[condition...]"];
+    protected override string Usage => throw new NotImplementedException();
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
     public override Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = [];
-
-    protected override string FriendlyName => "'while' loop statement";
+    
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

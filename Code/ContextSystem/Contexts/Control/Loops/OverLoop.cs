@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using SER.Code.ContextSystem.BaseContexts;
-using SER.Code.ContextSystem.CommunicationInterfaces;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
@@ -15,10 +14,60 @@ using SER.Code.VariableSystem.Bases;
 namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 
 [UsedImplicitly]
-public class ForeachLoopContext : LoopContext, IAcceptOptionalVariableDefinitions
+public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitions
 {
-    private readonly Result _mainErr = "Cannot create 'foreach' loop.";
+    public override string KeywordName => "over";
+    public override string Description =>
+        "Repeats its body for each player in the player variable or a value in a collection variable, " +
+        "assigning it its own custom variable.";
+    public override string[] Arguments => ["[player/collection variable]"];
+
+    protected override string Usage =>
+        """
+        # instead of writing something like this:
+        repeat {AmountOf @all}
+            Print "found player"
+        end
+        
+        # you can use 'over' to do the same:
+        over @all
+            Print "found player"
+        end
+        
+        # ========================================
+        # additionally, "over" loop can tell you which item is currently being iterated over
+        # this is usually known as a "for each" loop in other languages
+        # this can be done using "with" keyword and naming a temporary variable:
+        over @all
+            with @plr
+            
+            Print "found player {@plr name}"
+        end
+        
+        # this also works for collections:
+        &inventory = {@sender inventory}
+        over &inventory
+            with *item
+            
+            Print "found item {ItemInfo *item type}"
+        end
+        # its important to remember that the variable type in "with" keyword 
+        #  MUST match the value type inside the collection,
+        #  if this is not the case, like using $var for a reference value, there will be an error
+        
+        # ========================================
+        # "with" can also define a second variable, which will hold the index of the current item
+        # this is a number value starting at 1, and incrementing by 1 for each iteration
+        over @all
+            with @plr $index
+            
+            Print "found player #{$index}: {@plr name}"
+        end
+        """;
     
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private readonly Result _mainErr = "Cannot create 'over' loop.";
     private VariableToken? _indexIterationVariableToken;
     private Variable? _indexIterationVariable;
     private VariableToken? _itemIterationVariableToken;
@@ -26,15 +75,7 @@ public class ForeachLoopContext : LoopContext, IAcceptOptionalVariableDefinition
     
     private Func<Value[]>? _values = null;
 
-    public override string KeywordName => "foreach";
-    public override string Description =>
-        "Repeats its body for each player in the player variable or a value in a collection variable, " +
-        "assigning it its own custom variable.";
-    public override string[] Arguments => ["[player/collection variable]"];
-
     public override Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = new();
-
-    protected override string FriendlyName => "'foreach' loop statement";
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
@@ -75,7 +116,7 @@ public class ForeachLoopContext : LoopContext, IAcceptOptionalVariableDefinition
 
         Error:
         return TryAddTokenRes.Error(
-            "'foreach' loop expected to have either a player value or collection value as its third argument, " +
+            "'over' loop expected to have either a player value or collection value as its third argument, " +
             $"but received '{token.RawRep}'."
         );
     }

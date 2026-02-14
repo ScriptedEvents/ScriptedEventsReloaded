@@ -19,7 +19,7 @@ public class DiscordServerInfoScript : Example
             $text = "There are {AmountOf @all} players on the server"
             
             # list each player
-            foreach @all
+            over @all
                 with @plr
                 
                 # <br> creates a new line

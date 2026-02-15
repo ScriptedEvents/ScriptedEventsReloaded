@@ -16,7 +16,7 @@ public class IfStatement : StatementContext, IExtendableStatement, IKeywordConte
     public string KeywordName => "if";
     public string Description => "This statement will execute only if the provided condition is met.";
     public string[] Arguments => ["[condition]"];
-    public string? Example => throw new NotImplementedException();
+    public string? Example => null;
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

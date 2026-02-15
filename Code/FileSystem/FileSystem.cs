@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using LabApi.Features.Console;
 using LabApi.Loader.Features.Paths;
+using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Examples;
 using SER.Code.Extensions;
 using SER.Code.FlagSystem;
@@ -94,16 +95,28 @@ public static class FileSystem
 
     public static void GenerateExamples()
     {
-        var examples = Assembly.GetExecutingAssembly().GetTypes()
+        List<(string, string)> examples = Assembly.GetExecutingAssembly().GetTypes()
             .Where(t => typeof(Example).IsAssignableFrom(t) && !t.IsAbstract)
-            .Select(t => t.CreateInstance<Example>());
+            .Select(t => t.CreateInstance<Example>())
+            .Select(t => (t.Name, t.Content))
+            .Cast<(string, string)>()
+            .ToList();
+
+        examples.AddRange(Assembly.GetExecutingAssembly().GetTypes()
+            .Where(t => typeof(IKeywordContext).IsAssignableFrom(t) && !t.IsAbstract)
+            .Select(Activator.CreateInstance)
+            .Cast<IKeywordContext>()
+            .Where(k => k.Example != null)
+            .Select(k => ($"{k.KeywordName}KeywordExample", k.Example))
+            .Cast<(string, string)>()
+        );
 
         var exampleDir = Directory.CreateDirectory(Path.Combine(MainDirPath, "Example Scripts"));
-        foreach (var example in examples)
+        foreach (var (name, content) in examples)
         {
-            var path = Path.Combine(exampleDir.FullName, $"{example.Name}.txt");
+            var path = Path.Combine(exampleDir.FullName, $"{name}.txt");
             using var sw = File.CreateText(path);
-            sw.Write(example.Content);
+            sw.Write(content);
         }
     }
 }

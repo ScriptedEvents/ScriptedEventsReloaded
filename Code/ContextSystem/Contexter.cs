@@ -126,14 +126,14 @@ public static class Contexter
 
     public static TryGet<Context?> ContextLine(BaseToken[] tokens, uint? lineNum, Script scr)
     {
-        Result rs = $"Line {(lineNum.HasValue ? $"{lineNum.Value} " : "")}cannot execute";
+        Result rs = $"Line {(lineNum.HasValue ? $"{lineNum.Value} " : "")}is invalid";
         
         var firstToken = tokens.FirstOrDefault();
         if (firstToken is null) return null as Context;
         
         if (firstToken is not IContextableToken contextable)
         {
-            return rs + $"{firstToken} is not a valid way to start a line. Maybe you made a typo?";
+            return $"'{firstToken.RawRep}' is not a valid way to start a line. Perhaps you made a typo?";
         }
 
         var context = contextable.GetContext(scr);

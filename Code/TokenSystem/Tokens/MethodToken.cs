@@ -13,6 +13,14 @@ public class MethodToken : BaseToken, IContextableToken
     
     protected override IParseResult InternalParse(Script scr)
     {
+        if (RawRep is "GlobalVariable")
+        {
+            return new Error(
+                "'GlobalVariable' method has been replaced with 'global' keyword in a recent update. " +
+                "Please update your script."
+            );
+        }
+        
         if (MethodIndex.TryGetMethod(Slice.RawRep).HasErrored(out _, out var method))
         {
             return new Ignore();

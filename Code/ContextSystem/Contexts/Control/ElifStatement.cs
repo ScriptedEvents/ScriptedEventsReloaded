@@ -18,7 +18,7 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
     public string Description =>
         "If the statement above it didn't execute, 'elif' statement will try to execute if the provided condition is met.";
     public string[] Arguments => ["[condition]"];
-    public string Example => throw new NotImplementedException();
+    public string? Example => null;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     

@@ -32,21 +32,19 @@ public class ForeverLoop : LoopContextWithSingleIterationVariable<NumberValue>, 
         end
         
         # ========================================
-        # you can also use "with" keyword to define an interation variable
+        # you can also use "with" keyword to define an iteration variable
         #  which will hold the current iteration number, starting from 1
         forever
             with $iter
             
             Wait 1s
-            Print "current iteration: {$iter}
+            Print "current iteration: {$iter}"
         end
         """;
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     private readonly Result _mainErr = "Cannot create 'forever' loop.";
-    public override Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } =
-        new();
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

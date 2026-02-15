@@ -8,10 +8,10 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.NumberMethods;
 
 [UsedImplicitly]
-public class ChanceMethod : ReturningMethod<BoolValue>, IAdditionalDescription
+public class ChanceMethod : ReturningMethod<BoolValue>
 {
     public override string Description => 
-        "Generates a random number; returns true if it is less than your specified percentage threshold.";
+        "Returns true with the specified chance, e.g. if set to 20%, true will be returned 20% of the time.";
 
     public override Argument[] ExpectedArguments { get; } =
     [
@@ -22,7 +22,4 @@ public class ChanceMethod : ReturningMethod<BoolValue>, IAdditionalDescription
     {
         ReturnValue = Args.GetFloat("chance") < UnityEngine.Random.Range(0f, 1f);
     }
-
-    public string AdditionalDescription =>
-        "In simple terms, when you use {Chance 20%}, it will return true 20% of the time.";
 }

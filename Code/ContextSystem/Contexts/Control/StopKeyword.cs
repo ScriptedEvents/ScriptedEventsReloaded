@@ -12,11 +12,11 @@ public class StopKeyword : StandardContext, IKeywordContext
 {
     public string KeywordName => "stop";
 
-    public string Description =>
-        "Stops the script from executing.";
+    public string Description => "Stops the script from executing.";
 
     public string[] Arguments => [];
-    public string? Example => throw new NotImplementedException();
+    
+    public string? Example => null;
 
     protected override string FriendlyName => "'stop' keyword";
     

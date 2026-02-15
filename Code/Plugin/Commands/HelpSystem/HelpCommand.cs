@@ -38,7 +38,7 @@ public class HelpCommand : ICommand
         [HelpOption.RefResMethods] = GetReferenceResolvingMethodsHelpPage,
         [HelpOption.PlayerProperty] = GetPlayerInfoAccessorsHelpPage,
         [HelpOption.Flags] = GetFlagHelpPage,
-        //[HelpOption.Keywords] = GetKeywordHelpPage
+        [HelpOption.Keywords] = GetKeywordHelpPage
     };
     
     public bool Execute(ArraySegment<string> arguments, ICommandSender _, out string response)
@@ -183,65 +183,26 @@ public class HelpCommand : ICommand
             """;
     }
 
-    /*private static string GetKeywordHelpPage()
+    private static string GetKeywordHelpPage()
     {
         return
             """
-            Keywords are "commands" that alter how the script should behave.
-            They can range from simple things like stopping the script, to more complex things like handling advanced logic.
+            Keywords alter how the script behaves, not by changing someones role, but the internal script execution.
+            They can range from simple things from stopping the script to handling advanced logic.
 
             Keywords are written as all lowercase words, like 'stop', 'if' etc.
 
-            Some keywords also have an ability to house methods inside their "body", making them _statements_.
+            Some keywords also have an ability to have instructions inside their "body", making them statements!
             These statements control how the methods inside their body are executed.
-
-            For example:
-            if 5 > 3
-                # here is some code
-                # which will only run if the "if" statement is true
-            end
-
-            Or another example:
-            repeat 10
-                # here is some code
-                # which will run 10 times
-            end
 
             Here is a list of all keywords available in SER:
             (each of them is of course searchable using 'serhelp keywordName')
-            """ + KeywordToken.KeywordTypes
+            
+            """ + KeywordToken.KeywordContextTypes
                 .Select(t => t.CreateInstance<IKeywordContext>())
-                .Select(k => $"{k.KeywordName} - {k.Description}")
+                .Select(k => $"> {k.KeywordName}")
                 .JoinStrings("\n");
-
-        var keywords = KeywordToken.KeywordInfo.Keys.Select(k => $"\n> {k}").JoinStrings();
-
-        return
-            """
-            Keywords are special "commands" that alter how the script is executed.
-            They can range from simple things like stopping the script, to more complex things like handling advanced logic.
-
-            Keywords are written as all lowercase words, like 'stop' or 'if'.
-
-            Some keywords also have an ability to house methods inside their "body", making them statements.
-            These statements control how the methods inside their body are executed.
-
-            For example:
-            if ...
-                # here is some code
-                # which will only run if the "if" statement is true
-            end
-
-            Or another example:
-            repeat 10
-                # here is some code
-                # which will run 10 times
-            end
-
-            Here is a list of all keywords available in SER:
-            (each of them is of course searchable using 'serhelp keywordName')
-            """ + keywords;
-    }*/
+    }
 
     private static string GetFlagHelpPage()
     {

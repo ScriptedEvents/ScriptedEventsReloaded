@@ -11,8 +11,11 @@ namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 public class BreakKeyword : StandardContext, IKeywordContext
 {
     public string KeywordName => "break";
-    public string Description => "Makes a given loop (that the 'break' keyword is inside) act as it has completely " +
-                                 "ended its execution (\"breaks\" free from the loop)";
+    
+    public string Description => 
+        "Makes a given loop (that the 'break' keyword is inside) act as it has completely ended its execution " +
+        "(\"breaks\" free from the loop)";
+    
     public string[] Arguments => [];
 
     public string Example =>

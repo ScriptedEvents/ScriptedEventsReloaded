@@ -7,18 +7,18 @@ namespace SER.Code.ContextSystem.BaseContexts;
 public abstract class LoopContext : StatementContext, IExtendableStatement, IKeywordContext
 {
     public IExtendableStatement.Signal AllowedSignals => IExtendableStatement.Signal.DidntExecute;
-    public abstract Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; }
+    public Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = [];
     
     public abstract string KeywordName { get; }
     public abstract string Description { get; }
     public abstract string[] Arguments { get; }
     
-    protected abstract string Usage { get; }
+    protected abstract string? Usage { get; }
 
     public string Example =>
         $"""
          {Usage}
-
+         
          # ========================================
          # "break" and "continue" keywords work as usual and you are free to use them inside "{KeywordName}" loops
          """;

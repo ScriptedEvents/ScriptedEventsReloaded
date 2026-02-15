@@ -29,7 +29,7 @@ public class FunctionDefinitionContext :
     public string KeywordName => "func";
     public string Description => "Defines a function.";
     public string[] Arguments => ["[function name]"];
-    public string? Example => throw new NotImplementedException();
+    public string? Example => null;
 
     // gets the type of value associated with a token type of a variable prefix
     // sketchy!!

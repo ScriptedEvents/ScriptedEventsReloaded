@@ -37,14 +37,14 @@ public class ChaosCoinScript : Example
         $effect = RandomNum 1 9 int
 
         # russian rulette with a full gun :trollface:
-        if $effect == 1
+        if $effect is 1
             GiveItem @evPlayer GunRevolver
             Broadcast @evPlayer 5s "{$baseText}Let's play russian rulette!"
             stop
         end
 
         # HP change 
-        if $effect == 2
+        if $effect is 2
             $newHP = RandomNum 1 150 int
             SetHealth @evPlayer $newHP
             SetMaxHealth @evPlayer $newHP
@@ -54,7 +54,7 @@ public class ChaosCoinScript : Example
         end
 
         # rave 
-        if $effect == 3
+        if $effect is 3
             *room = {@evPlayer roomRef}
 
             # explode player if he isnt in a room
@@ -91,7 +91,7 @@ public class ChaosCoinScript : Example
         end
 
         # bomb 
-        if $effect == 4
+        if $effect is 4
             SetPlayerData @evPlayer "coin locked" true
             $initRole = {@evPlayer role}
 
@@ -116,7 +116,7 @@ public class ChaosCoinScript : Example
         end
 
         # bypass
-        if $effect == 5
+        if $effect is 5
             $initRole = {@evPlayer role}
             SetPlayerData @evPlayer "coin locked" true
 
@@ -126,7 +126,7 @@ public class ChaosCoinScript : Example
             repeat 15
                 Wait 1s
 
-                if {@evPlayer role} != $initRole
+                if {@evPlayer role} isnt $initRole
                     ClearCountdown @evPlayer
                     break
                 end
@@ -138,10 +138,10 @@ public class ChaosCoinScript : Example
         end
 
         # role downgrade 
-        if $effect == 6
-            if {@evPlayer role} != "ClassD"
+        if $effect is 6
+            if {@evPlayer role} isnt "ClassD"
                 SetRole @evPlayer ClassD None
-            elif {@evPlayer role} != "Scp0492"
+            elif {@evPlayer role} isnt "Scp0492"
                 SetRole @evPlayer Scp0492
             else
                 SetRole @evPlayer Spectator
@@ -152,7 +152,7 @@ public class ChaosCoinScript : Example
         end
 
         # funny cassie
-        if $effect == 7
+        if $effect is 7
             SetPlayerData @evPlayer "coin locked" true
 
             Cassie noJingle "pitch_0.7 warning . pitch_3 XMAS_JINGLEBELLS" ""
@@ -164,7 +164,7 @@ public class ChaosCoinScript : Example
         end
 
         # change size
-        if $effect == 8
+        if $effect is 8
             # set player size in every direction to a random number between 10% and 100%
             SetSize @evPlayer {RandomNum 0.1 1 real} {RandomNum 0.1 1 real} {RandomNum 0.1 1 real}
 
@@ -173,7 +173,7 @@ public class ChaosCoinScript : Example
         end
 
         # swap places 
-        if $effect == 9
+        if $effect is 9
             # cant swap places if there arent at least 2 players
             if {AmountOf @alivePlayers} < 2
                 Explode @evPlayer

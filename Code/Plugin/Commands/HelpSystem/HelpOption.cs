@@ -9,5 +9,5 @@ public enum HelpOption
     RefResMethods,
     PlayerProperty,
     Flags,
-    //Keywords
+    Keywords
 }

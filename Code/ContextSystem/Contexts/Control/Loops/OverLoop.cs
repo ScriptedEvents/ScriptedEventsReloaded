@@ -75,8 +75,6 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitions
     
     private Func<Value[]>? _values = null;
 
-    public override Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = new();
-
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
         if (token is not IValueToken valToken)

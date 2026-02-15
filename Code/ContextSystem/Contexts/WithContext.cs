@@ -18,7 +18,7 @@ public class WithContext : StandardContext, IKeywordContext, INotRunningContext,
         "This keyword is designed to provide a variable or a collection of variables to a statement.";
 
     public string[] Arguments => ["[variables...]"];
-    public string? Example => throw new NotImplementedException();
+    public string? Example => null;
 
     public Result AcceptStatement(StatementContext context)
     {

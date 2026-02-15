@@ -15,7 +15,7 @@ public class ElseStatement : StatementContext, IStatementExtender, IKeywordConte
     public string Description =>
         "If the statement above it didn't execute, 'else' statement will execute instead.";
     public string[] Arguments => [];
-    public string Example => throw new NotImplementedException();
+    public string? Example => null;
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

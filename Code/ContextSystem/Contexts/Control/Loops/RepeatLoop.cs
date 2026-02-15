@@ -12,21 +12,40 @@ using SER.Code.ValueSystem;
 namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 
 [UsedImplicitly]
-public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>, IKeywordContext, IAcceptOptionalVariableDefinitions
+public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
 {
-    private readonly Result _rs = "Cannot create 'repeat' loop.";
-    private Func<TryGet<ulong>>? _repeatCountExpression = null;
-    private ulong? _repeatCount = null;
-
-    public override Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = [];
-    
     public override string KeywordName => "repeat";
     public override string Description => "Repeats everything inside its body a given amount of times.";
     public override string[] Arguments => ["[number]"];
-    protected override string Usage => throw new NotImplementedException();
+    protected override string Usage =>
+        """
+        # repeat loop repeats its body a given amount of times
+        # in this case, it will print "hi" 10 times
+        repeat 10
+            Print "hi"
+        end
+        
+        # ========================================
+        # you can also use a variable to define the amount of times to repeat
+        repeat {RandomNum 1 10 int}
+            Print "hi"
+        end
+        
+        # ========================================
+        # you can also define a variable which will hold the current iteration number, starting from 1
+        repeat 10
+            with $iter
+            
+            Print "current iteration: {$iter}"
+        end
+        """;
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private readonly Result _rs = "Cannot create 'repeat' loop.";
+    private Func<TryGet<ulong>>? _repeatCountExpression = null;
+    private ulong? _repeatCount = null;
+    
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
         switch (token)

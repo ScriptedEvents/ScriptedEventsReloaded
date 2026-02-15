@@ -20,7 +20,7 @@ public class ReturnKeyword : StandardContext, IKeywordContext
     public string KeywordName => "return";
     public string Description => "Returns value when in a function.";
     public string[] Arguments => ["[return value]"];
-    public string? Example => throw new NotImplementedException();
+    public string? Example => null;
 
     protected override string FriendlyName => "'return' keyword";
     

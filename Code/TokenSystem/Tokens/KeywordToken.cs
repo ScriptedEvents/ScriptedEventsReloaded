@@ -22,6 +22,14 @@ public class KeywordToken : BaseToken, IContextableToken
     
     protected override IParseResult InternalParse(Script scr)
     {
+        if (RawRep is "foreach")
+        {
+            return new Error(
+                "The 'foreach' keyword has been replaced with 'over' keyword in the newest update. " +
+                "Please update your script."
+            );
+        }
+        
         _keywordType = KeywordContextTypes.FirstOrDefault(
             keyword => keyword.CreateInstance<IKeywordContext>().KeywordName == RawRep);
 

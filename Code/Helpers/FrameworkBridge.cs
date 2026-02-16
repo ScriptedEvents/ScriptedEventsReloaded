@@ -32,8 +32,8 @@ public class FrameworkBridge
     {
         Timing.KillCoroutines(_handles.ToArray());
         _handles.Clear();
-        if (_found.Count == 0) return "No supported framework was found, no additional methods will be loaded.";
-        return $"SER has found {_found.Count} supported framework(s): " +
+        if (_found.Count == 0) return "No supported framework was found, no additional methods were added.";
+        return $"SER has added methods for {_found.Count} supported framework(s): " +
                $"{_found.Select(f => f.Type.ToString()).JoinStrings(", ")}";
     }
 

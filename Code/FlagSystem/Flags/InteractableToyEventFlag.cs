@@ -58,5 +58,4 @@ public class InteractableToyEventFlag : Flag
             script.Run(RunContext.Event);
         }
     }
-    // TODO: add a way of comparing InteractableToys (to e.g. check if a SPECIFIC toy has been interacted with)
 }

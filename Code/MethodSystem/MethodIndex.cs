@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using LabApi.Features.Console;
 using SER.Code.Extensions;
+using SER.Code.Helpers;
 using SER.Code.Helpers.FrameworkExtensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem.BaseMethods;
@@ -21,11 +22,8 @@ public static class MethodIndex
         NameToMethodIndex.Clear();
         
         AddAllDefinedMethodsInAssembly();
-        
-        ExiledBridge.OnDetected += () => LoadMethodsOfFramework(IDependOnFramework.Type.Exiled);
-        CallvoteBridge.OnDetected += () => LoadMethodsOfFramework(IDependOnFramework.Type.Callvote);
-        UcrBridge.OnDetected += () => LoadMethodsOfFramework(IDependOnFramework.Type.Ucr);
-        RueiBridge.OnDetected += () => LoadMethodsOfFramework(IDependOnFramework.Type.Ruei);
+
+        FrameworkBridge.RegisterAll();
     }
     
     /// <summary>
@@ -104,7 +102,7 @@ public static class MethodIndex
         return $"There is no method with name '{name}'. Did you mean '{closestMethod ?? "<error>"}'?";
     }
 
-    private static void LoadMethodsOfFramework(IDependOnFramework.Type framework)
+    public static void LoadMethodsOfFramework(IDependOnFramework.Type framework)
     {
         foreach (var method in FrameworkDependentMethods.TryGetValue(framework, out var methods) ? methods : [])
         {

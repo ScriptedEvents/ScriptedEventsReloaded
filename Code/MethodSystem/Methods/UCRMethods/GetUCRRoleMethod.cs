@@ -5,6 +5,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.MethodSystem.Methods.ReferenceVariableMethods;
 using SER.Code.MethodSystem.Structures;
+using SER.Code.ValueSystem;
 using UncomplicatedCustomRoles.API.Features;
 using UncomplicatedCustomRoles.API.Interfaces;
 
@@ -12,10 +13,8 @@ namespace SER.Code.MethodSystem.Methods.UCRMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class GetUCRRoleMethod : ReferenceReturningMethod<ICustomRole>, IAdditionalDescription, IDependOnFramework
+public class GetUCRRoleMethod : ReferenceReturningMethod, IAdditionalDescription, IDependOnFramework
 {
-    public override Type ReturnType => typeof(ICustomRole);
-
     public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Ucr;
     
     public override string Description => "Returns a reference to the UCR role a player has.";
@@ -28,9 +27,11 @@ public class GetUCRRoleMethod : ReferenceReturningMethod<ICustomRole>, IAddition
     [
         new PlayerArgument("player")
     ];
-
+    
     public override void Execute()
     {
-        ReturnValue = SummonedCustomRole.Get(Args.GetPlayer("player"))?.Role!;
+        ReturnValue = new ReferenceValue(SummonedCustomRole.Get(Args.GetPlayer("player"))?.Role!);
     }
+
+    public override Type ReturnType { get; } = typeof(ICustomRole);
 }

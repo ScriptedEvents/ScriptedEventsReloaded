@@ -1,4 +1,5 @@
-﻿using SER.Code.Exceptions;
+﻿using LabApi.Features.Wrappers;
+using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.Interfaces;
@@ -67,5 +68,10 @@ public static class SerExtensions
     public static TryGet<T> TryGet<T>(this IValueToken valToken) where T : Value
     {
         return valToken.Value().SuccessTryCast<Value, T>();
+    }
+
+    public static PlayerValue ToPlayerValue(this IEnumerable<Player> players)
+    {
+        return new PlayerValue(players);
     }
 }

@@ -77,6 +77,7 @@ public static class VariableIndex
 
     public static void AddGlobalVariable(Variable variable)
     {
+        Script.CheckForVariableNameCollisions(variable, GlobalVariables);
         foreach (var runningScript in Script.RunningScripts)
         {
             Script.CheckForVariableNameCollisions(variable, runningScript.LocalVariables);

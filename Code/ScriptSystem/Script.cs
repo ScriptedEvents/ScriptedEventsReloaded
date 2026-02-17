@@ -368,8 +368,8 @@ public class Script
             .Any(gv => Variable.AreSyntacticallySame(gv, newVariable)))
         {
             throw new CustomScriptRuntimeError(
-                $"Tried to create a local variable '{newVariable}', " +
-                $"but there is already a global variable with the same name."
+                $"Tried to create a variable '{newVariable}', " +
+                $"but there already exists a variable with the same name."
             );
         }
     }

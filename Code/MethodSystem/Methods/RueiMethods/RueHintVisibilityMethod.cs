@@ -4,34 +4,39 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
+using SER.Code.ValueSystem;
 
 namespace SER.Code.MethodSystem.Methods.RueiMethods;
 
 public class RueHintVisibilityMethod : SynchronousMethod, IDependOnFramework
 {
-    public override string Description { get; } = "Manages the visibility of already created hints of player";
+    public override string Description => "Manages the visibility of already created hints of player";
+    public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Ruei;
+
+    public const string Visibility = "is hint visible";
+    
     public override Argument[] ExpectedArguments { get; } = 
     [
-        new PlayersArgument("players")
+        new PlayersArgument(RueHint.Players)
         {
-            Description = "The players that will have hint shown/removed",
+            Description = "The players that will have hint change visibility.",
         },
-        new TextArgument("Id")
+        new TextArgument(RueHint.Id)
         {
             Description = "Id required for the hint (if same id will be shown again it will override the last hint)", 
         },
-        new BoolArgument("IsVisible")
+        new BoolArgument(Visibility)
         {
-            DefaultValue = new (true, null),
+            DefaultValue = new (true, "true"),
             Description = "Sets the visibility of hint if Option set to Visibility"
         },
     ];
     public override void Execute()
     {
-        var players = Args.GetPlayers("players");
-        var id = Args.GetText("Id");
+        var players = Args.GetPlayers(RueHint.Players);
+        var id = Args.GetText(RueHint.Id);
         var tag = new Tag(id);
-        var isVisible = Args.GetBool("IsVisible");
+        var isVisible = Args.GetBool(Visibility);
 
         foreach (var player in players)
         {
@@ -39,6 +44,4 @@ public class RueHintVisibilityMethod : SynchronousMethod, IDependOnFramework
             display.SetVisible(tag, isVisible);
         }
     }
-
-    public IDependOnFramework.Type DependsOn { get; } = IDependOnFramework.Type.Ruei;
 }

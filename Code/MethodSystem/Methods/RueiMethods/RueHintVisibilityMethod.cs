@@ -17,11 +17,11 @@ public class RueHintVisibilityMethod : SynchronousMethod, IDependOnFramework
     
     public override Argument[] ExpectedArguments { get; } = 
     [
-        new PlayersArgument(RueHint.Players)
+        new PlayersArgument(RueHintMethod.Players)
         {
             Description = "The players that will have hint change visibility.",
         },
-        new TextArgument(RueHint.Id)
+        new TextArgument(RueHintMethod.Id)
         {
             Description = "Id required for the hint (if same id will be shown again it will override the last hint)", 
         },
@@ -33,8 +33,8 @@ public class RueHintVisibilityMethod : SynchronousMethod, IDependOnFramework
     ];
     public override void Execute()
     {
-        var players = Args.GetPlayers(RueHint.Players);
-        var id = Args.GetText(RueHint.Id);
+        var players = Args.GetPlayers(RueHintMethod.Players);
+        var id = Args.GetText(RueHintMethod.Id);
         var tag = new Tag(id);
         var isVisible = Args.GetBool(Visibility);
 

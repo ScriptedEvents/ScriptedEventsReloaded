@@ -8,7 +8,7 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
 
-namespace SER.Code.MethodSystem.Methods.VotingMethods;
+namespace SER.Code.MethodSystem.Methods.CallvoteMethods;
 
 [UsedImplicitly]
 public class StartVoteMethod : SynchronousMethod, IDependOnFramework

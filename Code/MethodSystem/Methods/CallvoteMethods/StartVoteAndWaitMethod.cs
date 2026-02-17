@@ -11,6 +11,7 @@ using SER.Code.MethodSystem.BaseMethods.Yielding;
 using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.MethodSystem.Structures;
 using SER.Code.ValueSystem;
+
 // ReSharper disable LoopCanBeConvertedToQuery
 
 /*
@@ -57,7 +58,7 @@ SUMMARY CHECKLIST
 By following these constraints, we ensure that our assembly remains "scannable" by the loader, regardless of which 
 optional plugins the user has installed.
  */
-namespace SER.Code.MethodSystem.Methods.VotingMethods;
+namespace SER.Code.MethodSystem.Methods.CallvoteMethods;
 
 [UsedImplicitly]
 public class StartVoteAndWaitMethod : YieldingReturningMethod<TextValue>, IAdditionalDescription, IDependOnFramework

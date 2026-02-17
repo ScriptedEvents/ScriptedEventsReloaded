@@ -376,7 +376,7 @@ public class Script
 
     public void AddLocalVariable(Variable variable)
     {
-        CheckForVariableNameCollisions(variable, _localVariables);
+        CheckForVariableNameCollisions(variable, VariableIndex.GlobalVariables);
         
         Log.Debug($"Added variable {variable.Name} to script {Name}");
         RemoveLocalVariable(variable);

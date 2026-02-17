@@ -8,7 +8,7 @@ using LightSourceToy = LabApi.Features.Wrappers.LightSourceToy;
 namespace SER.Code.MethodSystem.Methods.AdminToyPropertyMethods;
 
 [UsedImplicitly]
-public class LightSourcePropertiesMethod : SynchronousMethod
+public class SetLightSourcePropertiesMethod : SynchronousMethod
 {
     public override string Description => $"Sets the properties of a {nameof(LightSourceToy)}.";
 

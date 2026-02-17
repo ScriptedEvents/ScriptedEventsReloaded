@@ -7,7 +7,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.AdminToyPropertyMethods;
 
 [UsedImplicitly]
-public class ShootingTargetPropertiesMethod : SynchronousMethod
+public class SetShootingTargetPropertiesMethod : SynchronousMethod
 {
     public override string Description => $"Sets the properties of a {nameof(ShootingTargetToy)}.";
 

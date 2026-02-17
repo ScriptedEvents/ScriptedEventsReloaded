@@ -2,15 +2,12 @@
 using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
-using SER.Code.Exceptions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
-using SER.Code.MethodSystem.MethodDescriptors;
-using UnityEngine;
 
 namespace SER.Code.MethodSystem.Methods.AdminToyPropertyMethods;
 
 [UsedImplicitly]
-public class TextPropertiesMethod : SynchronousMethod
+public class SetTextPropertiesMethod : SynchronousMethod
 {
     public override string Description => $"Sets the properties of a {nameof(TextToy)}.";
 

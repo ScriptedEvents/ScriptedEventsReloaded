@@ -9,7 +9,7 @@ using PrimitiveObjectToy = LabApi.Features.Wrappers.PrimitiveObjectToy;
 namespace SER.Code.MethodSystem.Methods.AdminToyPropertyMethods;
 
 [UsedImplicitly]
-public class PrimitiveObjectPropertiesMethod : SynchronousMethod
+public class SetPrimitiveObjectPropertiesMethod : SynchronousMethod
 {
     public override string Description => $"Sets properties of a {nameof(PrimitiveObjectToy)}.";
 

@@ -9,7 +9,7 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.AdminToyPropertyMethods;
 
 [UsedImplicitly]
-public class GetToyPropertiesMethod : ReturningMethod<NumberValue>
+public class ToyInfoMethod : ReturningMethod<NumberValue>
 {
     public override string Description => "Returns information about an Admin Toy";
 

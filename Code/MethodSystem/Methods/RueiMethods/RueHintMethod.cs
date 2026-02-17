@@ -13,7 +13,7 @@ namespace SER.Code.MethodSystem.Methods.RueiMethods;
 
 public class RueHintMethod : SynchronousMethod, IDependOnFramework
 {
-    public override string Description => "Sends or removes hints (in Rue library) of players";
+    public override string Description => "Sends or removes hints (in Rue library) of players.";
     public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Ruei;
 
     public const string Players = "players";

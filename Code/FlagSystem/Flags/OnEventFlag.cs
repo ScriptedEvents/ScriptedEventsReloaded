@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using EventHandler = SER.Code.EventSystem.EventHandler;
@@ -8,7 +9,7 @@ namespace SER.Code.FlagSystem.Flags;
 [UsedImplicitly]
 public class OnEventFlag : Flag
 {
-    private string _event;
+    private Safe<string> _event;
     
     public override string Description =>
         "Binds a script to an in-game event. When the event happens, the script will execute. " +

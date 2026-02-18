@@ -49,7 +49,7 @@ public class DoorArgument(string name) : EnumHandlingArgument(name)
             {
                 Result rs = $"Value '{token.RawRep}' cannot be interpreted as {InputDescription}.";
                 
-                if (token is not IValueToken val || !val.CanReturn<ReferenceValue>(out var func))
+                if (token is not IValueToken val || !val.CapableOf<ReferenceValue>(out var func))
                 {
                     return rs;
                 }

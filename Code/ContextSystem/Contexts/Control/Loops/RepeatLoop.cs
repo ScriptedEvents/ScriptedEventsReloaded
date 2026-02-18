@@ -63,7 +63,7 @@ public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
             
             case IValueToken valToken:
             {
-                if (!valToken.CanReturn<NumberValue>(out var getNumber))
+                if (!valToken.CapableOf<NumberValue>(out var getNumber))
                 {
                     return TryAddTokenRes.Error($"Value '{token.RawRep}' returns a value, but.");   
                 }

@@ -55,7 +55,7 @@ public class BaseToken
             return textToken.Value;
         }
         
-        if (this is IValueToken valueToken && valueToken.CanReturn<LiteralValue>(out var func) && script is not null)
+        if (this is IValueToken valueToken && valueToken.CapableOf<LiteralValue>(out var func) && script is not null)
         {
             if (func().WasSuccessful(out var result))
             {
@@ -80,7 +80,7 @@ public class BaseToken
             return literalValueToken.Value;
         }
 
-        if (this is IValueToken valueToken && valueToken.CanReturn<LiteralValue>(out var get))
+        if (this is IValueToken valueToken && valueToken.CapableOf<LiteralValue>(out var get))
         {
             if (get().HasErrored(out var err, out var value))
             {

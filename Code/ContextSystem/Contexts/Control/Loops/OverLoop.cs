@@ -82,7 +82,7 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
             goto Error;
         }
 
-        if (valToken.CanReturn<PlayerValue>(out var getPlayer))
+        if (valToken.CapableOf<PlayerValue>(out var getPlayer))
         {
             _values = () =>
             {
@@ -97,7 +97,7 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
             return TryAddTokenRes.End();
         }
 
-        if (valToken.CanReturn<CollectionValue>(out var getCollection))
+        if (valToken.CapableOf<CollectionValue>(out var getCollection))
         {
             _values = () =>
             {

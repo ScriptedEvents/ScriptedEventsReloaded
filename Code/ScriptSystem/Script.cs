@@ -180,6 +180,10 @@ public class Script
             return null;
         }
         
+        StartTime = DateTime.Now;
+        Context = context;
+        Caller = caller;
+        
         if (ScriptFlagHandler.DoFlagsApproveExecution(this).HasErrored(out var error))
         {
             Executor.Error(error, this);
@@ -188,9 +192,6 @@ public class Script
         
         RunningScriptsList.Add(this);
         //Profile = new Profile(this);
-        StartTime = DateTime.Now;
-        Context = context;
-        Caller = caller;
         _scriptCoroutine = InternalExecute().Run(
             this, 
             _ => _scriptCoroutine.Kill()

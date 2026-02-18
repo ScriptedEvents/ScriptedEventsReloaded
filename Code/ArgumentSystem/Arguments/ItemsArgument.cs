@@ -31,7 +31,7 @@ public class ItemsArgument(string name) : EnumHandlingArgument(name)
                     return Item.List.ToArray();
                 }
 
-                if (token is not IValueToken valToken || !valToken.CanReturn<ReferenceValue>(out var get))
+                if (!token.CanReturn<ReferenceValue>(out var get))
                 {
                     return rs;
                 }

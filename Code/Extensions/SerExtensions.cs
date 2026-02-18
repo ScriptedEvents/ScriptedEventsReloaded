@@ -44,10 +44,10 @@ public static class SerExtensions
     {
         get = null!;
         if (token is not IValueToken valToken) return false;
-        return valToken.CanReturn(out get);
+        return valToken.CapableOf(out get);
     }
     
-    public static bool CanReturn<T>(this IValueToken valToken, out Func<TryGet<T>> get) where T : Value
+    public static bool CapableOf<T>(this IValueToken valToken, out Func<TryGet<T>> get) where T : Value
     {
         get = valToken.TryGet<T>;
         

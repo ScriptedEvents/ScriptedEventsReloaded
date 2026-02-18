@@ -77,7 +77,6 @@ public static class VariableIndex
 
     public static void AddGlobalVariable(Variable variable)
     {
-        Script.CheckForVariableNameCollisions(variable, GlobalVariables);
         foreach (var runningScript in Script.RunningScripts)
         {
             Script.CheckForVariableNameCollisions(variable, runningScript.LocalVariables);
@@ -89,8 +88,8 @@ public static class VariableIndex
 
     public static void RemoveGlobalVariable(Variable variable)
     {
-        GlobalVariables.RemoveAll(existingVar => 
-            existingVar.Name == variable.Name &&
-            existingVar.GetType() == variable.GetType());
+        GlobalVariables.RemoveAll(
+            existingVar => Variable.AreSyntacticallySame(existingVar, variable)
+        );
     }
 }

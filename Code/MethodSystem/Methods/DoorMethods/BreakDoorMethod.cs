@@ -10,7 +10,7 @@ namespace SER.Code.MethodSystem.Methods.DoorMethods;
 [UsedImplicitly]
 public class BreakDoorMethod : SynchronousMethod
 {
-    public override string Description => "Breaks specified doors if possible (for example, you can't destroy Gate B, but you can destroy normal HCZ doors)";
+    public override string Description => "Breaks specified doors if possible.";
 
     public override Argument[] ExpectedArguments { get; } = 
     [

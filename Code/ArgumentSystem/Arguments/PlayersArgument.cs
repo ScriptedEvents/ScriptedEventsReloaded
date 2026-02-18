@@ -22,7 +22,7 @@ public class PlayersArgument(string name) : Argument(name)
             return new(() => Player.ReadyList.ToArray());
         }
 
-        if (token is not IValueToken valToken || !valToken.CanReturn<PlayerValue>(out var get))
+        if (!token.CanReturn<PlayerValue>(out var get))
         {
             return $"Value '{token.RawRep}' does not represent a valid player variable.";
         }

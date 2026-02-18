@@ -22,7 +22,7 @@ public class TextArgument(string name, bool needsQuotes = true, bool allowsSpace
             return new(() => textToken.GetDynamicResolver().Invoke().OnSuccess(SpaceCheck, null));
         }    
         
-        if (token is not IValueToken valToken || !valToken.CanReturn<LiteralValue>(out var get))
+        if (token is not IValueToken valToken || !valToken.CapableOf<LiteralValue>(out var get))
         {
             if (!needsQuotes)
             {

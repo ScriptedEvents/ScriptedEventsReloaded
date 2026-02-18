@@ -9,7 +9,7 @@ namespace SER.Code.MethodSystem.Methods.OutputMethods;
 public class ReplyMethod : SynchronousMethod
 {
     public override string Description => 
-        "Sends a message to the place where the script was run from. Usually used for replying to the command sender.";
+        "Sends a message to the place where the script was run from.";
 
     public override Argument[] ExpectedArguments { get; } =
     [

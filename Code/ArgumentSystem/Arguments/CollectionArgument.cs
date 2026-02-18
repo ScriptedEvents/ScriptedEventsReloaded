@@ -16,7 +16,7 @@ public class CollectionArgument(string name) : Argument(name)
     [UsedImplicitly]
     public DynamicTryGet<CollectionValue> GetConvertSolution(BaseToken token)
     {
-        if (token is not IValueToken valToken || !valToken.CanReturn<CollectionValue>(out var func))
+        if (!token.CanReturn<CollectionValue>(out var func))
         {
             return $"Value '{token.RawRep}' does not represent a collection";
         }

@@ -70,7 +70,7 @@ public static class ScriptFlagHandler
         {
             if (flag.OnScriptRunning(scr).HasErrored(out var error))
             {
-                Result rs = $"Script '{scr.Name}' cannot run due to flag '{flag.Name}'.";
+                Result rs = $"Flag '{flag.Name}' disallows script execution.";
                 return rs + error;
             }
         }

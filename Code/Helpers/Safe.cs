@@ -21,4 +21,6 @@ public struct Safe<T>
 
     public static implicit operator T(Safe<T> wrapper) => wrapper.Value;
     public static implicit operator Safe<T>(T value) => new() { Value = value };
+    
+    public override string ToString() => Value?.ToString() ?? "null";
 }

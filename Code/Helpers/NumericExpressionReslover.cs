@@ -109,7 +109,7 @@ public static class NumericExpressionReslover
     {
         switch (token)
         {
-            case IValueToken valueToken when valueToken.CanReturn<LiteralValue>(out var get):
+            case IValueToken valueToken when valueToken.CapableOf<LiteralValue>(out var get):
             {
                 var tmp = MakeTempName();
                 

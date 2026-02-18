@@ -26,7 +26,7 @@ public class RoomArgument(string name) : EnumHandlingArgument(name)
             () =>
             {
                 Result rs = $"Value '{token.RawRep}' cannot be interpreted as {InputDescription}.";
-                if (token is not IValueToken valToken || valToken.CanReturn<ReferenceValue>(out var get))
+                if (!token.CanReturn<ReferenceValue>(out var get))
                 {
                     return rs;
                 }

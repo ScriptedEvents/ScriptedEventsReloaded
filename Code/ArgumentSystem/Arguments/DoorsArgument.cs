@@ -47,7 +47,7 @@ public class DoorsArgument(string name) : EnumHandlingArgument(name)
                     return Door.List.Where(d => d is not ElevatorDoor).ToArray();
                 }
 
-                if (token is not IValueToken valToken || !valToken.CanReturn<ReferenceValue>(out var get))
+                if (!token.CanReturn<ReferenceValue>(out var get))
                 {
                     return rs;
                 }

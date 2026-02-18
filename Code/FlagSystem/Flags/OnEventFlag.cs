@@ -8,6 +8,8 @@ namespace SER.Code.FlagSystem.Flags;
 [UsedImplicitly]
 public class OnEventFlag : Flag
 {
+    private string _event;
+    
     public override string Description =>
         "Binds a script to an in-game event. When the event happens, the script will execute. " +
         "Events can sometimes also carry information of their own, ";
@@ -25,7 +27,8 @@ public class OnEventFlag : Flag
                     return "Too many arguments, only event name is allowed";
             }
 
-            if (EventHandler.ConnectEvent(inlineArgs.First(), ScriptName).HasErrored(out var error))
+            _event = inlineArgs.First();
+            if (EventHandler.ConnectEvent(_event, ScriptName).HasErrored(out var error))
             {
                 return error;
             }
@@ -42,7 +45,7 @@ public class OnEventFlag : Flag
             return true;
         }
         
-        return $"A script using '{Name}' flag cannot be ran by any other mean than an event.";
+        return $"Tried to run script by other mean than the '{_event}' event, which is not allowed.";
     }
 
     public override Argument[] Arguments => [];

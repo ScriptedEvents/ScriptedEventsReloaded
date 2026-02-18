@@ -47,8 +47,16 @@ public class GlobalVariableContext : YieldingContext, IKeywordContext
 
     protected override IEnumerator<float> Execute()
     {
+        _variableContext.CreateLocalVariable = false;
+        
         using var definitionEnumerator = _variableContext.Run();
         while (definitionEnumerator.MoveNext()) yield return definitionEnumerator.Current;
-        VariableIndex.AddGlobalVariable(_variableContext.DefinedVariable ?? throw new TosoksFuckedUpException());
+
+        if (_variableContext.DefinedVariable is null)
+        {
+            throw new TosoksFuckedUpException();
+        }
+        
+        VariableIndex.AddGlobalVariable(_variableContext.DefinedVariable);
     }
 }

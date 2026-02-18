@@ -163,7 +163,7 @@ public class CustomCommandFlag : Flag
             return true;
         }
 
-        return $"A script using '{Name}' flag cannot be ran by any other mean than a custom command.";
+        return $"Tried to run script by other mean than the '{Command.Command}' command, which is not allowed.";
     }
 
     public class CustomCommand : ICommand, IUsageProvider, IHelpProvider

@@ -17,6 +17,7 @@ namespace SER.Code.ContextSystem.Contexts.VariableDefinition;
 public abstract class VariableDefinitionContext : YieldingContext
 {
     public Variable? DefinedVariable;
+    public bool CreateLocalVariable = true;
 }
 
 public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TVarToken varToken) : VariableDefinitionContext
@@ -134,16 +135,17 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
             }
 
             DefinedVariable = Variable.Create(varToken.Name, tValue);
-            Script.AddLocalVariable(DefinedVariable);
         }
         else if (_parser is not null)
         {
             DefinedVariable = Variable.Create(varToken.Name, Value.Parse(_parser(), Script));
-            Script.AddLocalVariable(DefinedVariable);
         }
         else
         {
             throw new AndrzejFuckedUpException();
         }
+        
+        if (CreateLocalVariable) 
+            Script.AddLocalVariable(DefinedVariable);
     }
 }

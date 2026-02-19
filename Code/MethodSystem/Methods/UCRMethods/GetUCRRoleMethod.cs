@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.Helpers;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.MethodSystem.Methods.ReferenceVariableMethods;
@@ -16,7 +17,7 @@ public class GetUCRRoleMethod : ReferenceReturningMethod, IAdditionalDescription
 {
     public override Type ReturnType => typeof(ICustomRole);
 
-    public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Ucr;
+    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.Ucr;
     
     public override string Description => "Returns a reference to the UCR role a player has.";
 

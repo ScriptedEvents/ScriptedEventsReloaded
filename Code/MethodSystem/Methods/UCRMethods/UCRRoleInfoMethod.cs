@@ -5,6 +5,7 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ArgumentSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
+using SER.Code.Helpers;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.MethodSystem.Structures;
@@ -19,7 +20,7 @@ public class UCRRoleInfoMethod : LiteralValueReturningMethod, IReferenceResolvin
 {
     public Type ResolvesReference => typeof(ICustomRole);
 
-    public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Ucr;
+    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.Ucr;
 
     public override string Description => "Returns information about a custom role.";
 

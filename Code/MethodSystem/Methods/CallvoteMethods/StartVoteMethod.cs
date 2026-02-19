@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.Helpers;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
 
@@ -13,7 +14,7 @@ namespace SER.Code.MethodSystem.Methods.CallvoteMethods;
 [UsedImplicitly]
 public class StartVoteMethod : SynchronousMethod, IDependOnFramework
 {
-    public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Callvote;
+    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.Callvote;
     
     public override string Description => "Starts a vote.";
 

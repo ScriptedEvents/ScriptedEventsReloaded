@@ -5,6 +5,7 @@ using PlayerRoles;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
+using SER.Code.Helpers;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
 
@@ -13,7 +14,7 @@ namespace SER.Code.MethodSystem.Methods.PlayerMethods;
 [UsedImplicitly]
 public class SetAppearanceMethod : SynchronousMethod, IDependOnFramework
 {
-    public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Exiled;
+    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.Exiled;
     
     public override string Description => "Changes the appearance of a player (or reskins)";
 

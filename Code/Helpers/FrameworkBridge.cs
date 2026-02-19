@@ -9,16 +9,24 @@ namespace SER.Code.Helpers;
 
 public class FrameworkBridge
 {
-    protected record struct Framework(string Name, IDependOnFramework.Type Type);
+    protected record struct Framework(string Name, Type Type);
 
     private readonly List<Framework> _found = [];
     private readonly List<CoroutineHandle> _handles = [];
 
+    public enum Type
+    {
+        None,
+        Exiled,
+        Callvote,
+        Ucr
+    }
+    
     private readonly Framework[] _frameworks =
     [
-        new("Callvote", IDependOnFramework.Type.Callvote),
-        new("Exiled Loader", IDependOnFramework.Type.Exiled),
-        new("UncomplicatedCustomRoles", IDependOnFramework.Type.Ucr)
+        new("Callvote", Type.Callvote),
+        new("Exiled Loader", Type.Exiled),
+        new("UncomplicatedCustomRoles", Type.Ucr)
     ];
 
     public void Load()
@@ -66,7 +74,7 @@ public class FrameworkBridge
     private static bool IsExiledCompatibleFrameworkLoaded(Framework framework)
     {
         // As of right now, Callvote-Exiled is not compatible with SER.
-        if (framework.Type == IDependOnFramework.Type.Callvote) 
+        if (framework.Type == FrameworkBridge.Type.Callvote) 
         {
             return false;
         }

@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using LabApi.Features.Console;
 using SER.Code.Extensions;
+using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.MethodSystem.Structures;
@@ -10,7 +11,7 @@ namespace SER.Code.MethodSystem;
 public static class MethodIndex
 {
     private static readonly Dictionary<string, Method> NameToMethodIndex = [];
-    private static readonly Dictionary<IDependOnFramework.Type, List<Method>> FrameworkDependentMethods = [];
+    private static readonly Dictionary<FrameworkBridge.Type, List<Method>> FrameworkDependentMethods = [];
     
     /// <summary>
     /// Initializes the method index.
@@ -97,7 +98,7 @@ public static class MethodIndex
         return $"There is no method with name '{name}'. Did you mean '{closestMethod ?? "<error>"}'?";
     }
 
-    internal static void LoadMethodsOfFramework(IDependOnFramework.Type framework)
+    internal static void LoadMethodsOfFramework(FrameworkBridge.Type framework)
     {
         foreach (var method in FrameworkDependentMethods.TryGetValue(framework, out var methods) ? methods : [])
         {

@@ -1,4 +1,5 @@
-﻿using LabApi.Loader;
+﻿using LabApi.Features.Console;
+using LabApi.Loader;
 using MEC;
 using SER.Code.Extensions;
 using SER.Code.MethodSystem;
@@ -27,7 +28,7 @@ public class FrameworkBridge
             _handles.Add(Timing.RunCoroutine(Await(framework)));
         }
     }
-    
+
     public string StopAndGetLoadedFrameworksMessage()
     {
         Timing.KillCoroutines(_handles.ToArray());
@@ -39,12 +40,39 @@ public class FrameworkBridge
 
     private IEnumerator<float> Await(Framework framework)
     {
-        while (PluginLoader.EnabledPlugins.All(plg => plg.Name != framework.Name))
+        for (int timer = 0; timer <= 3; timer++)
         {
-            yield return Timing.WaitForSeconds(0.1f);
+            yield return Timing.WaitForSeconds(1f);
+
+            if (_found.Contains(framework))
+            {
+                continue;
+            }
+            
+            if (PluginLoader.EnabledPlugins.All(plg => plg.Name != framework.Name) && !IsExiledCompatFrameworkLoaded(framework))
+            {
+                continue;
+            }
+
+            _found.Add(framework);
+            MethodIndex.LoadMethodsOfFramework(framework.Type);
         }
-        
-        _found.Add(framework);
-        MethodIndex.LoadMethodsOfFramework(framework.Type);
+
+        Logger.Raw(StopAndGetLoadedFrameworksMessage(), ConsoleColor.DarkYellow);
+    }
+
+    private bool IsExiledCompatFrameworkLoaded(Framework framework)
+    {
+        if (framework.Type == IDependOnFramework.Type.Callvote) // As of right now, Callvote-Exiled is not compatible with SER.
+        {
+            return false;
+        }
+
+        if (PluginLoader.Plugins.Any(plg => plg.Key.Name == "Exiled Loader"))
+        {
+            return Exiled.Loader.Loader.Plugins.Any(plg => plg.Name == framework.Name);
+        }
+
+        return false;
     }
 }

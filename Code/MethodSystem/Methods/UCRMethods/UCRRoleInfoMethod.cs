@@ -24,10 +24,10 @@ public class UCRRoleInfoMethod : LiteralValueReturningMethod, IReferenceResolvin
 
     public override string Description => "Returns information about a custom role.";
 
-    public override TypeOfValue LiteralReturnTypes => new TypesOfValue([
+    public override TypeOfValue LiteralReturnTypes => new TypesOfValue(
         typeof(NumberValue), 
         typeof(TextValue)
-    ]);
+    );
 
     public override Argument[] ExpectedArguments =>
     [

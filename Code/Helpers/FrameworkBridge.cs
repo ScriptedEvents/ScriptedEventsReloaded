@@ -27,43 +27,46 @@ public class FrameworkBridge
         {
             _handles.Add(Timing.RunCoroutine(Await(framework)));
         }
-    }
 
-    public string StopAndGetLoadedFrameworksMessage()
-    {
-        Timing.KillCoroutines(_handles.ToArray());
-        _handles.Clear();
-        if (_found.Count == 0) return "No supported framework was found, no additional methods were added.";
-        return $"SER has added methods for {_found.Count} supported framework(s): " +
-               $"{_found.Select(f => f.Type.ToString()).JoinStrings(", ")}";
+        Timing.CallDelayed(3f, () =>
+        {
+            Timing.KillCoroutines(_handles.ToArray());
+            _handles.Clear();
+            Logger.Info(_found.Count == 0
+                ? "No supported framework was found, no additional methods were added."
+                : $"SER has added methods for {_found.Count} supported framework(s): " +
+                  $"{_found.Select(f => f.Type.ToString()).JoinStrings(", ")}"
+            );
+        });
     }
 
     private IEnumerator<float> Await(Framework framework)
     {
-        for (int timer = 0; timer <= 3; timer++)
+        // handled from forever repeating when coroutines are killed
+        while (true)
         {
-            yield return Timing.WaitForSeconds(1f);
-
-            if (_found.Contains(framework))
-            {
-                continue;
-            }
+            yield return Timing.WaitForSeconds(.5f);
             
-            if (PluginLoader.EnabledPlugins.All(plg => plg.Name != framework.Name) && !IsExiledCompatFrameworkLoaded(framework))
+            if (IsLabAPIComatibleFrameworkLoaded(framework) || IsExiledCompatibleFrameworkLoaded(framework))
             {
-                continue;
+                break;
             }
-
-            _found.Add(framework);
-            MethodIndex.LoadMethodsOfFramework(framework.Type);
         }
-
-        Logger.Raw(StopAndGetLoadedFrameworksMessage(), ConsoleColor.DarkYellow);
+        
+        Logger.Debug($"SER found supported framework '{framework.Type}'");
+        _found.Add(framework);
+        MethodIndex.LoadMethodsOfFramework(framework.Type);
     }
 
-    private bool IsExiledCompatFrameworkLoaded(Framework framework)
+    private static bool IsLabAPIComatibleFrameworkLoaded(Framework framework)
     {
-        if (framework.Type == IDependOnFramework.Type.Callvote) // As of right now, Callvote-Exiled is not compatible with SER.
+        return PluginLoader.EnabledPlugins.Any(plg => plg.Name == framework.Name);
+    }
+
+    private static bool IsExiledCompatibleFrameworkLoaded(Framework framework)
+    {
+        // As of right now, Callvote-Exiled is not compatible with SER.
+        if (framework.Type == IDependOnFramework.Type.Callvote) 
         {
             return false;
         }

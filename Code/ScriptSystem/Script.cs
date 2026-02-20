@@ -9,6 +9,7 @@ using SER.Code.ContextSystem.Extensions;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.FlagSystem;
+using SER.Code.FlagSystem.Flags;
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem.Structures;
@@ -21,15 +22,6 @@ using SER.Code.VariableSystem.Bases;
 using SER.Code.VariableSystem.Variables;
 
 namespace SER.Code.ScriptSystem;
-
-public enum RunContext
-{
-    Unknown,
-    Script,
-    Event,
-    BaseCommand,
-    CustomCommand
-}
 
 public class Script
 {
@@ -63,7 +55,7 @@ public class Script
 
     public Profile? Profile { get; private set; }
     
-    public RunContext Context { get; private set; }
+    public RunReason RunReason { get; private set; }
     
     public uint CurrentLine { get; set; } = 0;
     
@@ -153,6 +145,11 @@ public class Script
         return matches.Length;
     }
 
+    public bool HasFlag<T>() where T : Flag
+    {
+        return ScriptFlagHandler.ScriptsFlags[Name].Any(f => f is T);
+    }
+
     public List<Line> GetFlagLines()
     {
         DefineLines();
@@ -164,16 +161,16 @@ public class Script
     /// <summary>
     /// Executes the script.
     /// </summary>
-    public void Run(RunContext context = RunContext.Unknown, Script? caller = null)
+    public void Run(RunReason reason = RunReason.Unknown, Script? caller = null)
     {
-        RunForEvent(context, caller);
+        RunForEvent(reason, caller);
     }
 
     /// <summary>
     /// Executes the script.
     /// </summary>
     /// <returns>Returns a boolean indicating whether the event is allowed.</returns>
-    public bool? RunForEvent(RunContext context, Script? caller = null)
+    public bool? RunForEvent(RunReason reason, Script? caller = null)
     {
         if (string.IsNullOrWhiteSpace(Content))
         {
@@ -181,7 +178,7 @@ public class Script
         }
         
         StartTime = DateTime.Now;
-        Context = context;
+        RunReason = reason;
         Caller = caller;
         
         if (ScriptFlagHandler.DoFlagsApproveExecution(this).HasErrored(out var error))

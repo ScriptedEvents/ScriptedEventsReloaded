@@ -4,6 +4,7 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Yielding;
 using SER.Code.ScriptSystem;
+using SER.Code.ScriptSystem.Structures;
 using SER.Code.VariableSystem.Bases;
 
 namespace SER.Code.MethodSystem.Methods.ScriptMethods;
@@ -30,7 +31,7 @@ public class RunScriptAndWaitMethod : YieldingMethod
         var variables = Args.GetRemainingArguments<Variable, VariableArgument>("variables to pass");
         
         script.AddLocalVariables(variables);
-        script.Run(RunContext.Script, Script);
+        script.Run(RunReason.Script, Script);
         
         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
         while (script.IsRunning)

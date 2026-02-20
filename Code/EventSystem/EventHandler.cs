@@ -145,7 +145,7 @@ public static class EventHandler
                 continue;
             }
 
-            script.Run(RunContext.Event);
+            script.Run(RunReason.Event);
         }
     }
 
@@ -179,7 +179,7 @@ public static class EventHandler
             }
             
             script.AddLocalVariables(variables);
-            var isAllowed = script.RunForEvent(RunContext.Event);
+            var isAllowed = script.RunForEvent(RunReason.Event);
             if (isAllowed.HasValue && ev is ICancellableEvent cancellable1)
                 cancellable1.IsAllowed = isAllowed.Value;
         }
@@ -219,37 +219,12 @@ public static class EventHandler
     private static Variable[] InternalGetVariablesFromProperties(List<(object value, string name, Type type)> properties)
     {
         List<Variable> variables = [];
-        foreach (var (value, name, type) in properties)
+        foreach (var (value, name, _) in properties)
         {
-            switch (value)
-            {
-                case Enum enumValue:
-                    variables.Add(new LiteralVariable<TextValue>(GetName(), new StaticTextValue(enumValue.ToString())));
-                    continue;
-                case Player player:
-                    variables.Add(new PlayerVariable(GetName(), new(player)));
-                    continue;
-                case IEnumerable<Player> players:
-                    variables.Add(new PlayerVariable(GetName(), new(players)));
-                    continue;
-                case null:
-                    if (type == typeof(Player))
-                    {
-                        // todo: wtf is this?
-                        // variables.Add(new PlayerVariable(GetName(), []));
-                    }
-                    continue;
-                default:
-                {
-                    variables.Add(Variable.Create(GetName(), Value.Parse(value, null)));
-                    continue;
-                }
-            }
-
-            string GetName()
-            {
-                return $"ev{name.First().ToString().ToUpper()}{name[1..]}";
-            }
+            variables.Add(Variable.Create(
+                $"ev{name.First().ToString().ToUpper()}{name[1..]}", 
+                Value.Parse(value, null))
+            );
         }
 
         return variables.ToArray();

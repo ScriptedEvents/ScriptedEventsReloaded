@@ -158,7 +158,12 @@ public class CustomCommandFlag : Flag
 
     public override Result OnScriptRunning(Script scr)
     {
-        if (scr.Context == RunContext.CustomCommand)
+        if (scr.HasFlag<OnEventFlag>())
+        {
+            return $"Detected conflicting flag: {nameof(OnEventFlag)}.";
+        }
+        
+        if (scr.RunReason == RunReason.CustomCommand)
         {
             return true;
         }
@@ -256,7 +261,7 @@ public class CustomCommandFlag : Flag
             script.AddLocalVariable(new LiteralVariable<TextValue>(name, new StaticTextValue(slice.Value)));
         }
 
-        script.Run(RunContext.CustomCommand);
+        script.Run(RunReason.CustomCommand);
         return true;
     }
 

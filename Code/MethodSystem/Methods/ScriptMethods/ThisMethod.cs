@@ -6,6 +6,7 @@ using SER.Code.Exceptions;
 using SER.Code.FlagSystem;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.ScriptSystem;
+using SER.Code.ScriptSystem.Structures;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.MethodSystem.Methods.ScriptMethods;
@@ -20,7 +21,7 @@ public class ThisMethod : ReturningMethod
         new OptionsArgument("info to receive",
             "flags",
             new("caller","The name of the script that called this script"),
-            Option.Enum<RunContext>("context"),
+            Option.Enum<RunReason>("context"),
             new("duration","The amount of time the script's been running for"),
             "name",
             new("path", "The path to the script on the local directory of the server"),
@@ -40,7 +41,7 @@ public class ThisMethod : ReturningMethod
             "flags" => new CollectionValue(ScriptFlagHandler.GetScriptFlags(Script.Name)
                 .Select(f => f.GetType().Name.Replace("Flag", ""))),
             "caller" => new StaticTextValue(Script.Caller?.Name ?? "none"),
-            "context" => new StaticTextValue(Script.Context.ToString()),
+            "context" => new StaticTextValue(Script.RunReason.ToString()),
             "duration" => new DurationValue(Script.TimeRunning),
             "name" => new StaticTextValue(Script.Name),
             "path" => new StaticTextValue(FileSystem.FileSystem.GetScriptPath(Script)),

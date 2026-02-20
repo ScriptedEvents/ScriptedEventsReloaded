@@ -33,7 +33,7 @@ public class TriggerMethod : SynchronousMethod
                 throw new ScriptRuntimeError(this, error);
             }
             
-            script.Run(RunContext.Script, Script);
+            script.Run(RunReason.Script, Script);
         }
     }
 }

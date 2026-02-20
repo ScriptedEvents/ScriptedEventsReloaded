@@ -2,6 +2,7 @@
 using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.BaseMethods.Yielding;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.TokenSystem.Tokens.ExpressionTokens;
@@ -20,6 +21,11 @@ public class MethodExpressionToken : ExpressionToken
             return new Ignore();
         }
 
+        if (methodToken.Method is YieldingMethod)
+        {
+            return new Error("Yielding methods are not allowed in expressions.");
+        }
+        
         if (methodToken.Method is not ReturningMethod method)
         {
             return new Error($"Method '{methodToken.Method.Name}' does not return a value.");

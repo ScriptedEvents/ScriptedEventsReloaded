@@ -15,6 +15,9 @@ public class LockElevatorMethod : SynchronousMethod
     [
         new ElevatorsArgument("elevators"),
         new EnumArgument<DoorLockReason>("lockReason")
+        {
+            DefaultValue = new(DoorLockReason.AdminCommand, null)
+        }
     ];
     
     public override void Execute()

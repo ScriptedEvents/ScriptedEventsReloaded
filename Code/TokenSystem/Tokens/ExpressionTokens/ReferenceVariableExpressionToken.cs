@@ -84,6 +84,7 @@ public class ReferenceVariableExpressionToken : ExpressionToken
         return $"Type {obj.GetType().AccurateName} has no property '{propertyName}' or this type is not supported.";
     }
 
+    // this will be improved upon later
     public static readonly Dictionary<Type, Dictionary<string, Info>> PropertyInfoMap = new()
     {
         [typeof(Item)] = new()

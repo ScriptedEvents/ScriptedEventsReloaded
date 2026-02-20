@@ -5,6 +5,10 @@ using SER.Code.ValueSystem;
 
 namespace SER.Code.TokenSystem.Tokens.ExpressionTokens;
 
+/// <summary>
+/// Used for variable formatting inside strings, as expression tokens are captured and formatted, but not variables
+/// Maybe we should add variable parsing for strings?
+/// </summary>
 public class LiteralVariableExpressionToken : ExpressionToken
 {
     private Safe<LiteralVariableToken> _varToken;

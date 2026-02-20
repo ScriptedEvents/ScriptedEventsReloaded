@@ -46,4 +46,6 @@ public readonly record struct ScriptName
     {
         return Value;
     }
+    
+    public override int GetHashCode() => Value.GetHashCode();
 }

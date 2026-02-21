@@ -1,5 +1,8 @@
 ﻿namespace SER.Code.Helpers;
 
+/// <summary>
+/// Wrapper for a value that might be read before it's set.
+/// </summary>
 public struct Safe<T>
 {
     private readonly bool _set;

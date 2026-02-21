@@ -18,8 +18,8 @@ public class PinataLootScript : Example
             stop
         end
 
-        # Trigger only with 25% chance
-        if {Chance 25%} is false
+        # Trigger only with 5% chance
+        if {Chance 5%} is false
             stop
         end
 

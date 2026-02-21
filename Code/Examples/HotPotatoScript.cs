@@ -20,8 +20,7 @@ public class HotPotatoScript : Example
             Wait 3s
 
             # Check if they still have the item (GunA7) in their inventory
-            &inv = {@potatoCarrier inventory}
-            over &inv
+            over {@potatoCarrier inventory}
                 with *item
 
                 if {ItemInfo *item type} isnt "GunA7"

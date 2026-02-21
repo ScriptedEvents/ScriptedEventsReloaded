@@ -137,13 +137,12 @@ public class FunctionDefinitionContext :
     protected override IEnumerator<float> Execute()
     {
         foreach (var coro in Children
-             .TakeWhile(_ => Script.IsRunning)
              .Select(child => child.ExecuteBaseContext())
         )
         {
             while (coro.MoveNext())
             {
-                if (!Script.IsRunning || _end)
+                if (_end)
                 {
                     goto Exit;
                 }

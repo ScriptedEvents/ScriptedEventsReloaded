@@ -82,11 +82,6 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
             var coro = enumerator();
             while (coro.MoveNext())
             {
-                if (!Script.IsRunning)
-                {
-                    yield break;
-                }
-                
                 yield return coro.Current;
             }
             
@@ -94,16 +89,10 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
         }
         
         foreach (var coro in Children
-                     .TakeWhile(_ => Script.IsRunning)
                      .Select(child => child.ExecuteBaseContext()))
         {
             while (coro.MoveNext())
             {
-                if (!Script.IsRunning)
-                {
-                    yield break;
-                }
-                
                 yield return coro.Current;
             }
         }

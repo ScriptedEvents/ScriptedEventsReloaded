@@ -51,6 +51,8 @@ public class Script
     public Line[] Lines = [];
     public Context[] Contexts = [];
     
+    public bool Killed { get; private set; }
+    
     public Script? Caller { get; private set; }
 
     public Profile? Profile { get; private set; }
@@ -58,8 +60,6 @@ public class Script
     public RunReason RunReason { get; private set; }
     
     public uint CurrentLine { get; set; } = 0;
-    
-    public bool IsRunning => RunningScripts.Contains(this);
 
     private static readonly List<Script> RunningScriptsList = [];
     public static readonly ReadOnlyCollection<Script> RunningScripts = RunningScriptsList.AsReadOnly();
@@ -69,9 +69,7 @@ public class Script
 
     public DateTime StartTime { get; private set; }
 
-    public TimeSpan TimeRunning => IsRunning ? DateTime.Now - StartTime : TimeSpan.Zero;
-    
-    private CoroutineHandle _scriptCoroutine;
+    public TimeSpan TimeRunning => StartTime == DateTime.MinValue ? TimeSpan.Zero : DateTime.Now - StartTime;
     
     private bool? _isEventAllowed;
 
@@ -91,7 +89,6 @@ public class Script
     public void Error(string message)
     {
         Executor.Error(message, this);
-        Stop();
     }
 
     public static TryGet<Script> CreateByScriptName(string dirtyName, ScriptExecutor? executor)
@@ -129,10 +126,15 @@ public class Script
         var count = RunningScripts.Count;
         foreach (var script in new List<Script>(RunningScripts))
         {
-            script.Stop();
+            script.ExternalStop();
         }
 
         return count;
+    }
+
+    public void ExternalStop()
+    {
+        Killed = true;
     }
     
     public static int StopByName(string name)
@@ -141,7 +143,7 @@ public class Script
             .Where(scr => string.Equals(scr.Name, name, StringComparison.CurrentCultureIgnoreCase))
             .ToArray();
         
-        matches.ForEachItem(scr => scr.Stop());
+        matches.ForEachItem(scr => scr.ExternalStop());
         return matches.Length;
     }
 
@@ -189,20 +191,13 @@ public class Script
         
         RunningScriptsList.Add(this);
         //Profile = new Profile(this);
-        _scriptCoroutine = InternalExecute().Run(
-            this, 
-            _ => _scriptCoroutine.Kill()
-            //() => Profile.LogResults()
+        InternalExecute().Run(
+            this,
+            null,
+            () => RunningScriptsList.Remove(this)
         );
         
         return _isEventAllowed;
-    }
-
-    public void Stop(bool silent = false)
-    {
-        RunningScriptsList.Remove(this);
-        _scriptCoroutine.Kill();
-        if (!silent) Logger.Info($"Script {Name} was stopped");
     }
 
     public void SendControlMessage(ScriptControlMessage msg)
@@ -314,19 +309,9 @@ public class Script
         
         foreach (var context in Contexts)
         {
-            if (!IsRunning)
-            {
-                break;
-            }
-
             var handle = context.ExecuteBaseContext();
             while (handle.MoveNext())
             {
-                if (!IsRunning)
-                {
-                    break;
-                }
-                
                 yield return handle.Current;
             }
         }

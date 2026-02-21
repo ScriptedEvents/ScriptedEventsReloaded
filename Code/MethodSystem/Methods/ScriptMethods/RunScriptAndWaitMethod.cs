@@ -3,7 +3,6 @@ using MEC;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Yielding;
-using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.VariableSystem.Bases;
 
@@ -33,8 +32,7 @@ public class RunScriptAndWaitMethod : YieldingMethod
         script.AddLocalVariables(variables);
         script.Run(RunReason.Script, Script);
         
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-        while (script.IsRunning)
+        while (ScriptSystem.Script.RunningScripts.Contains(script))
         {
             yield return Timing.WaitForOneFrame;
         }

@@ -3,6 +3,7 @@ using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Helpers.ResultSystem;
+using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
@@ -35,6 +36,6 @@ public class StopKeyword : StandardContext, IKeywordContext
 
     protected override void Execute()
     {
-        Script.Stop(true);
+        throw new StopScript();
     }
 }

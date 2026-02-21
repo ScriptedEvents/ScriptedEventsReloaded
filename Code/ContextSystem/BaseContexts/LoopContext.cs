@@ -48,7 +48,6 @@ public abstract class LoopContext : StatementContext, IExtendableStatement, IKey
     {
         foreach (var coro in Children
                      .TakeWhile(_ => !ReceivedBreak)
-                     .TakeWhile(_ => Script.IsRunning)
                      .Select(child => child.ExecuteBaseContext()))
         {
             while (coro.MoveNext())

@@ -182,6 +182,7 @@ public class PlayerExpressionToken : ExpressionToken
 
     protected override IParseResult InternalParse(BaseToken[] tokens)
     {
+        var rs = $"{RawRep} expression is invalid".AsError();
         if (tokens.First() is not PlayerVariableToken pvarToken)
         {
             return new Ignore();
@@ -192,16 +193,17 @@ public class PlayerExpressionToken : ExpressionToken
         switch (tokens.Length)
         {
             case < 2:
-                return new Error("A player expression expects to have an argument, but none was provided.");
+                return new Error(rs + "A player expression expects to have an argument, " +
+                                 "but none was provided.");
             case > 2:
-                return new Error(
-                    $"A player expression expects to have only one argument, but {tokens.Length - 1} were provided.");
+                return new Error(rs + "A player expression expects to have only one argument, " +
+                                 $"but {tokens.Length - 1} were provided.");
         }
 
         if (EnumArgument<PlayerProperty>.Convert(tokens.Last(), Script)
             .HasErrored(out var error, out var property))
         {
-            return new Error(error);
+            return new Error(rs + error);
         }
 
         _property = property;

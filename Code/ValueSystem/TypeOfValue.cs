@@ -18,6 +18,8 @@ public abstract class TypeOfValue
     public bool AreKnown(out Type[] known) => (known = Required!) is not null;
 
     public abstract override string ToString();
+    
+    public static implicit operator TypeOfValue(Type type) => new SingleTypeOfValue(type);
 }
 
 public class TypesOfValue : TypeOfValue

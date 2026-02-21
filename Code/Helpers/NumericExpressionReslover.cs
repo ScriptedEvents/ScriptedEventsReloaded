@@ -130,12 +130,7 @@ public static class NumericExpressionReslover
                 var tmp = MakeTempName();
                 variables[tmp] = new(() =>
                 {
-                    if (parentheses.TryGetTokens().HasErrored(out var tokenizeError, out var tokensInParentheses))
-                    {
-                        return mainErr + tokenizeError;
-                    }
-            
-                    if (CompileExpression(tokensInParentheses).HasErrored(out var conditonError, out var value))
+                    if (CompileExpression(parentheses.Tokens).HasErrored(out var conditonError, out var value))
                     {
                         return mainErr + conditonError;
                     }

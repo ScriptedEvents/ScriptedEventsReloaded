@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
+using LabApi.Features.Wrappers;
 using PlayerRoles;
 using Respawning;
-using Respawning.Waves;
 using Respawning.Waves.Generic;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
@@ -16,7 +16,7 @@ namespace SER.Code.MethodSystem.Methods.RespawnMethods;
 [UsedImplicitly]
 public class RespawnWaveInfoMethod : LiteralValueReturningMethod, IReferenceResolvingMethod
 {
-    public Type ResolvesReference => typeof(TimeBasedWave);
+    public Type ResolvesReference => typeof(RespawnWave);
 
     public override TypeOfValue LiteralReturnTypes => new TypesOfValue([
         typeof(NumberValue), 
@@ -28,7 +28,7 @@ public class RespawnWaveInfoMethod : LiteralValueReturningMethod, IReferenceReso
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new ReferenceArgument<TimeBasedWave>("respawnWave"),
+        new ReferenceArgument<RespawnWave>("respawnWave"),
         new OptionsArgument("property", 
             Option.Enum<Faction>(),
             "maxWaveSize",
@@ -40,15 +40,15 @@ public class RespawnWaveInfoMethod : LiteralValueReturningMethod, IReferenceReso
 
     public override void Execute()
     {
-        var wave = Args.GetReference<TimeBasedWave>("respawnWave");
+        var wave = Args.GetReference<RespawnWave>("respawnWave");
 
         ReturnValue = Args.GetOption("property") switch
         {
-            "faction" => new StaticTextValue(wave.TargetFaction.ToString()),
+            "faction" => new StaticTextValue(wave.Faction.ToString()),
             "maxwavesize" => new NumberValue(wave.MaxWaveSize),
-            "respawntokens" => new NumberValue(wave is ILimitedWave limitedWave ? limitedWave.RespawnTokens : 0),
-            "influence" => new NumberValue((decimal)FactionInfluenceManager.Get(wave.TargetFaction)),
-            "timeleft" => new DurationValue(TimeSpan.FromSeconds(wave.Timer.TimeLeft)),
+            "respawntokens" => new NumberValue(wave.Base is ILimitedWave limitedWave ? limitedWave.RespawnTokens : 0),
+            "influence" => new NumberValue((decimal)FactionInfluenceManager.Get(wave.Faction)),
+            "timeleft" => new DurationValue(TimeSpan.FromSeconds(wave.TimeLeft)),
             _ => throw new AndrzejFuckedUpException()
         };
     }

@@ -57,6 +57,7 @@ public class GlobalKeyword : YieldingContext, IKeywordContext
             throw new TosoksFuckedUpException();
         }
         
+        Script.RemoveLocalVariable(_variableContext.DefinedVariable);
         VariableIndex.AddGlobalVariable(_variableContext.DefinedVariable);
     }
 }

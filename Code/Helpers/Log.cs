@@ -62,12 +62,12 @@ public static class Log
         #endif
     }
     
-    public static string GetStackTrace()
+    public static string GetStackTrace(int depth = 10)
     {
         StackTrace stackTrace = new StackTrace(true);
 
         StringBuilder sb = new("");
-        foreach (var stackFrame in stackTrace.GetFrames()!.Take(10))
+        foreach (var stackFrame in stackTrace.GetFrames()!.Take(depth))
         {
             sb.AppendLine($"-> {stackFrame.GetMethod().Name}");
         }

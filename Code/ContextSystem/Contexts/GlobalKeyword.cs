@@ -12,7 +12,7 @@ using SER.Code.VariableSystem;
 namespace SER.Code.ContextSystem.Contexts;
 
 [UsedImplicitly]
-public class GlobalVariableContext : YieldingContext, IKeywordContext
+public class GlobalKeyword : YieldingContext, IKeywordContext
 {
     protected override string FriendlyName =>
         $"global{(_variableToken is null ? "" : $" '{_variableToken.RawRep}'")} variable definition";

@@ -9,7 +9,7 @@ public class RunFunctionToken : BaseToken, IContextableToken
 {
     public Context GetContext(Script scr)
     {
-        return new RunFunctionContext
+        return new RunKeyword
         {
             LineNum = LineNum,
             Script = scr

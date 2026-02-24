@@ -11,9 +11,9 @@ using SER.Code.ValueSystem;
 namespace SER.Code.ContextSystem.Contexts;
 
 [UsedImplicitly]
-public class RunFunctionContext : YieldingContext, IMayReturnValueContext
+public class RunKeyword : YieldingContext, IMayReturnValueContext
 {
-    private FunctionDefinitionContext? _functionDefinitionContext;
+    private FuncStatement? _functionDefinitionContext;
     private readonly List<IValueToken> _providedValues = [];
 
     public TypeOfValue? Returns => _functionDefinitionContext?.Returns;

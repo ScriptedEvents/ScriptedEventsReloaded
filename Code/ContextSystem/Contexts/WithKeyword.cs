@@ -1,4 +1,5 @@
-﻿using SER.Code.ContextSystem.BaseContexts;
+﻿using JetBrains.Annotations;
+using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Helpers.ResultSystem;
@@ -7,7 +8,8 @@ using SER.Code.TokenSystem.Tokens.VariableTokens;
 
 namespace SER.Code.ContextSystem.Contexts;
 
-public class WithContext : StandardContext, IKeywordContext, INotRunningContext, IRequirePreviousStatementContext
+[UsedImplicitly]
+public class WithKeyword : StandardContext, IKeywordContext, INotRunningContext, IRequirePreviousStatementContext
 {
     private readonly List<VariableToken> _variables = [];
     private IAcceptOptionalVariableDefinitionsContext _receiver = null!;
@@ -18,7 +20,30 @@ public class WithContext : StandardContext, IKeywordContext, INotRunningContext,
         "This keyword is designed to provide a variable or a collection of variables to a statement.";
 
     public string[] Arguments => ["[variables...]"];
-    public string? Example => null;
+
+    public string Example =>
+        """
+        # CORRECT
+        over @all
+            with @plr
+
+            Print {@plr name}
+        end
+
+        # WRONG - "with" keyword does not add indentation
+        over @all
+            with @plr
+                Print {@plr name}
+        end
+
+        # WRONG - with keyword is not a statement that can be closed
+        # this causes an error
+        # over @all
+        #     with @plr
+        #         Print {@plr name}
+        #     end
+        # end
+        """;
 
     public Result AcceptStatement(StatementContext context)
     {

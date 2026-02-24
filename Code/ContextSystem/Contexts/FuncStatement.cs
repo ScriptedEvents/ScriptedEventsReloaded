@@ -14,7 +14,7 @@ using SER.Code.VariableSystem.Bases;
 namespace SER.Code.ContextSystem.Contexts;
 
 [UsedImplicitly]
-public class FunctionDefinitionContext :
+public class FuncStatement :
     StatementContext,
     INotRunningContext, 
     IAcceptOptionalVariableDefinitionsContext,

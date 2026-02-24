@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using CommandSystem;
+using JetBrains.Annotations;
 using LabApi.Features.Permissions;
 using SER.Code.Exceptions;
 using SER.Code.Plugin.Commands.Interfaces;
@@ -8,6 +9,7 @@ namespace SER.Code.Plugin.Commands.HelpSystem;
 
 [CommandHandler(typeof(GameConsoleCommandHandler))]
 [CommandHandler(typeof(RemoteAdminCommandHandler))]
+[UsedImplicitly]
 public class DocsCommand : ICommand, IUsePermissions
 {
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
@@ -23,7 +25,7 @@ public class DocsCommand : ICommand, IUsePermissions
         var helpOptions = Enum.GetValues(typeof(HelpOption)).Cast<HelpOption>();
         foreach (var helpOption in helpOptions)
         {
-            if (!HelpCommand.GeneralOptions.TryGetValue(helpOption, out var generalOption))
+            if (!DocsProvider.GeneralOptions.TryGetValue(helpOption, out var generalOption))
             {
                 throw new AndrzejFuckedUpException(
                     $"Option {helpOption} is not registered in the help command.");

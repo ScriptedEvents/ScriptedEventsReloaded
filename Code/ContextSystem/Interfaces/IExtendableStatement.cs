@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using SER.Code.ContextSystem.BaseContexts;
 
 namespace SER.Code.ContextSystem.Interfaces;
 
@@ -14,5 +15,5 @@ public interface IExtendableStatement
     }
 
     public abstract Signal AllowedSignals { get; }
-    public Dictionary<Signal, Func<IEnumerator<float>>> RegisteredSignals { get; }
+    public Dictionary<Signal, StatementContext> RegisteredSignals { get; }
 }

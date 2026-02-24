@@ -96,7 +96,7 @@ public static class Contexter
                 return rs + "The statement to extend does not support this type of extension.";
             }
 
-            extendable.RegisteredSignals[treeExtenderInfo.Extends] = treeExtenderContext.Run;
+            extendable.RegisteredSignals[treeExtenderInfo.Extends] = treeExtenderContext;
             statementStack.Pop();
             statementStack.Push(treeExtenderContext);
             return context.VerifyCurrentState().HasErrored(out error) ? rs + error : true;

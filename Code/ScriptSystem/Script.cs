@@ -1,9 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-<<<<<<< Updated upstream
-=======
-using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
->>>>>>> Stashed changes
 using LabApi.Features.Wrappers;
 using SER.Code.ContextSystem;
 using SER.Code.ContextSystem.BaseContexts;

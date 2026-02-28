@@ -17,19 +17,4 @@ public class LiteralVariableToken : VariableToken<LiteralVariable, LiteralValue>
             LineNum = LineNum,
         };
     }
-    
-    public TryGet<T> TryGetValue<T>() where T : Value
-    {
-        if (TryGetVariable().HasErrored(out var varError, out var variable))
-        {
-            return varError;
-        }
-
-        if (variable.TryGetValue<T>().HasErrored(out var valError, out var value))
-        {
-            return valError;
-        }
-                
-        return value;
-    }
 }

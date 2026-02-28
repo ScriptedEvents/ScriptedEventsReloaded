@@ -2,7 +2,6 @@
 using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
-using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
@@ -12,10 +11,10 @@ namespace SER.Code.ContextSystem.Contexts.Control;
 public class AttemptStatement : StatementContext, IExtendableStatement, IKeywordContext
 {
     public string KeywordName => "attempt";
-    public string Description => "Runs everything inside the statement, and if something throws an exception (error), " +
-                                 "the statement skips everything after it and jumps straight to the " +
-                                 $"{typeof(OnErrorStatement).FriendlyTypeName(true)} " +
-                                 "after it if provided.";
+    public string Description => 
+        "Runs everything inside the statement, and if something throws an exception (error), the error will not " +
+        "terminate the script. If there is an 'on_error' statement, it will be executed.";
+    
     public string[] Arguments => [];
     public string? Example =>
         """

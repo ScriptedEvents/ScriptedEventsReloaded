@@ -8,7 +8,6 @@ using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
 using SER.Code.VariableSystem.Bases;
-using SER.Code.VariableSystem.Variables;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
 
@@ -16,19 +15,21 @@ namespace SER.Code.ContextSystem.Contexts.Control;
 public class OnErrorStatement : StatementContext, IStatementExtender, IKeywordContext, IAcceptOptionalVariableDefinitionsContext
 {
     public string KeywordName => "on_error";
-    public string Description => "Catches an exception thrown inside of a " +
-                                 typeof(AttemptStatement).FriendlyTypeName(true);
+    public string Description =>
+        $"Catches an exception thrown inside of a {typeof(AttemptStatement).FriendlyTypeName(true)}";
+    
     public string[] Arguments => [];
-    public string? Example =>
+    public string Example =>
         """
         &collection = EmptyCollection
         attempt
             Print {CollectionFetch &collection 2}
-            # throws because there's nothing at index 2
+            # ERROR: there's nothing at index 2
         on_error
-            with *exception
+            with $message
             
-            Print "Error!: {ExceptionInfo *exception message}"
+            # this will print the error message
+            Print "Error: {$message}"
         end
         """;
 
@@ -45,8 +46,7 @@ public class OnErrorStatement : StatementContext, IStatementExtender, IKeywordCo
             field = value;
         }
     }
-    private VariableToken? _variableToken;
-    private Variable? _variable;
+    private LiteralVariableToken? _variableToken;
     
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
@@ -62,12 +62,11 @@ public class OnErrorStatement : StatementContext, IStatementExtender, IKeywordCo
     {
         if (variableTokens.Length > 1)
             return $"Too many arguments provided for {FriendlyName}, only 1 is allowed.";
-        var token = variableTokens.FirstOrDefault();
-        if (token is null) return true;
 
-        if (token is not ReferenceVariableToken)
-            return $"Variable {token.RawRepr} cannot be used for a {FriendlyName} as it's not a " +
-                   $"{typeof(ReferenceVariable).FriendlyTypeName(true)}.";
+        if (variableTokens.First() is not LiteralVariableToken token)
+        {
+            return $"{FriendlyName} only accepts a literal variable.";
+        }
         
         _variableToken = token;
         return true;
@@ -75,16 +74,17 @@ public class OnErrorStatement : StatementContext, IStatementExtender, IKeywordCo
     
     protected override IEnumerator<float> Execute()
     {
+        Variable? variable = null;
         if (_variableToken is not null)
         {
-            _variable = Variable.Create(_variableToken.Name, Value.Parse(Exception!, Script));
-            Script.AddLocalVariable(_variable);
+            variable = Variable.Create(_variableToken.Name, Value.Parse(Exception!.Message, Script));
+            Script.AddLocalVariable(variable);
         }
 
         var coro = RunChildren();
         while (coro.MoveNext())
             yield return coro.Current;
         
-        if (_variable is not null) Script.RemoveLocalVariable(_variable);
+        if (variable is not null) Script.RemoveLocalVariable(variable);
     }
 }

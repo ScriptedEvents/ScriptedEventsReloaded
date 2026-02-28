@@ -171,8 +171,3 @@ public class CollectionValue(IEnumerable value) : Value
         return $"[{string.Join(", ", CastedValues.Select(v => v.ToString()))}]";
     }
 }
-
-public class CollectionValue<T>(IEnumerable<T> value) : CollectionValue(value) where T : Value
-{
-    public new Type Type => typeof(T);
-}

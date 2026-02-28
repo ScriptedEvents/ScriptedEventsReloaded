@@ -31,7 +31,7 @@ public class UCRRoleInfoMethod : LiteralValueReturningMethod, IReferenceResolvin
 
     public override Argument[] ExpectedArguments =>
     [
-        new LooseReferenceArgument("custom role reference", typeof(ICustomRole)),
+        new ReferenceArgument<ICustomRole>("custom role reference"),
         new OptionsArgument("property", 
             "id",
             "name",
@@ -43,7 +43,7 @@ public class UCRRoleInfoMethod : LiteralValueReturningMethod, IReferenceResolvin
 
     public override void Execute()
     {
-        var role = Args.GetLooseReference<ICustomRole>("custom role reference");
+        var role = Args.GetReference<ICustomRole>("custom role reference");
         
         ReturnValue = Args.GetOption("property") switch
         {

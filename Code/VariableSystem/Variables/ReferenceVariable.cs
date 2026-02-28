@@ -7,5 +7,6 @@ public class ReferenceVariable(string name, ReferenceValue value) : Variable<Ref
 {
     public override string Name => name;
     public override char Prefix => '*';
+    public override string FriendlyName => "reference variable";
     public override ReferenceValue Value => value;
 }

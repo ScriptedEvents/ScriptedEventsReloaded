@@ -462,7 +462,7 @@ public static class DocsProvider
                 if (ret.LiteralReturnTypes.AreKnown(out var types))
                 {
                     typeReturn = types
-                        .Select(Value.FriendlyName)
+                        .Select(Value.GetFriendlyName)
                         .JoinStrings(" or ") + " value";
                 }
                 else
@@ -492,7 +492,7 @@ public static class DocsProvider
                 if (ret.Returns.AreKnown(out var returnTypes))
                 {
                     typeReturn = returnTypes
-                        .Select(Value.FriendlyName)
+                        .Select(Value.GetFriendlyName)
                         .JoinStrings(" or ") + " value";
                 }
                 else

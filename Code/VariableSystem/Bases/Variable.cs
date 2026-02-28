@@ -13,7 +13,14 @@ public abstract class Variable
     public abstract char Prefix { get; }
     
     public abstract Value BaseValue { get; }
+    
+    public abstract string FriendlyName { get; }
 
+    public static string GetFriendlyName(Type t)
+    {
+        return ((Variable)t.CreateInstance()).FriendlyName;
+    }
+    
     public static Variable Create(string name, Value value)
     {
         return value switch

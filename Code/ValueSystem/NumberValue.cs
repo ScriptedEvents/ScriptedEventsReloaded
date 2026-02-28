@@ -13,4 +13,5 @@ public class NumberValue(decimal value) : LiteralValue<decimal>(value)
     }
 
     public override string StringRep => Value.ToString();
+    public override string FriendlyName => "number value";
 }

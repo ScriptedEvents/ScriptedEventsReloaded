@@ -29,7 +29,7 @@ public class VariableArgument(string name) : Argument(name)
 
 public class VariableArgument<T>(string name) : Argument(name) where T : Variable
 {
-    public override string InputDescription => $"A {typeof(T).FriendlyTypeName()}";
+    public override string InputDescription => $"A {Variable.GetFriendlyName(typeof(T))}";
 
     [UsedImplicitly]
     public DynamicTryGet<T> GetConvertSolution(BaseToken token)

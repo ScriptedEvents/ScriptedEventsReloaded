@@ -35,7 +35,7 @@ public class TypesOfValue : TypeOfValue
     }
 
     private readonly Type[] _types;
-    public override string ToString() => $"{string.Join(" or ", _types.Select(Value.FriendlyName))} value";
+    public override string ToString() => $"{string.Join(" or ", _types.Select(t => t))} value";
 }
 
 public class UnknownTypeOfValue() : TypeOfValue((Type?)null)
@@ -46,7 +46,7 @@ public class UnknownTypeOfValue() : TypeOfValue((Type?)null)
 public class SingleTypeOfValue(Type type) : TypeOfValue(type)
 {
     public readonly Type Type = type;
-    public override string ToString() => $"{Value.FriendlyName(Type)} value";
+    public override string ToString() => Value.GetFriendlyName(Type);
 }
 
 public class TypeOfValue<T>() : SingleTypeOfValue(typeof(T))

@@ -24,6 +24,8 @@ public class PlayerValue : Value
     
     public override int HashCode =>
         Players.Select(plr => plr.UserId).GetEnumerableHashCode().HasErrored(out var error, out var val)
-        ? throw new TosoksFuckedUpException(error)
-        : val;
+            ? throw new TosoksFuckedUpException(error)
+            : val;
+
+    public override string FriendlyName => "player value";
 }

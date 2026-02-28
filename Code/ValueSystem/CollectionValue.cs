@@ -96,10 +96,10 @@ public class CollectionValue(IEnumerable value) : Value
         }
 
         throw new CustomScriptRuntimeError(
-            $"Inserted value '{value}' has to be the same type as the collection ({FriendlyName(type)})."
+            $"Inserted value '{value}' has to be the same type as the collection ({GetFriendlyName(type)})."
         );
     }
-    public CollectionValue Insert(Value val) => CollectionValue.Insert(this, val);
+    public CollectionValue Insert(Value val) => Insert(this, val);
 
     /// <summary>
     /// Removes every match if <paramref name="amountToRemove"/> is -1
@@ -113,7 +113,7 @@ public class CollectionValue(IEnumerable value) : Value
         
         if (type.IsInstanceOfType(value))
         {
-            throw new CustomScriptRuntimeError($"Value {value.FriendlyName()} has to be the same type as the collection ({FriendlyName(type)}).");
+            throw new CustomScriptRuntimeError($"Value {value.FriendlyName} has to be the same type as the collection ({GetFriendlyName(type)}).");
         }
 
         var values = collection.CastedValues.ToList();
@@ -129,16 +129,16 @@ public class CollectionValue(IEnumerable value) : Value
 
         return new CollectionValue(values);
     }
-    public CollectionValue Remove(Value val, int amountToRemove = -1) => CollectionValue.Remove(this, val, amountToRemove);
+    public CollectionValue Remove(Value val, int amountToRemove = -1) => Remove(this, val, amountToRemove);
 
     public static CollectionValue RemoveAt(CollectionValue collection, int index)
     {
         return new CollectionValue(collection.CastedValues.Where((_, i) => i != index - 1));
     }
-    public CollectionValue RemoveAt(int index) => CollectionValue.RemoveAt(this, index);
+    public CollectionValue RemoveAt(int index) => RemoveAt(this, index);
 
     public static bool Contains(CollectionValue collection, Value value) => collection.CastedValues.Contains(value);
-    public bool Contains(Value val) => CollectionValue.Contains(this, val);
+    public bool Contains(Value val) => Contains(this, val);
 
     public static CollectionValue operator +(CollectionValue lhs, CollectionValue rhs)
     {
@@ -165,6 +165,8 @@ public class CollectionValue(IEnumerable value) : Value
 
         return new CollectionValue(lhs.CastedValues.Where(val => !rhs.CastedValues.Contains(val)));
     }
+
+    public override string FriendlyName => "collection value";
 
     public override string ToString()
     {

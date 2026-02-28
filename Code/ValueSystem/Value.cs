@@ -42,12 +42,16 @@ public abstract class Value
         };
     }
 
-    public static string FriendlyName(Type type) => type.Name.Replace("Value", "").Spaceify().ToLower();
-    public string FriendlyName() => FriendlyName(GetType());
+    public static string GetFriendlyName(Type t)
+    {
+        return ((Value)t.CreateInstance()).FriendlyName;
+    }
+    
+    public abstract string FriendlyName { get; }
 
     public override string ToString()
     {
-        return $"value of type {FriendlyName()}";
+        return FriendlyName;
     }
 
     public override int GetHashCode() => HashCode;

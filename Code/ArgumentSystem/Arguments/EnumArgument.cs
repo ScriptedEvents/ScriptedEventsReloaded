@@ -16,7 +16,7 @@ public class EnumArgument<TEnum> : Argument where TEnum : struct, Enum
         HelpInfoStorage.UsedEnums.Add(typeof(TEnum));
     }
     
-    public override string InputDescription => $"{typeof(TEnum).GetAccurateName()} enum value.";
+    public override string InputDescription => $"{typeof(TEnum).GetAccurateName()} enum value - found using 'serhelp {typeof(TEnum).GetAccurateName()}' command";
 
     [UsedImplicitly]
     public DynamicTryGet<TEnum> GetConvertSolution(BaseToken token)

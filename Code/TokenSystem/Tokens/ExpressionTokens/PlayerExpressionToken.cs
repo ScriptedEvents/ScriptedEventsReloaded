@@ -193,11 +193,9 @@ public class PlayerExpressionToken : ExpressionToken
         switch (tokens.Length)
         {
             case < 2:
-                return new Error(rs + "A player expression expects to have an argument, " +
-                                 "but none was provided.");
+                return new Error(rs + "A player expression expects to have an argument, but none was provided.");
             case > 2:
-                return new Error(rs + "A player expression expects to have only one argument, " +
-                                 $"but {tokens.Length - 1} were provided.");
+                return new Error(rs + $"A player expression expects to have only one argument, but {tokens.Length - 1} were provided.");
         }
 
         if (EnumArgument<PlayerProperty>.Convert(tokens.Last(), Script)

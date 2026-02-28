@@ -68,7 +68,7 @@ public static class FileSystem
                 .GetFlagLines()
                 .HasErrored(out var error, out var lines))
             {
-                Log.CompileError(error, scriptPath);
+                Log.CompileError(scriptName, error);
                 continue;
             }
             

@@ -369,21 +369,9 @@ public class Script
         return $"There is no variable called {name}.";
     }
 
-    public static void AssertNoVariableNameCollisions(Variable newVariable, IEnumerable<Variable> existingVariables)
-    {
-        if ((existingVariables as Variable[] ?? existingVariables.ToArray())
-            .Any(gv => Variable.AreSyntacticallySame(gv, newVariable)))
-        {
-            throw new CustomScriptRuntimeError(
-                $"Tried to create a variable '{newVariable}', " +
-                $"but there already exists a variable with the same name."
-            );
-        }
-    }
-
     public void AddLocalVariable(Variable variable)
     {
-        AssertNoVariableNameCollisions(variable, VariableIndex.GlobalVariables);
+        Variable.AssertNoVariableNameCollisions(variable, VariableIndex.GlobalVariables);
         
         Log.Debug($"Added variable {variable.Name} to script {Name}");
         RemoveLocalVariable(variable);

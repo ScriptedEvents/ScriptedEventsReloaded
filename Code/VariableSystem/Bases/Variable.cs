@@ -39,6 +39,18 @@ public abstract class Variable
     public static bool AreSyntacticallySame(Variable a, Variable b) => a.Prefix == b.Prefix && a.Name == b.Name;
 
     public static bool AreSyntacticallySame(Variable a, VariableToken b) => a.Prefix == b.Prefix && a.Name == b.Name;
+    
+    public static void AssertNoVariableNameCollisions(Variable newVariable, IEnumerable<Variable> existingVariables)
+    {
+        if ((existingVariables as Variable[] ?? existingVariables.ToArray())
+            .Any(gv => AreSyntacticallySame(gv, newVariable)))
+        {
+            throw new CustomScriptRuntimeError(
+                $"Tried to create a variable '{newVariable}', " +
+                $"but there already exists a variable with the same name."
+            );
+        }
+    }
 }
 
 public abstract class Variable<TValue> : Variable

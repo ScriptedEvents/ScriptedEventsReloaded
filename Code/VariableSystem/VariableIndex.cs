@@ -78,8 +78,8 @@ public static class VariableIndex
     public static void AddGlobalVariable(Variable variable)
     {
         foreach (var runningScript in Script.RunningScripts)
-        {
-            Script.AssertNoVariableNameCollisions(variable, runningScript.LocalVariables);
+        { 
+            Variable.AssertNoVariableNameCollisions(variable, runningScript.LocalVariables);
         }
         
         RemoveGlobalVariable(variable);

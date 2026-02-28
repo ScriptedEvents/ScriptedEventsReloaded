@@ -343,7 +343,14 @@ public static class DocsProvider
         return
             $"""
             Enum {enumType.Name} has the following values:
-            {string.Join("\n", Enum.GetValues(enumType).Cast<Enum>().Select(e => $"> {e}"))}
+            {string.Join("\n", Enum.GetValues(enumType)
+                .Cast<Enum>()
+                .Where(e => {
+                    Type type = e.GetType();
+                    FieldInfo field = type.GetField(e.ToString());
+                    return field.GetCustomAttribute<ObsoleteAttribute>() == null;
+                })
+                .Select(e => $"> {e}"))}
             """;
     }
 
@@ -464,22 +471,20 @@ public static class DocsProvider
                 }
 
                 sb.AppendLine();
-                sb.AppendLine($"This method returns a {typeReturn}, which can be saved or used directly. ");
+                sb.AppendLine($"Returns a {typeReturn}.");
                 break;
             }
             case IReturningMethod<CollectionValue>:
                 sb.AppendLine();
-                sb.AppendLine("This method returns a collection of values, which can be saved or used directly.");
+                sb.AppendLine("Returns a collection of values.");
                 break;
             case IReturningMethod<PlayerValue>:
                 sb.AppendLine();
-                sb.AppendLine("This method returns players, which can be saved or used directly.");
+                sb.AppendLine("Returns a player value.");
                 break;
             case IReferenceReturningMethod refMethod:
                 sb.AppendLine();
-                sb.AppendLine($"This method returns a reference to {refMethod.ReturnType.GetAccurateName()} object, which can be saved or used directly.\n" +
-                              $"References represent an object which cannot be fully represented in text.\n" +
-                              $"If you wish to use that reference further, find methods supporting references of this type.");
+                sb.AppendLine($"Returns a reference to {refMethod.ReturnType.GetAccurateName()} object.");
                 break;
             case IReturningMethod ret:
             {
@@ -528,6 +533,7 @@ public static class DocsProvider
             if (argument.DefaultValue is { } defVal)
             {
                 sb.AppendLine($" - Default value/behavior: {defVal.StringRep ?? defVal.Value?.ToString() ?? "<unknown>"}");
+                sb.AppendLine("   (if needed, you can skip providing this argument by using '_' character)");
             }
 
             if (argument.ConsumesRemainingValues)

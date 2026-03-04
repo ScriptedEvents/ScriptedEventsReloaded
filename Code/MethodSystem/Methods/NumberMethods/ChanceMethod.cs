@@ -21,6 +21,6 @@ public class ChanceMethod : ReturningMethod<BoolValue>, IAdditionalDescription
 
     public override void Execute()
     {
-        ReturnValue = Args.GetFloat("chance") < UnityEngine.Random.Range(0f, 1f);
+        ReturnValue = Args.GetFloat("chance") >= UnityEngine.Random.Range(0f, 1f);
     }
 }

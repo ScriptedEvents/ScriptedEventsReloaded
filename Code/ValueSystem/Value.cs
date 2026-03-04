@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using LabApi.Features.Wrappers;
 using SER.Code.Exceptions;
+using SER.Code.Extensions;
 using SER.Code.ScriptSystem;
 
 namespace SER.Code.ValueSystem;
@@ -32,6 +33,7 @@ public abstract class Value
             decimal n               => new NumberValue(n),
             string s when script is not null => new DynamicTextValue(s, script),
             string s                => new StaticTextValue(s),
+            Enum e                  => new StaticTextValue(e.ToString()),
             TimeSpan t              => new DurationValue(t),
             Player p                => new PlayerValue(p),
             IEnumerable<Player> ps  => new PlayerValue(ps),
@@ -40,12 +42,16 @@ public abstract class Value
         };
     }
 
-    public static string FriendlyName(Type type) => type.Name.Replace("Value", "").ToLower();
-    public string FriendlyName() => FriendlyName(GetType());
+    public static string GetFriendlyName(Type t)
+    {
+        return ((Value)t.CreateInstance()).FriendlyName;
+    }
+    
+    public abstract string FriendlyName { get; }
 
     public override string ToString()
     {
-        return $"value of type {FriendlyName()}";
+        return FriendlyName;
     }
 
     public override int GetHashCode() => HashCode;

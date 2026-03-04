@@ -32,7 +32,7 @@ public class RunCommand : ICommand, IUsePermissions
             return false;
         }
         
-        script.Run(RunContext.BaseCommand);
+        script.Run(RunReason.BaseCommand);
         response = $"Script '{script.Name}' was requested to run";
         return true;
     }

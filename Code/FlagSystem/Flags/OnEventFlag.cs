@@ -2,6 +2,7 @@
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
+using SER.Code.ScriptSystem.Structures;
 using EventHandler = SER.Code.EventSystem.EventHandler;
 
 namespace SER.Code.FlagSystem.Flags;
@@ -41,7 +42,12 @@ public class OnEventFlag : Flag
 
     public override Result OnScriptRunning(Script scr)
     {
-        if (scr.Context == RunContext.Event)
+        if (scr.HasFlag<CustomCommandFlag>())
+        {
+            return $"Detected conflicting flag: {nameof(CustomCommandFlag)}.";
+        }
+        
+        if (scr.RunReason == RunReason.Event)
         {
             return true;
         }

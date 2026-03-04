@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.Helpers;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
 using UncomplicatedCustomRoles.Extensions;
@@ -11,7 +12,7 @@ namespace SER.Code.MethodSystem.Methods.UCRMethods;
 [UsedImplicitly]
 public class SetUCRRoleMethod : SynchronousMethod, IDependOnFramework
 {
-    public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Ucr;
+    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.Ucr;
 
     public override string Description => "Sets the UCR role of a player.";
 

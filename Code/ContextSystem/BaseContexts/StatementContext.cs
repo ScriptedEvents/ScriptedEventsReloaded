@@ -22,7 +22,6 @@ public abstract class StatementContext : YieldingContext
     protected virtual IEnumerator<float> RunChildren()
     {
         foreach (var coro in Children
-                     .TakeWhile(_ => Script.IsRunning)
                      .Select(child => child.ExecuteBaseContext()))
         {
             while (coro.MoveNext())

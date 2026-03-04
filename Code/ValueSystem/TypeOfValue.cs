@@ -18,22 +18,24 @@ public abstract class TypeOfValue
     public bool AreKnown(out Type[] known) => (known = Required!) is not null;
 
     public abstract override string ToString();
+    
+    public static implicit operator TypeOfValue(Type type) => new SingleTypeOfValue(type);
 }
 
 public class TypesOfValue : TypeOfValue
 {
-    public TypesOfValue(SingleTypeOfValue[] types) : base(types.Select(t => t.Type).ToArray())
+    public TypesOfValue(params SingleTypeOfValue[] types) : base(types.Select(t => t.Type).ToArray())
     {
         _types = types.Select(t => t.Type).ToArray();
     }
 
-    public TypesOfValue(Type[] types) : base(types)
+    public TypesOfValue(params Type[] types) : base(types)
     {
         _types = types;
     }
 
     private readonly Type[] _types;
-    public override string ToString() => $"{string.Join(" or ", _types.Select(Value.FriendlyName))} value";
+    public override string ToString() => $"{string.Join(" or ", _types.Select(t => t))} value";
 }
 
 public class UnknownTypeOfValue() : TypeOfValue((Type?)null)
@@ -44,7 +46,7 @@ public class UnknownTypeOfValue() : TypeOfValue((Type?)null)
 public class SingleTypeOfValue(Type type) : TypeOfValue(type)
 {
     public readonly Type Type = type;
-    public override string ToString() => $"{Value.FriendlyName(Type)} value";
+    public override string ToString() => Value.GetFriendlyName(Type);
 }
 
 public class TypeOfValue<T>() : SingleTypeOfValue(typeof(T))

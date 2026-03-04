@@ -85,6 +85,12 @@ public class CustomCommandFlag : Flag
             false
         ),
         new(
+            "invalidRankMessage",
+            "Defines a message for when the sender does not have the needed rank (defined in 'neededRank' argument).",
+            AddInvalidRankMessage,
+            false
+        ),
+        new(
             "cooldown",
             "The time the player has to wait before being able to use the command again.",
             AddCooldown,
@@ -158,7 +164,12 @@ public class CustomCommandFlag : Flag
 
     public override Result OnScriptRunning(Script scr)
     {
-        if (scr.Context == RunContext.CustomCommand)
+        if (scr.HasFlag<OnEventFlag>())
+        {
+            return $"Detected conflicting flag: {nameof(OnEventFlag)}.";
+        }
+        
+        if (scr.RunReason == RunReason.CustomCommand)
         {
             return true;
         }
@@ -187,6 +198,7 @@ public class CustomCommandFlag : Flag
         public ConsoleType ConsoleTypes { get; set; } = ConsoleType.Server;
         public string[] Usage { get; set; } = [];
         public string[] NeededRanks { get; set; } = [];
+        public string? InvalidRankMessage { get; set; } = null;
         public TimeSpan PlayerCooldown { get; set; } = TimeSpan.Zero;
         public Dictionary<Player, DateTime> NextEligableDateForPlayer { get; } = [];
         public string GetHelp(ArraySegment<string> arguments)
@@ -256,7 +268,7 @@ public class CustomCommandFlag : Flag
             script.AddLocalVariable(new LiteralVariable<TextValue>(name, new StaticTextValue(slice.Value)));
         }
 
-        script.Run(RunContext.CustomCommand);
+        script.Run(RunReason.CustomCommand);
         return true;
     }
 
@@ -267,11 +279,16 @@ public class CustomCommandFlag : Flag
         {
             if (plr.UserGroup is not { } group || cmd.NeededRanks.All(rank => group.Name != rank))
             {
+                if (cmd.InvalidRankMessage is not null)
+                {
+                    return cmd.InvalidRankMessage;
+                }
+                
                 return "This command is reserved for players with a rank: " +
                        $"{cmd.NeededRanks.Select(r => $"'{r}'").JoinStrings(" or ")}";
             }
         }
-
+        
         if (cmd.PlayerCooldown <= TimeSpan.Zero)
         {
             return null;
@@ -329,6 +346,12 @@ public class CustomCommandFlag : Flag
     private Result AddNeededRank(string[] args)
     {
         Command.NeededRanks = args;
+        return true;
+    }
+
+    private Result AddInvalidRankMessage(string[] args)
+    {
+        Command.InvalidRankMessage = args.JoinStrings(" ");
         return true;
     }
     

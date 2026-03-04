@@ -20,6 +20,8 @@ public class KeywordToken : BaseToken, IContextableToken
         )
         .ToArray();
     
+    public static readonly IKeywordContext[] KeywordContexts = KeywordContextTypes.Select(t => t.CreateInstance<IKeywordContext>()).ToArray();
+    
     protected override IParseResult InternalParse(Script scr)
     {
         if (RawRep is "foreach")
@@ -30,9 +32,7 @@ public class KeywordToken : BaseToken, IContextableToken
             );
         }
         
-        _keywordType = KeywordContextTypes.FirstOrDefault(
-            keyword => keyword.CreateInstance<IKeywordContext>().KeywordName == RawRep);
-
+        _keywordType = KeywordContexts.FirstOrDefault(keyword => keyword.KeywordName == RawRep)?.GetType();
         return _keywordType is not null
             ? new Success()
             : new Ignore();

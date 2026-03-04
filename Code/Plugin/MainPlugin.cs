@@ -23,7 +23,7 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
     public override string Description => "The scripting language for SCP:SL.";
     public override string Author => "Elektryk_Andrzej";
     public override Version RequiredApiVersion => LabApiProperties.CurrentVersion;
-    public override Version Version => new(0, 14, 0);
+    public override Version Version => new(0, 14, 1);
 
     public static string GitHubLink => "https://github.com/ScriptedEvents/ScriptedEventsReloaded";
     public static string DocsLink => "https://scriptedeventsreloaded.gitbook.io/docs/tutorial";
@@ -37,7 +37,7 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
     [Flags]
     public enum Contribution : ushort
     {
-        LeadDeveloper = 1 << 8,
+        ProjectLead = 1 << 8,
         Developer = 1 << 7,
         QualityAssurance = 1 << 6,
         Sponsor = 1 << 5,
@@ -51,18 +51,18 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
     [
         new(
             Instance.Author, 
-            Contribution.LeadDeveloper, 
+            Contribution.ProjectLead, 
             "76561198361176072@steam"
-        ),
-        new(
-            "Whitty985playz", 
-            Contribution.QualityAssurance | Contribution.EarlyAdopter, 
-            "76561198859902154@steam"
         ),
         new(
             "Tosoks67", 
             Contribution.Developer | Contribution.Betatester, 
             "76561199175834203@steam"
+        ),
+        new(
+            "Whitty985playz", 
+            Contribution.QualityAssurance | Contribution.EarlyAdopter, 
+            "76561198859902154@steam"
         ),
         new(
             "Krzysiu Wojownik", 

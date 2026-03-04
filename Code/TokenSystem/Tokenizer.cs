@@ -40,7 +40,7 @@ public static class Tokenizer
         typeof(TextToken)
     ];
     
-    public static TryGet<Line[]> GetInfoFromMultipleLines(string content)
+    public static Line[] GetInfoFromMultipleLines(string content)
     {
         List<Line> outList = [];
         
@@ -148,15 +148,18 @@ public static class Tokenizer
     public static TryGet<BaseToken[]> TokenizeLine(IEnumerable<Slice> slices, Script scr, uint? lineNum)
     {
         var sliceArray = slices.ToArray();
-        var tokens = sliceArray.Select(slice => GetTokenFromSlice(slice, scr, lineNum)).ToArray();
-
-        var error = tokens.FirstOrDefault(t => t.HasErrored(out _))?.ErrorMsg;
-        if (error is not null)
+        List<BaseToken> outList = [];
+        foreach (var slice in sliceArray)
         {
-            return error;
+            if (GetTokenFromSlice(slice, scr, lineNum).HasErrored(out var error, out var token))
+            {
+                return error;
+            }
+            
+            outList.Add(token);
         }
         
-        return tokens.Select(t => t.Value!).ToArray();
+        return outList.ToArray();
     }
 
     public static TryGet<BaseToken> GetTokenFromSlice(Slice slice, Script? scr, uint? lineNum)

@@ -13,7 +13,7 @@ public class ScanScript : Example
         Cassie jingle "a facility scan is commencing" "A facility scan is commencing..."
 
         Wait 1s
-        WaitUntil (not {IsCassieSpeaking})
+        WaitUntil ({IsCassieSpeaking} is false)
 
         repeat 3
             Wait 10s

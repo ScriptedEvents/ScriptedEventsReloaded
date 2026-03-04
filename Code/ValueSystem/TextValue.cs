@@ -32,6 +32,8 @@ public abstract class TextValue : LiteralValue<string>
 
     public override string StringRep => Value;
     
+    public override string FriendlyName => "text value";
+    
     public static string ParseValue(string text, Script script) => ExpressionRegex.Replace(text, match =>
     {
         if (match.Value.StartsWith("~")) return match.Value[1..];
@@ -64,7 +66,10 @@ public abstract class TextValue : LiteralValue<string>
     });
 }
 
-public class DynamicTextValue(string text, Script script) : TextValue(text, script);
+public class DynamicTextValue(string text, Script script) : TextValue(text, script)
+{
+    public override string FriendlyName => "dynamic text value";
+}
 
 public class StaticTextValue(string text) : TextValue(text, null)
 {
@@ -72,4 +77,6 @@ public class StaticTextValue(string text) : TextValue(text, null)
     {
         return new(text);
     }
+
+    public override string FriendlyName => "static text value";
 }

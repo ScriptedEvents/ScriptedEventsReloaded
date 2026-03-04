@@ -1,5 +1,6 @@
 ﻿using CommandSystem;
 using LabApi.Features.Permissions;
+using SER.Code.Extensions;
 using SER.Code.Plugin.Commands.Interfaces;
 using SER.Code.ScriptSystem;
 
@@ -17,7 +18,7 @@ public class RunningScriptsCommand : ICommand, IUsePermissions
             return false;
         }
         
-        response = $"There are {Script.RunningScripts.Count} running scripts" 
+        response = $"There are {Script.RunningScripts.Len} running scripts" 
                    + Script.RunningScripts
                        .Select(s => s.Name)
                        .Aggregate(string.Empty, (a, b) => $"{a}\n> {b}");

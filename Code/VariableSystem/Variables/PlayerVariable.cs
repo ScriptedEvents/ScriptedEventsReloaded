@@ -8,6 +8,7 @@ public class PlayerVariable(string name, PlayerValue value) : Variable<PlayerVal
 {
     public override string Name => name;
     public override char Prefix => '@';
+    public override string FriendlyName => "player variable";
     public override PlayerValue Value => value;
     public Player[] Players => Value.Players;
 }

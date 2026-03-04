@@ -3,6 +3,7 @@ using Exiled.API.Features;
 using JetBrains.Annotations;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.Helpers;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
 using SER.Code.ValueSystem;
@@ -12,7 +13,7 @@ namespace SER.Code.MethodSystem.Methods.PlayerMethods;
 [UsedImplicitly]
 public class GetAmmoLimitMethod : ReturningMethod<NumberValue>, IDependOnFramework
 {
-    public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Exiled;
+    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.Exiled;
     
     public override string Description => "Gets the player's limit on a certain ammunition type";
     

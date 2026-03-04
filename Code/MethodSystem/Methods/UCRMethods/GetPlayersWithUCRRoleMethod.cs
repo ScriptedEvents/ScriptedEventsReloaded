@@ -3,6 +3,7 @@ using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
+using SER.Code.Helpers;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
 using SER.Code.ValueSystem;
@@ -14,7 +15,7 @@ namespace SER.Code.MethodSystem.Methods.UCRMethods;
 [UsedImplicitly]
 public class GetPlayersWithUCRRoleMethod : ReturningMethod<PlayerValue>, IDependOnFramework
 {
-    public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Ucr;
+    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.Ucr;
 
     public override string Description => "Gets all players who have a provided UCR role.";
 

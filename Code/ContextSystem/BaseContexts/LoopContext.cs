@@ -7,7 +7,7 @@ namespace SER.Code.ContextSystem.BaseContexts;
 public abstract class LoopContext : StatementContext, IExtendableStatement, IKeywordContext
 {
     public IExtendableStatement.Signal AllowedSignals => IExtendableStatement.Signal.DidntExecute;
-    public Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = [];
+    public Dictionary<IExtendableStatement.Signal, StatementContext> RegisteredSignals { get; } = [];
     
     public abstract string KeywordName { get; }
     public abstract string Description { get; }
@@ -48,7 +48,6 @@ public abstract class LoopContext : StatementContext, IExtendableStatement, IKey
     {
         foreach (var coro in Children
                      .TakeWhile(_ => !ReceivedBreak)
-                     .TakeWhile(_ => Script.IsRunning)
                      .Select(child => child.ExecuteBaseContext()))
         {
             while (coro.MoveNext())

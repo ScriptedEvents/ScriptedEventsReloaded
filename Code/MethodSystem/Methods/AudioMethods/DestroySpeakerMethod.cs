@@ -8,7 +8,7 @@ namespace SER.Code.MethodSystem.Methods.AudioMethods;
 [UsedImplicitly]
 public class DestroySpeakerMethod : SynchronousMethod
 {
-    public override string Description => "Destorys a speaker.";
+    public override string Description => "Destroys a speaker.";
 
     public override Argument[] ExpectedArguments { get; } =
     [

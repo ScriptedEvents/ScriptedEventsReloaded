@@ -14,7 +14,7 @@ using SER.Code.VariableSystem.Bases;
 namespace SER.Code.ContextSystem.Contexts;
 
 [UsedImplicitly]
-public class FunctionDefinitionContext :
+public class FuncStatement :
     StatementContext,
     INotRunningContext, 
     IAcceptOptionalVariableDefinitionsContext,
@@ -137,13 +137,12 @@ public class FunctionDefinitionContext :
     protected override IEnumerator<float> Execute()
     {
         foreach (var coro in Children
-             .TakeWhile(_ => Script.IsRunning)
              .Select(child => child.ExecuteBaseContext())
         )
         {
             while (coro.MoveNext())
             {
-                if (!Script.IsRunning || _end)
+                if (_end)
                 {
                     goto Exit;
                 }

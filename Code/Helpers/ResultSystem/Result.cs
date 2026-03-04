@@ -1,4 +1,5 @@
 ﻿using SER.Code.Exceptions;
+using SER.Code.Extensions;
 
 namespace SER.Code.Helpers.ResultSystem;
 
@@ -71,5 +72,10 @@ public readonly struct Result(bool wasSuccess, string errorMsg)
         }
         
         return value;
+    }
+
+    public static Result Merge(params IEnumerable<Result> results)
+    {
+        return "\n" + results.Select(r => r.ErrorMsg).Select(e => $">>>  {e}").JoinStrings("\n--------------------------------\n");
     }
 }

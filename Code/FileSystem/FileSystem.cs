@@ -5,6 +5,7 @@ using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Examples;
 using SER.Code.Extensions;
 using SER.Code.FlagSystem;
+using SER.Code.Helpers;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 
@@ -62,7 +63,15 @@ public static class FileSystem
         {
             var scriptName = ScriptName.InitUnchecked(Path.GetFileNameWithoutExtension(scriptPath));
 
-            var lines = Script.CreateByVerifiedPath(scriptPath, ServerConsoleExecutor.Instance).GetFlagLines();
+            if (Script
+                .CreateByVerifiedPath(scriptPath, ServerConsoleExecutor.Instance)
+                .GetFlagLines()
+                .HasErrored(out var error, out var lines))
+            {
+                Log.CompileError(scriptName, error);
+                continue;
+            }
+            
             if (lines.IsEmpty())
             {
                 continue;

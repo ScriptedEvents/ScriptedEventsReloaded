@@ -25,7 +25,7 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
     public IExtendableStatement.Signal Extends => IExtendableStatement.Signal.DidntExecute;
     
     public IExtendableStatement.Signal AllowedSignals => IExtendableStatement.Signal.DidntExecute;
-    public Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = new();
+    public Dictionary<IExtendableStatement.Signal, StatementContext> RegisteredSignals { get; } = new();
 
     private readonly List<BaseToken> _condition = [];
     
@@ -74,19 +74,14 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
         
         if (!result)
         {
-            if (!RegisteredSignals.TryGetValue(IExtendableStatement.Signal.DidntExecute, out var enumerator))
+            if (!RegisteredSignals.TryGetValue(IExtendableStatement.Signal.DidntExecute, out var statement))
             {
                 yield break;
             }
             
-            var coro = enumerator();
+            var coro = statement.Run();
             while (coro.MoveNext())
             {
-                if (!Script.IsRunning)
-                {
-                    yield break;
-                }
-                
                 yield return coro.Current;
             }
             
@@ -94,16 +89,10 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
         }
         
         foreach (var coro in Children
-                     .TakeWhile(_ => Script.IsRunning)
                      .Select(child => child.ExecuteBaseContext()))
         {
             while (coro.MoveNext())
             {
-                if (!Script.IsRunning)
-                {
-                    yield break;
-                }
-                
                 yield return coro.Current;
             }
         }

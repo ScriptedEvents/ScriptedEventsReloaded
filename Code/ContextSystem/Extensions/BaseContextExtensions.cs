@@ -18,16 +18,7 @@ public static class BaseContextExtensions
             
             case YieldingContext yieldingContext:
                 var coro = yieldingContext.Run();
-                while (coro.MoveNext())
-                {
-                    if (!context.Script.IsRunning)
-                    {
-                        yield break;
-                    }
-                    
-                    yield return coro.Current;
-                }
-                
+                while (coro.MoveNext()) yield return coro.Current;
                 yield break;
             
             default:

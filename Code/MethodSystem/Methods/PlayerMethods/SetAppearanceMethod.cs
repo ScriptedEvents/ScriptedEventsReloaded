@@ -5,6 +5,7 @@ using PlayerRoles;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
+using SER.Code.Helpers;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
 
@@ -13,7 +14,7 @@ namespace SER.Code.MethodSystem.Methods.PlayerMethods;
 [UsedImplicitly]
 public class SetAppearanceMethod : SynchronousMethod, IDependOnFramework
 {
-    public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Exiled;
+    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.Exiled;
     
     public override string Description => "Changes the appearance of a player (or reskins)";
 
@@ -29,16 +30,20 @@ public class SetAppearanceMethod : SynchronousMethod, IDependOnFramework
 
     public override void Execute()
     {
-        var players = Args
-            .GetPlayers("players whose appearance will be changed")
-            .Select(Player.Get)
-            .ToArray();
+        var labApiPlayers = Args.GetPlayers("players whose appearance will be changed");
+        Player[] players = [];
+        for (uint i = 0; i < labApiPlayers.Length; i++)
+            players[i] = Player.Get(labApiPlayers[i]);
+        
         var role = Args.GetEnum<RoleTypeId>("role to change appearance to");
         var potentialTargets = Args.GetPlayers("players who will see the change").MaybeNull();
 
         if (potentialTargets != null)
         {
-            var targets = potentialTargets.Select(Player.Get).ToArray();
+            Player[] targets = [];
+            for (uint i = 0; i < potentialTargets.Length; i++)
+                targets[i] = Player.Get(potentialTargets[i]);
+            
             foreach (var player in players)
             {
                 player.ChangeAppearance(role, targets);

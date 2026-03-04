@@ -21,7 +21,7 @@ public class IfStatement : StatementContext, IExtendableStatement, IKeywordConte
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public IExtendableStatement.Signal AllowedSignals => IExtendableStatement.Signal.DidntExecute;
-    public Dictionary<IExtendableStatement.Signal, Func<IEnumerator<float>>> RegisteredSignals { get; } = [];
+    public Dictionary<IExtendableStatement.Signal, StatementContext> RegisteredSignals { get; } = [];
 
     private readonly List<BaseToken> _condition = [];
     
@@ -69,12 +69,12 @@ public class IfStatement : StatementContext, IExtendableStatement, IKeywordConte
         
         if (!result)
         {
-            if (!RegisteredSignals.TryGetValue(IExtendableStatement.Signal.DidntExecute, out var enumerator))
+            if (!RegisteredSignals.TryGetValue(IExtendableStatement.Signal.DidntExecute, out var statement))
             {
                 yield break;
             }
             
-            var didntExecuteCoro = enumerator();
+            var didntExecuteCoro = statement.Run();
             while (didntExecuteCoro.MoveNext())
             {
                 yield return didntExecuteCoro.Current;

@@ -20,23 +20,28 @@ public static class Contexter
         Stack<StatementContext> statementStack = [];
         List<Context> contexts = [];
         
+        List<Result> errors = [];
         foreach (var line in lines)
         {
             Result mainErr = $"Line {line.LineNumber} cannot compile.";
             if (ContextLine(line.Tokens, line.LineNumber, scr)
                 .HasErrored(out var error, out var context))
             {
-                return mainErr + error;
+                errors.Add(mainErr + error);
+                continue;
             }
             
             if (context is null) continue;
             
             if (TryAddResult(context, line.LineNumber, statementStack, contexts).HasErrored(out var addError))
             {
-                return mainErr + addError;
+                errors.Add(mainErr + addError);
+                continue;
             }
             Log.Debug($"current statement stack: {statementStack.Select(s => s.GetType().Name).JoinStrings(" -> ")}");
         }
+        
+        if (errors.Any()) return Result.Merge(errors);
         
         return contexts.ToArray();
     }
@@ -96,7 +101,7 @@ public static class Contexter
                 return rs + "The statement to extend does not support this type of extension.";
             }
 
-            extendable.RegisteredSignals[treeExtenderInfo.Extends] = treeExtenderContext.Run;
+            extendable.RegisteredSignals[treeExtenderInfo.Extends] = treeExtenderContext;
             statementStack.Pop();
             statementStack.Push(treeExtenderContext);
             return context.VerifyCurrentState().HasErrored(out error) ? rs + error : true;

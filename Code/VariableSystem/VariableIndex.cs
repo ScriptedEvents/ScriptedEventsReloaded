@@ -19,9 +19,11 @@ public static class VariableIndex
         List<PredefinedPlayerVariable> allApiVariables =
         [
             new("all", Player.ReadyList.ToList, "Other"),
+            new("allPlayers", Player.ReadyList.ToList, "Other"),
             new("alivePlayers", () => Player.ReadyList.Where(plr => plr.IsAlive).ToList(), "Other"),
             new("npcPlayers", () => Player.ReadyList.Where(plr => plr.IsNpc).ToList(), "Other"),
-            new("empty", () => [], "Other")
+            new("empty", () => [], "Other"),
+            new("emptyPlayers", () => [], "Other"),
         ];
 
         allApiVariables.AddRange(
@@ -29,9 +31,11 @@ public static class VariableIndex
                 .Cast<RoleTypeId>()
                 .Select(roleType =>
                 {
-                    return new PredefinedPlayerVariable(roleType.ToString().LowerFirst() + "Players",
+                    return new PredefinedPlayerVariable(
+                        roleType.ToString().LowerFirst() + "Players",
                         () => Player.ReadyList.Where(plr => plr.Role == roleType).ToList(),
-                        "Role");
+                        "Role"
+                    );
                 }));
         
         allApiVariables.AddRange(
@@ -40,9 +44,11 @@ public static class VariableIndex
                 .Where(zone => zone != FacilityZone.None)
                 .Select(zone =>
                 {
-                    return new PredefinedPlayerVariable(zone.ToString().LowerFirst() + "Players",
+                    return new PredefinedPlayerVariable(
+                        zone.ToString().LowerFirst() + "Players",
                         () => Player.ReadyList.Where(plr => plr.Zone == zone).ToList(),
-                        "Facility zone");
+                        "Facility zone"
+                    );
                 }));
         
         allApiVariables.AddRange(
@@ -66,9 +72,11 @@ public static class VariableIndex
                         return null;
                     }
 
-                    return new PredefinedPlayerVariable(name,
+                    return new PredefinedPlayerVariable(
+                        name,
                         () => Player.ReadyList.Where(plr => plr.Role.GetTeam() == teamType).ToList(),
-                        "Team");
+                        "Team"
+                    );
                 })
                 .OfType<PredefinedPlayerVariable>());
         
@@ -78,8 +86,8 @@ public static class VariableIndex
     public static void AddGlobalVariable(Variable variable)
     {
         foreach (var runningScript in Script.RunningScripts)
-        {
-            Script.CheckForVariableNameCollisions(variable, runningScript.LocalVariables);
+        { 
+            Variable.AssertNoVariableNameCollisions(variable, runningScript.LocalVariables);
         }
         
         RemoveGlobalVariable(variable);

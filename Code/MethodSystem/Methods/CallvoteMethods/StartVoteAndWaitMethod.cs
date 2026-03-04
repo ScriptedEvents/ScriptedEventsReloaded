@@ -5,6 +5,7 @@ using MEC;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
+using SER.Code.Helpers;
 using SER.Code.MethodSystem.BaseMethods.Yielding;
 using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.MethodSystem.Structures;
@@ -61,7 +62,7 @@ namespace SER.Code.MethodSystem.Methods.CallvoteMethods;
 [UsedImplicitly]
 public class StartVoteAndWaitMethod : YieldingReturningMethod<TextValue>, IAdditionalDescription, IDependOnFramework
 {
-    public IDependOnFramework.Type DependsOn => IDependOnFramework.Type.Callvote;
+    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.Callvote;
     
     public override string Description => "Starts a vote and waits until it is completed.";
     

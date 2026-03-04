@@ -1,7 +1,9 @@
 ﻿using MEC;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
+using SER.Code.Plugin;
 using SER.Code.ScriptSystem;
+using SER.Code.ScriptSystem.Structures;
 
 namespace SER.Code.Helpers;
 
@@ -31,9 +33,18 @@ public static class BetterCoros
     {
         while (true)
         {
+            if (MainPlugin.Instance.Config?.SafeScripts is true)
+            {
+                yield return Timing.WaitForOneFrame;
+            }
+            
             try
             {
                 if (!routine.MoveNext()) goto End;
+            }
+            catch (StopScript)
+            {
+                goto End;
             }
             catch (ScriptCompileError compErr)
             {
@@ -57,6 +68,11 @@ public static class BetterCoros
             {
                 onException?.Invoke(ex);
                 scr.Error($"Coroutine failed with {ex.GetType().AccurateName}: {ex.Message}\n{ex.StackTrace}");
+                goto End;
+            }
+
+            if (scr.Killed)
+            {
                 goto End;
             }
             

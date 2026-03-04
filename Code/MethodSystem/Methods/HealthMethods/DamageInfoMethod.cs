@@ -47,7 +47,7 @@ public class DamageInfoMethod : ReturningMethod, IReferenceResolvingMethod, IAdd
         
         ReturnValue = Args.GetOption("property") switch
         {
-            "damage" => new StaticTextValue(standard?.Damage.ToString() ?? "none"),
+            "damage" => new NumberValue((decimal)(standard?.Damage ?? 0)),
             "hitbox" => new StaticTextValue(standard?.Hitbox.ToString() ?? "none"),
             "firearmused" => new ReferenceValue(firearm?.Firearm),
             "attacker" => new ReferenceValue(attacker?.Attacker),

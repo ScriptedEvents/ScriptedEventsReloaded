@@ -13,7 +13,7 @@ namespace SER.Code.FlagSystem;
 
 public static class ScriptFlagHandler
 {
-    private static readonly Dictionary<ScriptName, List<Flag>> ScriptsFlags = [];
+    public static readonly Dictionary<ScriptName, List<Flag>> ScriptsFlags = [];
     public static Flag[] GetScriptFlags(ScriptName scriptName) => ScriptsFlags[scriptName].ToArray();
     
     private static Flag? _currentFlag;

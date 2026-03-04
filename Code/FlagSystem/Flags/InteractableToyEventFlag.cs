@@ -1,7 +1,6 @@
 ﻿using JetBrains.Annotations;
 using LabApi.Features.Wrappers;
 using SER.Code.Helpers;
-using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.ValueSystem;
 using SER.Code.VariableSystem.Bases;
@@ -55,7 +54,7 @@ public class InteractableToyEventFlag : Flag
             }
 
             script.AddLocalVariables(variables);
-            script.Run(RunContext.Event);
+            script.Run(RunReason.Event);
         }
     }
 }

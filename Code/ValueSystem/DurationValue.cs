@@ -47,4 +47,6 @@ public class DurationValue(TimeSpan value) : LiteralValue<TimeSpan>(value)
             return sb.Remove(sb.Length - 1, 1).ToString();
         }
     }
+
+    public override string FriendlyName => "duration value";
 }

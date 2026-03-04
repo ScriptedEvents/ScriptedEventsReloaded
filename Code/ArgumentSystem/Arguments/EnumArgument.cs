@@ -5,6 +5,7 @@ using SER.Code.Helpers.ResultSystem;
 using SER.Code.Plugin.Commands.HelpSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Tokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 
 namespace SER.Code.ArgumentSystem.Arguments;
 
@@ -15,7 +16,7 @@ public class EnumArgument<TEnum> : Argument where TEnum : struct, Enum
         HelpInfoStorage.UsedEnums.Add(typeof(TEnum));
     }
     
-    public override string InputDescription => $"{typeof(TEnum).GetAccurateName()} enum value.";
+    public override string InputDescription => $"{typeof(TEnum).GetAccurateName()} enum value - found using 'serhelp {typeof(TEnum).GetAccurateName()}' command";
 
     [UsedImplicitly]
     public DynamicTryGet<TEnum> GetConvertSolution(BaseToken token)
@@ -23,6 +24,11 @@ public class EnumArgument<TEnum> : Argument where TEnum : struct, Enum
         if (InternalConvert(token).WasSuccessful(out var value))
         {
             return value;
+        }
+
+        if (token is not IValueToken valToken || valToken.IsConstant)
+        {
+            return $"Not a {InputDescription}.";
         }
 
         return new(() =>
@@ -57,8 +63,7 @@ public class EnumArgument<TEnum> : Argument where TEnum : struct, Enum
             return Enum.Parse(enumType, stringRep, true);
         }
         
-        return $"Value '{stringRep}' does not represent a valid {enumType.GetAccurateName()} " +
-               $"enum value.";
+        return $"Value '{token.RawRep}' is not a {enumType.GetAccurateName()} enum value.";
     }
     
     private TryGet<TEnum> InternalConvert(BaseToken token)

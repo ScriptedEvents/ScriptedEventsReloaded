@@ -220,6 +220,7 @@ public static class EventHandler
         List<Variable> variables = [];
         foreach (var (value, name, _) in properties)
         {
+            if (value is null) continue;
             variables.Add(Variable.Create(
                 $"ev{name.First().ToString().ToUpper()}{name[1..]}", 
                 Value.Parse(value, null))

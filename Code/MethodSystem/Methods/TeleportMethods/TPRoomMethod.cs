@@ -18,15 +18,15 @@ public class TPRoomMethod : SynchronousMethod
         new RoomArgument("room to teleport to"),
         new FloatArgument("relative x")
         {
-            DefaultValue = new(0, null)
+            DefaultValue = new(0f, null)
         },
         new FloatArgument("relative y")
         {
-            DefaultValue = new(0, null)
+            DefaultValue = new(0f, null)
         },
         new FloatArgument("relative z")
         {
-            DefaultValue = new(0, null)
+            DefaultValue = new(0f, null)
         },
     ];
     

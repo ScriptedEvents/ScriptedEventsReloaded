@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using JetBrains.Annotations;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
@@ -166,7 +167,8 @@ public class CollectionValue(IEnumerable value) : Value
         return new CollectionValue(lhs.CastedValues.Where(val => !rhs.CastedValues.Contains(val)));
     }
 
-    public override string FriendlyName => "collection value";
+    [UsedImplicitly]
+    public new static string FriendlyName => "collection value";
 
     public override string ToString()
     {

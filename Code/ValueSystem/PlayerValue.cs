@@ -1,4 +1,5 @@
-﻿using LabApi.Features.Wrappers;
+﻿using JetBrains.Annotations;
+using LabApi.Features.Wrappers;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 
@@ -27,5 +28,6 @@ public class PlayerValue : Value
             ? throw new TosoksFuckedUpException(error)
             : val;
 
-    public override string FriendlyName => "player value";
+    [UsedImplicitly]
+    public new static string FriendlyName => "player value";
 }

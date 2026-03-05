@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Reflection;
 using LabApi.Features.Wrappers;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
@@ -14,11 +15,12 @@ public abstract class Value
 
     public static Value Parse(object obj, Script? script)
     {
+        // ReSharper disable once ConvertIfStatementToSwitchStatement
         if (obj is null) throw new AndrzejFuckedUpException();
         if (obj is Value v) return v;
         
         return obj switch
-        {     
+        {   
             bool b                  => new BoolValue(b),
             byte n                  => new NumberValue(n),
             sbyte n                 => new NumberValue(n),
@@ -42,12 +44,15 @@ public abstract class Value
         };
     }
 
+    public string FriendlyName => GetFriendlyName(GetType());
+    
     public static string GetFriendlyName(Type t)
     {
-        return ((Value)t.CreateInstance()).FriendlyName;
+        return (string?)t
+            .GetField("FriendlyName", BindingFlags.Public | BindingFlags.Static)?
+            .GetValue(null) 
+               ?? throw new AndrzejFuckedUpException($"FriendlyName is not defined in {t.AccurateName}");
     }
-    
-    public abstract string FriendlyName { get; }
 
     public override string ToString()
     {

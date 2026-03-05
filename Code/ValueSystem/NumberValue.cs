@@ -1,4 +1,6 @@
-﻿namespace SER.Code.ValueSystem;
+﻿using JetBrains.Annotations;
+
+namespace SER.Code.ValueSystem;
 
 public class NumberValue(decimal value) : LiteralValue<decimal>(value)
 {
@@ -13,5 +15,7 @@ public class NumberValue(decimal value) : LiteralValue<decimal>(value)
     }
 
     public override string StringRep => Value.ToString();
-    public override string FriendlyName => "number value";
+    
+    [UsedImplicitly]
+    public new static string FriendlyName => "number value";
 }

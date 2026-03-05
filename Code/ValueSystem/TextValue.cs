@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
@@ -32,7 +33,8 @@ public abstract class TextValue : LiteralValue<string>
 
     public override string StringRep => Value;
     
-    public override string FriendlyName => "text value";
+    [UsedImplicitly]
+    public new static string FriendlyName => "text value";
     
     public static string ParseValue(string text, Script script) => ExpressionRegex.Replace(text, match =>
     {
@@ -68,7 +70,8 @@ public abstract class TextValue : LiteralValue<string>
 
 public class DynamicTextValue(string text, Script script) : TextValue(text, script)
 {
-    public override string FriendlyName => "dynamic text value";
+    [UsedImplicitly]
+    public new static string FriendlyName => "dynamic text value";
 }
 
 public class StaticTextValue(string text) : TextValue(text, null)
@@ -78,5 +81,6 @@ public class StaticTextValue(string text) : TextValue(text, null)
         return new(text);
     }
 
-    public override string FriendlyName => "static text value";
+    [UsedImplicitly]
+    public new static string FriendlyName => "static text value";
 }

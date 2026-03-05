@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using SER.Code.Exceptions;
 
 namespace SER.Code.ValueSystem;
@@ -37,6 +38,9 @@ public abstract class LiteralValue : Value
     }
 
     public override int HashCode => Value.GetHashCode();
+    
+    [UsedImplicitly]
+    public new static string FriendlyName => "literal value";
 }
 
 public abstract class LiteralValue<T>: LiteralValue

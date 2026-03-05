@@ -1,4 +1,5 @@
-﻿using SER.Code.Exceptions;
+﻿using JetBrains.Annotations;
+using SER.Code.Exceptions;
 using SER.Code.Extensions;
 
 namespace SER.Code.ValueSystem;
@@ -16,7 +17,8 @@ public class ReferenceValue(object? value) : Value
 
     public override int HashCode => Value.GetHashCode();
 
-    public override string FriendlyName => "reference value";
+    [UsedImplicitly]
+    public new static string FriendlyName => "reference value";
 
     public override string ToString()
     {
@@ -28,5 +30,6 @@ public class ReferenceValue<T>(T? value) : ReferenceValue(value)
 {
     public new T Value => (T) base.Value;
 
-    public override string FriendlyName => $"reference value of type {typeof(T).GetAccurateName()}";
+    [UsedImplicitly]
+    public new static string FriendlyName => $"reference to {typeof(T).GetAccurateName()} object";
 }

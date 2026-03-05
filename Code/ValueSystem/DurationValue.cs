@@ -1,4 +1,5 @@
-﻿using StringBuilder = System.Text.StringBuilder;
+﻿using JetBrains.Annotations;
+using StringBuilder = System.Text.StringBuilder;
 
 namespace SER.Code.ValueSystem;
 
@@ -48,5 +49,6 @@ public class DurationValue(TimeSpan value) : LiteralValue<TimeSpan>(value)
         }
     }
 
-    public override string FriendlyName => "duration value";
+    [UsedImplicitly]
+    public new static string FriendlyName => "duration value";
 }

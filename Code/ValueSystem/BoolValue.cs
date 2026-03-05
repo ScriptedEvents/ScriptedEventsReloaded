@@ -1,4 +1,6 @@
-﻿namespace SER.Code.ValueSystem;
+﻿using JetBrains.Annotations;
+
+namespace SER.Code.ValueSystem;
 
 public class BoolValue(bool value) : LiteralValue<bool>(value)
 {
@@ -14,5 +16,6 @@ public class BoolValue(bool value) : LiteralValue<bool>(value)
 
     public override string StringRep => Value.ToString().ToLower();
 
-    public override string FriendlyName => "boolean value";
+    [UsedImplicitly]
+    public new static string FriendlyName => "boolean (true/false) value";
 }

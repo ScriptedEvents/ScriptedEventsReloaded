@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
@@ -17,7 +18,6 @@ public class FriendlyFireMethod : SynchronousMethod
     
     public override void Execute()
     {
-        ServerConsole.FriendlyFire = Args.GetBool("enabled?");
-        ServerConfigSynchronizer.Singleton.RefreshMainBools();
+        Server.FriendlyFire = Args.GetBool("enabled?");
     }
 }

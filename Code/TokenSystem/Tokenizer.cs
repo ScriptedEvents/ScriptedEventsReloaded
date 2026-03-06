@@ -153,7 +153,7 @@ public static class Tokenizer
         {
             if (GetTokenFromSlice(slice, scr, lineNum).HasErrored(out var error, out var token))
             {
-                return error;
+                return $"Value '{slice.RawRep}' is invalid.".AsError() + error.AsError();
             }
             
             outList.Add(token);

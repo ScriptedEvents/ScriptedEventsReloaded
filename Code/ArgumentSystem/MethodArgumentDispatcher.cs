@@ -47,7 +47,7 @@ public class MethodArgumentDispatcher(Method method)
             return ConverterCache[argType] = new ConverterInfo(instanceMethod);
         }
         
-        throw new AndrzejFuckedUpException($"No suitable GetConvertSolution method found for {argType.GetAccurateName()}.");
+        throw new AndrzejFuckedUpException($"No suitable GetConvertSolution method found for {argType.AccurateName}.");
     }
 
     public TryGet<ArgumentValueInfo?> TryGetValueInfo(BaseToken token, int index)

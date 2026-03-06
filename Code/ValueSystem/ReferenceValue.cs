@@ -22,7 +22,7 @@ public class ReferenceValue(object? value) : Value
 
     public override string ToString()
     {
-        return $"<{Value.GetType().GetAccurateName()} reference | {Value.GetHashCode()}>";
+        return $"<{Value.GetType().AccurateName} reference | {Value.GetHashCode()}>";
     }
 }
 
@@ -31,5 +31,5 @@ public class ReferenceValue<T>(T? value) : ReferenceValue(value)
     public new T Value => (T) base.Value;
 
     [UsedImplicitly]
-    public new static string FriendlyName => $"reference to {typeof(T).GetAccurateName()} object";
+    public new static string FriendlyName => $"reference to {typeof(T).AccurateName} object";
 }

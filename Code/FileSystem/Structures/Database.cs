@@ -11,7 +11,7 @@ public class Database
 {
     public readonly struct DatabaseValue(Type originalType, object value)
     {
-        public string Type { get; } = originalType.GetAccurateName();
+        public string Type { get; } = originalType.AccurateName;
         public object Value { get; } = value;
     }
     
@@ -109,7 +109,7 @@ public class Database
             return $"Value of key '{key}' cannot be read.";
         }
 
-        if (val.Type == typeof(PlayerValue).GetAccurateName())
+        if (val.Type == typeof(PlayerValue).AccurateName)
         {
             if (val.Value is not string[] playerIds)
             {
@@ -119,7 +119,7 @@ public class Database
             return Value.Parse(Player.List.Where(p => playerIds.Contains(p.UserId)), null);
         }
 
-        if (Value.Parse(val.Value, null) is { } value && value.GetType().GetAccurateName() == val.Type)
+        if (Value.Parse(val.Value, null) is { } value && value.GetType().AccurateName == val.Type)
         {
             return value;
         }

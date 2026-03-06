@@ -9,7 +9,7 @@ namespace SER.Code.ArgumentSystem.Arguments;
 
 public class ValueArgument<T>(string name) : Argument(name) where T : Value
 {
-    public override string InputDescription => $"a value of type {typeof(T).GetAccurateName()}";
+    public override string InputDescription => $"a value of type {typeof(T).AccurateName}";
     
     [UsedImplicitly]
     public DynamicTryGet<T> GetConvertSolution(BaseToken token)

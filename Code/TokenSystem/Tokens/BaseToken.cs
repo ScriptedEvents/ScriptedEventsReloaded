@@ -109,7 +109,7 @@ public class BaseToken
                 return correctValue;           
             }
 
-            return $"Expression '{parenthesesToken.RawRep}' parsed to a {result.GetType().GetAccurateName()} " +
+            return $"Expression '{parenthesesToken.RawRep}' parsed to a {result.GetType().AccurateName} " +
                    $"'{result}', which is not a '{typeof(T).Name}' value.";
         }
 

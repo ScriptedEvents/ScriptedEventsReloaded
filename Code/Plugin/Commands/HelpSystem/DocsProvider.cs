@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
 using System.Text;
 using CommandSystem;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Exceptions;
@@ -296,7 +294,7 @@ public static class DocsProvider
         var sb = new StringBuilder();
         foreach (var method in referenceResolvingMethods)
         {
-            sb.AppendLine($"{method.ReferenceType.GetAccurateName()} ref -> {method.Name} method");
+            sb.AppendLine($"{method.ReferenceType.AccurateName} ref -> {method.Name} method");
         }
         
         return
@@ -484,7 +482,7 @@ public static class DocsProvider
                 break;
             case IReferenceReturningMethod refMethod:
                 sb.AppendLine();
-                sb.AppendLine($"Returns a reference to {refMethod.ReturnType.GetAccurateName()} object.");
+                sb.AppendLine($"Returns a reference to {refMethod.ReturnType.AccurateName} object.");
                 break;
             case IReturningMethod ret:
             {

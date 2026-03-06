@@ -13,11 +13,11 @@ public record Option(string Value, string Description = "")
     public static Option Enum<T>(string? name = null) where T : struct, Enum
     {
         HelpInfoStorage.UsedEnums.Add(typeof(T));
-        return new(name ?? typeof(T).Name.LowerFirst(), $"Returns a {typeof(T).GetAccurateName()} enum value");
+        return new(name ?? typeof(T).Name.LowerFirst(), $"Returns a {typeof(T).AccurateName} enum value");
     }
     
     public static Option Reference<T>(string value) where T : class
     {
-        return new(value, $"Returns a reference to {typeof(T).GetAccurateName()} object");
+        return new(value, $"Returns a reference to {typeof(T).AccurateName} object");
     }
 }

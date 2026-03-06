@@ -150,7 +150,7 @@ public static class EventHandler
 
     private static void OnArgumentedEvent<T>(string evName, T ev) where T : EventArgs
     {
-        Log.Debug($"[Arg] Event '{evName}' triggered with {typeof(T).GetAccurateName()}.");
+        Log.Debug($"[Arg] Event '{evName}' triggered with {typeof(T).AccurateName}.");
 
         if (ev is ICancellableEvent cancellable && DisabledEvents.Contains(evName))
         {

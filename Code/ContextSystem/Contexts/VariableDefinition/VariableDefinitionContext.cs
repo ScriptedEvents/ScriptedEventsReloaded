@@ -27,7 +27,7 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
 {
     protected virtual (TryAddTokenRes result, Func<TValue> parser) AdditionalParsing(BaseToken token)
     {
-        return (TryAddTokenRes.Error($"Value '{token.RawRep}' ({token.GetType().GetAccurateName()}) cannot be assigned to {typeof(TVarToken).GetAccurateName()} variable"), null!);
+        return (TryAddTokenRes.Error($"Value '{token.RawRep}' ({token.GetType().AccurateName}) cannot be assigned to {typeof(TVarToken).AccurateName} variable"), null!);
     }
     
     protected Func<BaseToken, Func<TValue>?>? AdditionalTokenParser = null;

@@ -17,8 +17,18 @@ public class MethodExpressionToken : ExpressionToken
 
     protected override IParseResult InternalParse(BaseToken[] tokens)
     {
-        if (tokens.FirstOrDefault() is not MethodToken methodToken)
+        if (tokens.FirstOrDefault() is not { } token)
         {
+            return new Ignore();
+        }
+        
+        if (token is not MethodToken methodToken)
+        {
+            if (char.IsUpper(token.RawRep.First()))
+            {
+                return new Error($"'{token.RawRep}' is not a valid method.");
+            }
+            
             return new Ignore();
         }
 

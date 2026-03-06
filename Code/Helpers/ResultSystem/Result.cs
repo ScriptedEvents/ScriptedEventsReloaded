@@ -76,6 +76,9 @@ public readonly struct Result(bool wasSuccess, string errorMsg)
 
     public static Result Merge(params IEnumerable<Result> results)
     {
-        return "\n" + results.Select(r => r.ErrorMsg).Select(e => $">>>  {e}").JoinStrings("\n--------------------------------\n");
+        return "\n" + results
+            .Select(r => r.ErrorMsg)
+            .Select(e => $">>> {e}")
+            .JoinStrings("\n--------------------------------\n");
     }
 }

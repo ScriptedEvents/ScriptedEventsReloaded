@@ -1,6 +1,4 @@
-﻿using Callvote.API;
-using Callvote.API.VoteTemplate;
-using Callvote.Features;
+﻿using Callvote.API.Features.Votes;
 using JetBrains.Annotations;
 using LabApi.Features.Wrappers;
 using MEC;
@@ -119,12 +117,13 @@ public class StartVoteAndWaitMethod : YieldingReturningMethod<TextValue>, IAddit
             voteOptions.Add(new VoteOption(o.Option, o.DisplayText));
         }
 
-        var voting = new CustomVote(
-            Server.Host!,
+        var voting = new Vote(
+            Server.Host.ReferenceHub!,
             question,
             $"SER.{question}",
-            VoteCallback,
-            voteOptions
+            callback: VoteCallback,
+            voteOptions,
+            Player.ReadyList.Select(p => p.ReferenceHub).ToHashSet()
         );
     
         VoteHandler.CallVote(voting);

@@ -17,5 +17,5 @@ public class NumberValue(decimal value) : LiteralValue<decimal>(value)
     public override string StringRep => Value.ToString();
     
     [UsedImplicitly]
-    public new static string FriendlyName => "number value";
+    public new static string FriendlyName = "number value";
 }

@@ -18,7 +18,7 @@ public class ReferenceValue(object? value) : Value
     public override int HashCode => Value.GetHashCode();
 
     [UsedImplicitly]
-    public new static string FriendlyName => "reference value";
+    public new static string FriendlyName = "reference value";
 
     public override string ToString()
     {
@@ -31,5 +31,5 @@ public class ReferenceValue<T>(T? value) : ReferenceValue(value)
     public new T Value => (T) base.Value;
 
     [UsedImplicitly]
-    public new static string FriendlyName => $"reference to {typeof(T).AccurateName} object";
+    public new static string FriendlyName = $"reference to {typeof(T).AccurateName} object";
 }

@@ -168,7 +168,7 @@ public class CollectionValue(IEnumerable value) : Value
     }
 
     [UsedImplicitly]
-    public new static string FriendlyName => "collection value";
+    public new static string FriendlyName = "collection value";
 
     public override string ToString()
     {

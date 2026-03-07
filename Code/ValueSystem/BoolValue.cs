@@ -17,5 +17,5 @@ public class BoolValue(bool value) : LiteralValue<bool>(value)
     public override string StringRep => Value.ToString().ToLower();
 
     [UsedImplicitly]
-    public new static string FriendlyName => "boolean (true/false) value";
+    public new static string FriendlyName = "boolean (true/false) value";
 }

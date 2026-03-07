@@ -40,7 +40,7 @@ public abstract class LiteralValue : Value
     public override int HashCode => Value.GetHashCode();
     
     [UsedImplicitly]
-    public new static string FriendlyName => "literal value";
+    public new static string FriendlyName = "literal value";
 }
 
 public abstract class LiteralValue<T>: LiteralValue

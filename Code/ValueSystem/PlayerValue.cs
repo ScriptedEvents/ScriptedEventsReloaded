@@ -29,5 +29,5 @@ public class PlayerValue : Value
             : val;
 
     [UsedImplicitly]
-    public new static string FriendlyName => "player value";
+    public new static string FriendlyName = "player value";
 }

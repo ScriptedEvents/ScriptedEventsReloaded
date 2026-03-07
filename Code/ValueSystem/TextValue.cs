@@ -34,7 +34,7 @@ public abstract class TextValue : LiteralValue<string>
     public override string StringRep => Value;
     
     [UsedImplicitly]
-    public new static string FriendlyName => "text value";
+    public new static string FriendlyName = "text value";
     
     public static string ParseValue(string text, Script script) => ExpressionRegex.Replace(text, match =>
     {
@@ -71,7 +71,7 @@ public abstract class TextValue : LiteralValue<string>
 public class DynamicTextValue(string text, Script script) : TextValue(text, script)
 {
     [UsedImplicitly]
-    public new static string FriendlyName => "dynamic text value";
+    public new static string FriendlyName = "dynamic text value";
 }
 
 public class StaticTextValue(string text) : TextValue(text, null)
@@ -82,5 +82,5 @@ public class StaticTextValue(string text) : TextValue(text, null)
     }
 
     [UsedImplicitly]
-    public new static string FriendlyName => "static text value";
+    public new static string FriendlyName = "static text value";
 }

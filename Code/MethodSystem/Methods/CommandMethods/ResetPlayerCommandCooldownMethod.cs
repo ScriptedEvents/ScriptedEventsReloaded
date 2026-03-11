@@ -21,7 +21,7 @@ public class ResetPlayerCommandCooldownMethod : SynchronousMethod
     {
         Args
             .GetReference<CustomCommandFlag.CustomCommand>("command")
-            .NextEligableDateForPlayer
+            .NextEligibleDateForPlayer
             .Remove(Args.GetPlayer("player"));
     }
 }

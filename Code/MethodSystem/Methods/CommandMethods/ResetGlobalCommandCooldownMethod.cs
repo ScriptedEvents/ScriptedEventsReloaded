@@ -18,6 +18,6 @@ public class ResetGlobalCommandCooldownMethod : SynchronousMethod
     
     public override void Execute()
     {
-        Args.GetReference<CustomCommandFlag.CustomCommand>("command").NextEligableDateForGlobal = null;
+        Args.GetReference<CustomCommandFlag.CustomCommand>("command").NextEligibleDateForGlobal = null;
     }
 }

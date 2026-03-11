@@ -263,24 +263,24 @@ public class CustomCommandFlag : Flag
         }
 
         public required string Command { get; init; }
-        public string[] Aliases { get; set; } = [];
+        public string[] Aliases => [];
         public string Description { get; set; } = "";
         public string[] Usage { get; set; } = [];
         public ConsoleType ConsoleTypes = ConsoleType.Server;
         
         public string[] NeededRanks = [];
-        public string? InvalidRankMessage = null;
+        public string? InvalidRankMessage;
         
         public string[] NeededPermissions = [];
-        public string? NoPermissionMessage = null;
+        public string? NoPermissionMessage;
         
         public TimeSpan PlayerCooldown = TimeSpan.Zero;
-        public Dictionary<Player, DateTime> NextEligableDateForPlayer { get; } = [];
-        public string? OnCooldownMessage = null;
+        public Dictionary<Player, DateTime> NextEligibleDateForPlayer { get; } = [];
+        public string? OnCooldownMessage;
         
         public TimeSpan GlobalCooldown = TimeSpan.Zero;
-        public DateTime? NextEligableDateForGlobal = null;
-        public string? OnGlobalCooldownMessage = null;
+        public DateTime? NextEligibleDateForGlobal;
+        public string? OnGlobalCooldownMessage;
         
         public string GetHelp(ArraySegment<string> arguments)
         {
@@ -302,23 +302,23 @@ public class CustomCommandFlag : Flag
 
         if (cmd.GlobalCooldown > TimeSpan.Zero)
         {
-            if (cmd.NextEligableDateForGlobal is { } nextEligableDate
-                && nextEligableDate > DateTime.UtcNow)
+            if (cmd.NextEligibleDateForGlobal is { } nextEligibleDate
+                && nextEligibleDate > DateTime.UtcNow)
             {
                 var timeRemaining = Math.Round(
-                    (nextEligableDate - DateTime.UtcNow).TotalSeconds, 
+                    (nextEligibleDate - DateTime.UtcNow).TotalSeconds, 
                     MidpointRounding.AwayFromZero
                 );
                 
                 if (cmd.OnGlobalCooldownMessage is not null)
                 {
-                    return cmd.OnGlobalCooldownMessage.Replace("%time%", timeRemaining.ToString());
+                    return cmd.OnGlobalCooldownMessage.Replace("%time%", timeRemaining.ToString("F1"));
                 }
 
                 return $"This command is on cooldown! You will be able to use this command in {timeRemaining} seconds.";
             }
             
-            cmd.NextEligableDateForGlobal = DateTime.UtcNow + cmd.GlobalCooldown;
+            cmd.NextEligibleDateForGlobal = DateTime.UtcNow + cmd.GlobalCooldown;
         }
         
         if (!ScriptCommands.TryGetValue(cmd, out var flag))
@@ -414,28 +414,28 @@ public class CustomCommandFlag : Flag
             return null;
         }
         
-        if (cmd.NextEligableDateForPlayer.TryGetValue(plr, out var nextEligableDate) && nextEligableDate > DateTime.UtcNow)
+        if (cmd.NextEligibleDateForPlayer.TryGetValue(plr, out var nextEligibleDate) && nextEligibleDate > DateTime.UtcNow)
         {
             var timeRemaining = Math.Round(
-                (nextEligableDate - DateTime.UtcNow).TotalSeconds,
+                (nextEligibleDate - DateTime.UtcNow).TotalSeconds,
                 MidpointRounding.AwayFromZero
             );
             
             if (cmd.OnCooldownMessage is not null)
             {
-                return cmd.OnCooldownMessage.Replace("%time%", timeRemaining.ToString());
+                return cmd.OnCooldownMessage.Replace("%time%", timeRemaining.ToString("F1"));
             }
             
             return $"You are on cooldown! You will be able to use this command in {timeRemaining} seconds.";
         }
         
-        cmd.NextEligableDateForPlayer[plr] = DateTime.UtcNow + cmd.PlayerCooldown;
+        cmd.NextEligibleDateForPlayer[plr] = DateTime.UtcNow + cmd.PlayerCooldown;
         return null;
     }
     
     private Result AddArguments(string[] args)
     {
-        bool onlyOptionals = false;
+        var onlyOptionals = false;
         foreach (var arg in args)
         {
             var markedOptional = arg.Last() == '?';

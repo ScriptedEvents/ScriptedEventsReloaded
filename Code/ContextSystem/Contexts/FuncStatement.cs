@@ -136,22 +136,9 @@ public class FuncStatement :
 
     protected override IEnumerator<float> Execute()
     {
-        foreach (var coro in Children
-             .Select(child => child.ExecuteBaseContext())
-        )
-        {
-            while (coro.MoveNext())
-            {
-                if (_end)
-                {
-                    goto Exit;
-                }
-                
-                yield return coro.Current;
-            }
-        }
+        var coro = RunChildren(() => _end);
+        while (coro.MoveNext()) yield return coro.Current;
         
-        Exit:
         _localVariables.ForEach(v => Script.RemoveLocalVariable(v));
     }
 }

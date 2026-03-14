@@ -44,7 +44,7 @@ public abstract class LoopContext : StatementContext, IExtendableStatement, IKey
         }
     }
 
-    protected override IEnumerator<float> RunChildren()
+    protected IEnumerator<float> RunChildren()
     {
         foreach (var coro in Children
                      .TakeWhile(_ => !ReceivedBreak)

@@ -19,13 +19,14 @@ public abstract class StatementContext : YieldingContext
         ParentContext?.SendControlMessage(msg);
     }
     
-    protected virtual IEnumerator<float> RunChildren()
+    protected IEnumerator<float> RunChildren(Func<bool>? endCond = null)
     {
-        foreach (var coro in Children
-                     .Select(child => child.ExecuteBaseContext()))
+        foreach (var coro in Children.Select(c => c.ExecuteBaseContext()))
         {
+            if (endCond?.Invoke() is true) yield break;
             while (coro.MoveNext())
             {
+                if (endCond?.Invoke() is true) yield break;
                 yield return coro.Current;
             }
         }

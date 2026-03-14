@@ -4,6 +4,7 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
+using SER.Code.TokenSystem.Tokens.ValueTokens;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.MethodSystem.Methods.NumberMethods;

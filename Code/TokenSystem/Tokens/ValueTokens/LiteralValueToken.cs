@@ -4,7 +4,7 @@ using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 
-namespace SER.Code.TokenSystem.Tokens;
+namespace SER.Code.TokenSystem.Tokens.ValueTokens;
 
 public abstract class LiteralValueToken<T> : BaseToken, IValueToken
     where T : LiteralValue 

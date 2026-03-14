@@ -4,7 +4,7 @@ using SER.Code.TokenSystem.Slices;
 using SER.Code.TokenSystem.Structures;
 using SER.Code.ValueSystem;
 
-namespace SER.Code.TokenSystem.Tokens;
+namespace SER.Code.TokenSystem.Tokens.ValueTokens;
 
 public class TextToken : LiteralValueToken<TextValue>
 {

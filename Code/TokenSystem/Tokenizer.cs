@@ -6,6 +6,7 @@ using SER.Code.TokenSystem.Slices;
 using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.ExpressionTokens;
+using SER.Code.TokenSystem.Tokens.ValueTokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 
 namespace SER.Code.TokenSystem;
@@ -19,6 +20,7 @@ public static class Tokenizer
         typeof(MethodToken),
         typeof(FlagToken),
         typeof(FlagArgumentToken),
+        typeof(ColorToken),
         typeof(CommentToken),
         typeof(SymbolToken),
         typeof(NumberToken),

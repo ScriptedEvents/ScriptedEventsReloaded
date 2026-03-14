@@ -14,7 +14,7 @@ using UnityEngine;
 namespace SER.Code.MethodSystem.Methods.MapMethods;
 
 [UsedImplicitly]
-public class SpawnRagdollMethod : SynchronousMethod, ICanError
+public class CreateRagdollMethod : SynchronousMethod, ICanError
 {
     public override string Description => "Spawns a ragdoll.";
 

@@ -6,6 +6,7 @@ using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.FlagSystem.Flags;
+using SER.Code.Helpers;
 using SER.Code.MethodSystem;
 using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.MethodSystem.BaseMethods.Interfaces;
@@ -85,6 +86,15 @@ public static class DocsProvider
         {
             response = GetMethodHelp(method);
             return true;
+        }
+        
+        var outsideMethodKvp = MethodIndex.FrameworkDependentMethods
+            .Select(kvp => kvp.Value.Select(m => (m, kvp.Key)))
+            .Flatten()
+            .FirstOrDefault(kvp => kvp.m.Name.ToLower() == arg);
+        if (outsideMethodKvp is { m: {} outsideMethod, Key: var framework})
+        {
+            response = GetMethodHelp(outsideMethod, framework);
         }
 
         var correctFlagName = Flag.FlagInfos.Keys
@@ -394,29 +404,52 @@ public static class DocsProvider
         var sb = new StringBuilder($"Hi! There are {MethodIndex.GetMethods().Length} methods available for your use!\n");
         sb.AppendLine($"If a method has {retsSuffix.TrimStart()}, it means that this method returns a value.");
         sb.AppendLine("If you want to get specific information about a given method, just do 'serhelp <MethodName>'!");
-        
+
         foreach (var kvp in MethodsByCategory().OrderBy(kvp => kvp.Key[0]))
         {
-            var descDistance = kvp.Value
-                .Select(m => m.Name.Length + (m is ReturningMethod ? retsSuffix.Length : 0))
-                .Max() + 1;
+            var descDistance = DescDistance(kvp.Value);
             
             sb.AppendLine();
             sb.AppendLine($"--- {kvp.Key} methods ---");
             foreach (var method in kvp.Value)
             {
-                var name = method.Name;
-                if (method is ReturningMethod)
-                {
-                    name += retsSuffix;
-                }
-
-                var descPadding = new string(' ', descDistance - name.Length);
-                sb.AppendLine($"> {name}{descPadding}~ {method.Description}");
+                sb.AppendLine(GetFormatted(method, descDistance));
+            }
+        }
+        
+        foreach (var (framework, methods) in MethodIndex.FrameworkDependentMethods
+                     .Where(kvp => FrameworkBridge.Found.All(fb => fb.Type != kvp.Key)))
+        {
+            var descDistance = DescDistance(methods);
+            
+            sb.AppendLine();
+            sb.AppendLine($"--- (not accessible) {framework} framework methods ---");
+            foreach (var method in methods)
+            {
+                sb.AppendLine(GetFormatted(method, descDistance));
             }
         }
         
         return sb.ToString();
+
+        string GetFormatted(Method method, int descDistance)
+        {
+            var name = method.Name;
+            if (method is ReturningMethod)
+            {
+                name += retsSuffix;
+            }
+
+            var descPadding = new string(' ', descDistance - name.Length);
+            return $"> {name}{descPadding}~ {method.Description}";
+        }
+        
+        int DescDistance(IEnumerable<Method> methods)
+        {
+            return methods
+                .Select(m => m.Name.Length + (m is ReturningMethod ? retsSuffix.Length : 0))
+                .Max() + 1;
+        }
     }
     
     public static string GetVariableList()
@@ -442,11 +475,18 @@ public static class DocsProvider
         return sb.ToString();
     }
 
-    public static string GetMethodHelp(Method method)
+    public static string GetMethodHelp(Method method, FrameworkBridge.Type? notLoadedFramework = null)
     {
         var sb = new StringBuilder($"=== {method.Name} ===\n");
 
         sb.AppendLine($"> {method.Description}");
+        
+        if (notLoadedFramework is {} framework)
+        {
+            sb.AppendLine();
+            sb.AppendLine($"This method requires the '{framework}' framework in order to be used.");
+            return sb.ToString();
+        }
         
         if (method is IAdditionalDescription addDesc)
         {

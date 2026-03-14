@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using LabApi.Features.Wrappers;
 using PlayerRoles;
+using PlayerRoles.Ragdolls;
 using PlayerStatsSystem;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
@@ -21,14 +22,26 @@ public class SpawnRagdollMethod : SynchronousMethod, ICanError
     [
         new EnumArgument<RoleTypeId>("role"),
         new TextArgument("name"),
-        new ReferenceArgument<Vector3>("position"),
-        new ReferenceArgument<Vector3?>("scale")
-        { DefaultValue = new(null, "default size") },
-        new ReferenceArgument<Quaternion>("rotation")
-        { DefaultValue = new(Quaternion.identity, "default rotation") },
+        new FloatArgument("x position"),
+        new FloatArgument("y position"),
+        new FloatArgument("z position"),
+        new FloatArgument("x size")
+            { DefaultValue = new(null, "default role x scale") },
+        new FloatArgument("y size")
+            { DefaultValue = new(null, "default role y scale") },
+        new FloatArgument("z size")
+            { DefaultValue = new(null, "default role z scale") },
+        new FloatArgument("x rotation")
+            { DefaultValue = new(0f, null) },
+        new FloatArgument("y rotation")
+            { DefaultValue = new(0f, null) },
+        new FloatArgument("z rotation")
+            { DefaultValue = new(0f, null) },
+        new FloatArgument("w rotation")
+            { DefaultValue = new(1f, null) },
         new AnyValueArgument("damage handler")
         {
-            DefaultValue = new(new CustomReasonDamageHandler(""), "damage reason will be blank"),
+            DefaultValue = new(new CustomReasonDamageHandler(""), "Damage reason will be blank"),
             Description = $"Accepts a {nameof(TextValue)} or a {nameof(DamageHandlerBase)} reference."
         },
     ];
@@ -37,10 +50,27 @@ public class SpawnRagdollMethod : SynchronousMethod, ICanError
     {
         var role = Args.GetEnum<RoleTypeId>("role");
         var name = Args.GetText("name");
-        var position = Args.GetReference<Vector3>("position");
-        var scale = Args.GetReference<Vector3?>("scale");
-        var rotation = Args.GetReference<Quaternion>("rotation");
+        
+        var xPosition = Args.GetFloat("x position");
+        var yPosition = Args.GetFloat("y position");
+        var zPosition = Args.GetFloat("z position");
+        
+        var defaultSize = RagdollManager.GetDefaultScale(role);
+        
+        var xSize = Args.GetNullableFloat("x size") ?? defaultSize.x;
+        var ySize = Args.GetNullableFloat("y size") ?? defaultSize.y;
+        var zSize = Args.GetNullableFloat("z size") ?? defaultSize.z;
+        
+        var xRotation = Args.GetFloat("x rotation");
+        var yRotation = Args.GetFloat("y rotation");
+        var zRotation = Args.GetFloat("z rotation");
+        var wRotation = Args.GetFloat("w rotation");
+        
         var value = Args.GetAnyValue("damage handler");
+        
+        var position = new Vector3(xPosition, yPosition, zPosition);
+        var rotation = new Quaternion(xRotation, yRotation, zRotation, wRotation);
+        var size = new Vector3(xSize, ySize, zSize);
         
         DamageHandlerBase? damageHandler = null;
         
@@ -62,7 +92,7 @@ public class SpawnRagdollMethod : SynchronousMethod, ICanError
         if (damageHandler is null)
             throw new ScriptRuntimeError(this, ErrorReasons[0]);
         
-        Ragdoll.SpawnRagdoll(role, position, rotation, damageHandler, name, scale);
+        Ragdoll.SpawnRagdoll(role, position, rotation, damageHandler, name, size);
     }
 
     public string[] ErrorReasons =>

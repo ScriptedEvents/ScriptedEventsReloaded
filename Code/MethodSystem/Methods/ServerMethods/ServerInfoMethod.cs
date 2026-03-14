@@ -19,8 +19,10 @@ public class ServerInfoMethod : ReturningMethod
             "ip",
             "port",
             "name",
+            "playerCount",
             "maxPlayers",
             "tps",
+            "maxTps",
             "isVerified")
     ];
 
@@ -37,8 +39,10 @@ public class ServerInfoMethod : ReturningMethod
             "ip" => new StaticTextValue(Server.IpAddress),
             "port" => new NumberValue(Server.Port),
             "name" => new StaticTextValue(Server.ServerListName),
+            "playercount" => new NumberValue(Server.PlayerCount),
             "maxplayers" => new NumberValue(Server.MaxPlayers),
             "tps" => new NumberValue((decimal)Server.Tps),
+            "maxtps" => new NumberValue(Server.MaxTps),
             "isverified" => new BoolValue(CustomNetworkManager.IsVerified),
             _ => throw new TosoksFuckedUpException("out of order")
         };

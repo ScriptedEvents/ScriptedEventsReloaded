@@ -8,9 +8,8 @@ namespace SER.Code.Helpers;
 
 public class FrameworkBridge
 {
-    protected record struct Framework(string Name, Type Type);
-
-    private readonly List<Framework> _found = [];
+    public record struct Framework(string Name, Type Type);
+    public static readonly List<Framework> Found = [];
     private readonly List<CoroutineHandle> _handles = [];
 
     public enum Type
@@ -30,6 +29,7 @@ public class FrameworkBridge
 
     public void Load()
     {
+        Found.Clear();
         foreach (var framework in _frameworks)
         {
             _handles.Add(Timing.RunCoroutine(Await(framework)));
@@ -39,10 +39,10 @@ public class FrameworkBridge
         {
             Timing.KillCoroutines(_handles.ToArray());
             _handles.Clear();
-            Logger.Info(_found.Count == 0
+            Logger.Info(Found.Count == 0
                 ? "No supported framework was found, no additional methods were added."
-                : $"SER has added methods for {_found.Count} supported framework(s): " +
-                  $"{_found.Select(f => f.Type.ToString()).JoinStrings(", ")}"
+                : $"SER has added methods for {Found.Count} supported framework(s): " +
+                  $"{Found.Select(f => f.Type.ToString()).JoinStrings(", ")}"
             );
         });
     }
@@ -61,7 +61,7 @@ public class FrameworkBridge
         }
         
         Logger.Debug($"SER found supported framework '{framework.Type}'");
-        _found.Add(framework);
+        Found.Add(framework);
         MethodIndex.LoadMethodsOfFramework(framework.Type);
     }
 

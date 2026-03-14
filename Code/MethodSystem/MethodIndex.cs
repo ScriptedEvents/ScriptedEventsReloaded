@@ -11,7 +11,7 @@ namespace SER.Code.MethodSystem;
 public static class MethodIndex
 {
     public static readonly Dictionary<string, Method> NameToMethodIndex = [];
-    private static readonly Dictionary<FrameworkBridge.Type, List<Method>> FrameworkDependentMethods = [];
+    public static readonly Dictionary<FrameworkBridge.Type, List<Method>> FrameworkDependentMethods = [];
     
     /// <summary>
     /// Initializes the method index.

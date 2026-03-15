@@ -17,7 +17,7 @@ public class GetAmmoLimitMethod : ReturningMethod<NumberValue>, IDependOnFramewo
     
     public override string Description => "Gets the player's limit on a certain ammunition type";
     
-    public override Argument[] ExpectedArguments { get; } =
+    public override Argument[] ExpectedArguments =>
     [
         new PlayerArgument("player to get the limit from"),
         new EnumArgument<AmmoType>("ammo type")

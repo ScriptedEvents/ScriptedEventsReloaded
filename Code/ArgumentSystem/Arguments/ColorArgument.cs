@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using SER.Code.ArgumentSystem.BaseArguments;
-using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.ValueTokens;
@@ -20,12 +19,7 @@ public class ColorArgument(string name) : Argument(name)
         {
             return colorToken.Value.Value;
         }
-
-        if (token.CanReturn<ColorValue>(out var get))
-        {
-            return new(get().OnSuccess(cv => cv.Value));
-        }
-
-        return $"{token} is not a valid color.";
+        
+        return new(() => token.TryGetLiteralValue<ColorValue>().OnSuccess(val => val.Value));
     }
 }

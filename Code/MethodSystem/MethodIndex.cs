@@ -42,7 +42,11 @@ public static class MethodIndex
         assembly ??= Assembly.GetCallingAssembly();
         var definedMethods = assembly.GetTypes()
             .Where(t => t.IsClass && !t.IsAbstract && typeof(Method).IsAssignableFrom(t))
-            .Select(t => Activator.CreateInstance(t) as Method)
+            .Select(t =>
+            {
+                Log.Debug($"trying to activate {t.AccurateName}");
+                return Activator.CreateInstance(t) as Method;
+            })
             .Where(t =>
             {
                 if (t is not IDependOnFramework framework)

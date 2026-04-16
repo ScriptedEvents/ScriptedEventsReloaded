@@ -117,9 +117,6 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Code\" />
-    </ItemGroup>
 
     <!-- embedding dependencies into SER.dll -->
     <Target Name="EmbedSelectedDependencies" AfterTargets="ResolveReferences">
@@ -151,130 +148,157 @@
             <Using Namespace="System.Collections.Generic" />
             <Code Type="Fragment" Language="cs">
                 <![CDATA[
-          #nullable enable annotations
-          // 1. Resolver for SCP:SL Dependencies
-          ResolveEventHandler resolver = (sender, args) => {
-              try {
-                  // Parse the requested assembly name
-                  var nameObj = new AssemblyName(args.Name);
-                  string fileName = nameObj.Name + ".dll";
-                  
-                  // Look in the game references folder
-                  string fullPath = Path.Combine(ReferencePath, fileName);
-                  
-                  if (File.Exists(fullPath)) {
-                      return Assembly.LoadFrom(fullPath);
-                  }
-              }
-              catch (Exception e)
-              {
-                  Log.LogError("Resolver Error: " + e.ToString());
-              }
+#nullable enable annotations
+// 1. Resolver for SCP:SL Dependencies
+ResolveEventHandler resolver = (sender, args) => {
+  try {
+      // Parse the requested assembly name
+      var nameObj = new AssemblyName(args.Name);
+      string fileName = nameObj.Name + ".dll";
+      
+      // Look in the game references folder
+      string fullPath = Path.Combine(ReferencePath, fileName);
+      
+      if (File.Exists(fullPath)) {
+          return Assembly.LoadFrom(fullPath);
+      }
+  }
+  catch (Exception e)
+  {
+      Log.LogError("Resolver Error: " + e.ToString());
+  }
 
-              return null;
-          };
+  return null;
+};
 
+try
+{
+AppDomain.CurrentDomain.AssemblyResolve += resolver;
+
+    if (!File.Exists(AssemblyPath)) {
+        Log.LogError("Target DLL not found: " + AssemblyPath);
+        return false;
+    }
+  
+    // 3. Load the DLL
+    // LoadFrom allows dependencies to be resolved via the event handler
+    Assembly assembly = Assembly.LoadFrom(AssemblyPath);
+    {
+        // 4. Find the class (Namespace.ClassName)
+        Type? targetType = assembly.GetType("SER.Code.MethodSystem.MethodIndex");
+        if (targetType == null) 
+        {
+            Log.LogError("Validation Error: Type 'SER.Code.MethodSystem.MethodIndex' not found.");
+            return false;
+        }
+  
+        // 5. Find the method
+      MethodInfo? method = targetType.GetMethod(
+          "AddAllDefinedMethodsInAssembly",
+          BindingFlags.Public | BindingFlags.Static
+      );
+        if (method == null)
+        {
+            Log.LogError("Validation Error: Static method 'AddAllDefinedMethodsInAssembly()' not found.");
+            return false;
+        }
+  
+        method.Invoke(null, new object[] { assembly });
+        Log.LogMessage(MessageImportance.High, ">>> Loaded methods.");
+    }
+    
+    {
+        // 4. Find the class (Namespace.ClassName)
+        Type? targetType = assembly.GetType("SER.Code.Examples.Example");
+        if (targetType == null) 
+        {
+            Log.LogError("Validation Error: Type 'SER.Code.Examples.Example' not found.");
+            return false;
+        }
+  
+        // 5. Find the method
+      MethodInfo? method = targetType.GetMethod(
+          "Verify",
+          BindingFlags.Public | BindingFlags.Static
+      );
+        if (method == null)
+        {
+            Log.LogError("Validation Error: Static method 'Verify()' not found.");
+            return false;
+        }
+  
+        Log.LogMessage(MessageImportance.High, ">>> Validating Scripts...");
+  
+        // 6. Invoke
+        string result = (string)method.Invoke(null, null);
+  
+        if (!string.IsNullOrEmpty(result))
+        {
+            Log.LogError("SCRIPT ERROR: " + result);
+            return false;
+        }
+  
+        Log.LogMessage(MessageImportance.High, ">>> Validation Passed.");
+        
         try
         {
-          AppDomain.CurrentDomain.AssemblyResolve += resolver;
+            assembly.GetType("SER.Code.EventSystem.EventHandler").GetMethod("Initialize").Invoke(null, null);
+        }
+        catch (Exception ex)
+        {
+            Log.LogWarning("Failed to load events: " + ex.Message);
+        }
+        
+        try
+        {
+            assembly.GetType("SER.Code.FlagSystem.Flags.Flag").GetMethod("RegisterFlags").Invoke(null, [null]);
+        }
+        catch (Exception ex)
+        {
+            Log.LogWarning("Failed to load flags: " + ex.Message);
+        }
+        
+        try
+        {
+            assembly.GetType("SER.Code.VisualEditorSystem.VisualEditor").GetMethod("CreateFile").Invoke(null, null);
+        }
+        catch (Exception ex)
+        {
+            Log.LogWarning("Failed to generate Visual Editor file: " + ex.Message);
+        }
+        
 
-              if (!File.Exists(AssemblyPath)) {
-                  Log.LogError("Target DLL not found: " + AssemblyPath);
-                  return false;
-              }
-
-              // 3. Load the DLL
-              // LoadFrom allows dependencies to be resolved via the event handler
-              Assembly assembly = Assembly.LoadFrom(AssemblyPath);
-              
-              {
-                  // 4. Find the class (Namespace.ClassName)
-                  Type? targetType = assembly.GetType("SER.Code.MethodSystem.MethodIndex");
-                  if (targetType == null) 
-                  {
-                      Log.LogError("Validation Error: Type 'SER.Code.MethodSystem.MethodIndex' not found.");
-                      return false;
-                  }
-    
-                  // 5. Find the method
-                MethodInfo? method = targetType.GetMethod(
-                    "AddAllDefinedMethodsInAssembly",
-                    BindingFlags.Public | BindingFlags.Static
-                );
-                  if (method == null)
-                  {
-                      Log.LogError("Validation Error: Static method 'AddAllDefinedMethodsInAssembly()' not found.");
-                      return false;
-                  }
-   
-                  method.Invoke(null, new object[] { assembly });
-                  Log.LogMessage(MessageImportance.High, ">>> Loaded methods.");
-              }
-              
-              {
-                  // 4. Find the class (Namespace.ClassName)
-                  Type? targetType = assembly.GetType("SER.Code.Examples.Example");
-                  if (targetType == null) 
-                  {
-                      Log.LogError("Validation Error: Type 'SER.Code.Examples.Example' not found.");
-                      return false;
-                  }
-    
-                  // 5. Find the method
-                MethodInfo? method = targetType.GetMethod(
-                    "Verify",
-                    BindingFlags.Public | BindingFlags.Static
-                );
-                  if (method == null)
-                  {
-                      Log.LogError("Validation Error: Static method 'Verify()' not found.");
-                      return false;
-                  }
-    
-                  Log.LogMessage(MessageImportance.High, ">>> Validating Scripts...");
-    
-                  // 6. Invoke
-                  string result = (string)method.Invoke(null, null);
-    
-                  if (!string.IsNullOrEmpty(result))
-                  {
-                      Log.LogError("SCRIPT ERROR: " + result);
-                      return false;
-                  }
-    
-                  Log.LogMessage(MessageImportance.High, ">>> Validation Passed.");
-                  
-                  return true;
-              }
-          }
-          catch (OperationCanceledException)
-          {
-              throw;
-          }
-          catch (ReflectionTypeLoadException re)
-          {
-              foreach (var loaderEx in re.LoaderExceptions)
-              {
-                  Log.LogError("Loader Error: " + loaderEx.ToString());
-              }
-              return false;
-          }
-          catch (TargetInvocationException tie)
-          {
-              Log.LogError("Invocation Error: " +
-                  (tie.InnerException != null ? tie.InnerException.ToString() : tie.ToString()));
-              return false;
-          }
-          catch (Exception ex) 
-          {
-              Log.LogError("Task Error: " + ex.ToString());
-              return false;
-          }
-          finally {
-              // 7. Detach Resolver to keep build process clean
-              AppDomain.CurrentDomain.AssemblyResolve -= resolver;
-          }
-          #nullable disable annotations
+        return true;
+    }
+}
+catch (OperationCanceledException)
+{
+    throw;
+}
+catch (ReflectionTypeLoadException re)
+{
+    foreach (var loaderEx in re.LoaderExceptions)
+    {
+        Log.LogError("Loader Error: " + loaderEx.ToString());
+    }
+    return false;
+}
+catch (TargetInvocationException tie)
+{
+    Log.LogError("Invocation Error: " +
+        (tie.InnerException != null ? tie.InnerException.ToString() : tie.ToString()));
+    return false;
+}
+catch (Exception ex) 
+{
+    Log.LogError("Task Error: " + ex.ToString());
+    return false;
+}
+finally {
+    // 7. Detach Resolver to keep build process clean
+    AppDomain.CurrentDomain.AssemblyResolve -= resolver;
+}
+#nullable disable annotations
         ]]>
             </Code>
         </Task>

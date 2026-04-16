@@ -1,4 +1,4 @@
-# SCRIPTED EVENTS RELOADED (SER) - Language Specification v0.16
+# SCRIPTED EVENTS RELOADED (SER) - Language Specification v1.0.0
 
 ## Core Concepts
 

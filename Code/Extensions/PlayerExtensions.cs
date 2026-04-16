@@ -22,7 +22,7 @@ public static class PlayerExtensions
         bool playBackground, 
         float glitchScale)
     {
-        CassieAnnouncement ann = new(new(message, subtitles, playBackground), glitchScale);
+        CassieAnnouncement ann = new(new(message, subtitles, playBackground), 1f, glitchScale);
         ann.OnStartedPlaying();
         ann.Payload.SendToHubsConditionally(hub => hub == player.ReferenceHub);
     }

@@ -1,7 +1,3 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using JetBrains.Annotations;
 using SER.Code.MethodSystem;
@@ -9,7 +5,6 @@ using SER.Code.VariableSystem;
 using SER.Code.VariableSystem.Variables;
 using SER.Code.Plugin.Commands.HelpSystem;
 using SER.Code.FlagSystem.Flags;
-using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.MethodSystem.BaseMethods.Interfaces;
 
 namespace SER.Code.VisualEditorSystem;
@@ -40,7 +35,7 @@ public static class VisualEditor
                 m.Name,
                 Description = DocsProvider.GetMethodHelp(m),
                 m.Subgroup,
-                ReturnType = (m as IReturningMethod)?.Returns?.ToString(),
+                ReturnType = (m as IReturningMethod)?.Returns.ToString(),
                 Arguments = m.ExpectedArguments.Select(a => new
                 {
                     a.Name,

@@ -26,54 +26,5 @@ public static class CommandEvents
     public static void CaptureCommand(CommandExecutingEventArgs ev)
     {
         UsedCommandTypes[ev.Sender] = ev.CommandType;
-        
-        if (MainPlugin.Instance.Config?.MethodCommandPrefix is not true)
-        {
-            return;
-        }
-        
-        if (!ev.Sender.HasPermissions(MethodCommand.RunPermission))
-        {
-            return;
-        }
-
-        if (!ev.CommandName.StartsWith(">"))
-        {
-            return;
-        }
-        
-        var methodName = ev.CommandName[1..];
-        
-        if (!methodName.Any())
-        {
-            return;
-        }
-        
-        var script = new Script
-        {
-            Name = ScriptName.InitUnchecked(methodName),
-            Content = $"{methodName} {ev.Arguments.JoinStrings(" ")}",
-            Executor = ScriptExecutor.Get(ev.Sender, ev.CommandType)
-        };
-
-        if (Tokenizer.SliceLine(methodName).HasErrored(out _, out var slices))
-        {
-            return;
-        }
-        
-        // check if the a method like this exists
-        var instance = new MethodToken();
-        var res = (BaseToken.IParseResult) typeof(MethodToken)
-            .GetMethod(nameof(MethodToken.TryInit))!
-            .Invoke(instance, [slices.First(), script, null]);
-
-        if (res is not BaseToken.Success)
-        {
-            return;
-        }
-
-        ev.Sender.Respond($"Running method '{methodName}'!");
-        ev.IsAllowed = false;
-        script.Run(RunReason.BaseCommand);
     }
 }

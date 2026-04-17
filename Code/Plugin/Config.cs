@@ -6,9 +6,6 @@ public class Config
 {
     public bool IsEnabled { get; set; } = true;
     
-    [Description("If true, SER will add a > prefix to all consoles (like >Print \"Hello\") instead of using the longer command.")]
-    public bool MethodCommandPrefix { get; set; } = false;
-    
     [Description("If true, SER will send a message to the server console when the plugin is enabled.")]
     public bool SendInitMessage { get; set; } = true;
 

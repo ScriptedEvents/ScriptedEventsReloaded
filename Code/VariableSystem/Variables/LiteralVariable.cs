@@ -8,7 +8,6 @@ namespace SER.Code.VariableSystem.Variables;
 public class LiteralVariable(string name, LiteralValue value) : Variable<LiteralValue>
 {
     public override string Name => name;
-    public override char Prefix => '$';
     public override string FriendlyName => "literal variable";
     public override LiteralValue Value => value;
     

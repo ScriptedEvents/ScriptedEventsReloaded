@@ -10,7 +10,8 @@ public abstract class Variable
 {
     public abstract string Name { get; }
 
-    public abstract char Prefix { get; }
+    private char? _prefix;
+    public char Prefix => _prefix ??= Value.GetPrefixOfValue(new(BaseValue.GetType()));
     
     public abstract Value BaseValue { get; }
     

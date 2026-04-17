@@ -17,6 +17,8 @@ using SER.Code.TokenSystem;
 using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
+using SER.Code.ValueSystem;
+using SER.Code.ValueSystem.Other;
 using SER.Code.VariableSystem;
 using SER.Code.VariableSystem.Bases;
 using SER.Code.VariableSystem.Variables;
@@ -60,6 +62,7 @@ public class Script
     
     public Script? Caller { get; private set; }
 
+    // ReSharper disable once UnusedAutoPropertyAccessor.Local
     public Profile? Profile { get; private set; }
     
     public RunReason RunReason { get; private set; }
@@ -138,7 +141,7 @@ public class Script
             Executor = executor,
             Content = content,
             _beforeExecutionAction = beforeExecutionAction
-        };;  
+        };
     }
 
     public static int StopAll()
@@ -359,31 +362,28 @@ public class Script
         RunningScriptsList.Remove(this);
     }
 
-    public TryGet<T> TryGetVariable<T>(VariableToken variable) where T : Variable
+    public TryGet<T> TryGetVariable<T>(VariableToken varToken) where T : Variable
     {
-        return TryGetVariable<T>(variable.Name);
-    }
-
-    public TryGet<T> TryGetVariable<T>(string name) where T : Variable
-    {
-        var variable = _localVariables.FirstOrDefault(v => v.Name == name);
+        var variable = _localVariables
+            .FirstOrDefault(var => var.Name == varToken.Name && varToken.ValueType.CanHold(var.BaseValue.Type));
         if (variable is not null)
         {
             if (variable is not T casted)
             {
-                return $"Variable '{name}' is not a {Variable.GetFriendlyName(typeof(T))}, but a {variable.FriendlyName} instead.";
+                return $"Variable '{varToken.RawRepr}' is not a {Variable.GetFriendlyName(typeof(T))}, but a {variable.FriendlyName} instead.";
             }
 
             return casted;
         }
         
-        var global = VariableIndex.GlobalVariables.FirstOrDefault(v => v.Name == name);
+        var global = VariableIndex.GlobalVariables.
+            FirstOrDefault(var => var.Name == varToken.Name && varToken.ValueType.CanHold(var.BaseValue.Type));
         if (global is T globalT)
         {
             return globalT;
         }
 
-        return $"There is no variable called {name}.";
+        return $"Variable {varToken.RawRepr} doesn't exist or is inaccessible.";
     }
 
     public void AddLocalVariable(Variable variable)

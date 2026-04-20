@@ -19,7 +19,15 @@ public abstract class Value : IEquatable<Value>
     public static Type GuessValueType(Type t)
     {
         if (typeof(Value).IsAssignableFrom(t)) return t;
-        if (typeof(Enum).IsAssignableFrom(t)) return typeof(EnumValue<>).MakeGenericType(t);
+        if (typeof(Enum).IsAssignableFrom(t))
+        {
+            if (t.IsDefined(typeof(FlagsAttribute)))
+            {
+                return typeof(EnumFlagValue<>).MakeGenericType(t);
+            }
+
+            return typeof(EnumValue<>).MakeGenericType(t);
+        };
         if (typeof(Color).IsAssignableFrom(t)) return typeof(ColorValue);
         if (t == typeof(bool)) return typeof(BoolValue);
         if (t == typeof(byte) || t == typeof(sbyte) || t == typeof(short) || t == typeof(ushort) ||
@@ -79,7 +87,12 @@ public abstract class Value : IEquatable<Value>
             string s 
                 when script != null => new DynamicTextValue(s, script),
             string s                => new StaticTextValue(s),
-            Enum e                  => (Value)Activator.CreateInstance(typeof(EnumValue<>).MakeGenericType(e.GetType()), e),
+            
+            Enum e when obj.GetType().IsDefined(typeof(FlagsAttribute)) 
+                => (Value)Activator.CreateInstance(typeof(EnumFlagValue<>).MakeGenericType(e.GetType()), e),
+            Enum e
+                => (Value)Activator.CreateInstance(typeof(EnumValue<>).MakeGenericType(e.GetType()), e),
+            
             TimeSpan t              => new DurationValue(t),
             Player p                => new PlayerValue(p),
             IEnumerable<Player> ps  => new PlayerValue(ps),

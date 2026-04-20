@@ -42,7 +42,7 @@ public abstract class LiteralValue : Value
                            ?? _valueGetter?.Invoke() 
                            ?? throw new AndrzejFuckedUpException("literal value is null");
 
-    public override bool EqualCondition(Value other) => other is LiteralValue otherP && Value.Equals(otherP.Value);
+    public override bool Equals(Value? other) => other is LiteralValue otherP && Value.Equals(otherP.Value);
 
     public override string ToString()
     {

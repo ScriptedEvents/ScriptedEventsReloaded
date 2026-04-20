@@ -10,7 +10,7 @@ namespace SER.Code.MethodSystem.Methods.PlayerVariableMethods;
 [UsedImplicitly]
 public class OverlappingMethod : ReturningMethod<BoolValue>
 {
-    public override string Description => "Checks if all player variables have the same players.";
+    public override string Description => "Checks if provided player variables have the same players.";
 
     public override Argument[] ExpectedArguments { get; } =
     [

@@ -11,20 +11,16 @@ namespace SER.Code.ArgumentSystem.Arguments;
 public class BoolArgument(string name) : Argument(name)
 {
     public override string InputDescription => "bool (true or false) value";
-
-    public bool IsFunction { get; init; } = false;
     
     [UsedImplicitly]
     public DynamicTryGet<bool> GetConvertSolution(BaseToken token)
     {
         Result error = $"Value '{token.RawRep}' cannot be interpreted as a boolean value or condition.";
-        if (token is not IValueToken valueToken || !valueToken.CapableOf<BoolValue>(out var get))
+        if (!token.CanReturn<BoolValue>(out var get))
         {
             return error;
         }
 
-        return valueToken.IsConstant
-            ? new(get().OnSuccess(v => v.Value, error))
-            : new(() => get().OnSuccess(v => v.Value, error));
+        return new(() => get().OnSuccess(v => v.Value, error));
     }
 }

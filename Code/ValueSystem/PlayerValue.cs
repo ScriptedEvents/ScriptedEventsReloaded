@@ -36,7 +36,7 @@ public class PlayerValue : Value, IValueWithProperties
 
     public Player[] Players { get; }
 
-    public override bool EqualCondition(Value other) => other is PlayerValue otherP && Players.SequenceEqual(otherP.Players);
+    public override bool Equals(Value? other) => other is PlayerValue otherP && Players.SequenceEqual(otherP.Players);
     
     public override int HashCode =>
         Players.Select(plr => plr.UserId).GetEnumerableHashCode().HasErrored(out var error, out var val)

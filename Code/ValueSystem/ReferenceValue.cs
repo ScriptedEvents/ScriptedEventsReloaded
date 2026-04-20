@@ -18,7 +18,7 @@ public class ReferenceValue(object? value) : Value, IValueWithDynamicProperties
 
     public virtual Type ReferenceType => value?.GetType() ?? typeof(object);
 
-    public override bool EqualCondition(Value other)
+    public override bool Equals(Value? other)
     {
         if (other is not ReferenceValue otherP || !IsValid || !otherP.IsValid) return false;
         return Value.Equals(otherP.Value);

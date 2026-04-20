@@ -1,18 +1,18 @@
 ﻿using System.Collections;
 using System.Reflection;
 using LabApi.Features.Wrappers;
+using Newtonsoft.Json.Linq;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
-using SER.Code.ValueSystem.PropertySystem;
-using Newtonsoft.Json.Linq;
 using SER.Code.ValueSystem.Other;
+using SER.Code.ValueSystem.PropertySystem;
 using UnityEngine;
 
 namespace SER.Code.ValueSystem;
 
-public abstract class Value
+public abstract class Value : IEquatable<Value>
 {
     public SingleTypeOfValue Type => new(GetType());
     
@@ -51,8 +51,6 @@ public abstract class Value
         if (value.IsSameOrHigherThan<CollectionValue>()) return '&';
         return '?';
     }
-    
-    public abstract bool EqualCondition(Value other);
     
     public abstract int HashCode { get; }
 
@@ -149,8 +147,8 @@ public abstract class Value
     public static bool operator ==(Value? lhs, Value? rhs)
     {
         if (lhs is null && rhs is null) return true;
-        if (lhs is null || rhs is null || lhs.GetType() != rhs.GetType()) return false;
-        return lhs.EqualCondition(rhs);
+        if (lhs is null || rhs is null) return false;
+        return lhs.Equals(rhs);
     }
 
     public static bool operator ==(Value? lhs, object? rhs)
@@ -177,4 +175,6 @@ public abstract class Value
     {
         return !(lhs == rhs);
     }
+
+    public abstract bool Equals(Value? other);
 }

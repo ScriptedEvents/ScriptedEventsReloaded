@@ -92,10 +92,10 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties
         private set;
     }
 
-    public override bool EqualCondition(Value other)
+    public override bool Equals(Value? other)
     {
         if (other is not CollectionValue otherP || otherP.CastedValues.Length != CastedValues.Length) return false;
-        return !CastedValues.Where((val, i) => !val.EqualCondition(otherP.CastedValues[i])).Any();
+        return !CastedValues.Where((val, i) => !val.Equals(otherP.CastedValues[i])).Any();
     }
 
     public override int HashCode =>

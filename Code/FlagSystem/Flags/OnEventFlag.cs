@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using SER.Code.Extensions;
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
@@ -38,7 +37,7 @@ public class OnEventFlag : Flag
             }
 
             _event = inlineArgs.First();
-            if (EventHandler.ConnectEvent(_event, ScriptName).HasErrored(out var error))
+            if (EventHandler.AddEventHandler(_event, ScriptName).HasErrored(out var error))
             {
                 return error;
             }

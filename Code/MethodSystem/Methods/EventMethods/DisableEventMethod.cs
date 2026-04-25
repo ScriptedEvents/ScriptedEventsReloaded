@@ -20,7 +20,7 @@ public class DisableEventMethod : SynchronousMethod, ICanError
     
     public override void Execute()
     {
-        if (EventHandler.DisableEvent(Args.GetText("eventName"), Script.Name).HasErrored(out var error))
+        if (EventHandler.DisableEvent(Args.GetText("eventName")).HasErrored(out var error))
         {
             throw new ScriptRuntimeError(this, error);
         }

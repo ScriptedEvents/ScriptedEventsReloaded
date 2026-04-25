@@ -57,7 +57,7 @@ public static class FileSystem
         
         foreach (var scriptPath in RegisteredScriptPaths)
         {
-            var scriptName = ScriptName.InitUnchecked(Path.GetFileNameWithoutExtension(scriptPath));
+            var scriptName = ScriptName.CreateUnsafe(Path.GetFileNameWithoutExtension(scriptPath));
 
             if (Script
                 .CreateByVerifiedPath(scriptPath, ServerConsoleExecutor.Instance)
@@ -80,7 +80,7 @@ public static class FileSystem
     public static string GetScriptPath(ScriptName scriptName)
     {
         UpdateScriptPathCollection();
-        return RegisteredScriptPaths.First(p => Path.GetFileNameWithoutExtension(p) == scriptName.Value);
+        return RegisteredScriptPaths.First(p => Path.GetFileNameWithoutExtension(p) == scriptName);
     }
     
     public static bool DoesScriptExistByName(string scriptName, out string path)

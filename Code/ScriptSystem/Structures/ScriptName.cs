@@ -4,37 +4,50 @@ namespace SER.Code.ScriptSystem.Structures;
 
 public readonly record struct ScriptName
 {
-    public readonly string Value;
+    private readonly string _value;
     
     private ScriptName(string value)
     {
-        Value = value;
+        _value = value;
     }
 
-    public TryGet<Script> GetScript(ScriptExecutor? executor)
+    public TryGet<Script> GetScript(ScriptExecutor? executor, bool assertCheck = true)
     {
+        if (assertCheck)
+        {
+            if (Assert(_value).HasErrored(out var error))
+            {
+                return error;
+            }
+        }
+        
         executor ??= ScriptExecutor.Get();
-        return Script.CreateByScriptName(Value, executor);
+        return Script.CreateByScriptName(this, executor);
     }
 
-    public static ScriptName InitUnchecked(string name)
+    public static ScriptName CreateUnsafe(string name) => new(name);
+
+    public static TryGet<ScriptName> Create(string name)
     {
-        return new(name);
+        if (Assert(name).HasErrored(out var error)) return error;
+
+        return new ScriptName(name);
     }
-    
-    public static TryGet<ScriptName> TryInit(string name)
+
+    public static Result Assert(string name)
     {
+        name = Path.GetFileNameWithoutExtension(name);
         if (!FileSystem.FileSystem.DoesScriptExistByName(name, out _))
         {
             return $"Script '{name}' does not exist in the SER folder or is inaccessible.";
         }
 
-        return new ScriptName(name);
+        return true;
     }
 
     public static implicit operator string(ScriptName scriptName)
     {
-        return scriptName.Value;
+        return scriptName._value;
     }
 
     public static implicit operator ScriptName(Script script)
@@ -44,8 +57,8 @@ public readonly record struct ScriptName
 
     public override string ToString()
     {
-        return Value;
+        return _value;
     }
     
-    public override int GetHashCode() => Value.GetHashCode();
+    public override int GetHashCode() => _value.GetHashCode();
 }

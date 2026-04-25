@@ -23,7 +23,7 @@ public class WaveArgument(string name) : Argument(name)
     [UsedImplicitly]
     public DynamicTryGet<SpawnableWaveBase> GetConvertSolution(BaseToken token)
     {
-        if (token.BestDynamicTextRepr().IsStatic(out var name, out var func))
+        if (token.BestTextRepr().IsStatic(out var name, out var func))
         {
             return InternalConvert(name);
         }

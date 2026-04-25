@@ -13,11 +13,11 @@ public class ScriptNameArgument(string name) : Argument(name)
     [UsedImplicitly]
     public DynamicTryGet<ScriptName> GetConvertSolution(BaseToken token)
     {
-        if (token.BestDynamicTextRepr().IsStatic(out var name, out var func))
+        if (token.BestTextRepr().IsStatic(out var name, out var func))
         {
-            return ScriptName.TryInit(name);
+            return ScriptName.Create(name);
         }
         
-        return new(() => ScriptName.TryInit(func()));
+        return new(() => ScriptName.Create(func()));
     }
 }

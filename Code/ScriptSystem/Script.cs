@@ -97,10 +97,20 @@ public class Script
         Executor.Error(message, this);
     }
 
+    public static TryGet<Script> CreateByScriptName(ScriptName name, ScriptExecutor? executor)
+    {
+        return new Script
+        {
+            Name = name,
+            Content = File.ReadAllText(FileSystem.FileSystem.GetScriptPath(name)),
+            Executor = executor ?? ScriptExecutor.Get()
+        };
+    }
+    
     public static TryGet<Script> CreateByScriptName(string dirtyName, ScriptExecutor? executor)
     {
         var name = Path.GetFileNameWithoutExtension(dirtyName);
-        if (ScriptName.TryInit(name).HasErrored(out var initError, out var scriptName))
+        if (ScriptName.Create(name).HasErrored(out var initError, out var scriptName))
         {
             return initError;       
         }
@@ -115,14 +125,14 @@ public class Script
     
     public static Script CreateByVerifiedPath(string path, ScriptExecutor? executor) => new() 
     {
-        Name = ScriptName.InitUnchecked(Path.GetFileNameWithoutExtension(path)),
+        Name = ScriptName.CreateUnsafe(Path.GetFileNameWithoutExtension(path)),
         Content = File.ReadAllText(path),
         Executor = executor ?? ScriptExecutor.Get()
     };
 
     public static Script CreateAnonymous(string name, string content) => new()
     {
-        Name = ScriptName.InitUnchecked(name),
+        Name = ScriptName.CreateUnsafe(name),
         Content = content,
         Executor = ScriptExecutor.Get()
     };
@@ -135,7 +145,7 @@ public class Script
     {
         return new Script
         {
-            Name = ScriptName.InitUnchecked(name),
+            Name = ScriptName.CreateUnsafe(name),
             Executor = executor,
             Content = content,
             _beforeExecutionAction = beforeExecutionAction

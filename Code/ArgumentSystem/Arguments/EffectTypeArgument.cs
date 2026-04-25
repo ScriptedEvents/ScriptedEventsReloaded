@@ -27,7 +27,7 @@ public class EffectTypeArgument(string name) : Argument(name)
     [UsedImplicitly]
     public DynamicTryGet<Type> GetConvertSolution(BaseToken token)
     {
-        if (token.BestDynamicTextRepr().IsStatic(out var name, out var func))
+        if (token.BestTextRepr().IsStatic(out var name, out var func))
         {
             return InternalConvert(name);
         }

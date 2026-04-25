@@ -1,17 +1,15 @@
-﻿using System.Collections;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Reflection;
 using LabApi.Events;
 using LabApi.Events.Arguments.Interfaces;
-using LabApi.Features.Wrappers;
 using LabApi.Loader;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
-using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
+using SER.Code.ValueSystem.Other;
 using SER.Code.VariableSystem.Bases;
 
 namespace SER.Code.EventSystem;
@@ -19,9 +17,10 @@ namespace SER.Code.EventSystem;
 public static class EventHandler
 {
     private static readonly Dictionary<string, Action> UnsubscribeActions = [];
-    private static readonly Dictionary<string, List<ScriptName>> ScriptsUsingEvent = [];
+    private static readonly Dictionary<string, List<Action<EventArgs?, Variable[]>>> OnEventActions = [];
     private static readonly HashSet<string> DisabledEvents = [];
     public static List<EventInfo> AvailableEvents = [];
+    public static readonly HashSet<string> RegisteredHandlers = [];
     
     public static void Initialize()
     {
@@ -32,21 +31,22 @@ public static class EventHandler
             .Flatten().ToList();
     }
     
-    internal static void EventClear()
+    public static void EventClear()
     {
-        ScriptsUsingEvent.Clear();
+        RegisteredHandlers.Clear();
+        OnEventActions.Clear();
         UnsubscribeActions.Values.ForEachItem(act => act());
         UnsubscribeActions.Clear();
         DisabledEvents.Clear();
     }
 
-    internal static Result DisableEvent(string evName, ScriptName scriptName)
+    public static Result DisableEvent(string evName)
     {
         DisabledEvents.Add(evName);
-        return ConnectEvent(evName, scriptName, false);
+        return BindEvent(evName);
     }
 
-    internal static bool EnableEvent(string evName, bool unsubscribe = false)
+    public static bool EnableEvent(string evName, bool unsubscribe = false)
     {
         DisabledEvents.Remove(evName);
         if (unsubscribe && UnsubscribeActions.TryGetValue(evName, out var action))
@@ -58,16 +58,62 @@ public static class EventHandler
         return false;
     }
     
-    internal static Result ConnectEvent(string evName, ScriptName scriptName, bool allowNonArg = true) 
+    public static Result AddEventHandler(string evName, ScriptName scriptName) 
     {
-        if (ScriptsUsingEvent.TryGetValue(evName, out var scriptsConnected))
+        if (RegisteredHandlers.Contains($"'{scriptName}' script"))
         {
-            scriptsConnected.Add(scriptName);
             return true;
         }
         
-        ScriptsUsingEvent.Add(evName, [scriptName]);
+        if (BindEvent(evName).HasErrored(out var error))
+        {
+            return error;
+        }
+        
+        RegisteredHandlers.Add($"'{scriptName}' script");
+        if (OnEventActions.TryGetValue(evName, out var actions))
+        {
+            actions.Add(RunScriptOnEvent(scriptName, evName));
+            return true;
+        }
+        
+        OnEventActions.Add(evName, [RunScriptOnEvent(scriptName, evName)]);
+        return true;
+    }
+    
+    public static Result AddEventHandler(string evName, Action<EventArgs?, Variable[]> action, string handlerId) 
+    {
+        if (RegisteredHandlers.Contains(handlerId))
+        {
+            return $"{handlerId}' is already registered as an event handler!";
+        }
+        
+        if (BindEvent(evName).HasErrored(out var error))
+        {
+            return error;
+        }
+        
+        RegisteredHandlers.Add(handlerId);
+        if (OnEventActions.TryGetValue(evName, out var actions))
+        {
+            actions.Add(action);
+        }
+        else
+        {
+            OnEventActions.Add(evName, [action]);
+        }
+        
+        return true;
+    }
 
+    private static Result BindEvent(string evName)
+    {
+        if (UnsubscribeActions.ContainsKey(evName))
+        {
+            // already binded
+            return true;
+        }
+        
         EventInfo? matchingEventInfo = AvailableEvents.FirstOrDefault(e => e.Name == evName);
         if (matchingEventInfo is null)
         {
@@ -80,14 +126,29 @@ public static class EventHandler
             BindArgumented(matchingEventInfo, genericType);
             return true;
         }
-
-        if (!allowNonArg)
-        {
-            return $"Event '{evName}' must be an argumented event!";
-        }
         
         BindNonArgumented(matchingEventInfo);
         return true;
+    }
+
+    private static Action<EventArgs?, Variable[]> RunScriptOnEvent(ScriptName scrName, string evName)
+    {
+        return (ev, variables) =>
+        {
+            Result rs = $"Failed to run script '{scrName}' connected to event '{evName}'";
+            Log.Debug($"Running script '{scrName}' for event '{evName}'");
+
+            if (Script.CreateByScriptName(scrName, ScriptExecutor.Get()).HasErrored(out var error, out var script))
+            {
+                Log.CompileError(scrName, rs + error);
+                return;
+            }
+
+            script.AddLocalVariables(variables);
+            var isAllowed = script.RunForEvent(RunReason.Event);
+            if (isAllowed.HasValue && ev is ICancellableEvent cancellable1)
+                cancellable1.IsAllowed = isAllowed.Value;
+        };
     }
 
     private static void BindNonArgumented(EventInfo eventInfo)
@@ -135,20 +196,10 @@ public static class EventHandler
     {
         Log.Debug($"[NonArg] Event '{evName}' triggered.");
 
-        if (!ScriptsUsingEvent.TryGetValue(evName, out var scriptsConnected))
+        if (!OnEventActions.TryGetValue(evName, out var actions))
             return;
 
-        foreach (var scrName in scriptsConnected)
-        {
-            Result rs = $"Failed to run script '{scrName}' connected to event '{evName}'";
-            if (Script.CreateByScriptName(scrName, ScriptExecutor.Get()).HasErrored(out var error, out var script))
-            {
-                Log.CompileError(scrName, rs + error);
-                continue;
-            }
-
-            script.Run(RunReason.Event);
-        }
+        foreach (var action in actions) action(null, []);
     }
 
     private static void OnArgumentedEvent<T>(string evName, T ev) where T : EventArgs
@@ -163,28 +214,13 @@ public static class EventHandler
         }
 
         var variables = GetVariablesFromEvent(ev);
-        if (!ScriptsUsingEvent.TryGetValue(evName, out var scriptsConnected))
+        if (!OnEventActions.TryGetValue(evName, out var actions))
         {
             Log.Debug($"Event '{evName}' has no scripts connected.");
             return;
         }
 
-        foreach (var scrName in scriptsConnected.ToArray())
-        {
-            Result rs = $"Failed to run script '{scrName}' connected to event '{evName}'";
-            Log.Debug($"Running script '{scrName}' for event '{evName}'");
-            
-            if (Script.CreateByScriptName(scrName, ScriptExecutor.Get()).HasErrored(out var error, out var script))
-            {
-                Log.CompileError(scrName, rs + error);
-                continue;
-            }
-            
-            script.AddLocalVariables(variables);
-            var isAllowed = script.RunForEvent(RunReason.Event);
-            if (isAllowed.HasValue && ev is ICancellableEvent cancellable1)
-                cancellable1.IsAllowed = isAllowed.Value;
-        }
+        foreach (var action in actions) action(ev, variables);
     }
     
     public static Variable[] GetVariablesFromEvent(EventArgs ev)
@@ -238,47 +274,8 @@ public static class EventHandler
         List<string> variables = [];
         foreach (var (type, name) in properties)
         {
-            string var;
             if (type is null) continue;
-            
-            if (type == typeof(bool) ||
-                type == typeof(string) ||
-                type == typeof(int) ||
-                type == typeof(float) ||
-                type == typeof(double) ||
-                type == typeof(decimal) ||
-                type == typeof(byte) ||
-                type == typeof(sbyte) ||
-                type == typeof(short) ||
-                type == typeof(ushort) ||
-                type == typeof(uint) ||
-                type.IsEnum)
-            {
-                var = $"{new LiteralVariableToken().Prefix}{GetName()}";
-            }
-            else if (
-                type == typeof(Player) ||
-                typeof(IEnumerable<Player>).IsAssignableFrom(type)
-            )
-            {
-                var = $"{new PlayerVariableToken().Prefix}{GetName()}";
-            }
-            else if (typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string))
-            {
-                var = $"{new CollectionVariableToken().Prefix}{GetName()}";
-            }
-            else
-            {
-                var = $"{new ReferenceVariableToken().Prefix}{GetName()}";
-            }
-            
-            variables.Add(var);
-            continue;
-
-            string GetName()
-            {
-                return $"ev{name.First().ToString().ToUpper()}{name[1..]}";
-            }
+            variables.Add($"{Value.GetPrefixOfValue(new SingleTypeOfValue(Value.GuessValueType(type)))}ev{name.LowerFirst()}");
         }
 
         return variables;

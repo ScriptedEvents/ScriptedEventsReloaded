@@ -22,7 +22,7 @@ public class MethodCommand : ICommand, IUsePermissions
 
         var script = new Script
         {
-            Name = ScriptName.InitUnchecked("Command"),
+            Name = ScriptName.CreateUnsafe("Command"),
             Content = string.Join(" ", arguments.ToArray()),
             Executor = ScriptExecutor.Get(sender)
         };

@@ -1,28 +1,43 @@
+using Exiled.API.Features;
 using JetBrains.Annotations;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.ContextSystem.Contexts;
+using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
+using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
 using SER.Code.VariableSystem.Bases;
+using Log = SER.Code.Helpers.Log;
 
 namespace SER.Code.ArgumentSystem.Arguments;
 
-public class CallbackArgument(string name, params (SingleTypeOfValue type, string name)[] requiredArguments) : Argument(name)
+public class CallbackArgument(string argumentName, params (SingleTypeOfValue type, string name)[] requiredArguments) 
+    : Argument(argumentName)
 {
+    public struct Callback
+    {
+        public Action<Value[], Action<Script>?> Action;
+        public string Name;
+    }
+    
+    public string FuncName = null!;
+    
     public override string InputDescription => 
         "A name of a function defined above e.g. MyFunction" +
         (requiredArguments.Length > 0 
-            ? $". It has to have these arguments: {requiredArguments.Select(x => $"{Value.GetPrefixOfValue(x.type)}{x.name}").JoinStrings(" ")}"
+            ? $". It has to have these arguments: {requiredArguments
+                .Select(x => $"{Value.GetPrefixOfValue(x.type)}{x.name}").JoinStrings(" ")}"
             : string.Empty
         );
     
     [UsedImplicitly]
-    public DynamicTryGet<Action<Value[]>> GetConvertSolution(BaseToken token)
+    public DynamicTryGet<Callback> GetConvertSolution(BaseToken token)
     {
-        if (token.BestDynamicTextRepr().IsStatic(out var value, out var func))
+        if (token.BestTextRepr().IsStatic(out var value, out var func))
         {
             return Verify(value);
         }
@@ -30,16 +45,94 @@ public class CallbackArgument(string name, params (SingleTypeOfValue type, strin
         return new(() => Verify(func()));
     }
 
-    private TryGet<Action<Value[]>> Verify(string name)
+    private TryGet<Callback> Verify(string funcName)
     {
-        if (!Script.DefinedFunctions.TryGetValue(name, out var func))
+        if (FetchFunc(Script, funcName).HasErrored(out var err))
         {
-            return $"There is no function called '{name}'";
+            return err;
+        }
+        
+        FuncName = funcName;
+        return new(
+            new Callback
+            {
+                Action = GetCallback, 
+                Name = funcName
+            }, 
+            null
+        );
+    }
+
+    private void GetCallback(Value[] args, Action<Script>? modifier)
+    {
+        var mainError = $"Failed getting the callback function '{FuncName}' from script '{Script.Name}'.".AsError();
+        
+        // create new instance of the script since there may have been changes to it, 
+        // which the old object will not know about
+        if (Script.Name.GetScript(null).HasErrored(out var error, out var hostScript) 
+            || hostScript.Compile().HasErrored(out error) 
+            || FetchFunc(hostScript, FuncName).HasErrored(out error, out var func))
+        {
+            throw new CustomScriptRuntimeError(mainError + error.AsError());
+        }
+
+        if (func.LineNum is not { } startLine)
+        {
+            throw new CustomScriptRuntimeError(
+                mainError 
+                + $"Cannot find the beginning of the '{FuncName}' function - this should not happen.".AsError());
+        }
+
+        if (func.EndLine is not { } endLine)
+        {
+            throw new CustomScriptRuntimeError(
+                mainError
+                + $"Cannot find the end of the '{FuncName}' function - this should not happen.".AsError());
+        }
+        
+        var funcContent = hostScript
+            .Content
+            .Replace("\r", string.Empty)
+            .Split('\n')
+            .AsSpan((int)startLine, (int)endLine - (int)startLine - 1)
+            .ToArray()
+            .JoinStrings("\n");
+
+        var executingScript = Script.CreateForCallback(
+            $"'{func.FunctionName}' function from '{Script.Name}' script",
+            funcContent,
+            Script.Executor,
+            scr =>
+            {
+                for (int i = 0; i < args.Length; i++)
+                {
+                    scr.AddLocalVariable(
+                        Variable.Create(func.ExpectedVariables[i].Name, args[i])
+                    );
+                }
+            }
+        );
+
+        if (modifier is null)
+        {
+            executingScript.Run(RunReason.FunctionCallback, Script);
+        }
+        else
+        {
+            modifier.Invoke(executingScript);
+        }
+    }
+
+    private TryGet<FuncStatement> FetchFunc(Script functionHolder, string functionName)
+    {
+        if (!functionHolder.DefinedFunctions.TryGetValue(functionName, out var func))
+        {
+            return $"There is no function called '{functionName}'";
         }
 
         if (func.ExpectedVariables.Length != requiredArguments.Length)
         {
-            return $"The amount of expected variables in the '{name}' function is {func.ExpectedVariables.Length}, " +
+            return $"The amount of expected variables in the '{functionName}' function is {func.ExpectedVariables.Length}, " +
                    $"but {requiredArguments.Length} are needed.";
         }
 
@@ -51,44 +144,10 @@ public class CallbackArgument(string name, params (SingleTypeOfValue type, strin
             if (!definedType.CanHold(requiredType))
             {
                 return $"Method expects the argument #{i + 1} to be of '{requiredType}', " +
-                       $"but '{name}' function defines it to be of '{definedType}'.";
+                       $"but '{functionName}' function defines it to be of '{definedType}'.";
             }
         }
 
-        if (func.LineNum is not { } startLine)
-        {
-            return $"Cannot find the beginning of the '{name}' function - this should not happen.";
-        }
-
-
-        if (func.EndLine is not { } endLine)
-        {
-            return $"Cannot find the end of the '{name}' function - this should not happen.";
-        }
-        
-        var funcContent = Script
-            .Content
-            .Replace("\r", string.Empty)
-            .Split('\n')
-            .AsSpan((int)startLine, (int)endLine - (int)startLine - 1)
-            .ToArray()
-            .JoinStrings("\n");
-        
-        return new(
-            args => Script.CreateForCallback(
-                $"'{func.FunctionName}' function from '{Script.Name}' script",
-                funcContent,
-                Script.Executor,
-                scr =>
-                {
-                    for (int i = 0; i < args.Length; i++)
-                    {
-                        var v = Variable.Create(func.ExpectedVariables[i].Name, args[i]);
-                        scr.AddLocalVariable(v);
-                    }
-                }
-            ).Run(), 
-            null
-        );
+        return func;
     }
 }

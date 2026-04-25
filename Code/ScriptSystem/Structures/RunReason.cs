@@ -6,5 +6,6 @@ public enum RunReason
     Script,
     Event,
     BaseCommand,
-    CustomCommand
+    CustomCommand,
+    FunctionCallback
 }

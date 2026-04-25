@@ -34,7 +34,7 @@ public class SetCRoleCallbacksMethod : SynchronousMethod
     public override void Execute()
     {
         var customRole = Args.GetCustomRole("custom role");
-        customRole.SpawnAction = Args.GetCallback("on spawning");
-        customRole.RemoveAction = Args.GetCallback("on removing");
+        customRole.SpawnAction = args => Args.GetCallback("on spawning").Action(args, null);
+        customRole.RemoveAction = args => Args.GetCallback("on removing").Action(args, null);
     }
 }

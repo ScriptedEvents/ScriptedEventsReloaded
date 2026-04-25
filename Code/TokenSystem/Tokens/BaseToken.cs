@@ -50,7 +50,7 @@ public class BaseToken
     
     public string BestStaticTextRepr() => InternalBestTextExpr().Value;
     
-    public DynamicGet<string> BestDynamicTextRepr() => InternalBestTextExpr();
+    public DynamicGet<string> BestTextRepr() => InternalBestTextExpr();
     
     public DynamicGet<string> InternalBestTextExpr()
     {

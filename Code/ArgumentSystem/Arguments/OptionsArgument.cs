@@ -19,7 +19,7 @@ public class OptionsArgument(string name, params Option[] options) : Argument(na
     [UsedImplicitly]
     public DynamicTryGet<string> GetConvertSolution(BaseToken token)
     {
-        if (token.BestDynamicTextRepr().IsStatic(out var value, out var func))
+        if (token.BestTextRepr().IsStatic(out var value, out var func))
         {
             return InternalConvert(value);
         }

@@ -25,14 +25,19 @@ public class ProvidedArguments(Method method)
 {
     private Dictionary<(string name, Type type), List<DynamicTryGet>> ArgumentValues { get; } = [];
 
+    public string GetEvent(string argName)
+    {
+        return GetValue<string, EventArgument>(argName);
+    }
+    
     public CRole GetCustomRole(string argName)
     {
         return GetValue<CRole, CustomRoleArgument>(argName);
     }
     
-    public Action<Value[]> GetCallback(string argName)
+    public CallbackArgument.Callback GetCallback(string argName)
     {
-        return GetValue<Action<Value[]>, CallbackArgument>(argName);
+        return GetValue<CallbackArgument.Callback, CallbackArgument>(argName);
     }
     
     public Generator[] GetGenerators(string argName)

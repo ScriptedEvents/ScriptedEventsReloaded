@@ -7,7 +7,6 @@ using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
-using EventHandler = SER.Code.EventSystem.EventHandler;
 
 namespace SER.Code.FlagSystem;
 

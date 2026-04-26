@@ -9,7 +9,7 @@ $duration = .5s
 *room = @sender -> roomRef
 
 # verify that the player is in a room
-if not {ValidRef *room}
+if {ValidRef *room} is false
     Reply "you need to be in a room!"
     stop
 end

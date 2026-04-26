@@ -16,10 +16,10 @@ namespace SER.Code.ArgumentSystem.Arguments;
 public class CallbackArgument(string argumentName, params (SingleTypeOfValue type, string name)[] requiredArguments) 
     : Argument(argumentName)
 {
-    public struct Callback
+    public class Callback
     {
-        public Action<Value[], Action<Script>?> Action;
-        public string Name;
+        public required Action<Value[], Action<Script>?> Action;
+        public required string Name;
     }
     
     public string FuncName = null!;

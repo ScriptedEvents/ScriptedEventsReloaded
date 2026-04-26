@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using LabApi.Features.Wrappers;
+using SER.Code.FlagSystem.Structures;
 using SER.Code.Helpers;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.ValueSystem;
@@ -10,7 +11,7 @@ using Utils.NonAllocLINQ;
 namespace SER.Code.FlagSystem.Flags;
 
 [UsedImplicitly]
-public class InteractableToyEventFlag : Flag
+public class InteractableToyEventFlag : Flag, IMajorBehaviorFlag
 {
     public static readonly List<ScriptName> ScriptsBoundToEvent = [];
     

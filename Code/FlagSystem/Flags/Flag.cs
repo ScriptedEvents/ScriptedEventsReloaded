@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using LabApi.Features.Console;
 using SER.Code.Extensions;
+using SER.Code.FlagSystem.Structures;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
@@ -34,6 +35,15 @@ public abstract class Flag
     public virtual Result OnScriptRunning(Script scr, out bool mustReport)
     {
         mustReport = true;
+        if (this is IMajorBehaviorFlag)
+        {
+            if (ScriptFlagHandler.ScriptsFlags[scr].Without(this)
+                    .FirstOrDefault(f => f is IMajorBehaviorFlag) is {} conflictingFlag)
+            {
+                return $"Flag '{Name}' and '{conflictingFlag.Name}' cannot be used in the same script.";
+            }
+        }
+        
         return true;
     }
 

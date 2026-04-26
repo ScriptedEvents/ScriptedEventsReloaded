@@ -1,4 +1,5 @@
-﻿using SER.Code.Helpers.ResultSystem;
+﻿using Exiled.API.Features;
+using SER.Code.Helpers.ResultSystem;
 
 namespace SER.Code.ScriptSystem.Structures;
 
@@ -11,6 +12,17 @@ public readonly record struct ScriptName
         _value = value;
     }
 
+    public Script? GetScriptWithAutomaticLog(ScriptExecutor? executor, bool assertCheck = true)
+    {
+        if (GetScript(executor, assertCheck).HasErrored(out var error, out var script))
+        {
+            Log.Error(error);
+            return null;       
+        }
+
+        return script;
+    }
+    
     public TryGet<Script> GetScript(ScriptExecutor? executor, bool assertCheck = true)
     {
         if (assertCheck)

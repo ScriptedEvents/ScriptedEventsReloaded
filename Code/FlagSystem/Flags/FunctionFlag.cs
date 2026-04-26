@@ -1,4 +1,5 @@
 ﻿using SER.Code.Extensions;
+using SER.Code.FlagSystem.Structures;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Tokens;
@@ -7,7 +8,7 @@ using SER.Code.VariableSystem.Bases;
 
 namespace SER.Code.FlagSystem.Flags;
 
-public class FunctionFlag : Flag
+public class FunctionFlag : Flag, IMajorBehaviorFlag
 {
     private readonly List<VariableToken> _expectedVarTokens = [];
     public IReadOnlyCollection<VariableToken> ExpectedVarTokens => _expectedVarTokens;
@@ -47,6 +48,7 @@ public class FunctionFlag : Flag
     public override Result OnScriptRunning(Script scr, out bool mustReport)
     {
         mustReport = true;
+        if (base.OnScriptRunning(scr, out _).HasErrored(out var error)) return error;
         
         (VariableToken token, Variable var)[] provided = _expectedVarTokens
             .Select(token => (token, scr.LocalVariables.FirstOrDefault(var => var.Name == token.Name)))

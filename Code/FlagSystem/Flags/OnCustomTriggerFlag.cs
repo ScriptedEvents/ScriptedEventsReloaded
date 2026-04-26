@@ -1,12 +1,13 @@
 ﻿using JetBrains.Annotations;
 using SER.Code.Extensions;
+using SER.Code.FlagSystem.Structures;
 using SER.Code.MethodSystem.Methods.ScriptMethods;
 using SER.Code.ScriptSystem.Structures;
 
 namespace SER.Code.FlagSystem.Flags;
 
 [UsedImplicitly]
-public class OnCustomTriggerFlag : Flag
+public class OnCustomTriggerFlag : Flag, IMajorBehaviorFlag
 {
     private string _trigger = null!;
     

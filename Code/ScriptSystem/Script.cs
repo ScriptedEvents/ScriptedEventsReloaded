@@ -347,6 +347,14 @@ public class Script
 
         return true;
     }
+    
+    public void CompileWithAutomaticThrow()
+    {
+        if (Compile().HasErrored(out var err))
+        {
+            throw new ScriptCompileError(err);
+        }
+    }
 
     private IEnumerator<float> InternalExecute()
     {

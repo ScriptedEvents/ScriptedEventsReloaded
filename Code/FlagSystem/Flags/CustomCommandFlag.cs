@@ -5,6 +5,7 @@ using LabApi.Features.Wrappers;
 using RemoteAdmin;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
+using SER.Code.FlagSystem.Structures;
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
@@ -19,7 +20,7 @@ using Console = GameCore.Console;
 namespace SER.Code.FlagSystem.Flags;
 
 [UsedImplicitly]
-public class CustomCommandFlag : Flag
+public class CustomCommandFlag : Flag, IMajorBehaviorFlag
 {
     public override string Description =>
         """
@@ -276,6 +277,8 @@ public class CustomCommandFlag : Flag
     public override Result OnScriptRunning(Script scr, out bool mustReport)
     {
         mustReport = true;
+        if (base.OnScriptRunning(scr, out _).HasErrored(out var error)) return error;
+        
         if (scr.HasFlag<OnEventFlag>())
         {
             return $"Detected conflicting flag: {nameof(OnEventFlag)}.";

@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using SER.Code.FlagSystem.Structures;
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
@@ -11,7 +12,7 @@ using EventHandler = SER.Code.EventSystem.EventHandler;
 namespace SER.Code.FlagSystem.Flags;
 
 [UsedImplicitly]
-public class OnEventFlag : Flag
+public class OnEventFlag : Flag, IMajorBehaviorFlag
 {
     private List<VariableToken> _requiredVars = [];
     private Safe<string> _event;
@@ -51,10 +52,7 @@ public class OnEventFlag : Flag
     public override Result OnScriptRunning(Script scr, out bool mustReport)
     {
         mustReport = true;
-        if (scr.HasFlag<CustomCommandFlag>())
-        {
-            return $"Detected conflicting flag: {nameof(CustomCommandFlag)}.";
-        }
+        if (base.OnScriptRunning(scr, out _).HasErrored(out var error)) return error;
 
         if (scr.RunReason != RunReason.Event)
         {

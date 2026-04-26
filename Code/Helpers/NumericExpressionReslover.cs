@@ -104,8 +104,7 @@ public static class NumericExpressionReslover
         Dictionary<string, DynamicTryGet<object>> variables,
         StringBuilder sb, 
         Result mainErr,
-        uint tempId
-    )
+        uint tempId)
     {
         switch (token)
         {
@@ -141,19 +140,16 @@ public static class NumericExpressionReslover
                 AppendRaw(tmp);
                 return true;
             }
-            case { RawRep: "not" }:
-            case SymbolToken:
+            case { RawRep: "==" or "!=" or ">" or ">=" or "<" or "<=" or "+" or "-" or "*" or "/" or "%"}:
             {
                 AppendRaw(token.RawRep);
                 return true;
             }
-            case { RawRep: "=" }:
-            case { RawRep: "is" }:
+            case { RawRep: "=" or "is" }:
             {
                 AppendRaw("==");
                 return true;
             }
-            // great addition XD
             case { RawRep: "isnt" or "isn't" or "isnot" }:
             {
                 AppendRaw("!=");

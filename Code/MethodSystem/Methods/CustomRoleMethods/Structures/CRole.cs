@@ -3,22 +3,54 @@ using LabApi.Events.Handlers;
 using LabApi.Features.Wrappers;
 using MEC;
 using PlayerRoles;
-using SER.Code.ValueSystem;
 
 namespace SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
 
 public class CRole
 {
+    public enum CustomRoleEvent
+    {
+        Spawned,
+        Removed
+    }
+
+    public class Handler : IEquatable<Handler>
+    {
+        public required Action<Player, CRole> Action { get; init; }
+        public required string Id { get; init; }
+        public string[]? ForRoles { get; init; }
+
+        public bool Equals(Handler? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Id == other.Id;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((Handler)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
+    }
+    
     public static readonly Dictionary<string, CRole> RegisteredRoles = [];
     public static readonly Dictionary<Player, CRole> AssignedRoles = [];
     public static readonly Dictionary<Player, CRole> LastRoles = [];
+    
+    public static readonly Dictionary<CustomRoleEvent, List<Handler>> EventHandlers = [];
 
     public required string Id;
     public required string DisplayName;
     public required RoleTypeId RoleType;
     public CustomRoleSpawnSystem? SpawnInfo;
-    public Action<Value[]>? SpawnAction;
-    public Action<Value[]>? RemoveAction;
     public bool RemoveRoleOnDeath = true;
 
     public static void ResetAll()
@@ -40,17 +72,14 @@ public class CRole
         
         plr.SetRole(RoleType);
         
-        SpawnAction?.Invoke([
-            new PlayerValue(plr),
-            new ReferenceValue(this)
-        ]);
-        
         plr.InfoArea |= PlayerInfoArea.CustomInfo;
         plr.InfoArea &= ~PlayerInfoArea.Role;
         plr.InfoArea &= ~PlayerInfoArea.Nickname;
         plr.InfoArea &= ~PlayerInfoArea.UnitName;
 
         plr.CustomInfo = $"{plr.DisplayName}\n{DisplayName}";
+         
+        RunHandlers(CustomRoleEvent.Spawned, plr);
     }
 
     public static void RemoveRoleFrom(Player plr)
@@ -68,12 +97,23 @@ public class CRole
         AssignedRoles.Remove(plr);
         
         plr.CustomInfo = "";
-        plr.InfoArea = (PlayerInfoArea)0xFFFF;
+        plr.InfoArea = (PlayerInfoArea)~0;
         
-        RemoveAction?.Invoke([
-            new PlayerValue(plr),
-            new ReferenceValue(this)
-        ]);
+        RunHandlers(CustomRoleEvent.Removed, plr);
+    }
+
+    private void RunHandlers(CustomRoleEvent @event, Player plr)
+    {
+        if (EventHandlers.TryGetValue(@event, out var handlers))
+        {
+            foreach (var handler in handlers)
+            {
+                if (handler.ForRoles is not { } roles || roles.Contains(Id))
+                {
+                    handler.Action(plr, this);
+                }
+            }
+        }
     }
     
     public static void RegisterEvents()

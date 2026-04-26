@@ -1,9 +1,12 @@
 using JetBrains.Annotations;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.Extensions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
+using SER.Code.ScriptSystem.Structures;
 using SER.Code.ValueSystem;
+using YamlDotNet.Serialization.NodeDeserializers;
 
 namespace SER.Code.MethodSystem.Methods.CustomRoleMethods;
 
@@ -34,7 +37,27 @@ public class SetCRoleCallbacksMethod : SynchronousMethod
     public override void Execute()
     {
         var customRole = Args.GetCustomRole("custom role");
-        customRole.SpawnAction = args => Args.GetCallback("on spawning").Action(args, null);
-        customRole.RemoveAction = args => Args.GetCallback("on removing").Action(args, null);
+
+        if (Args.GetCallback("on spawning") is { } onSpawning)
+        {
+            CRole.EventHandlers.AddOrInitListWithKey(CRole.CustomRoleEvent.Spawned, GetHandler(onSpawning));
+        }
+        
+        if (Args.GetCallback("on removing") is { } onRemoving)
+        {
+            CRole.EventHandlers.AddOrInitListWithKey(CRole.CustomRoleEvent.Removed, GetHandler(onRemoving));
+        }
+
+        return;
+
+        CRole.Handler GetHandler(CallbackArgument.Callback callback)
+        {
+            return new()
+            {
+                Action = (plr, role) => callback.Action([new PlayerValue(plr), new ReferenceValue<CRole>(role)], null),
+                Id = $"callback '{callback.Name}' in script '{Script.Name}'",
+                ForRoles = [customRole.Id]
+            };
+        }
     }
 }

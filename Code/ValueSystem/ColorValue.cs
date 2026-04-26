@@ -14,7 +14,7 @@ public class ColorValue(Color color) : LiteralValue<Color>(color), IValueWithPro
     public override string StringRep => Value.ToHex();
 
     [UsedImplicitly]
-    public new static string FriendlyName = "color value";
+    public new static string FriendlyName => "color value";
 
     private class Prop<T>(Func<ColorValue, T> handler, string? description)
         : IValueWithProperties.PropInfo<ColorValue, T>(handler, description) where T : Value;

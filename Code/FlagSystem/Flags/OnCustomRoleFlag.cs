@@ -87,7 +87,7 @@ public class OnCustomRoleFlag : Flag, IMajorBehaviorFlag
     {
         if (CRole.EventHandlers.TryGetValue(Event, out var list))
         {
-            list.RemoveAll(handler => handler.Id == ScriptName);
+            list.RemoveWhere(handler => handler.Id == ScriptName);
         }
     }
 }

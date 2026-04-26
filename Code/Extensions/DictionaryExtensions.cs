@@ -6,7 +6,7 @@ public static class DictionaryExtensions
         this Dictionary<TKey, TCollection> dictionary, 
         TKey key, 
         TCollectionValue value
-    ) where TCollection : List<TCollectionValue>, new()
+    ) where TCollection : ICollection<TCollectionValue>, new()
     {
         if (dictionary.TryGetValue(key, out var list))
         {

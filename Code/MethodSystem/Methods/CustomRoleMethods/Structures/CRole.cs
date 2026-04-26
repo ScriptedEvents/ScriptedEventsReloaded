@@ -45,7 +45,7 @@ public class CRole
     public static readonly Dictionary<Player, CRole> AssignedRoles = [];
     public static readonly Dictionary<Player, CRole> LastRoles = [];
     
-    public static readonly Dictionary<CustomRoleEvent, List<Handler>> EventHandlers = [];
+    public static readonly Dictionary<CustomRoleEvent, HashSet<Handler>> EventHandlers = [];
 
     public required string Id;
     public required string DisplayName;

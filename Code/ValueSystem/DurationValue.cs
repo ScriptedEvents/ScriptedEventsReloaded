@@ -55,7 +55,7 @@ public class DurationValue(TimeSpan value) : LiteralValue<TimeSpan>(value), IVal
     }
 
     [UsedImplicitly]
-    public new static string FriendlyName = "duration value";
+    public new static string FriendlyName => "duration value";
 
     private class Prop<T>(Func<DurationValue, T> handler, string? description)
         : IValueWithProperties.PropInfo<DurationValue, T>(handler, description) where T : Value;

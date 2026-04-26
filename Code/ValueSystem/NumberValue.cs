@@ -22,7 +22,7 @@ public class NumberValue(decimal value) : LiteralValue<decimal>(value), IValueWi
     public override string StringRep => Value.ToString();
     
     [UsedImplicitly]
-    public new static string FriendlyName = "number value";
+    public new static string FriendlyName => "number value";
 
     private class Prop<T>(Func<NumberValue, T> handler, string? description)
         : IValueWithProperties.PropInfo<NumberValue, T>(handler, description) where T : Value;

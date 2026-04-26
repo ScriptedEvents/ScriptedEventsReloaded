@@ -65,7 +65,7 @@ public abstract class LiteralValue : Value
     }
     
     [UsedImplicitly]
-    public new static string FriendlyName = "literal value";
+    public new static string FriendlyName => "literal value";
 }
 
 public abstract class LiteralValue<T>: LiteralValue

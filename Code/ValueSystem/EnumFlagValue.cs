@@ -15,5 +15,5 @@ public class EnumFlagValue<T> : CollectionValue<EnumValue<T>> where T : struct, 
     }
 
     [UsedImplicitly]
-    public new static string FriendlyName = $"collection of {typeof(T).Name} enum values";
+    public new static string FriendlyName => $"collection of {typeof(T).Name} enum values";
 }

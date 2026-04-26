@@ -22,7 +22,7 @@ public class BoolValue(bool value) : LiteralValue<bool>(value), IValueWithProper
     public override string StringRep => Value.ToString().ToLower();
 
     [UsedImplicitly]
-    public new static string FriendlyName = "bool value";
+    public new static string FriendlyName => "bool value";
 
     private class Prop<T>(Func<BoolValue, T> handler, string? description)
         : IValueWithProperties.PropInfo<BoolValue, T>(handler, description) where T : Value;

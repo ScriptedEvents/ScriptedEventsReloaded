@@ -35,7 +35,7 @@ public abstract class TextValue : LiteralValue<string>, IValueWithProperties
     public override string StringRep => Value;
     
     [UsedImplicitly]
-    public new static string FriendlyName = "text value";
+    public new static string FriendlyName => "text value";
 
     public static TryGet<ExpressionToken?> ParseExpression(string text, Script script)
     {
@@ -121,7 +121,7 @@ public class DynamicTextValue(string text, Script script) : TextValue(text, scri
     public DynamicTextValue() : this(string.Empty, null!) {}
 
     [UsedImplicitly]
-    public new static string FriendlyName = "text value";
+    public new static string FriendlyName => "text value";
 }
 
 [UsedImplicitly]
@@ -136,5 +136,5 @@ public class StaticTextValue(string text) : TextValue(text, null)
     }
 
     [UsedImplicitly]
-    public new static string FriendlyName = "text value";
+    public new static string FriendlyName => "text value";
 }

@@ -216,7 +216,7 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties
     }
 
     [UsedImplicitly]
-    public new static string FriendlyName = "collection value";
+    public new static string FriendlyName => "collection value";
 
     public override string ToString()
     {
@@ -270,7 +270,7 @@ public class CollectionValue<T>(IEnumerable value) : CollectionValue(value)
     public CollectionValue() : this(Array.Empty<T>()) {}
     
     [UsedImplicitly]
-    public new static string FriendlyName = $"collection of {(typeof(T).IsSubclassOf(typeof(Value)) 
+    public new static string FriendlyName => $"collection of {(typeof(T).IsSubclassOf(typeof(Value)) 
                 ? GetFriendlyName(typeof(T)) 
                 : typeof(T).AccurateName)}";
 }

@@ -125,10 +125,10 @@ public abstract class Value : IEquatable<Value>
     {
         if (typeof(Value).IsAssignableFrom(t))
         {
-            var field = t.GetField("FriendlyName", BindingFlags.Public | BindingFlags.Static);
-            if (field != null)
+            var property = t.GetProperty("FriendlyName", BindingFlags.Public | BindingFlags.Static);
+            if (property != null)
             {
-                return (string)field.GetValue(null);
+                return (string)property.GetValue(null);
             }
 
             if (t.BaseType != null && t.BaseType != typeof(object))

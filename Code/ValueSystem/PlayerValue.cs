@@ -44,7 +44,7 @@ public class PlayerValue : Value, IValueWithProperties
             : val;
 
     [UsedImplicitly]
-    public new static string FriendlyName = "player value";
+    public new static string FriendlyName => "player value";
 
     public Dictionary<string, IValueWithProperties.PropInfo> Properties { get; } = 
         PropertyInfoMap.ToDictionary(pair => pair.Key.ToString().LowerFirst(), pair => pair.Value, StringComparer.OrdinalIgnoreCase)

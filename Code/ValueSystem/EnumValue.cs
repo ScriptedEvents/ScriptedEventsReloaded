@@ -23,7 +23,7 @@ public class EnumValue<T> : TextValue where T : struct, Enum
     }
 
     [UsedImplicitly]
-    public new static string FriendlyName = $"{typeof(T).Name} enum value";
+    public new static string FriendlyName => $"{typeof(T).Name} enum value";
     
     public static implicit operator EnumValue<T>(T value) => new(value);
 }

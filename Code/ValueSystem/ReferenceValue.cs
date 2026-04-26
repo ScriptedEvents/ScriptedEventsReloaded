@@ -33,7 +33,7 @@ public class ReferenceValue(object? value) : Value, IValueWithDynamicProperties
     }
     
     [UsedImplicitly]
-    public new static string FriendlyName = "reference value";
+    public new static string FriendlyName => "reference value";
 
     public override string ToString()
     {
@@ -64,5 +64,5 @@ public class ReferenceValue<T>(T? value) : ReferenceValue(value)
     }
 
     [UsedImplicitly]
-    public new static string FriendlyName = $"reference to {GetFriendlyName(typeof(T))} object";
+    public new static string FriendlyName => $"reference to {GetFriendlyName(typeof(T))} object";
 }

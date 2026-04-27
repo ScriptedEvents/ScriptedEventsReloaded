@@ -7,7 +7,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.ServerMethods;
 
 [UsedImplicitly]
-public class FriendlyFireMethod : SynchronousMethod
+public class SetFriendlyFireMethod : SynchronousMethod
 {
     public override string Description => "Changes friendly fire mode.";
 

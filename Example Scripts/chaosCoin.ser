@@ -171,7 +171,7 @@ if $effect is 9
     end
 
     # gets a random player that is not @evPlayer
-    @swapPlayer = Limit {Except * @evPlayer} 1
+    @swapPlayer = Take {Except * @evPlayer} 1
     $swapX = @swapPlayer -> positionX
     $swapY = @swapPlayer -> positionY
     $swapZ = @swapPlayer -> positionZ

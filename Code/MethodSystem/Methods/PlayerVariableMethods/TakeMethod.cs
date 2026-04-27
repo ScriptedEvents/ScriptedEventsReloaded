@@ -8,10 +8,10 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.PlayerVariableMethods;
 
 [UsedImplicitly]
-public class LimitMethod : ReturningMethod<PlayerValue>
+public class TakeMethod : ReturningMethod<PlayerValue>
 {
     public override string Description =>
-        "Returns a player variable with amount of players being equal or lower than the limit.";
+        "Takes a specified amount of players from a player variable, lower or equal to the limit.";
 
     public override Argument[] ExpectedArguments { get; } =
     [

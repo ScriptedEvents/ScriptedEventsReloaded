@@ -3,7 +3,7 @@
 -- description "Kills a random player currently in the Surface Zone."
 
 # 1. Get all players on the surface and limit the selection to 1 random person.
-@target = Limit @surfacePlayers 1
+@target = Take @surfacePlayers 1
 
 # 2. Check if anyone was actually found to avoid a runtime error.
 if {AmountOf @target} isnt 1

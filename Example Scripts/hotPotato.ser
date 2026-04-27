@@ -14,7 +14,7 @@ forever
     wait 1m
 
     # Get a random player from the alive players that are not SCPs
-    @potatoCarrier = Limit {Except @alivePlayers @scpPlayers} 1
+    @potatoCarrier = Take {Except @alivePlayers @scpPlayers} 1
 
     # if no player is alive, continue to next attempt
     if {AmountOf @potatoCarrier} is 0

@@ -17,8 +17,8 @@ func SetDiscordMessage
     *msg = DiscordMessage _ "{ServerInfo name} status" _ *embed
 
     # remove unneeded variables
-    PopVariable local $text
-    PopVariable local *embed
+    delete $text
+    delete *embed
 end
 
 if {$url -> length} is 0

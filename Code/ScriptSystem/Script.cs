@@ -19,6 +19,7 @@ using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.VariableSystem;
 using SER.Code.VariableSystem.Bases;
+using SER.Code.VariableSystem.Structures;
 using SER.Code.VariableSystem.Variables;
 
 namespace SER.Code.ScriptSystem;
@@ -419,7 +420,7 @@ public class Script
         }
     }
 
-    public void RemoveLocalVariable(Variable variable)
+    public void RemoveLocalVariable(IVariableRepr variable)
     {
         _localVariables.RemoveWhere(lv => Variable.AreSyntacticallySame(lv, variable));
     }

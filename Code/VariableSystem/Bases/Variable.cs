@@ -1,12 +1,12 @@
 ﻿using SER.Code.Exceptions;
 using SER.Code.Extensions;
-using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
+using SER.Code.VariableSystem.Structures;
 using SER.Code.VariableSystem.Variables;
 
 namespace SER.Code.VariableSystem.Bases;
 
-public abstract class Variable
+public abstract class Variable : IVariableRepr
 {
     public abstract string Name { get; }
 
@@ -38,9 +38,7 @@ public abstract class Variable
     
     public sealed override string ToString() => $"{Prefix}{Name}";
     
-    public static bool AreSyntacticallySame(Variable a, Variable b) => a.Prefix == b.Prefix && a.Name == b.Name;
-
-    public static bool AreSyntacticallySame(Variable a, VariableToken b) => a.Prefix == b.Prefix && a.Name == b.Name;
+    public static bool AreSyntacticallySame(IVariableRepr a, IVariableRepr b) => a.Prefix == b.Prefix && a.Name == b.Name;
     
     public static void AssertNoVariableNameCollisions(Variable newVariable, IEnumerable<Variable> existingVariables)
     {

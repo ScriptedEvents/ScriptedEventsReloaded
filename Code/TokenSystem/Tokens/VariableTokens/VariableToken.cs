@@ -6,10 +6,11 @@ using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
 using SER.Code.VariableSystem.Bases;
+using SER.Code.VariableSystem.Structures;
 
 namespace SER.Code.TokenSystem.Tokens.VariableTokens;
 
-public abstract class VariableToken : BaseToken, IContextableToken
+public abstract class VariableToken : BaseToken, IContextableToken, IVariableRepr
 {
     public abstract string Name { get; protected set; }
     

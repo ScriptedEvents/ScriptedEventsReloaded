@@ -105,11 +105,7 @@ public static class MethodIndex
             return method;
         }
         
-        var closestMethod = NameToMethodIndex.Keys
-            .OrderBy(x => LevenshteinDistance(x, name))
-            .FirstOrDefault();
-        
-        return $"There is no method with name '{name}'. Did you mean '{closestMethod ?? "<error>"}'?";
+        return $"There is no method with name '{name}'.";
     }
 
     internal static void LoadMethodsOfFramework(FrameworkBridge.Type framework)
@@ -119,41 +115,6 @@ public static class MethodIndex
             AddMethod(method);
         }
     }
-
-    /// <summary>
-    /// Calculates the Levenshtein distance between two strings, which represents the minimum number of
-    /// single-character edits (insertions, deletions, or substitutions) required to transform one string to another.
-    /// </summary>
-    /// <param name="a">The first string to compare.</param>
-    /// <param name="b">The second string to compare.</param>
-    /// <returns>The Levenshtein distance between the two strings.</returns>
-    private static int LevenshteinDistance(string a, string b)
-    {
-        int[,] dp = new int[a.Length + 1, b.Length + 1];
-
-        for (int i = 0; i <= a.Length; i++)
-            dp[i, 0] = i;
-
-        for (int j = 0; j <= b.Length; j++)
-            dp[0, j] = j;
-
-        for (int i = 1; i <= a.Length; i++)
-        {
-            for (int j = 1; j <= b.Length; j++)
-            {
-                int cost = a[i - 1] == b[j - 1] ? 0 : 1;
-
-                dp[i, j] = Math.Min(
-                    Math.Min(dp[i - 1, j] + 1, 
-                        dp[i, j - 1] + 1),
-                    dp[i - 1, j - 1] + cost    
-                );
-            }
-        }
-
-        return dp[a.Length, b.Length];
-    }
-
 
     internal static void Clear()
     {

@@ -4,6 +4,7 @@ using PlayerRoles;
 using SER.Code.Extensions;
 using SER.Code.ScriptSystem;
 using SER.Code.VariableSystem.Bases;
+using SER.Code.VariableSystem.Structures;
 using SER.Code.VariableSystem.Variables;
 
 namespace SER.Code.VariableSystem;
@@ -94,7 +95,7 @@ public static class VariableIndex
         GlobalVariables.Add(variable);
     }
 
-    public static void RemoveGlobalVariable(Variable variable)
+    public static void RemoveGlobalVariable(IVariableRepr variable)
     {
         GlobalVariables.RemoveAll(
             existingVar => Variable.AreSyntacticallySame(existingVar, variable)

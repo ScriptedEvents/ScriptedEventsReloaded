@@ -267,6 +267,9 @@ public static class Contexter
     
     public static double GetJaroWinklerSimilarity(string s1, string s2)
     {
+        s1 = s1.ToLowerInvariant();
+        s2 = s2.ToLowerInvariant();
+        
         double jaroDist = GetJaroSimilarity(s1, s2);
         if (jaroDist < 0.7) return jaroDist;
         

@@ -9,7 +9,7 @@ using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.PropertySystem;
 
-namespace SER.Code.MethodSystem.Methods.PlayerVariableMethods;
+namespace SER.Code.MethodSystem.Methods.PlayerMethods;
 
 [UsedImplicitly]
 public class ShowMethod : ReturningMethod<TextValue>, ICanError

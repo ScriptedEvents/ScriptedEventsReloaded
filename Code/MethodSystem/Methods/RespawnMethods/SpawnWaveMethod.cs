@@ -13,11 +13,24 @@ public class SpawnWaveMethod : SynchronousMethod
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new WaveArgument("wave")
+        new WaveTypeArgument("wave type"),
+        new OptionsArgument("mode", "withAnimation", "instant")
+        {
+            DefaultValue = new("withAnimation", null)
+        }
     ];
     
     public override void Execute()
     {
-        WaveManager.Spawn(Args.GetWave("wave"));
+        if (WaveTypeArgument.GetWave(Args.GetWaveType("wave type")) is not {} wave)
+        {
+            return;
+        }
+
+        switch (Args.GetOption("mode"))
+        {
+            case "withanimation": wave.InitiateRespawn(); break;
+            case "instant": wave.InstantRespawn(); break;
+        }
     }
 }

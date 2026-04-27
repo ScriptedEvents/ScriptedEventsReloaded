@@ -5,6 +5,7 @@ using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
+using SER.Code.MethodSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
@@ -142,7 +143,9 @@ public static class Contexter
         
         if (firstToken is not IContextableToken contextable)
         {
-            return rs + $"'{firstToken.RawRep}' is not a valid way to start a line. Perhaps you made a typo?";
+            var text = $"'{firstToken.RawRep}' is not a valid way to start a line."
+                + (FindClosestMatch(firstToken.RawRep) is { } match ? $" Did you mean to use '{match}'?" : "");
+            return rs + text.AsError();
         }
 
         var context = contextable.GetContext(scr);
@@ -241,5 +244,78 @@ public static class Contexter
 
         endLineContexting = true;
         return true;
+    }
+
+    private static List<string>? _suggestions = null;
+    public static string? FindClosestMatch(string input)
+    {
+        if (_suggestions is null)
+        {
+            _suggestions = [];
+            _suggestions.AddRange(MethodIndex.GetMethods().Select(m => m.Name));
+            _suggestions.AddRange(KeywordToken.KeywordContexts.Select(k => k.KeywordName));
+        }
+        
+        var suggestion = _suggestions
+            .Select(name => new { Name = name, Score = GetJaroWinklerSimilarity(input, name) })
+            .Where(x => x.Score > 0.5)
+            .OrderByDescending(x => x.Score)
+            .FirstOrDefault();
+
+        return suggestion?.Name;
+    }
+    
+    public static double GetJaroWinklerSimilarity(string s1, string s2)
+    {
+        double jaroDist = GetJaroSimilarity(s1, s2);
+        if (jaroDist < 0.7) return jaroDist;
+        
+        int prefixLength = 0;
+        for (int i = 0; i < Math.Min(4, Math.Min(s1.Length, s2.Length)); i++)
+        {
+            if (s1[i] == s2[i]) prefixLength++;
+            else break;
+        }
+
+        return jaroDist + prefixLength * 0.1 * (1.0 - jaroDist);
+    }
+
+    private static double GetJaroSimilarity(string s1, string s2)
+    {
+        int s1Len = s1.Length, s2Len = s2.Length;
+        if (s1Len == 0 && s2Len == 0) return 1.0;
+    
+        int matchDistance = Math.Max(s1Len, s2Len) / 2 - 1;
+        bool[] s1Matches = new bool[s1Len];
+        bool[] s2Matches = new bool[s2Len];
+
+        int matches = 0;
+        for (int i = 0; i < s1Len; i++)
+        {
+            int start = Math.Max(0, i - matchDistance);
+            int end = Math.Min(i + matchDistance + 1, s2Len);
+            for (int j = start; j < end; j++)
+            {
+                if (s2Matches[j] || s1[i] != s2[j]) continue;
+                s1Matches[i] = true;
+                s2Matches[j] = true;
+                matches++;
+                break;
+            }
+        }
+
+        if (matches == 0) return 0.0;
+
+        double transpositions = 0;
+        int k = 0;
+        for (int i = 0; i < s1Len; i++)
+        {
+            if (!s1Matches[i]) continue;
+            while (!s2Matches[k]) k++;
+            if (s1[i] != s2[k]) transpositions++;
+            k++;
+        }
+
+        return (matches / (double)s1Len + matches / (double)s2Len + (matches - transpositions / 2.0) / matches) / 3.0;
     }
 }

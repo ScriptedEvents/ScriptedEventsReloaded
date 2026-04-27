@@ -38,6 +38,8 @@ public class EphmKeyword : YieldingContext, IKeywordContext
 
     public override Result VerifyCurrentState()
     {
+        if (ParentContext is null) return "To define an ephemeral variable, it must be inside a statement.";
+        
         if (_variableToken is null)
             return "Variable name and value haven't been provided.";
             

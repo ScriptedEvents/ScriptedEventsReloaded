@@ -7,7 +7,8 @@ using SER.Code.ValueSystem.Other;
 namespace SER.Code.MethodSystem.Methods.TextMethods;
 
 [UsedImplicitly]
-public class TextContainsMethod : ReturningMethod
+// ReSharper disable once InconsistentNaming
+public class Text_ContainsMethod : ReturningMethod
 {
     public override string Description => "Returns true or false indicating if the provided text contains a provided value.";
 

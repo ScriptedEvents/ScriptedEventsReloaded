@@ -7,10 +7,11 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.TextMethods;
 
 [UsedImplicitly]
-public class SubTextMethod : ReturningMethod<TextValue>
+// ReSharper disable once InconsistentNaming
+public class Text_SliceMethod : ReturningMethod<TextValue>
 {
     public override string Description => 
-        "Removes certain amount of characters from beginning and end of a text value.";
+        "Slices off characters from beginning and end of a text value.";
 
     public override Argument[] ExpectedArguments { get; } =
     [

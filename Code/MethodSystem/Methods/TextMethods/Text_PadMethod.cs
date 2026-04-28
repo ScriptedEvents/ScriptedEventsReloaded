@@ -9,7 +9,8 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.TextMethods;
 
 [UsedImplicitly]
-public class PadTextMethod : ReturningMethod<TextValue>, ICanError, IAdditionalDescription
+// ReSharper disable once InconsistentNaming
+public class Text_PadMethod : ReturningMethod<TextValue>, ICanError, IAdditionalDescription
 {
     public override string Description => "Fills the text from the left or right with the given character " +
                                           "until the specified length is met";

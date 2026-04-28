@@ -6,7 +6,8 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.TextMethods;
 
 [UsedImplicitly]
-public class ReplaceTextMethod : ReturningMethod<TextValue>
+// ReSharper disable once InconsistentNaming
+public class Text_ReplaceMethod : ReturningMethod<TextValue>
 {
     public override string Description => "Replaces given values in a given text.";
 

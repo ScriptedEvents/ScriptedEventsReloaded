@@ -13,14 +13,28 @@ public class ResetPlayerCommandCooldownMethod : SynchronousMethod
     public override Argument[] ExpectedArguments { get; } =
     [
         new ReferenceArgument<CustomCommandFlag.CustomCommand>("command"),
-        new PlayerArgument("player")
+        new PlayersArgument("players")
+        {
+            DefaultValue = new(null, "all players")
+        }
     ];
     
     public override void Execute()
     {
-        Args
+        var dict = Args
             .GetReference<CustomCommandFlag.CustomCommand>("command")
-            .NextEligibleDateForPlayer
-            .Remove(Args.GetPlayer("player"));
+            .NextEligibleDateForPlayer;
+
+        if (Args.GetPlayers("players") is { } players)
+        {
+            foreach (var player in players)
+            {
+                dict.Remove(player);
+            }
+        }
+        else
+        {
+            dict.Clear();
+        }
     }
 }

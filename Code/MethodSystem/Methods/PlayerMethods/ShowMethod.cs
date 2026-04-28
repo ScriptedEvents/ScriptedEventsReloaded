@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using LabApi.Features.Wrappers;
+﻿using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
@@ -32,6 +31,11 @@ public class ShowMethod : ReturningMethod<TextValue>, ICanError
         new TextArgument("separator")
         {
             DefaultValue = new(", ", "\", \"")
+        },
+        new BoolArgument("separator on beginning")
+        {
+            Description = "Whether to add the separator at the beginning of the returned text",
+            DefaultValue = new(false, null)
         }
     ];
 
@@ -47,11 +51,18 @@ public class ShowMethod : ReturningMethod<TextValue>, ICanError
             throw new ScriptRuntimeError(this, ErrorReasons[0]);
         }
 
-        ReturnValue = players
+        var separator = Args.GetText("separator");
+        var value = players
             .Select(handler)
             .OfType<LiteralValue>()
             .Select(lv => lv.StringRep)
-            .JoinStrings(Args.GetText("separator"))
-            .ToStaticTextValue();
+            .JoinStrings(separator);
+
+        if (Args.GetBool("separator on beginning"))
+        {
+            value = separator + value;
+        }
+        
+        ReturnValue = value.ToStaticTextValue();
     }
 }

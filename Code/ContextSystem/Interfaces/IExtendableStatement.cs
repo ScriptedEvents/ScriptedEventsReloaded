@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using SER.Code.ContextSystem.BaseContexts;
+﻿using SER.Code.ContextSystem.BaseContexts;
 
 namespace SER.Code.ContextSystem.Interfaces;
 

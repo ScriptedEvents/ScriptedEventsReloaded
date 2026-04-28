@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using LabApi.Features.Wrappers;
+﻿using LabApi.Features.Wrappers;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.VariableSystem.Variables;

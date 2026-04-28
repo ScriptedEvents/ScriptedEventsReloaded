@@ -1,5 +1,4 @@
 ﻿using InventorySystem.Configs;
-using JetBrains.Annotations;
 using PlayerRoles;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;

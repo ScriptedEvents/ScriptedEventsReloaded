@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using SER.Code.ArgumentSystem.BaseArguments;
+﻿using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ArgumentSystem.Structures;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;

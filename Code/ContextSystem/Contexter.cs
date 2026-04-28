@@ -109,12 +109,9 @@ public static class Contexter
             extendable.RegisteredSignals[treeExtenderInfo.Extends] = treeExtenderContext;
             statementStack.Pop();
             statementStack.Push(treeExtenderContext);
-            return context.VerifyCurrentState().HasErrored(out error) ? rs + error : true;
+            return context.VerifyCurrentState().HasErrored(out error) ? rs + error.AsError() : true;
         }
-
-        if (context.VerifyCurrentState().HasErrored(out error)) 
-            return rs + error;
-
+        
         if (currentStatement is not null)
         {
             Log.Debug($"Adding finished context {context} to tree context {currentStatement}");
@@ -129,6 +126,9 @@ public static class Contexter
 
         if (context is StatementContext treeContext) 
             statementStack.Push(treeContext);
+        
+        if (context.VerifyCurrentState().HasErrored(out error)) 
+            return rs + error;
 
         Log.Debug($"Line {lineNum} has been contexted to {context}");
         return true;

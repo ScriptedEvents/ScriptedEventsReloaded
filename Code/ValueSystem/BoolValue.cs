@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using SER.Code.ValueSystem.PropertySystem;
+﻿using SER.Code.ValueSystem.PropertySystem;
 using ValueType = SER.Code.ValueSystem.Other.ValueType;
 
 namespace SER.Code.ValueSystem;

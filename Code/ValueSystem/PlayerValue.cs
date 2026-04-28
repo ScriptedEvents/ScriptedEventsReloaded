@@ -1,5 +1,4 @@
 ﻿using CustomPlayerEffects;
-using JetBrains.Annotations;
 using LabApi.Features.Wrappers;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;

@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using SER.Code.FlagSystem.Structures;
+﻿using SER.Code.FlagSystem.Structures;
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;

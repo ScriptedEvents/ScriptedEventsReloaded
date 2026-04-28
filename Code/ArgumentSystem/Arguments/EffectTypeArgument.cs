@@ -1,5 +1,4 @@
 using CustomPlayerEffects;
-using JetBrains.Annotations;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;

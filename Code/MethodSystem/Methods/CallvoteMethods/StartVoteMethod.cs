@@ -1,7 +1,6 @@
 ﻿using Callvote.API;
 using Callvote.API.VoteTemplate;
 using Callvote.Features;
-using JetBrains.Annotations;
 using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;

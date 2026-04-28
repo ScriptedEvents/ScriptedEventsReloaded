@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using LabApi.Events.Arguments.Interfaces;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;

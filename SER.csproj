@@ -97,6 +97,10 @@
         <None Include="THIRD_PARTY_LICENSES.txt" CopyToOutputDirectory="Always" />
         <EmbeddedResource Include="Example Scripts\*.ser" />
     </ItemGroup>
+    
+    <ItemGroup>
+        <Using Include="JetBrains.Annotations" />
+    </ItemGroup>
 
     <!-- ignore warnings about mismatch between versions of core libs
         and unreachable code because compiler is stupid -->

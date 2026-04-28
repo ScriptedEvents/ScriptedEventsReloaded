@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using SER.Code.Extensions;
+﻿using SER.Code.Extensions;
 using SER.Code.ValueSystem;
 using SER.Code.VariableSystem.Bases;
 

@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Contexts.VariableDefinition;
 using SER.Code.ContextSystem.Interfaces;

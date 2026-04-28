@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using SER.Code.Extensions;
 using SER.Code.Plugin.Commands.HelpSystem;
 

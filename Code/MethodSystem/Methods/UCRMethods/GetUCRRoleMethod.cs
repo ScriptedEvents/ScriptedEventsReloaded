@@ -3,7 +3,6 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Helpers;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.MethodDescriptors;
-using SER.Code.MethodSystem.Methods.ReferenceVariableMethods;
 using SER.Code.MethodSystem.Structures;
 using UncomplicatedCustomRoles.API.Features;
 using UncomplicatedCustomRoles.API.Interfaces;
@@ -21,8 +20,7 @@ public class GetUCRRoleMethod : ReferenceReturningMethod, IAdditionalDescription
     public override string Description => "Returns a reference to the UCR role a player has.";
 
     public string AdditionalDescription =>
-        $"Be sure to use {GetFriendlyName(typeof(ValidRefMethod))} method to verify if the player has a role. " +
-        $"The reference will be INVALID when the player doesn't have a role.";
+        "Be sure to verify if the player has a role. The reference will be INVALID when the player doesn't have a role.";
 
     public override Argument[] ExpectedArguments { get; } =
     [

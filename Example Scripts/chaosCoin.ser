@@ -47,7 +47,7 @@ if $effect is 3
     *room = @evPlayer -> roomRef
 
     # explode player if he isnt in a room
-    if {ValidRef *room} is false
+    if {*room -> isInvalid}
         Explode @evPlayer
         stop
     end

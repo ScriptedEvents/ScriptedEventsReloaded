@@ -1,29 +1,29 @@
 # confirm that @sender variable was created
-if {VarExists @sender} == false
+if {VarExists @sender} is false
     Reply "you need to run this script through remote admin!"
     stop
 end
 
 # the values for the rave
-$duration = .5s
+$dur = .5s
 *room = @sender -> roomRef
 
 # verify that the player is in a room
-if {ValidRef *room} is false
+if {*room -> isInvalid}
     Reply "you need to be in a room!"
     stop
 end
 
 # changing colors for the room
 repeat 20
-    TransitionLightColor *room #ff0000ff $duration
-    wait $duration
+    TransitionLightColor *room #ff0000ff $dur
+    wait $dur
     
-    TransitionLightColor *room #00ff00ff $duration
-    wait $duration
+    TransitionLightColor *room #00ff00ff $dur
+    wait $dur
     
-    TransitionLightColor *room #0000ffff $duration
-    wait $duration
+    TransitionLightColor *room #0000ffff $dur
+    wait $dur
 end
 
 # reset color to default

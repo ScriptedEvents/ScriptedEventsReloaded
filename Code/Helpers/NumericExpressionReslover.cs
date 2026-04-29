@@ -7,6 +7,7 @@ using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.Interfaces;
+using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.Helpers;
@@ -129,12 +130,28 @@ public static class NumericExpressionReslover
                 var tmp = MakeTempName();
                 variables[tmp] = new(() =>
                 {
-                    if (CompileExpression(parentheses.Tokens).HasErrored(out var conditonError, out var value))
+                    if (parentheses.ParseExpression().HasErrored(out var conditonError, out var value))
                     {
                         return mainErr + conditonError;
                     }
                     
-                    return value.Evaluate();
+                    return value;
+                });
+                
+                AppendRaw(tmp);
+                return true;
+            }
+            case VariableToken playerVariable:
+            {
+                var tmp = MakeTempName();
+                variables[tmp] = new(() =>
+                {
+                    if (playerVariable.TryGetVariable().HasErrored(out var err, out var variable))
+                    {
+                        return mainErr + err;
+                    }
+                    
+                    return variable.BaseValue.HashCode;
                 });
                 
                 AppendRaw(tmp);

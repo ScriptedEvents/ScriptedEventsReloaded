@@ -5,7 +5,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.PlayerMethods;
 
 [UsedImplicitly]
-public class GodmodeMethod : SynchronousMethod
+public class SetGodModeMethod : SynchronousMethod
 {
     public override string Description => "Enables or disables godmode for specified players.";
 

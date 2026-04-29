@@ -87,7 +87,7 @@ public class ValueExpressionContext : AdditionalContext
             
         _handler = symbol switch
         {
-            { IsArrow: false } => new NumericExpressionHandler(_initial, Script),
+            { IsArrow: false } => new NumericExpressionValueHandler(_initial, Script),
             { IsArrow: true } => new ValuePropertyHandler(_initial, (IValueToken)_initial)
         };
 
@@ -199,7 +199,7 @@ public class ValuePropertyHandler(
 /// <summary>
 /// Used for math expressions.
 /// </summary>
-public class NumericExpressionHandler(BaseToken initial, Script scr)
+public class NumericExpressionValueHandler(BaseToken initial, Script scr)
     : ValueExpressionContext.Handler
 {
     private readonly List<BaseToken> _tokens = [initial];

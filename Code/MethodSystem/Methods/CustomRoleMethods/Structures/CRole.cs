@@ -154,7 +154,7 @@ public class CRole
                 }
                 case BracketSpawn bracketSpawn:
                 {
-                    var pool = Player.List.Where(p => p.Role == bracketSpawn.RoleToReplace).ToArray();
+                    var pool = Player.ReadyList.Where(p => p.Role == bracketSpawn.RoleToReplace).ToArray();
                 
                     foreach (var bracket in bracketSpawn.SpawnBrackets)
                     {

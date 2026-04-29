@@ -1,4 +1,5 @@
 ﻿using LabApi.Features.Wrappers;
+using ProgressiveCulling;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ArgumentSystem.Structures;
@@ -265,13 +266,19 @@ public class ProvidedArguments(Method method)
     public TValue[] GetRemainingArguments<TValue, TArg>(string argName) 
         where TArg : Argument
     {
-        return GetValues<TValue, TArg>(argName).ToArray();
+        return GetValues<TValue, TArg>(argName).Select(x => x.value).ToArray();
     }
 
     public TValue GetValue<TValue, TArg>(string argName) 
         where TArg : Argument
     {
-        return GetValues<TValue, TArg>(argName)[0];
+        return GetValues<TValue, TArg>(argName)[0].value;
+    }
+    
+    public DynamicTryGet<TValue> GetGetter<TValue, TArg>(string argName) 
+        where TArg : Argument
+    {
+        return GetValues<TValue, TArg>(argName)[0].getter;
     }
     
     public TValue? GetValueNullableStruct<TValue, TArg>(string argName) 
@@ -298,14 +305,14 @@ public class ProvidedArguments(Method method)
         };
     }
 
-    private List<TValue> GetValues<TValue, TArg>(string argName)
+    private List<(TValue value, DynamicTryGet<TValue> getter)> GetValues<TValue, TArg>(string argName)
         where TArg : Argument
     {
         Result mainErr = $"Fetching argument '{argName}' for method '{method.Name}' failed.";
 
         var evaluators = GetValueInternal<TValue, TArg>(argName);
 
-        List<TValue> resultList = [];
+        List<(TValue, DynamicTryGet<TValue>)> resultList = [];
         foreach (var evaluator in evaluators)
         {
             if (evaluator is not DynamicTryGet<TValue> argEvalRes)
@@ -321,7 +328,7 @@ public class ProvidedArguments(Method method)
                 throw new CustomScriptRuntimeError(mainErr + err);
             }
 
-            resultList.Add(value);
+            resultList.Add((value, argEvalRes));
         }
         
         return resultList;

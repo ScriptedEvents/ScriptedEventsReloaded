@@ -61,14 +61,14 @@ public class DurationValue(TimeSpan value) : LiteralValue<TimeSpan>(value), IVal
 
     public Dictionary<string, IValueWithProperties.PropInfo> Properties { get; } = new()
     {
-        ["hours"] = new Prop<NumberValue>(d => d.Value.Hours, "Hours component of the duration"),
-        ["minutes"] = new Prop<NumberValue>(d => d.Value.Minutes, "Minutes component of the duration"),
-        ["seconds"] = new Prop<NumberValue>(d => d.Value.Seconds, "Seconds component of the duration"),
-        ["milliseconds"] = new Prop<NumberValue>(d => d.Value.Milliseconds, "Milliseconds component of the duration"),
-        ["totalHours"] = new Prop<NumberValue>(d => (decimal)d.Value.TotalHours, "Total hours in the duration"),
-        ["totalMinutes"] = new Prop<NumberValue>(d => (decimal)d.Value.TotalMinutes, "Total minutes in the duration"),
-        ["totalSeconds"] = new Prop<NumberValue>(d => (decimal)d.Value.TotalSeconds, "Total seconds in the duration"),
-        ["totalMilliseconds"] = new Prop<NumberValue>(d => (decimal)d.Value.TotalMilliseconds, "Total milliseconds in the duration"),
+        ["h"] = new Prop<NumberValue>(d => d.Value.Hours, "Hours component of the duration"),
+        ["m"] = new Prop<NumberValue>(d => d.Value.Minutes, "Minutes component of the duration"),
+        ["s"] = new Prop<NumberValue>(d => d.Value.Seconds, "Seconds component of the duration"),
+        ["ms"] = new Prop<NumberValue>(d => d.Value.Milliseconds, "Milliseconds component of the duration"),
+        ["totalH"] = new Prop<NumberValue>(d => (decimal)d.Value.TotalHours, "Total hours in the duration"),
+        ["totalM"] = new Prop<NumberValue>(d => (decimal)d.Value.TotalMinutes, "Total minutes in the duration"),
+        ["totalS"] = new Prop<NumberValue>(d => (decimal)d.Value.TotalSeconds, "Total seconds in the duration"),
+        ["totalMs"] = new Prop<NumberValue>(d => (decimal)d.Value.TotalMilliseconds, "Total milliseconds in the duration"),
         ["valType"] = new Prop<EnumValue<ValueType>>(_ => ValueType.Duration, "The type of the value")
     };
 }

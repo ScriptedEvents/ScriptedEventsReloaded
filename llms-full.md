@@ -41,7 +41,7 @@ You can store method return values in variables:
 
 ```
 $name = ServerInfo name
-@newPlrs = LimitPlayers @all @classDPlayers
+@newPlrs = Take @all {AmountOf @classDPlayers}
 ```
 
 ### The Wildcard (`*`)
@@ -87,9 +87,9 @@ You can chain property accesses together:
 $nameLengthOdd = @sender -> name -> length -> isOdd
 ```
 
-### Enum Values vs String Representations
+### Enum Values vs. String Representations
 
-When using enum values in methods vs properties, note the type difference:
+When using enum values in methods vs. properties, note the type difference:
 
 **In methods** - Use bare enum tokens (unquoted):
 ```
@@ -126,7 +126,7 @@ Always validate references before using them:
 ```
 *room = @plr -> roomRef
 
-if {ValidRef *room} is false
+if {*room -> isInvalid}
     Print "Player is not in a room"
     stop
 end
@@ -134,9 +134,6 @@ end
 # Safe to use *room now
 CloseDoor *room
 ```
-
-The `ValidRef` method checks if a reference is null. If it returns false, the reference cannot be used.
-
 
 ### Using Properties in Different Contexts
 
@@ -215,7 +212,7 @@ $var = 10
 global $score = 100
 ```
 
-To read a global variable later, just use its name (no `global` keyword):
+To read a global variable later, use its name (no `global` keyword):
 ```
 Broadcast @all 5s "Score: {$score}"
 ```
@@ -235,7 +232,7 @@ over @all with @plr
 end
 ```
 
-Other valid way: (carried over from previous versions)
+Another valid way: (carried over from previous versions)
 ```
 over @all 
     with @plr
@@ -604,11 +601,11 @@ If there's no `!--` line, the script is a utility. Run it manually via `serrun` 
 
 ### Custom Command Flag
 
-Creates a custom command and binds it to the script. When the command is ran, the script runs as well.
+Creates a custom command and binds it to the script. When the command is run, the script runs as well.
 
 ```
 !-- CustomCommand heal
--- availableFor Server RemoteAdmin
+-- availableFor RemoteAdmin
 -- description "Heals the sender"
 
 Heal @sender
@@ -655,6 +652,11 @@ if {VarExists @evAttacker} is false
     stop
 end
 ```
+or define which are required:
+```
+!-- OnEvent Dying
+-- requiredVars @evAttacker
+```
 
 ---
 
@@ -686,7 +688,7 @@ end
 ### Select Random Player
 
 ```
-@plr = LimitPlayers @all 1
+@plr = Take @all 1
 ```
 
 ### Percentage Chance

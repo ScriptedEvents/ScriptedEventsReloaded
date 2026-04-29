@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Text;
 using CommandSystem;
+using HarmonyLib;
 using LabApi.Events.Arguments.Interfaces;
 using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
@@ -639,6 +640,7 @@ public static class DocsProvider
     public static bool GetPropertiesForType(string typeName, out string response)
     {
         IReadOnlyDictionary<string, IValueWithProperties.PropInfo> props;
+        string messagePrefix = string.Empty;
         
         if (typeName.Equals("player", StringComparison.OrdinalIgnoreCase))
         {
@@ -670,79 +672,106 @@ public static class DocsProvider
         }
         else
         {
-            var type = ReferencePropertyRegistry.GetRegisteredTypes()
-                .FirstOrDefault(t => t.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase));
-
-            if (type == null)
+            var types = ReferencePropertyRegistry.GetRegisteredTypes()
+                .Where(t => t.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            
+            if (types.Count is 0)
             {
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
                     var name = assembly.GetName().Name;
-                    if (name.StartsWith("UnityEngine") || name.StartsWith("LabApi") || name.StartsWith("NorthwoodLib") 
-                        || name.StartsWith("PluginAPI") || name.StartsWith("Mirror") || name.StartsWith("SER")
-                        || name.StartsWith("Assembly-CSharp"))
+                    if (!name.StartsWith("UnityEngine") && !name.StartsWith("LabApi") && !name.StartsWith("NorthwoodLib")
+                        && !name.StartsWith("PluginAPI") && !name.StartsWith("Mirror") && !name.StartsWith("SER")
+                        && !name.StartsWith("Assembly-CSharp"))
                     {
-                        try
-                        {
-                            type = assembly.GetTypes()
-                                .FirstOrDefault(t => t.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase));
-                        }
-                        catch (ReflectionTypeLoadException e)
-                        {
-                            type = e.Types.FirstOrDefault(t => t != null && t.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase));
-                        }
-                        catch
-                        {
-                            // Ignore other reflection errors
-                        }
-
-                        if (type != null) break;
+                        continue;
+                    }
+                    
+                    try
+                    {
+                        types.AddRange(assembly.GetTypes()
+                            .Where(t => t.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase)));
+                    }
+                    catch (ReflectionTypeLoadException e)
+                    {
+                        types.AddRange(e.Types
+                            .Where(t => t != null && t.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase)));
+                    }
+                    catch
+                    {
+                        // Ignore other reflection errors
                     }
                 }
             }
 
-            if (type == null)
+            switch (types.Count)
             {
-                response = $"Unknown object type: {typeName}";
-                return false;
-            }
-
-            props = ReferencePropertyRegistry.GetProperties(type);
-        }
-
-        var sb = new StringBuilder($"> Properties for {typeName} value\n");
-        var sortedProps = props.OrderBy(kvp => kvp.Key).ToList();
-        var custom = sortedProps.Where(p => !p.Value.IsReflected).ToList();
-        var reflected = sortedProps.Where(p => p.Value.IsReflected).ToList();
-
-        if (reflected.Count > 0)
-        {
-            sb.AppendLine("\n--- Base properties ---");
-            foreach (var (name, info) in reflected)
-            {
-                sb.AppendLine(GetTypeInfo(name, info));
-            }
-        }
-
-        if (custom.Count > 0)
-        {
-            sb.AppendLine("\n--- Custom SER properties ---");
-            foreach (var (name, info) in custom)
-            {
-                sb.AppendLine(GetTypeInfo(name, info));
+                case 0:
+                    response = $"Unknown object type: {typeName}";
+                    return false;
+                case > 1:
+                {
+                    var output = new StringBuilder($"Warning! There are {types.Count} defined types with the same name '{typeName}'.\n\n");
+                    foreach (var type in types)
+                    {
+                        output.AppendLine(GetProperties(typeName, ReferencePropertyRegistry.GetProperties(type), type));
+                    }
+                
+                    response = output.ToString();
+                    return true;
+                }
+                default:
+                    props = ReferencePropertyRegistry.GetProperties(types[0]);
+                    break;
             }
         }
         
-        response = sb.ToString();
+        response = GetProperties(typeName, props, null);
         return true;
 
-        string GetTypeInfo(string name, IValueWithProperties.PropInfo info)
+        static string GetProperties(
+            string typeName,
+            IReadOnlyDictionary<string, IValueWithProperties.PropInfo> props,
+            Type? type)
         {
-            var returnTypeFriendlyName = info.ReturnType.ToString();
-            return $"> {name} " +
-                   $"({returnTypeFriendlyName}) " +
-                   $"{(info.IsSettable ? "[settable] " : "")}" +
-                   $"{(string.IsNullOrEmpty(info.Description) ? "" : $"- {info.Description}")}";
+            var sb = new StringBuilder(
+                $"> Properties for {typeName} value" 
+                + (type is not null ? $" in '{type.Assembly.GetName().Name}' assembly" : "") 
+                + "\n");
+            
+            var sortedProps = props.OrderBy(kvp => kvp.Key).ToList();
+            var custom = sortedProps.Where(p => !p.Value.IsReflected).ToList();
+            var reflected = sortedProps.Where(p => p.Value.IsReflected).ToList();
+
+            if (reflected.Count > 0)
+            {
+                sb.AppendLine("\n--- Base properties ---");
+                foreach (var (name, info) in reflected)
+                {
+                    sb.AppendLine(GetTypeInfo(name, info));
+                }
+            }
+
+            if (custom.Count > 0)
+            {
+                sb.AppendLine("\n--- Custom SER properties ---");
+                foreach (var (name, info) in custom)
+                {
+                    sb.AppendLine(GetTypeInfo(name, info));
+                }
+            }
+            
+            return sb.ToString();
+
+            string GetTypeInfo(string name, IValueWithProperties.PropInfo info)
+            {
+                var returnTypeFriendlyName = info.ReturnType.ToString();
+                return $"> {name} " +
+                       $"({returnTypeFriendlyName}) " +
+                       $"{(info.IsSettable ? "[settable] " : "")}" +
+                       $"{(string.IsNullOrEmpty(info.Description) ? "" : $"- {info.Description}")}";
+            }
         }
     }
 }

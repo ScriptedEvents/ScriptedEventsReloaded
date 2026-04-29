@@ -93,6 +93,14 @@ public static class ReferencePropertyRegistry
                 "Returns the name of the held object"
             )
         );
+        
+        combined.Add(
+            "refAssembly", 
+            new IValueWithProperties.PropInfo<ReferenceValue, StaticTextValue>(
+                rv => rv.Value.GetType().Assembly.GetName().Name, 
+                "Returns the name of the assembly the object is defined in"
+            )
+        );
 
         CachedCombinedProperties[type] = combined;
         return type == typeof(JObject) || type == typeof(JToken) || type.IsSubclassOf(typeof(JToken)) 

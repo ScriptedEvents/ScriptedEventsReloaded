@@ -311,4 +311,39 @@ finally {
     <Target Name="RunValidation" AfterTargets="Build">
         <RunDllValidation AssemblyPath="$(TargetPath)" ReferencePath="$(SL_DEV_REFERENCES)" />
     </Target>
+
+    <UsingTask TaskName="CountLinesTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+        <ParameterGroup>
+            <SourceFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+            <TotalLines ParameterType="System.Int32" Output="true" />
+        </ParameterGroup>
+        <Task>
+            <Using Namespace="System" />
+            <Using Namespace="System.IO" />
+            <Code Type="Fragment" Language="cs">
+                <![CDATA[
+                int count = 0;
+                foreach (var item in SourceFiles)
+                {
+                    string path = item.GetMetadata("FullPath");
+                    if (File.Exists(path))
+                    {
+                        count += File.ReadAllLines(path).Length;
+                    }
+                }
+                TotalLines = count;
+                ]]>
+            </Code>
+        </Task>
+    </UsingTask>
+
+    <Target Name="CountLines" BeforeTargets="BeforeBuild">
+        <ItemGroup>
+            <SourceFilesToCount Include="**\*.cs" Exclude="obj\**\*;bin\**\*" />
+        </ItemGroup>
+        <CountLinesTask SourceFiles="@(SourceFilesToCount)">
+            <Output TaskParameter="TotalLines" PropertyName="LOC" />
+        </CountLinesTask>
+        <Message Importance="High" Text=">>> Total lines of code in project: $(LOC)" />
+    </Target>
 </Project>

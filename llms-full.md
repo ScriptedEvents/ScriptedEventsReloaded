@@ -172,30 +172,11 @@ A variable's name must always include its type prefix:
 Create or update variables using `=`:
 
 ```
-# static value
 $kills = 0
-
-# variable
 @target = @sender
-
-# math 
 $kills = $kills + 1
-
-# method return value
 $name = ServerInfo name
-
-# function return value
 &items = run &GetItems @plr true
-```
-
-### Default Values
-
-```
-$name = ""  # empty text
-$num = 0  # zero
-$bool = false  # false
-@plrs = @empty  # empty player array
-&coll = Coll.Empty  # empty collection
 ```
 
 ### Memory Scopes
@@ -224,7 +205,16 @@ global $number = $number * 2
 ```
 Not using `global` when changing value makes LOCAL variable with the same name, causing NAME COLLISION error.
 
-**Ephemeral** - Only exists inside a specific loop or function (defined with `with`).
+**Ephemeral** - Only exists inside a specific loop or function (defined with `with` or `ephm`).
+```
+func Func
+    ephm $x = 1
+end
+
+run Func
+Print $x  # does NOT print 1, as $x was specific to `Func`
+```
+
 Preferred way:
 ```
 over @all with @plr

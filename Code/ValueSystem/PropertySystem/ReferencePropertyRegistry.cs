@@ -168,13 +168,13 @@ public static class ReferencePropertyRegistry
         Register<Door, BoolValue>("isBreakable", d => d is BreakableDoor, "Is the door breakable?");
         Register<Door, BoolValue>("isCheckpoint", d => d is CheckpointDoor, "Is the door a part of a checkpoint?");
         
-        Register<Pickup, NumberValue>("positionX", p => new NumberValue((decimal)p.Position.x), "The X position of the pickup");
-        Register<Pickup, NumberValue>("positionY", p => new NumberValue((decimal)p.Position.y), "The Y position of the pickup");
-        Register<Pickup, NumberValue>("positionZ", p => new NumberValue((decimal)p.Position.z), "The Z position of the pickup");
+        Register<Pickup, NumberValue>("posX", p => new NumberValue((decimal)p.Position.x), "The X position of the pickup");
+        Register<Pickup, NumberValue>("posY", p => new NumberValue((decimal)p.Position.y), "The Y position of the pickup");
+        Register<Pickup, NumberValue>("posZ", p => new NumberValue((decimal)p.Position.z), "The Z position of the pickup");
         
-        Register<Room, NumberValue>("positionX", r => new NumberValue((decimal)r.Position.x), "The X position of the room");
-        Register<Room, NumberValue>("positionY", r => new NumberValue((decimal)r.Position.y), "The Y position of the room");
-        Register<Room, NumberValue>("positionZ", r => new NumberValue((decimal)r.Position.z), "The Z position of the room");
+        Register<Room, NumberValue>("posX", r => new NumberValue((decimal)r.Position.x), "The X position of the room");
+        Register<Room, NumberValue>("posY", r => new NumberValue((decimal)r.Position.y), "The Y position of the room");
+        Register<Room, NumberValue>("posZ", r => new NumberValue((decimal)r.Position.z), "The Z position of the room");
         
         Register<DamageHandlerBase, NumberValue>("damage", h => new NumberValue((decimal)((h as StandardDamageHandler)?.Damage ?? -1)), "Damage amount, -1 if not applicable");
         Register<DamageHandlerBase, EnumValue<HitboxType>>("hitbox", h => (h as StandardDamageHandler)?.Hitbox.ToEnumValue() ?? new EnumValue<HitboxType>(), "Hitbox type");

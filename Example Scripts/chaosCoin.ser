@@ -172,9 +172,9 @@ if $effect is 9
 
     # gets a random player that is not @evPlayer
     @swapPlayer = Take {Except * @evPlayer} 1
-    $swapX = @swapPlayer -> positionX
-    $swapY = @swapPlayer -> positionY
-    $swapZ = @swapPlayer -> positionZ
+    $swapX = @swapPlayer -> posX
+    $swapY = @swapPlayer -> posY
+    $swapZ = @swapPlayer -> posZ
 
     # we can teleport @swapPlayer directly to @evPlayer
     TPPlayer @swapPlayer @evPlayer 

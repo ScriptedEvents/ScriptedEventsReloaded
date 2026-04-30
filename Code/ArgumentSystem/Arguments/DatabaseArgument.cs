@@ -8,7 +8,7 @@ namespace SER.Code.ArgumentSystem.Arguments;
 public class DatabaseArgument(string name) : Argument(name)
 {
     public override string InputDescription => "Database name";
-    
+
     [UsedImplicitly]
     public DynamicTryGet<Database> GetConvertSolution(BaseToken token)
     {

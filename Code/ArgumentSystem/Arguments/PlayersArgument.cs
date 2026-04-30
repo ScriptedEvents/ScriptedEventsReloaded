@@ -12,7 +12,7 @@ namespace SER.Code.ArgumentSystem.Arguments;
 
 public class PlayersArgument(string name) : EnumHandlingArgument(name)
 {
-    public override string InputDescription => 
+    public override string InputDescription =>
         $"Player variable (e.g. {PlayerVariableToken.Example}), " +
         $"RoleTypeId enum (e.g. ClassD), " +
         $"Team enum (e.g. SCPs), " +
@@ -26,9 +26,9 @@ public class PlayersArgument(string name) : EnumHandlingArgument(name)
             {
                 [typeof(Team)] = team => new(
                     () => Player.ReadyList.Where(player => player.Team == (Team)team).ToArray()),
-                
+
                 [typeof(RoleTypeId)] = role => new(
-                    () => Player.ReadyList.Where(player => player.Role == (RoleTypeId)role).ToArray()),
+                    () => Player.ReadyList.Where(player => player.Role == (RoleTypeId)role).ToArray())
             },
             () =>
             {
@@ -59,13 +59,3 @@ public class PlayersArgument(string name) : EnumHandlingArgument(name)
         );
     }
 }
-
-
-
-
-
-
-
-
-
-

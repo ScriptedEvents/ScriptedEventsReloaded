@@ -12,14 +12,14 @@ public abstract class EnumArgument(string name) : Argument(name)
     public static TryGet<object> ConvertOne(string stringRep, Type enumType)
     {
         stringRep = stringRep.Trim();
-        
+
         // only allow exact matches or matches with the first letter not capitalized
-        if (Enum.IsDefined(enumType, stringRep) || 
+        if (Enum.IsDefined(enumType, stringRep) ||
             Enum.GetNames(enumType).Any(n => n.LowerFirst() == stringRep))
         {
             return Enum.Parse(enumType, stringRep, true);
         }
-        
+
         return $"Value '{stringRep}' is not a {enumType.AccurateName} enum value.";
     }
 }
@@ -27,18 +27,18 @@ public abstract class EnumArgument(string name) : Argument(name)
 public class EnumArgument<TEnum> : EnumArgument where TEnum : struct, Enum
 {
     private readonly bool _isFlag;
-    
+
     public EnumArgument(string name) : base(name)
     {
         HelpInfoStorage.UsedEnums.Add(typeof(TEnum));
-        
+
         if (typeof(TEnum).IsDefined(typeof(FlagsAttribute), false))
         {
             _isFlag = true;
         }
     }
 
-    public override string InputDescription => 
+    public override string InputDescription =>
         $"{typeof(TEnum).AccurateName} enum value - found using 'serhelp {typeof(TEnum).AccurateName}' command"
         + (_isFlag ? ". Use '|' character to provide multiple e.g. Val1|Val2|Val3" : "");
 
@@ -75,7 +75,7 @@ public class EnumArgument<TEnum> : EnumArgument where TEnum : struct, Enum
             {
                 return error;
             }
-        
+
             return (TEnum)value;
         }
 
@@ -88,7 +88,7 @@ public class EnumArgument<TEnum> : EnumArgument where TEnum : struct, Enum
             {
                 return error;
             }
-            
+
             result |= System.Convert.ToUInt64(value);
         }
 

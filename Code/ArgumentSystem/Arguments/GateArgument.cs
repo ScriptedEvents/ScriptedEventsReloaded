@@ -26,7 +26,7 @@ public class GateArgument(string name) : EnumHandlingArgument(name)
                     if (door is null)
                     {
                         return $"Gate with name '{doorName}' does not exist.";
-                    }   
+                    }
 
                     return door;
                 }
@@ -34,7 +34,7 @@ public class GateArgument(string name) : EnumHandlingArgument(name)
             () =>
             {
                 Result rs = $"Value '{token.RawRep}' cannot be interpreted as {InputDescription}.";
-                
+
                 if (token is not IValueToken val || !val.CapableOf<ReferenceValue>(out var func))
                 {
                     return rs;
@@ -46,7 +46,7 @@ public class GateArgument(string name) : EnumHandlingArgument(name)
                     {
                         return error;
                     }
-                    
+
                     if (ReferenceArgument<Gate>.TryParse(refVal).WasSuccessful(out var gate))
                     {
                         return gate;

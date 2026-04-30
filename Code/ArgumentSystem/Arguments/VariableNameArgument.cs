@@ -26,9 +26,9 @@ public class VariableNameArgument<T>(string name) : Argument(name)
     where T : VariableToken
 {
     public string TypeName => typeof(T).AccurateName[..^"VariableToken".Length].LowerFirst();
-    
+
     public override string InputDescription => $"A {TypeName} variable name (doesn't have to be real)";
-    
+
     [UsedImplicitly]
     public DynamicTryGet<T> GetConvertSolution(BaseToken token)
     {
@@ -36,7 +36,7 @@ public class VariableNameArgument<T>(string name) : Argument(name)
         {
             return $"Value '{token.RawRep}' is not a syntactically valid {TypeName} variable name.";
         }
-        
+
         return variableToken;
     }
 }

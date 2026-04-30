@@ -33,11 +33,10 @@ public class LooseReferenceArgument(string name, Type type) : Argument(name)
         {
             return value.Value;
         }
-        
+
         return $"The {value} reference is not {ValidInput}";
     }
 }
-
 
 public class ReferenceArgument<TValue>(string name) : LooseReferenceArgument(name, typeof(TValue))
 {
@@ -60,7 +59,7 @@ public class ReferenceArgument<TValue>(string name) : LooseReferenceArgument(nam
         {
             return tValue;
         }
-        
+
         return $"The {value} reference is not valid {typeof(TValue).AccurateName} object";
     }
 }

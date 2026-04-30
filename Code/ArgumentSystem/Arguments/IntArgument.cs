@@ -10,9 +10,9 @@ namespace SER.Code.ArgumentSystem.Arguments;
 
 public class IntArgument : Argument
 {
-    private readonly int? _minValue;
     private readonly int? _maxValue;
-    
+    private readonly int? _minValue;
+
     public IntArgument(string name, int? minValue = null, int? maxValue = null) : base(name)
     {
         if (minValue.HasValue && maxValue.HasValue && minValue.Value > maxValue.Value)
@@ -20,12 +20,12 @@ public class IntArgument : Argument
             throw new AndrzejFuckedUpException(
                 $"{nameof(IntArgument)} has minValue at {minValue.Value} and maxValue at {maxValue.Value}.");
         }
-        
+
         _minValue = minValue;
         _maxValue = maxValue;
     }
 
-    public override string InputDescription 
+    public override string InputDescription
     {
         get
         {
@@ -49,7 +49,7 @@ public class IntArgument : Argument
             return "Any number e.g. 2";
         }
     }
-    
+
     [UsedImplicitly]
     public DynamicTryGet<int> GetConvertSolution(BaseToken token)
     {
@@ -62,7 +62,7 @@ public class IntArgument : Argument
         {
             return $"{token} is not {InputDescription}.";
         }
-        
+
         return new(() => func().OnSuccess(VerifyRange));
     }
 
@@ -71,7 +71,7 @@ public class IntArgument : Argument
         var result = (int)value.Value;
         if (result < _minValue)
             return $"Value {value} is lower than allowed minimum value {_minValue}.";
-            
+
         if (result > _maxValue)
             return $"Value {value} is higher than allowed maximum value {_maxValue}.";
 

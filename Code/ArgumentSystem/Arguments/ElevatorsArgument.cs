@@ -18,7 +18,7 @@ public class ElevatorsArgument(string name) : EnumHandlingArgument(name)
             new()
             {
                 [typeof(ElevatorGroup)] = group =>
-                    Elevator.List.Where(elevator => elevator.Group == (ElevatorGroup)group).ToArray(),
+                    Elevator.List.Where(elevator => elevator.Group == (ElevatorGroup)group).ToArray()
             },
             () =>
             {

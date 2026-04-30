@@ -9,7 +9,7 @@ namespace SER.Code.ArgumentSystem.Arguments;
 public class BoolArgument(string name) : Argument(name)
 {
     public override string InputDescription => "bool (true or false) value";
-    
+
     [UsedImplicitly]
     public DynamicTryGet<bool> GetConvertSolution(BaseToken token)
     {

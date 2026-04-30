@@ -9,20 +9,20 @@ namespace SER.Code.ArgumentSystem.Arguments;
 public class EffectTypeArgument(string name) : Argument(name)
 {
     public static readonly Type[] EffectTypes = typeof(StatusEffectBase).Assembly.GetTypes()
-        .Where(t => 
-            t.IsSubclassOf(typeof(StatusEffectBase)) && 
-            !t.IsAbstract && 
+        .Where(t =>
+            t.IsSubclassOf(typeof(StatusEffectBase)) &&
+            !t.IsAbstract &&
             !typeof(IHolidayEffect).IsAssignableFrom(t)
         )
         .ToArray();
-    
+
     public static readonly Dictionary<string, Type> EffectNames = EffectTypes
         .ToDictionary(t => t.Name, t => t, StringComparer.OrdinalIgnoreCase);
 
-    public override string InputDescription => 
-        "One of the following effects:\n" 
-        + EffectNames.Keys.Select(n => $"> {n}").JoinStrings("\n"); 
-    
+    public override string InputDescription =>
+        "One of the following effects:\n"
+        + EffectNames.Keys.Select(n => $"> {n}").JoinStrings("\n");
+
     [UsedImplicitly]
     public DynamicTryGet<Type> GetConvertSolution(BaseToken token)
     {
@@ -30,7 +30,7 @@ public class EffectTypeArgument(string name) : Argument(name)
         {
             return InternalConvert(name);
         }
-        
+
         return new(() => InternalConvert(func()));
     }
 
@@ -40,7 +40,7 @@ public class EffectTypeArgument(string name) : Argument(name)
         {
             return type;
         }
-        
+
         return "Value is not a valid effect name.";
     }
 }

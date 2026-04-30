@@ -9,7 +9,7 @@ public class TokenArgument<T>(string name) : Argument(name) where T : BaseToken
 {
     // todo: add better descriptions for tokens
     public override string InputDescription => $"A {typeof(T).FriendlyTypeName(true)}";
-    
+
     [UsedImplicitly]
     public DynamicTryGet<T> GetConvertSolution(BaseToken token)
     {
@@ -17,7 +17,7 @@ public class TokenArgument<T>(string name) : Argument(name) where T : BaseToken
         {
             return $"Token '{token.RawRep}' is not of type {nameof(T)}.";
         }
-        
+
         return cToken;
     }
 }

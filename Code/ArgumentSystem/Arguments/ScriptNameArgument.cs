@@ -8,7 +8,7 @@ namespace SER.Code.ArgumentSystem.Arguments;
 public class ScriptNameArgument(string name) : Argument(name)
 {
     public override string InputDescription => "Name of a script";
-    
+
     [UsedImplicitly]
     public DynamicTryGet<ScriptName> GetConvertSolution(BaseToken token)
     {
@@ -16,7 +16,7 @@ public class ScriptNameArgument(string name) : Argument(name)
         {
             return ScriptName.Create(name);
         }
-        
+
         return new(() => ScriptName.Create(func()));
     }
 }

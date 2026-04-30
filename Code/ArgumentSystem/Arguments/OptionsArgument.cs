@@ -11,7 +11,7 @@ public class OptionsArgument(string name, params Option[] options) : Argument(na
 
     public override string InputDescription =>
         "One of the following options:\n > " +
-        string.Join("\n > ", Options.Select(o => string.IsNullOrEmpty(o.Description) 
+        string.Join("\n > ", Options.Select(o => string.IsNullOrEmpty(o.Description)
             ? o.Value
             : $"{o.Value} ({o.Description})"));
 
@@ -22,15 +22,15 @@ public class OptionsArgument(string name, params Option[] options) : Argument(na
         {
             return InternalConvert(value);
         }
-        
+
         return new(() => InternalConvert(func()));
     }
 
     private TryGet<string> InternalConvert(string value)
     {
-        var option = Options.FirstOrDefault(opt 
+        var option = Options.FirstOrDefault(opt
             => opt.Value.Equals(value, StringComparison.CurrentCultureIgnoreCase));
-        
+
         if (option == null)
         {
             return TryGet<string>.Error(

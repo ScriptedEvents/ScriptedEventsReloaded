@@ -18,12 +18,12 @@ public class ItemsArgument(string name) : EnumHandlingArgument(name)
             token,
             new()
             {
-                [typeof(ItemType)] = itemType => Item.GetAll((ItemType)itemType).ToArray(),
+                [typeof(ItemType)] = itemType => Item.GetAll((ItemType)itemType).ToArray()
             },
             () =>
             {
                 Result rs = $"Value '{token.RawRep}' cannot be interpreted as {InputDescription}.";
-                
+
                 if (token is SymbolToken { IsJoker: true })
                 {
                     return Item.List.ToArray();
@@ -40,7 +40,7 @@ public class ItemsArgument(string name) : EnumHandlingArgument(name)
                     {
                         return error;
                     }
-                    
+
                     if (ReferenceArgument<Item>.TryParse(refValue).WasSuccessful(out var item))
                     {
                         return new[] { item };

@@ -19,7 +19,7 @@ public class RoomArgument(string name) : EnumHandlingArgument(name)
             token,
             new()
             {
-                [typeof(RoomName)] = roomName => Room.List.Where(room => room.Name == (RoomName)roomName).GetRandomValue()!,
+                [typeof(RoomName)] = roomName => Room.List.Where(room => room.Name == (RoomName)roomName).GetRandomValue()!
             },
             () =>
             {
@@ -33,9 +33,9 @@ public class RoomArgument(string name) : EnumHandlingArgument(name)
                 {
                     if (get().HasErrored(out var error, out var refVal))
                     {
-                        return error;   
+                        return error;
                     }
-                    
+
                     if (ReferenceArgument<Room>.TryParse(refVal).WasSuccessful(out var room))
                     {
                         return room;

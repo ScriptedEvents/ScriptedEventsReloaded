@@ -18,7 +18,7 @@ public class ColorArgument(string name) : Argument(name)
         {
             return $"Value is not a {InputDescription}.";
         }
-        
+
         return new(() => func().OnSuccess(val => val.Value));
     }
 }

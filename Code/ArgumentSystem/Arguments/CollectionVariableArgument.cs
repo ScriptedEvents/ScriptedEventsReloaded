@@ -7,7 +7,7 @@ using SER.Code.VariableSystem.Variables;
 namespace SER.Code.ArgumentSystem.Arguments;
 
 /// <summary>
-/// Represents any Variable argument used in a method.
+///     Represents any Variable argument used in a method.
 /// </summary>
 public class CollectionVariableArgument(string name) : Argument(name)
 {

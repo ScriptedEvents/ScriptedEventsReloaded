@@ -10,14 +10,14 @@ namespace SER.Code.ArgumentSystem.Arguments;
 
 public class FloatArgument : Argument
 {
-    private readonly float? _minValue;
     private readonly float? _maxValue;
+    private readonly float? _minValue;
     private readonly bool _preferPercent;
 
     public FloatArgument(
         string name,
         float? minValue = null,
-        float? maxValue = null, 
+        float? maxValue = null,
         bool preferPercent = false) : base(name)
     {
         if (minValue.HasValue && maxValue.HasValue && minValue.Value > maxValue.Value)
@@ -25,18 +25,12 @@ public class FloatArgument : Argument
             throw new AndrzejFuckedUpException(
                 $"{nameof(FloatArgument)} has minValue at {minValue.Value} and maxValue at {maxValue.Value}.");
         }
-        
+
         _minValue = minValue;
         _maxValue = maxValue;
         _preferPercent = preferPercent;
     }
 
-    private string FormatNum(double number)
-    {
-        if (!_preferPercent) return number.ToString();
-        return $"{number * 100}%";
-    }
-    
     public override string InputDescription
     {
         get
@@ -62,6 +56,12 @@ public class FloatArgument : Argument
         }
     }
 
+    private string FormatNum(double number)
+    {
+        if (!_preferPercent) return number.ToString();
+        return $"{number * 100}%";
+    }
+
     [UsedImplicitly]
     public DynamicTryGet<float> GetConvertSolution(BaseToken token)
     {
@@ -74,7 +74,7 @@ public class FloatArgument : Argument
         {
             return $"{token} is not {InputDescription}.";
         }
-        
+
         return new(() => func().OnSuccess(VerifyRange));
     }
 
@@ -83,7 +83,7 @@ public class FloatArgument : Argument
         var result = (float)value.Value;
         if (result < _minValue)
             return $"Value {value} is lower than allowed minimum value {_minValue}.";
-            
+
         if (result > _maxValue)
             return $"Value {value} is higher than allowed maximum value {_maxValue}.";
 

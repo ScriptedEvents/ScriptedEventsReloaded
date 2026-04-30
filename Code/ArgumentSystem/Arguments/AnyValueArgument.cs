@@ -9,7 +9,7 @@ namespace SER.Code.ArgumentSystem.Arguments;
 public class AnyValueArgument(string name) : Argument(name)
 {
     public override string InputDescription => "Any value";
-    
+
     [UsedImplicitly]
     public DynamicTryGet<Value> GetConvertSolution(BaseToken token)
     {
@@ -17,7 +17,7 @@ public class AnyValueArgument(string name) : Argument(name)
         {
             return new(valToken.Value);
         }
-        
+
         return $"Value '{token.RawRep}' does not represent any kind of value";
     }
 }

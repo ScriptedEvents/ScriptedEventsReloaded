@@ -10,7 +10,7 @@ namespace SER.Code.ArgumentSystem.Arguments;
 public class CollectionArgument(string name) : Argument(name)
 {
     public override string InputDescription => $"A collection variable e.g. {CollectionVariableToken.Example}";
-    
+
     [UsedImplicitly]
     public DynamicTryGet<CollectionValue> GetConvertSolution(BaseToken token)
     {

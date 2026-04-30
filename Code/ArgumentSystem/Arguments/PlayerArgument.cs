@@ -26,7 +26,7 @@ public class PlayerArgument(string name) : Argument(name)
         {
             return error;
         }
-        
+
         var plrs = variable.Players;
         if (plrs.Len != 1)
         {

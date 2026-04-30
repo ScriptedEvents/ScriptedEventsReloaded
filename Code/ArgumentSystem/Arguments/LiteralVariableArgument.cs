@@ -9,7 +9,7 @@ namespace SER.Code.ArgumentSystem.Arguments;
 public class LiteralVariableArgument(string name) : Argument(name)
 {
     public override string InputDescription => "Any existing literal variable e.g. $text or $playerId";
-    
+
     [UsedImplicitly]
     public DynamicTryGet<LiteralVariable> GetConvertSolution(BaseToken token)
     {

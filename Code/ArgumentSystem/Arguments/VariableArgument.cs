@@ -8,7 +8,7 @@ using SER.Code.VariableSystem.Bases;
 namespace SER.Code.ArgumentSystem.Arguments;
 
 /// <summary>
-/// Represents any Variable argument used in a method.
+///     Represents any Variable argument used in a method.
 /// </summary>
 public class VariableArgument(string name) : Argument(name)
 {
@@ -39,8 +39,8 @@ public class VariableArgument<T>(string name) : Argument(name) where T : Variabl
         }
 
         return new(() => variableToken
-                .TryGetVariable()
-                .SuccessTryCast<Variable, T>()
+            .TryGetVariable()
+            .SuccessTryCast<Variable, T>()
         );
     }
 }

@@ -5,14 +5,14 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.PlayerMethods;
 
 [UsedImplicitly]
-public class SetInfoAreaMethod : SynchronousMethod
+public class SetShownPlayerInfoMethod : SynchronousMethod
 {
-    public override string Description => "Sets InfoArea for specified players";
+    public override string Description => "Sets what information about the player is shown.";
 
     public override Argument[] ExpectedArguments { get; } = 
     [
         new PlayersArgument("players"),
-        new EnumArgument<PlayerInfoArea>("info area")
+        new EnumArgument<PlayerInfoArea>("info to show")
         {
             ConsumesRemainingValues = true,
         }
@@ -21,8 +21,7 @@ public class SetInfoAreaMethod : SynchronousMethod
     public override void Execute()
     {
         var players = Args.GetPlayers("players");
-        PlayerInfoArea info = Args.GetRemainingArguments<object, EnumArgument<PlayerInfoArea>>("info area")
-            .Cast<PlayerInfoArea>()
+        PlayerInfoArea info = Args.GetRemainingArguments<PlayerInfoArea, EnumArgument<PlayerInfoArea>>("info area")
             .Aggregate((a, b) => a | b);
         
         players.ForEach(p => p.InfoArea = info);

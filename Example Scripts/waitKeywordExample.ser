@@ -1,6 +1,0 @@
-# wait for 5 seconds
-wait 5s
-
-# Waits using a variable
-$duration = 10s
-wait $duration

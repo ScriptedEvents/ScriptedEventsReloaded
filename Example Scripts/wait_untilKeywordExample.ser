@@ -1,2 +1,0 @@
-# wait until there are no players on the server
-wait_until {AmountOf @all} is 0

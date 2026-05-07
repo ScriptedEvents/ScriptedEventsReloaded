@@ -1,0 +1,23 @@
+!-- OnEvent Joined
+-- require @evPlayer
+
+forever
+    wait_until {@evPlayer -> isTransmitting} is true
+
+    # save last display name before changing
+    $lastDisplayName = @evPlayer -> displayName
+
+    # anonymize the player
+    SetDisplayName @evPlayer "???" 
+
+    wait_until {@evPlayer -> isTransmitting} is false
+
+    # if the last display name is the exact same as the name,
+    # then reset the display name for the same effect
+    # else set the last display name back
+    if $lastDisplayName is {@evPlayer -> name}
+        SetDisplayName @evPlayer _
+    else
+        SetDisplayName @evPlayer $lastDisplayName
+    end
+end

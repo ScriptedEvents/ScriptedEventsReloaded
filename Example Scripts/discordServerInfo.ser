@@ -12,7 +12,7 @@ func *GetDiscordMessage
 end
 
 if {$url -> length} is 0
-    Error "Script '{This name}' cannot run, because the webhook URL was not set!"
+    Print "The discord server info system cannot run, because the webhook URL was not set!"
     stop
 end
 

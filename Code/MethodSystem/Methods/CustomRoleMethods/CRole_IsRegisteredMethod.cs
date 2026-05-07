@@ -7,7 +7,8 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.CustomRoleMethods;
 
 [UsedImplicitly]
-public class IsCRoleRegisteredMethod : ReturningMethod<BoolValue>
+// ReSharper disable once InconsistentNaming
+public class CRole_IsRegisteredMethod : ReturningMethod<BoolValue>
 {
     public override string Description => "Checks if a given custom role is registered.";
 

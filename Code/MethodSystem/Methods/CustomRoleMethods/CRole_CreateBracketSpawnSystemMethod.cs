@@ -10,7 +10,8 @@ using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
 namespace SER.Code.MethodSystem.Methods.CustomRoleMethods;
 
 [UsedImplicitly]
-public class BracketSpawnSystemMethod : ReferenceReturningMethod<CustomRoleSpawnSystem>, ICanError
+// ReSharper disable once InconsistentNaming
+public class CRole_CreateBracketSpawnSystemMethod : ReferenceReturningMethod<CustomRoleSpawnSystem>, ICanError
 {
     public override string Description => "Creates a spawn for a custom roles that uses ranges of available players.";
 

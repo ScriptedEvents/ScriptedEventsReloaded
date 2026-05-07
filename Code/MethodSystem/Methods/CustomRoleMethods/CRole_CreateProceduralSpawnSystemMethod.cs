@@ -8,7 +8,8 @@ using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
 namespace SER.Code.MethodSystem.Methods.CustomRoleMethods;
 
 [UsedImplicitly]
-public class ProceduralSpawnSystemMethod : ReferenceReturningMethod<CustomRoleSpawnSystem>, IAdditionalDescription
+// ReSharper disable once InconsistentNaming
+public class CRole_CreateProceduralSpawnSystemMethod : ReferenceReturningMethod<CustomRoleSpawnSystem>, IAdditionalDescription
 {
     public override string Description => "Creates a procedural spawn system for a custom role.";
     public string AdditionalDescription => "This spawn system works only when the round starts.";

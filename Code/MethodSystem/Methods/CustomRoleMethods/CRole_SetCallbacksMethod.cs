@@ -8,7 +8,8 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.CustomRoleMethods;
 
 [UsedImplicitly]
-public class SetCRoleCallbacksMethod : SynchronousMethod
+// ReSharper disable once InconsistentNaming
+public class CRole_SetCallbacksMethod : SynchronousMethod
 {
     public override string Description => "Sets the callbacks for a provided custom role.";
 

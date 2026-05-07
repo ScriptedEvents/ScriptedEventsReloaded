@@ -10,7 +10,8 @@ using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
 namespace SER.Code.MethodSystem.Methods.CustomRoleMethods;
 
 [UsedImplicitly]
-public class RegisterCRoleMethod : SynchronousMethod, ICanError
+// ReSharper disable once InconsistentNaming
+public class CRole_RegisterMethod : SynchronousMethod, ICanError
 {
     public override string Description => "Registers a custom role.";
 

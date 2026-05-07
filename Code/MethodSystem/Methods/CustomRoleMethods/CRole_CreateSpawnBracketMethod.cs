@@ -8,7 +8,8 @@ using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
 namespace SER.Code.MethodSystem.Methods.CustomRoleMethods;
 
 [UsedImplicitly]
-public class SpawnBracketMethod : ReferenceReturningMethod<SpawnBracket>, IAdditionalDescription, ICanError
+// ReSharper disable once InconsistentNaming
+public class CRole_CreateSpawnBracketMethod : ReferenceReturningMethod<SpawnBracket>, IAdditionalDescription, ICanError
 {
     public override string Description => "Creates a spawn bracket for a the bracket spawn system.";
 

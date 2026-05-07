@@ -6,7 +6,8 @@ using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
 namespace SER.Code.MethodSystem.Methods.CustomRoleMethods;
 
 [UsedImplicitly]
-public class UnregisterCRoleMethod : SynchronousMethod
+// ReSharper disable once InconsistentNaming
+public class CRole_UnregisterMethod : SynchronousMethod
 {
     public override string Description => "Unregisters a given custom role from the server.";
 

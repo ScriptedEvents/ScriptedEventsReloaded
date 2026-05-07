@@ -8,7 +8,7 @@ namespace SER.Code.MethodSystem.Methods.HTTPMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class FormatToReadableJSONMethod : ReturningMethod<TextValue>
+public class JSON_FormatToReadableMethod : ReturningMethod<TextValue>
 {
     public override string Description => "Returns the JSON object in a readable format.";
 

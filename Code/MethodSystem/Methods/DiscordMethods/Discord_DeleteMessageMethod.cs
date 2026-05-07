@@ -16,7 +16,7 @@ public class Discord_DeleteMessageMethod : SynchronousMethod, ICanError
 
     public string[] ErrorReasons =>
     [
-        ..HTTPPostMethod.HttpErrorReasons,
+        ..HTTP_PostMethod.HttpErrorReasons,
         "Message ID must not be empty.",
         "Provided URL is not a valid webhook URL."
     ];
@@ -50,6 +50,6 @@ public class Discord_DeleteMessageMethod : SynchronousMethod, ICanError
         var messageURL = webhookUrl + "/messages/" + messageId +
                          (!threadId.IsEmpty() ? $"?thread_id={threadId}" : "");
 
-        Timing.RunCoroutine(HTTPPostMethod.RequestSend(this, messageURL, null, "DELETE"));
+        Timing.RunCoroutine(HTTP_PostMethod.RequestSend(this, messageURL, null, "DELETE"));
     }
 }

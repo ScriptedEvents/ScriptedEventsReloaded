@@ -12,13 +12,13 @@ namespace SER.Code.MethodSystem.Methods.HTTPMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class HTTPGetMethod : YieldingReferenceReturningMethod<JObject>, ICanError
+public class HTTP_GetMethod : YieldingReferenceReturningMethod<JObject>, ICanError
 {
     public override string Description =>
         "Sends a GET request to a provided URL and returns the response as a JSON object.";
 
     public string[] ErrorReasons => [
-        ..HTTPPostMethod.HttpErrorReasons, 
+        ..HTTP_PostMethod.HttpErrorReasons, 
         "Provided response was not a valid JSON object."
     ];
 

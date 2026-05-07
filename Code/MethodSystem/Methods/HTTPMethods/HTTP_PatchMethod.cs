@@ -10,7 +10,7 @@ namespace SER.Code.MethodSystem.Methods.HTTPMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class HTTPPatchMethod : SynchronousMethod, ICanError
+public class HTTP_PatchMethod : SynchronousMethod, ICanError
 {
     public override string Description => "Sends a PATCH request to a provided URL.";
 
@@ -31,6 +31,6 @@ public class HTTPPatchMethod : SynchronousMethod, ICanError
     {
         var address = Args.GetText("address");
         var jsonData = Args.GetReference<JObject>("json data to patch");
-        Timing.RunCoroutine(HTTPPostMethod.RequestSend(this, address, jsonData, "PATCH"));
+        Timing.RunCoroutine(HTTP_PostMethod.RequestSend(this, address, jsonData, "PATCH"));
     }
 }

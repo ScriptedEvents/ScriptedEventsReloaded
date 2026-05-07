@@ -16,7 +16,7 @@ public class Discord_SendMessageMethod : SynchronousMethod, ICanError
 
     public string[] ErrorReasons =>
     [
-        ..HTTPPostMethod.HttpErrorReasons,
+        ..HTTP_PostMethod.HttpErrorReasons,
         "Provided URL is not a valid webhook URL."
     ];
 
@@ -39,7 +39,7 @@ public class Discord_SendMessageMethod : SynchronousMethod, ICanError
         if (!webhookUrl.StartsWith("https://discord.com/api/webhooks/"))
             throw new ScriptRuntimeError(this, ErrorReasons.Last());
 
-        Timing.RunCoroutine(HTTPPostMethod.RequestSend(
+        Timing.RunCoroutine(HTTP_PostMethod.RequestSend(
             this, 
             webhookUrl + (!threadId.IsEmpty() ? $"?thread_id={threadId}" : ""), 
             messageObject));

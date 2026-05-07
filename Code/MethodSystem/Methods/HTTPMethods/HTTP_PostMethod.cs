@@ -12,7 +12,7 @@ namespace SER.Code.MethodSystem.Methods.HTTPMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class HTTPPostMethod : SynchronousMethod, ICanError
+public class HTTP_PostMethod : SynchronousMethod, ICanError
 {
     public override string Description => "Sends a POST request to a provided URL.";
 

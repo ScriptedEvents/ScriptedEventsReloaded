@@ -6,7 +6,7 @@ namespace SER.Code.MethodSystem.Methods.HTTPMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class CreateJSONMethod : ReferenceReturningMethod<JObject>
+public class JSON_CreateMethod : ReferenceReturningMethod<JObject>
 {
     public override string Description => "Returns an empty JSON object.";
 

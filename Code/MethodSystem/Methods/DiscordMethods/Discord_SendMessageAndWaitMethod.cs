@@ -20,7 +20,7 @@ public class Discord_SendMessageAndWaitMethod : YieldingReturningMethod<TextValu
 
     public string[] ErrorReasons =>
     [
-        ..HTTPPostMethod.HttpErrorReasons,
+        ..HTTP_PostMethod.HttpErrorReasons,
         "Provided URL is not a valid webhook URL."
     ];
 

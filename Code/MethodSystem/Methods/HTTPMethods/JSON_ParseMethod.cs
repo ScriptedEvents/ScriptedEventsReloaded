@@ -7,8 +7,9 @@ using SER.Code.MethodSystem.MethodDescriptors;
 
 namespace SER.Code.MethodSystem.Methods.HTTPMethods;
 
+[UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class ParseJSONMethod : ReferenceReturningMethod<JObject>, ICanError
+public class JSON_ParseMethod : ReferenceReturningMethod<JObject>, ICanError
 {
     public override string Description => "Parses a provided value into a JSON object.";
 

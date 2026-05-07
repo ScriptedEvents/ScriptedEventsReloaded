@@ -5,7 +5,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.HealthMethods;
 
 [UsedImplicitly]
-public class RegenerateMethod : SynchronousMethod
+public class SetRegenerationMethod : SynchronousMethod
 {
     public override string Description => "Adds health regeneration to players.";
 

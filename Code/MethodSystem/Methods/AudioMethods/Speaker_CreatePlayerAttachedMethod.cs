@@ -9,9 +9,10 @@ using UnityEngine;
 namespace SER.Code.MethodSystem.Methods.AudioMethods;
 
 [UsedImplicitly]
-public class CreatePlayerAttachedSpeakerMethod : SynchronousMethod, ICanError
+// ReSharper disable once InconsistentNaming
+public class Speaker_CreatePlayerAttachedMethod : SynchronousMethod, ICanError
 {
-    public override string Description => "Creates a speaker attached to the player to play audio through.";
+    public override string Description => "Creates a speaker attached to a player to play audio through.";
 
     public string[] ErrorReasons =>
     [

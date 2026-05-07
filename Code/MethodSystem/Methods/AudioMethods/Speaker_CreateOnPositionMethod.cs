@@ -6,7 +6,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.AudioMethods;
 
 [UsedImplicitly]
-public class CreateSpeakerOnPositionMethod : SynchronousMethod
+public class Speaker_CreateOnPositionMethod : SynchronousMethod
 {
     public override string Description => "Creates a speaker in a specified XYZ position.";
 

@@ -8,11 +8,11 @@ namespace SER.Code.MethodSystem.Methods.AdminToysMethods;
 
 [UsedImplicitly]
 // ReSharper disable InconsistentNaming
-public class TPToyRoomMethod : SynchronousMethod, IAdditionalDescription
+public class Toy_TPRoomMethod : SynchronousMethod, IAdditionalDescription
 {
     public override string Description => "Teleports an Admin Toy to the given room";
 
-    public string AdditionalDescription => TPToyPosMethod.Singleton.AdditionalDescription;
+    public string AdditionalDescription => Toy_TPPositionMethod.Singleton.AdditionalDescription;
     
     public override Argument[] ExpectedArguments { get; } =
     [
@@ -33,6 +33,6 @@ public class TPToyRoomMethod : SynchronousMethod, IAdditionalDescription
             Args.GetFloat("y position"),
             Args.GetFloat("z position"));
         
-        TPToyPosMethod.TeleportOrSpawn(toy, pos);
+        Toy_TPPositionMethod.TeleportOrSpawn(toy, pos);
     }
 }

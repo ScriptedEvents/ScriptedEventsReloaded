@@ -5,10 +5,11 @@ using SER.Code.Exceptions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.ValueSystem;
 
-namespace SER.Code.MethodSystem.Methods.AdminToyPropertyMethods;
+namespace SER.Code.MethodSystem.Methods.AdminToysMethods;
 
 [UsedImplicitly]
-public class ToyInfoMethod : ReturningMethod<NumberValue>
+// ReSharper disable once InconsistentNaming
+public class Toy_InfoMethod : ReturningMethod<NumberValue>
 {
     public override string Description => "Returns information about an Admin Toy";
 

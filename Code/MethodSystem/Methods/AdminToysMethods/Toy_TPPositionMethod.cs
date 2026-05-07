@@ -11,7 +11,7 @@ namespace SER.Code.MethodSystem.Methods.AdminToysMethods;
 
 [UsedImplicitly]
 // ReSharper disable InconsistentNaming
-public class TPToyPosMethod : SynchronousMethod, IAdditionalDescription
+public class Toy_TPPositionMethod : SynchronousMethod, IAdditionalDescription
 {
     public override string Description => "Teleports an Admin Toy to the given absolute coordinates";
 
@@ -46,9 +46,9 @@ public class TPToyPosMethod : SynchronousMethod, IAdditionalDescription
     }
 
     // Once again the singleton is there just to make the ErrorReasons universal
-    public static TPToyPosMethod Singleton
+    public static Toy_TPPositionMethod Singleton
     {
-        get => field is null ? field = new TPToyPosMethod() : field;
+        get => field is null ? field = new Toy_TPPositionMethod() : field;
     } = null!;
 
     public static void TeleportOrSpawn(AdminToy toy, Vector3 position, Quaternion? rotation = null)

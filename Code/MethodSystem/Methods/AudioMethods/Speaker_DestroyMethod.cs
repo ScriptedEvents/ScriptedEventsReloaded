@@ -5,7 +5,8 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.AudioMethods;
 
 [UsedImplicitly]
-public class DestroySpeakerMethod : SynchronousMethod
+// ReSharper disable once InconsistentNaming
+public class Speaker_DestroyMethod : SynchronousMethod
 {
     public override string Description => "Destroys a speaker.";
 

@@ -8,11 +8,12 @@ using UnityEngine;
 namespace SER.Code.MethodSystem.Methods.AdminToysMethods;
 
 [UsedImplicitly]
-public class MoveToyMethod : SynchronousMethod, ICanError, IAdditionalDescription
+// ReSharper disable once InconsistentNaming
+public class Toy_MoveMethod : SynchronousMethod, ICanError, IAdditionalDescription
 {
     public override string Description => "Moves an Admin Toy relative to its rotation.";
 
-    public string AdditionalDescription => $"E.g. \"{GetFriendlyName(typeof(MoveToyMethod))} *toy 0 0 1\" would " +
+    public string AdditionalDescription => $"E.g. \"{GetFriendlyName(typeof(Toy_MoveMethod))} *toy 0 0 1\" would " +
                                            $"move the referenced toy 1 unit (meter) forward.";
     public string[] ErrorReasons =>
     [

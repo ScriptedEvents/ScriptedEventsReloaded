@@ -9,7 +9,8 @@ using SER.Code.MethodSystem.MethodDescriptors;
 namespace SER.Code.MethodSystem.Methods.AdminToysMethods;
 
 [UsedImplicitly]
-public class SetToyParentMethod : SynchronousMethod, ICanError
+// ReSharper disable once InconsistentNaming
+public class Toy_SetParentMethod : SynchronousMethod, ICanError
 {
     public override string Description => "Sets the parent of a toy (So that the toy follows it).";
 

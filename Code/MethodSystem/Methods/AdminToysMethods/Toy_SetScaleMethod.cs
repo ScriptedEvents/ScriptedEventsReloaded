@@ -7,7 +7,8 @@ using UnityEngine;
 namespace SER.Code.MethodSystem.Methods.AdminToysMethods;
 
 [UsedImplicitly]
-public class SetToyScaleMethod : SynchronousMethod
+// ReSharper disable once InconsistentNaming
+public class Toy_SetScaleMethod : SynchronousMethod
 {
     public override string Description => "Sets the scale of a toy.";
 

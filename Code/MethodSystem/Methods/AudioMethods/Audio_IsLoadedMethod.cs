@@ -6,7 +6,8 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.AudioMethods;
 
 [UsedImplicitly]
-public class IsAudioLoadedMethod : ReturningMethod<BoolValue>
+// ReSharper disable once InconsistentNaming
+public class Audio_IsLoadedMethod : ReturningMethod<BoolValue>
 {
     public override string Description => "Returns true if a given audio clip has been loaded";
 

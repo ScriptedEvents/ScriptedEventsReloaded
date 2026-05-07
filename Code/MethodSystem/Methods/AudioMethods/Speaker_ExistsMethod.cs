@@ -6,7 +6,8 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.AudioMethods;
 
 [UsedImplicitly]
-public class SpeakerExistsMethod : ReturningMethod<BoolValue>
+// ReSharper disable once InconsistentNaming
+public class Speaker_ExistsMethod : ReturningMethod<BoolValue>
 {
     public override string Description => "Returns true or false indicating if a speaker with the provided name exists.";
 

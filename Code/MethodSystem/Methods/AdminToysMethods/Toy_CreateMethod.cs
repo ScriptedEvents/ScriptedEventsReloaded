@@ -14,7 +14,8 @@ using TextToy = LabApi.Features.Wrappers.TextToy;
 namespace SER.Code.MethodSystem.Methods.AdminToysMethods;
 
 [UsedImplicitly]
-public class CreateToyMethod : ReferenceReturningMethod<AdminToy>, IAdditionalDescription
+// ReSharper disable once InconsistentNaming
+public class Toy_CreateMethod : ReferenceReturningMethod<AdminToy>, IAdditionalDescription
 {
     public override string Description => "Creates an Admin Toy";
 

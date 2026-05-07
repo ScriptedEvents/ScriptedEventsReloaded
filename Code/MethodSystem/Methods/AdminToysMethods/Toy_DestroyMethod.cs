@@ -10,7 +10,8 @@ using SER.Code.MethodSystem.MethodDescriptors;
 namespace SER.Code.MethodSystem.Methods.AdminToysMethods;
 
 [UsedImplicitly]
-public class DestroyToyMethod : SynchronousMethod, ICanError
+// ReSharper disable once InconsistentNaming
+public class Toy_DestroyMethod : SynchronousMethod, ICanError
 {
     public override string Description => "Destroys an Admin Toy.";
 

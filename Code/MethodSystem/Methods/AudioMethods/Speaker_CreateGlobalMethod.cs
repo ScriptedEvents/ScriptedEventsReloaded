@@ -6,7 +6,8 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.AudioMethods;
 
 [UsedImplicitly]
-public class CreateGlobalSpeakerMethod : SynchronousMethod
+// ReSharper disable once InconsistentNaming
+public class Speaker_CreateGlobalMethod : SynchronousMethod
 {
     public override string Description => "Creates a speaker to play audio through.";
 

@@ -7,7 +7,8 @@ using SER.Code.MethodSystem.MethodDescriptors;
 namespace SER.Code.MethodSystem.Methods.AudioMethods;
 
 [UsedImplicitly]
-public class LoadAudioMethod : SynchronousMethod, IAdditionalDescription, ICanError
+// ReSharper disable once InconsistentNaming
+public class Audio_LoadMethod : SynchronousMethod, IAdditionalDescription, ICanError
 {
     public override string Description => "Loads an audio file into the audio player.";
 

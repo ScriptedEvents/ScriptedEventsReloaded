@@ -7,7 +7,8 @@ using UnityEngine;
 namespace SER.Code.MethodSystem.Methods.AdminToysMethods;
 
 [UsedImplicitly]
-public class SetToyRotationMethod : SynchronousMethod
+// ReSharper disable once InconsistentNaming
+public class Toy_SetRotationMethod : SynchronousMethod
 {
     public override string Description => "Sets the rotation of a toy.";
 

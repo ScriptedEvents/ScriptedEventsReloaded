@@ -7,7 +7,8 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.ScriptMethods;
 
 [UsedImplicitly]
-public class IsRunningMethod : ReturningMethod<BoolValue>
+// ReSharper disable once InconsistentNaming
+public class Script_IsRunningMethod : ReturningMethod<BoolValue>
 {
     public override string Description => "Returns true if given script is running";
 

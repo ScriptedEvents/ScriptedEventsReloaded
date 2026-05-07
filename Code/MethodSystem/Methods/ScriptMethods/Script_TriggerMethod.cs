@@ -9,7 +9,8 @@ using SER.Code.ScriptSystem.Structures;
 namespace SER.Code.MethodSystem.Methods.ScriptMethods;
 
 [UsedImplicitly]
-public class TriggerMethod : SynchronousMethod
+// ReSharper disable once InconsistentNaming
+public class Script_TriggerMethod : SynchronousMethod
 {
     public override string Description => "Fires a given trigger, executing scripts which are attached to it.";
 

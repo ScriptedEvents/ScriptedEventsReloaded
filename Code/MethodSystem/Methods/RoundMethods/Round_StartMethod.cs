@@ -5,14 +5,15 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.RoundMethods;
 
 [UsedImplicitly]
-public class EndRoundMethod : SynchronousMethod
+// ReSharper disable once InconsistentNaming
+public class Round_StartMethod : SynchronousMethod
 {
-    public override string Description => "Ends a round.";
+    public override string Description => "Start a round.";
 
     public override Argument[] ExpectedArguments { get; } = [];
     
     public override void Execute()
     {
-        Round.End(true);
+        Round.Start();
     }
 }

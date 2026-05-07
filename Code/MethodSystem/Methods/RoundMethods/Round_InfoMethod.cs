@@ -9,7 +9,8 @@ using SER.Code.ValueSystem.Other;
 namespace SER.Code.MethodSystem.Methods.RoundMethods;
 
 [UsedImplicitly]
-public class RoundInfoMethod : LiteralValueReturningMethod
+// ReSharper disable once InconsistentNaming
+public class Round_InfoMethod : LiteralValueReturningMethod
 {
     public override string Description => "Returns information about the current round.";
     

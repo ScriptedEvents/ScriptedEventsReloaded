@@ -5,7 +5,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.RoundMethods;
 
 [UsedImplicitly]
-public class RestartRoundMethod : SynchronousMethod
+public class Round_RestartMethod : SynchronousMethod
 {
     public override string Description => "Restarts the round.";
 

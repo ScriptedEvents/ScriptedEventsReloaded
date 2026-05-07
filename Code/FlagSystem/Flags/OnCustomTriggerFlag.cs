@@ -13,7 +13,7 @@ public class OnCustomTriggerFlag : Flag, IMajorBehaviorFlag
     public static readonly Dictionary<string, List<ScriptName>> ScriptsBoundToTrigger = [];
     
     public override string Description =>
-        $"Makes a script execute when a trigger with a matching name is fired (done using {nameof(TriggerMethod).Replace("Method", "")} method)";
+        $"Makes a script execute when a trigger with a matching name is fired (done using {nameof(Script_TriggerMethod).Replace("Method", "")} method)";
 
     public override Argument? InlineArgument => new(
         "triggerName",

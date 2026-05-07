@@ -6,7 +6,8 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.RoundMethods;
 
 [UsedImplicitly]
-public class SetLobbyLockMethod : SynchronousMethod
+// ReSharper disable once InconsistentNaming
+public class Lobby_SetLockMethod : SynchronousMethod
 {
     public override string Description => "Changes the lobby lock state.";
 

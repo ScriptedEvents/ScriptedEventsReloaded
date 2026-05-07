@@ -7,7 +7,7 @@ using SER.Code.VariableSystem.Bases;
 namespace SER.Code.MethodSystem.Methods.ScriptMethods;
 
 [UsedImplicitly]
-public class RunScriptMethod : SynchronousMethod
+public class Script_RunMethod : SynchronousMethod
 {
     public override string Description => "Runs a script.";
 

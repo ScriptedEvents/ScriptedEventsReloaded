@@ -6,7 +6,8 @@ using SER.Code.VariableSystem.Bases;
 namespace SER.Code.MethodSystem.Methods.ScriptMethods;
 
 [UsedImplicitly]
-public class TransferVariablesMethod : SynchronousMethod
+// ReSharper disable once InconsistentNaming
+public class Script_TransferVariablesMethod : SynchronousMethod
 {
     public override string Description => "Makes a copy of the given local variable(s) in a different script.";
 

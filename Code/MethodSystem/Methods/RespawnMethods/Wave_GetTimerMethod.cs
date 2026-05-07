@@ -9,7 +9,8 @@ using SER.Code.ValueSystem;
 namespace SER.Code.MethodSystem.Methods.RespawnMethods;
 
 [UsedImplicitly]
-public class GetWaveTimerMethod : ReturningMethod<DurationValue>, IAdditionalDescription
+// ReSharper disable once InconsistentNaming
+public class Wave_GetTimerMethod : ReturningMethod<DurationValue>, IAdditionalDescription
 {
     public override string Description => "Returns the duration of a given spawn wave.";
 

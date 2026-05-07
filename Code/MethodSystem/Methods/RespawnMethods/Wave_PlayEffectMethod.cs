@@ -6,7 +6,8 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.RespawnMethods;
 
 [UsedImplicitly]
-public class PlayWaveEffectMethod : SynchronousMethod
+// ReSharper disable once InconsistentNaming
+public class Wave_PlayEffectMethod : SynchronousMethod
 {
     public override string Description => "Plays a Respawn Wave effect (the NTF helicopter/CI van arrival animation)";
 

@@ -5,7 +5,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.ScriptMethods;
 
 [UsedImplicitly]
-public class StopScriptMethod : SynchronousMethod
+public class Script_StopMethod : SynchronousMethod
 {
     public override string Description => "Stops a given script.";
 

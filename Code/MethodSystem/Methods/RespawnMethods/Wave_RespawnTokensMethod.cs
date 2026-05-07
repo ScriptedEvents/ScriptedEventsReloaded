@@ -5,15 +5,16 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.RespawnMethods;
 
 [UsedImplicitly]
-public class WaveInfluenceMethod : SynchronousMethod
+// ReSharper disable once InconsistentNaming
+public class Wave_RespawnTokensMethod : SynchronousMethod
 {
-    public override string Description => "Changes influence of a wave.";
+    public override string Description => "Changes respawn tokens of a wave.";
 
     public override Argument[] ExpectedArguments { get; } =
     [
         new WaveArgument("wave type"),
         new OptionsArgument("mode", "set", "changeBy"),
-        new FloatArgument("influence")
+        new IntArgument("respawn tokens")
     ];
 
     public override void Execute()
@@ -25,11 +26,11 @@ public class WaveInfluenceMethod : SynchronousMethod
         
         if (Args.GetOption("mode") is "set")
         {
-            wave.Influence = Args.GetFloat("influence");
+            wave.RespawnTokens = Args.GetInt("respawn tokens");
         }
         else
         {
-            wave.Influence += Args.GetFloat("influence");
+            wave.RespawnTokens += Args.GetInt("respawn tokens");
         }
     }
 }

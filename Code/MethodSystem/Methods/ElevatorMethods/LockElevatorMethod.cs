@@ -6,8 +6,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.ElevatorMethods;
 
 [UsedImplicitly]
-// ReSharper disable once InconsistentNaming
-public class Elevator_LockMethod : SynchronousMethod
+public class LockElevatorMethod : SynchronousMethod
 {
     public override string Description => "Locks elevators.";
 

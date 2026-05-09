@@ -7,8 +7,7 @@ using SER.Code.MethodSystem.MethodDescriptors;
 namespace SER.Code.MethodSystem.Methods.ElevatorMethods;
 
 [UsedImplicitly]
-// ReSharper disable once InconsistentNaming
-public class Elevator_SetTextMethod : SynchronousMethod, IAdditionalDescription
+public class SetElevatorTextMethod : SynchronousMethod, IAdditionalDescription
 {
     public override string Description => "Changes the text on the elevator panels between LCZ and HCZ.";
 

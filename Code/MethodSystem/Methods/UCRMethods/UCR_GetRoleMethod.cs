@@ -11,7 +11,7 @@ namespace SER.Code.MethodSystem.Methods.UCRMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class GetUCRRoleMethod : ReferenceReturningMethod, IAdditionalDescription, IDependOnFramework
+public class UCR_GetRoleMethod : ReferenceReturningMethod, IAdditionalDescription, IDependOnFramework
 {
     public override Type ReturnType => typeof(ICustomRole);
 

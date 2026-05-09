@@ -39,9 +39,8 @@ public class AddTeslaIgnoreRuleMethod : SynchronousMethod
         Func<Player[]> getter;
         if (Args.GetBool("update"))
         {
-            getter = () => Args
-                .GetGetter<Player[], PlayersArgument>("players")
-                .Invoke()
+            var func = Args.GetGetter<Player[], PlayersArgument>("players");
+            getter = () => func.Invoke()
                     .WasSuccessful(out var players)
                     ? players
                     : [];

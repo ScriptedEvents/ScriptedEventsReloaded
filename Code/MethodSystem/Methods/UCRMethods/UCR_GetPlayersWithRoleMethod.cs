@@ -12,7 +12,7 @@ namespace SER.Code.MethodSystem.Methods.UCRMethods;
 
 // ReSharper disable once InconsistentNaming
 [UsedImplicitly]
-public class GetPlayersWithUCRRoleMethod : ReturningMethod<PlayerValue>, IDependOnFramework
+public class UCR_GetPlayersWithRoleMethod : ReturningMethod<PlayerValue>, IDependOnFramework
 {
     public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.Ucr;
 

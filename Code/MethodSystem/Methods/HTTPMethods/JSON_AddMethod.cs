@@ -12,7 +12,7 @@ namespace SER.Code.MethodSystem.Methods.HTTPMethods;
 // ReSharper disable once InconsistentNaming
 public class JSON_AddMethod : ReferenceReturningMethod<JObject>, ICanError
 {
-    public override string Description => "Parses a provided value into a JSON object.";
+    public override string Description => "Adds a key-value pair to a JSON object.";
 
     public string[] ErrorReasons { get; } =
     [

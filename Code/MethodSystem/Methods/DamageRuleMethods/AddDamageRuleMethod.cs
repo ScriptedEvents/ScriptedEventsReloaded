@@ -43,14 +43,15 @@ public class AddDamageRuleMethod : SynchronousMethod
     public override void Execute()
     {
         var players = Args.GetPlayers("players affected");
+        var func = Args.GetGetter<Player[], PlayersArgument>("players affected");
         var damageRule = new DamageRuleHandler.DamageRule
         {
             Id = Args.GetText("remove id"),
             Multiplier = Args.GetFloat("multiplier"),
             Getter = Args.GetBool("update")
-                ? () => Args.GetGetter<Player[], PlayersArgument>("players affected")
-                    .Invoke()
-                    .WasSuccessful(out var value) ? value : []
+                ? () => func.Invoke().WasSuccessful(out var value) 
+                    ? value 
+                    : []
                 : () => players
         };
         

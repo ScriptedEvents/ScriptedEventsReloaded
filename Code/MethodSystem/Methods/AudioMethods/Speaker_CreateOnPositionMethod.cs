@@ -1,3 +1,4 @@
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
@@ -6,6 +7,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.AudioMethods;
 
 [UsedImplicitly]
+// ReSharper disable once InconsistentNaming
 public class Speaker_CreateOnPositionMethod : SynchronousMethod
 {
     public override string Description => "Creates a speaker in a specified XYZ position.";
@@ -36,11 +38,7 @@ public class Speaker_CreateOnPositionMethod : SynchronousMethod
             DefaultValue = new(true, null),
             Description = "Whether the audio will be 3D."
         },
-        new PlayersArgument("target players")
-        {
-            DefaultValue = new(null, "all"),
-            Description = "If specified, only the provided players will hear the audio."
-        }
+        ..Argument.PlayersArgumentUpdating("target players", playerDefault: new(null, "everyone"))
     ];
 
     public override void Execute()
@@ -55,9 +53,24 @@ public class Speaker_CreateOnPositionMethod : SynchronousMethod
         var isStereo = Args.GetBool("is stereo");
         var targetPlayers = Args.GetPlayers("target players").MaybeNull();
         
+        Func<ReferenceHub, bool>? condition;
+        if (targetPlayers is not null && Args.GetBool("update target players"))
+        {
+            var func = Args.GetPlayersFunc("target players");
+            condition = p => func().Contains(Player.Get(p));
+        }
+        else if (targetPlayers is not null)
+        {
+            condition = plr => targetPlayers.Contains(Player.Get(plr));
+        }
+        else
+        {
+            condition = null;
+        }
+        
         AudioPlayer.Create(
             speakerName, 
-            condition: hub => targetPlayers is null || targetPlayers.Any(p => p.ReferenceHub == hub),
+            condition: condition,
             onIntialCreation: p =>
             {        
                 var speaker = p.AddSpeaker("Main", volume, isStereo, minDistance, maxDistance);

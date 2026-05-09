@@ -1,4 +1,5 @@
-﻿using SER.Code.ArgumentSystem.Arguments;
+﻿using LabApi.Features.Wrappers;
+using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
@@ -43,11 +44,7 @@ public class Speaker_CreatePlayerAttachedMethod : SynchronousMethod, ICanError
             DefaultValue = new(true, null),
             Description = "Whether the audio will be 3D."
         },
-        new PlayersArgument("target players")
-        {
-            DefaultValue = new(null, "all"),
-            Description = "If specified, only the provided players will hear the audio."
-        }
+        ..Argument.PlayersArgumentUpdating("target players", playerDefault: new(null, "everyone"))
     ];
 
     public override void Execute()
@@ -60,9 +57,24 @@ public class Speaker_CreatePlayerAttachedMethod : SynchronousMethod, ICanError
         var isStereo = Args.GetBool("is stereo");
         var targetPlayers = Args.GetPlayers("target players").MaybeNull();
         
+        Func<ReferenceHub, bool>? condition;
+        if (targetPlayers is not null && Args.GetBool("update target players"))
+        {
+            var func = Args.GetPlayersFunc("target players");
+            condition = p => func().Contains(Player.Get(p));
+        }
+        else if (targetPlayers is not null)
+        {
+            condition = plr => targetPlayers.Contains(Player.Get(plr));
+        }
+        else
+        {
+            condition = null;
+        }
+        
         AudioPlayer.Create(
             speakerName, 
-            condition: hub => targetPlayers is null || targetPlayers.Any(p => p.ReferenceHub == hub),
+            condition: condition,
             onIntialCreation: p =>
             {        
                 p.transform.parent = player.GameObject?.transform 

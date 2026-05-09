@@ -13,7 +13,7 @@ namespace SER.Code.MethodSystem.Methods.ScriptMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class Script_InfoMethod : ReturningMethod
+public class ThisInfoMethod : ReturningMethod
 {
     public override string Description => "Returns info about the current script";
 

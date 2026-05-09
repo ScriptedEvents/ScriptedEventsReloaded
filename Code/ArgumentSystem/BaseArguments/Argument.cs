@@ -1,4 +1,5 @@
-﻿using SER.Code.ScriptSystem;
+﻿using SER.Code.ArgumentSystem.Arguments;
+using SER.Code.ScriptSystem;
 
 namespace SER.Code.ArgumentSystem.BaseArguments;
 
@@ -37,4 +38,26 @@ public abstract class Argument(string name)
     public abstract string InputDescription { get; }
 
     public Script Script { get; set; } = null!;
+
+    public static Argument[] PlayersArgumentUpdating(
+        string name, 
+        Default? playerDefault = null, 
+        string? playerDescription = null,
+        Default? updateDefault = null,
+        string? updateAdditionalDescription = null)
+    {
+        return
+        [
+            new PlayersArgument(name)
+            {
+                DefaultValue = playerDefault,
+                Description = playerDescription
+            }, 
+            new BoolArgument($"update {name}")
+            {
+                Description = $"Whether to constantly refresh the value provided in the '{name}' argument. {updateDefault}",
+                DefaultValue = updateDefault
+            }
+        ];
+    }
 }

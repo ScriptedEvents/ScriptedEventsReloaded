@@ -1,4 +1,5 @@
-﻿using SER.Code.ArgumentSystem.Arguments;
+﻿using LabApi.Features.Wrappers;
+using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
@@ -19,20 +20,31 @@ public class Speaker_CreateGlobalMethod : SynchronousMethod
             DefaultValue = new(1f, "100%"),
             Description = "The volume of the audio."
         },
-        new PlayersArgument("target players")
-        {
-            DefaultValue = new(null, "all"),
-            Description = "If specified, only the provided players will hear the audio."
-        }
+        ..Argument.PlayersArgumentUpdating("target players", playerDefault: new(null, "everyone"))
     ];
 
     public override void Execute()
     {
         var targetPlayers = Args.GetPlayers("target players").MaybeNull();
         
+        Func<ReferenceHub, bool>? condition;
+        if (targetPlayers is not null && Args.GetBool("update target players"))
+        {
+            var func = Args.GetPlayersFunc("target players");
+            condition = p => func().Contains(Player.Get(p));
+        }
+        else if (targetPlayers is not null)
+        {
+            condition = plr => targetPlayers.Contains(Player.Get(plr));
+        }
+        else
+        {
+            condition = null;
+        }
+        
         AudioPlayer.Create(
             Args.GetText("speaker name"), 
-            condition: hub => targetPlayers is null || targetPlayers.Any(p => p.ReferenceHub == hub),
+            condition: condition,
             onIntialCreation: p =>
             {
                 p.AddSpeaker("Main", Args.GetFloat("volume"), isSpatial: false, maxDistance: 5000f);

@@ -9,7 +9,7 @@ namespace SER.Code.MethodSystem.Methods.DiscordMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class Discord_CreateEmbedMethod : ReferenceReturningMethod<Discord_CreateEmbedMethod.DEmbed>, IAdditionalDescription
+public class Embed_CreateMethod : ReferenceReturningMethod<Embed_CreateMethod.DEmbed>, IAdditionalDescription
 {
     public class DEmbed : JObject;
     

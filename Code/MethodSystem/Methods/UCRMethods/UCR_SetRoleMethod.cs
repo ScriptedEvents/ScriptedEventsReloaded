@@ -9,7 +9,7 @@ namespace SER.Code.MethodSystem.Methods.UCRMethods;
 
 // ReSharper disable once InconsistentNaming
 [UsedImplicitly]
-public class SetUCRRoleMethod : SynchronousMethod, IDependOnFramework
+public class UCR_SetRoleMethod : SynchronousMethod, IDependOnFramework
 {
     public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.Ucr;
 

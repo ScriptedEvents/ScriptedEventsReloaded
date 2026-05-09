@@ -25,14 +25,6 @@ public class DynamicTryGet<T> : DynamicTryGet
     private readonly Func<TryGet<T>>? _tryGetFunc;
     private readonly TryGet<T>? _tryGet;
 
-    public bool IsStaticSuccess([NotNullWhen(true)] out T? value, out Func<TryGet<T>>? tryGetFunc)
-    {
-        tryGetFunc = _tryGetFunc;
-        value = default;
-        if (!Static) return false;
-        return Invoke().WasSuccessful(out value);
-    }
-    
     public override Result Result
     {
         get

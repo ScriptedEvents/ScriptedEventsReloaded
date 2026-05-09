@@ -8,7 +8,6 @@ using Respawning;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ValueSystem.Other;
-using MethodResult = SER.Code.MethodSystem.Structures.Result;
 
 namespace SER.Code.ValueSystem.PropertySystem;
 
@@ -184,10 +183,6 @@ public static class ReferencePropertyRegistry
         Register<RespawnWave, NumberValue>("respawnTokens", w => new NumberValue(w.Base is Respawning.Waves.Generic.ILimitedWave limitedWave ? limitedWave.RespawnTokens : -1), "Respawn tokens");
         Register<RespawnWave, NumberValue>("influence", w => new NumberValue((decimal)FactionInfluenceManager.Get(w.Faction)), "Faction influence");
         Register<RespawnWave, DurationValue>("timeLeft", w => new DurationValue(TimeSpan.FromSeconds(w.TimeLeft)), "Time left for wave");
-
-        Register<MethodResult, BoolValue>("success", r => new BoolValue(r.Success), "Whether the parsing was successful");
-        Register<MethodResult, BoolValue>("failed", r => new BoolValue(!r.Success), "Whether the parsing has failed");
-        Register<MethodResult, Value>("value", r => r.Value ?? new StaticTextValue("null"), "The value that got parsed");
 
         Register<JObject, Value>("value", obj => Value.Parse(obj, null), "The value of the JSON object");
         

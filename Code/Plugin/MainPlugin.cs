@@ -147,7 +147,7 @@ public class MainPlugin : Plugin<Config>
     {
         CRole.ResetAll();
         Script.StopAll();
-        SetPlayerDataMethod.PlayerData.Clear();
+        PlayerData_SetMethod.PlayerData.Clear();
         TeslaRuleHandler.ResetAll();
         DamageRuleHandler.ResetAll();
     }

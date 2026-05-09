@@ -15,7 +15,7 @@ public class HintMethod : SynchronousMethod
         new DurationArgument("duration"),
         new TextArgument("message")
     ];
-    
+                                                                                        
     public override void Execute()
     {
         var players = Args.GetPlayers("players");

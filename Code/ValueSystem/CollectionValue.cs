@@ -216,7 +216,7 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties
 
     public override string ToString()
     {
-        return $"[{string.Join(", ", CastedValues.Select(v => v.ToString()))}]";
+        return $"[{string.Join(", ", CastedValues.Select(v => v.ToString()))}] ({FriendlyName})";
     }
 
     public override TryGet<object> ToCSharpObject(Type targetType)

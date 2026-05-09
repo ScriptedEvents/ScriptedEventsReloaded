@@ -195,6 +195,12 @@ public class ProvidedArguments(Method method)
         return GetValue<string, TextArgument>(argName);
     }
 
+    public Func<Player[]> GetPlayersFunc(string argName)
+    {
+        var getter = GetGetter<Player[], PlayersArgument>(argName);
+        return () => getter.Invoke().Value ?? [];
+    }
+    
     public Player[] GetPlayers(string argName)
     {
         return GetValue<Player[], PlayersArgument>(argName);

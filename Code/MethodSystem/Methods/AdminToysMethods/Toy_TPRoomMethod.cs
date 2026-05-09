@@ -19,9 +19,9 @@ public class Toy_TPRoomMethod : SynchronousMethod, IAdditionalDescription
         new ReferenceArgument<AdminToy>("toy reference"),
         new RoomArgument("room to teleport toy to"),
         
-        new FloatArgument("relative x") { DefaultValue = new(0, null) },
-        new FloatArgument("relative y") { DefaultValue = new(0, null) },
-        new FloatArgument("relative z") { DefaultValue = new(0, null) },
+        new FloatArgument("relative x") { DefaultValue = new(0f, null) },
+        new FloatArgument("relative y") { DefaultValue = new(0f, null) },
+        new FloatArgument("relative z") { DefaultValue = new(0f, null) },
     ];
 
     public override void Execute()

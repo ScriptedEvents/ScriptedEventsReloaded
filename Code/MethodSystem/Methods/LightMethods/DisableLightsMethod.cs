@@ -6,7 +6,7 @@ using SER.Code.MethodSystem.BaseMethods.Synchronous;
 namespace SER.Code.MethodSystem.Methods.LightMethods;
 
 [UsedImplicitly]
-public class LightsOutMethod : SynchronousMethod
+public class DisableLightsMethod : SynchronousMethod
 {
     public override string Description => "Turns off lights for rooms.";
 

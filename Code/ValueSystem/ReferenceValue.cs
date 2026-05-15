@@ -11,7 +11,7 @@ public class ReferenceValue(object? value) : Value, IValueWithDynamicProperties
 {
     [UsedImplicitly]
     public ReferenceValue() : this(null) {}
-
+    
     public bool IsValid => value is not null;
     public object Value => value ?? throw new CustomScriptRuntimeError("Value of reference is invalid.");
 

@@ -7,7 +7,7 @@ namespace SER.Code.TokenSystem.Tokens;
 
 public class RunFunctionToken : BaseToken, IContextableToken
 {
-    public RunnableContext? GetContext(Script scr)
+    public RunnableContext GetContext(Script scr)
     {
         return new RunKeyword
         {

@@ -10,7 +10,7 @@ public class PlayerVariableToken : VariableToken<PlayerVariable, PlayerValue>
 {
     public static string Example => "@players";
 
-    public override RunnableContext? GetContext(Script scr)
+    public override RunnableContext GetContext(Script scr)
     {
         return new PlayerVariableDefinitionContext(this)
         {

@@ -8,7 +8,7 @@ namespace SER.Code.TokenSystem.Tokens.VariableTokens;
 
 public class LiteralVariableToken : VariableToken<LiteralVariable, LiteralValue>
 {
-    public override RunnableContext? GetContext(Script scr)
+    public override RunnableContext GetContext(Script scr)
     {
         return new LiteralVariableDefinitionContext(this)
         {

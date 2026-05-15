@@ -40,7 +40,7 @@ public class FuncStatement :
     public string Description => "Defines a function.";
     public string[] Arguments => ["[function name]"];
 
-    public string? Example =>
+    public string Example =>
         """
         func $Add with $a $b
             return $a + $b

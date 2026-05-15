@@ -24,11 +24,11 @@ public class WaitUntilKeyword : YieldingContext, IKeywordContext
 
     public virtual string[] Arguments => ["<condition...>"];
 
-    public virtual string? Example => ExampleHandler.GetExample($"{KeywordName}KeywordExample") ??
-                                      """
-                                      # wait until there are no players on the server
-                                      wait_until {AmountOf @all} is 0
-                                      """;
+    public virtual string Example => ExampleHandler.GetExample($"{KeywordName}KeywordExample") ??
+                                     """
+                                     # wait until there are no players on the server
+                                     wait_until {AmountOf @all} is 0
+                                     """;
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

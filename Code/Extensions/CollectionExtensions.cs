@@ -1,4 +1,4 @@
-﻿using Random = UnityEngine.Random;
+﻿using SER.Code.Plugin;
 
 namespace SER.Code.Extensions;
 
@@ -19,7 +19,14 @@ public static class CollectionExtensions
         public T GetRandomValue()
         {
             var array = enumerable as T[] ?? enumerable.ToArray();
-            return array[Random.Range(0, array.Length)];
+            
+            // this 
+            if (array.Length == 0 && MainPlugin.AllowDetachedScriptCompilingShenanigans)
+            {
+                return default!;
+            }
+            
+            return array[new Random().Next(0, array.Length)];
         }
     }
 

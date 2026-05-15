@@ -39,6 +39,10 @@ public class MainPlugin : Plugin<Config>
     public static string DocsLink => "https://scriptedeventsreloaded.gitbook.io/docs/tutorial";
     public static string DiscordLink => "https://discord.gg/3j54zBnbbD";
 
+    // ReSharper disable once FieldCanBeMadeReadOnly.Global
+    // ReSharper disable once ConvertToConstant.Global
+    public static bool AllowDetachedScriptCompilingShenanigans = false;
+
     public static string HelpCommandName => "serhelp";
     public static MainPlugin Instance { get; private set; } = null!;
 
@@ -78,7 +82,7 @@ public class MainPlugin : Plugin<Config>
         new(
             "Luke", 
             Contribution.SponsorWithTooMuchMoney | Contribution.Betatester,
-            "76561197961020347@steam"
+            "76561199023975117@steam"
         ),
         new(
             "RetroReul",
@@ -134,7 +138,6 @@ public class MainPlugin : Plugin<Config>
         FileSystem.FileSystem.Initialize();
         CustomHandlersManager.RegisterEventsHandler(new TeslaRuleHandler());
         CustomHandlersManager.RegisterEventsHandler(new DamageRuleHandler());
-        CRole.RegisterEvents();
     }
     
 #if !EXILED

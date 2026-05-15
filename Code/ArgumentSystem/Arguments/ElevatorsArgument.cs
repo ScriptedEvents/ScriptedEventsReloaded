@@ -1,6 +1,7 @@
 ﻿using Interactables.Interobjects;
 using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
@@ -8,7 +9,7 @@ namespace SER.Code.ArgumentSystem.Arguments;
 
 public class ElevatorsArgument(string name) : EnumHandlingArgument(name)
 {
-    public override string InputDescription => $"{nameof(ElevatorGroup)} enum or * for every elevator";
+    public override string InputDescription => $"{nameof(ElevatorGroup)} enum, reference to an elevator or * for every elevator";
 
     [UsedImplicitly]
     public DynamicTryGet<Elevator[]> GetConvertSolution(BaseToken token)
@@ -27,8 +28,12 @@ public class ElevatorsArgument(string name) : EnumHandlingArgument(name)
                     return Elevator.List.ToArray();
                 }
 
-                return
-                    $"Value '{token.RawRep}' cannot be interpreted as an elevator or collection of elevators.";
+                if (token.CanReturnReference<Elevator>(out var func))
+                {
+                    return new(() => func().OnSuccess<Elevator[]>(e => [e]));
+                }
+                
+                return $"Value '{token.RawRep}' cannot be interpreted as an elevator or collection of elevators.";
             }
         );
     }

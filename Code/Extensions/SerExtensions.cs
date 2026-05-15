@@ -95,6 +95,7 @@ public static class SerExtensions
             // if any of known types is assignable to T, or T to type, then it may return T
             return knownReturnTypes.Any(type => typeof(T).IsAssignableFrom(type) || type.IsAssignableFrom(typeof(T)));
         }
+        
         public TryGet<T> TryGet<T>() where T : Value
         {
             return valToken.Value().SuccessTryCast<Value, T>();

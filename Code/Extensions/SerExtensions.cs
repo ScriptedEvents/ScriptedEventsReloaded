@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using LabApi.Features.Wrappers;
+using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
@@ -46,6 +47,30 @@ public static class SerExtensions
         get = null!;
         if (token is not IValueToken valToken) return false;
         return valToken.CapableOf(out get);
+    }
+    
+    public static bool CanReturnReference<T>(this BaseToken token, [NotNullWhen(true)] out Func<TryGet<T>>? get)
+    {
+        get = null!;
+        if (token is not IValueToken valToken) return false;
+        if (!valToken.CapableOf<ReferenceValue>(out var refFunc)) return false;
+
+        get = delegate
+        {
+            if (refFunc().HasErrored(out var error, out var refVal))
+            {
+                return error;
+            }
+
+            if (ReferenceArgument<T>.TryParse(refVal).HasErrored(out error, out var value))
+            {
+                return error;
+            }
+
+            return value;
+        };
+        
+        return true;
     }
     
     public static bool CapableOf<T>(this IValueToken valToken, [NotNullWhen(true)] out Func<TryGet<T>>? get) where T : Value

@@ -42,58 +42,63 @@ public static class SerExtensions
         return $"{valueRep}{value.FriendlyTypeName()} is not a {typeof(TOut).FriendlyTypeName()}";
     }
 
-    public static bool CanReturn<T>(this BaseToken token, [NotNullWhen(true)] out Func<TryGet<T>>? get) where T : Value
+    extension(BaseToken token)
     {
-        get = null!;
-        if (token is not IValueToken valToken) return false;
-        return valToken.CapableOf(out get);
-    }
-    
-    public static bool CanReturnReference<T>(this BaseToken token, [NotNullWhen(true)] out Func<TryGet<T>>? get)
-    {
-        get = null!;
-        if (token is not IValueToken valToken) return false;
-        if (!valToken.CapableOf<ReferenceValue>(out var refFunc)) return false;
-
-        get = delegate
+        public bool CanReturn<T>([NotNullWhen(true)] out Func<TryGet<T>>? get) where T : Value
         {
-            if (refFunc().HasErrored(out var error, out var refVal))
+            get = null!;
+            if (token is not IValueToken valToken) return false;
+            return valToken.CapableOf(out get);
+        }
+        
+        public bool CanReturnReference<T>([NotNullWhen(true)] out Func<TryGet<T>>? get)
+        {
+            get = null!;
+            if (token is not IValueToken valToken) return false;
+            if (!valToken.CapableOf<ReferenceValue>(out var refFunc)) return false;
+
+            get = delegate
             {
-                return error;
-            }
+                if (refFunc().HasErrored(out var error, out var refVal))
+                {
+                    return error;
+                }
 
-            if (ReferenceArgument<T>.TryParse(refVal).HasErrored(out error, out var value))
-            {
-                return error;
-            }
+                if (ReferenceArgument<T>.TryParse(refVal).HasErrored(out error, out var value))
+                {
+                    return error;
+                }
 
-            return value;
-        };
+                return value;
+            };
         
-        return true;
-    }
-    
-    public static bool CapableOf<T>(this IValueToken valToken, [NotNullWhen(true)] out Func<TryGet<T>>? get) where T : Value
-    {
-        get = valToken.TryGet<T>;
+            return true;
+        }
         
-        // if unknown, its always assumed that it may return T
-        if (!valToken.PossibleValues.AreKnown(out var knownReturnTypes)) return true;
+        public TryGet<T> TryGet<T>() where T : Value
+        {
+            if (token is not IValueToken valToken) return $"Value '{token.RawRep}' cannot represent a {typeof(T).FriendlyTypeName()}";
         
-        // if any of known types is assignable to T, or T to type, then it may return T
-        return knownReturnTypes.Any(type => typeof(T).IsAssignableFrom(type) || type.IsAssignableFrom(typeof(T)));
-    }
-    
-    public static TryGet<T> TryGet<T>(this BaseToken token) where T : Value
-    {
-        if (token is not IValueToken valToken) return $"Value '{token.RawRep}' cannot represent a {typeof(T).FriendlyTypeName()}";
-        
-        return valToken.Value().SuccessTryCast<Value, T>();
+            return valToken.Value().SuccessTryCast<Value, T>();
+        }
     }
 
-    public static TryGet<T> TryGet<T>(this IValueToken valToken) where T : Value
+    extension(IValueToken valToken)
     {
-        return valToken.Value().SuccessTryCast<Value, T>();
+        public bool CapableOf<T>([NotNullWhen(true)] out Func<TryGet<T>>? get) where T : Value
+        {
+            get = valToken.TryGet<T>;
+        
+            // if unknown, its always assumed that it may return T
+            if (!valToken.PossibleValues.AreKnown(out var knownReturnTypes)) return true;
+        
+            // if any of known types is assignable to T, or T to type, then it may return T
+            return knownReturnTypes.Any(type => typeof(T).IsAssignableFrom(type) || type.IsAssignableFrom(typeof(T)));
+        }
+        public TryGet<T> TryGet<T>() where T : Value
+        {
+            return valToken.Value().SuccessTryCast<Value, T>();
+        }
     }
 
     public static PlayerValue ToPlayerValue(this IEnumerable<Player> players)

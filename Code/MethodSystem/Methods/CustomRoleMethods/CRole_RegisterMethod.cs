@@ -61,7 +61,7 @@ public class CRole_RegisterMethod : SynchronousMethod, ICanError
                 DisplayName = displayName,
                 RoleType = Args.GetEnum<RoleTypeId>("role type"),
                 RemoveRoleOnDeath = Args.GetBool("remove role on death"),
-                SpawnInfo = Args.GetReference<CustomRoleSpawnSystem>("spawn system")
+                SpawnSystem = Args.GetReference<CustomRoleSpawnSystem>("spawn system")
             }
         );
     }

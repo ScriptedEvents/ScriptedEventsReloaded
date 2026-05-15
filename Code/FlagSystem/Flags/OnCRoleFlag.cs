@@ -8,7 +8,7 @@ using SER.Code.VariableSystem.Variables;
 namespace SER.Code.FlagSystem.Flags;
 
 [UsedImplicitly]
-public class OnCustomRoleFlag : Flag, IMajorBehaviorFlag
+public class OnCRoleFlag : Flag, IMajorBehaviorFlag
 {
     public override string Description => 
         """
@@ -42,7 +42,7 @@ public class OnCustomRoleFlag : Flag, IMajorBehaviorFlag
             return true;
         },
         true,
-        "!-- OnCustomRole spawned"
+        "!-- OnCRole spawned"
     );
 
     public override Argument[] Arguments =>

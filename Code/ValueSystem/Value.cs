@@ -134,20 +134,20 @@ public abstract class Value : IEquatable<Value>
             if (t.BaseType != null && t.BaseType != typeof(object))
             {
                 var baseName = GetFriendlyName(t.BaseType);
-                if (baseName != "generic value") return baseName;
+                if (baseName != "any value") return baseName;
             }
 
-            return "generic value";
+            return "any value";
         }
 
-        if (t == typeof(object)) return "generic value";
+        if (t == typeof(object)) return "any value";
 
         return t.AccurateName;
     }
 
     public override string ToString()
     {
-        return FriendlyName;
+        return $"{FriendlyName} <{GetHashCode()}>";
     }
 
     public override int GetHashCode() => HashCode;

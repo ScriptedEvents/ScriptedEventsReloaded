@@ -6,6 +6,7 @@ using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
+using SER.Code.ValueSystem.Other;
 
 namespace SER.Code.Extensions;
 
@@ -25,12 +26,19 @@ public static class SerExtensions
     
     public static TryGet<TOut> TryCast<TOut>(this object value, string rawRep = "")
     {
-        switch (value)
+        if (value is null) throw new AndrzejFuckedUpException();
+        if (value is TOut outValue) return outValue;
+
+        if (value is IInvalidable inv && inv.SafeValue is TOut outValue2)
+            return outValue2;
+        
+        if (typeof(TOut).IsGenericType && typeof(TOut).GetGenericTypeDefinition() == typeof(Invalidable<>))
         {
-            case null:
-                throw new AndrzejFuckedUpException();
-            case TOut outValue:
-                return outValue;
+            var innerType = typeof(TOut).GetGenericArguments()[0];
+            if (innerType.IsInstanceOfType(value))
+            {
+                return (TOut)Activator.CreateInstance(typeof(TOut), value);
+            }
         }
 
         string valueRep = "";
@@ -41,6 +49,11 @@ public static class SerExtensions
         
         return $"{valueRep}{value.FriendlyTypeName()} is not a {typeof(TOut).FriendlyTypeName()}";
     }
+
+    private static Type Unwrap(Type type) =>
+        (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Invalidable<>))
+            ? type.GetGenericArguments()[0]
+            : type;
 
     extension(BaseToken token)
     {
@@ -93,7 +106,15 @@ public static class SerExtensions
             if (!valToken.PossibleValues.AreKnown(out var knownReturnTypes)) return true;
         
             // if any of known types is assignable to T, or T to type, then it may return T
-            return knownReturnTypes.Any(type => typeof(T).IsAssignableFrom(type) || type.IsAssignableFrom(typeof(T)));
+            return knownReturnTypes.Any(type => 
+            {
+                if (typeof(T).IsAssignableFrom(type) || type.IsAssignableFrom(typeof(T))) return true;
+
+                var unwrappedTarget = Unwrap(typeof(T));
+                var unwrappedSource = Unwrap(type);
+
+                return unwrappedTarget.IsAssignableFrom(unwrappedSource) || unwrappedSource.IsAssignableFrom(unwrappedTarget);
+            });
         }
         
         public TryGet<T> TryGet<T>() where T : Value

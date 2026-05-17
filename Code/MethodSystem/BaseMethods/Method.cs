@@ -73,6 +73,6 @@ public abstract class Method
             ? $"{Name} method in line {LineNum}"
             : $"{Name} method";
     }
-    
-    public static string NameOfMethod(Type type) => type.Name[..^"Method".Length].Replace("_", ".");
+
+    protected static string NameOfMethod(Type type) => type.Name[..^"Method".Length].Replace("_", ".");
 }

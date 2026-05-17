@@ -1,6 +1,7 @@
 ﻿using Interactables.Interobjects;
 using LabApi.Features.Enums;
 using MapGeneration;
+using PlayerRoles;
 using SER.Code.FlagSystem.Flags;
 
 namespace SER.Code.Plugin.Commands.HelpSystem;
@@ -14,6 +15,7 @@ public static class HelpInfoStorage
         typeof(DoorName),
         typeof(ItemType),
         typeof(ElevatorGroup),
-        typeof(CustomCommandFlag.ConsoleType)
+        typeof(CustomCommandFlag.ConsoleType),
+        typeof(Team)
     ];
 }

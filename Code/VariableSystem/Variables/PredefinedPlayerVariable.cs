@@ -6,7 +6,7 @@ namespace SER.Code.VariableSystem.Variables;
 public class PredefinedPlayerVariable(string name, Func<List<Player>> value, string category) 
     : PlayerVariable(name, null!)
 {
-    public override PlayerValue Value => new(value());
+    public override Value BaseValue => new PlayerValue(value());
     public string Category => category;
     
     [UsedImplicitly]

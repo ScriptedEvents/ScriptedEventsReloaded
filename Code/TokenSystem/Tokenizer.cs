@@ -29,7 +29,8 @@ public static class Tokenizer
         typeof(CollectionVariableToken),
         typeof(ReferenceVariableToken),
         typeof(DurationToken),
-        typeof(RunFunctionToken)
+        typeof(RunFunctionToken),
+        typeof(InvalidToken)
     ];
     
     public static readonly Type[] OrderedImportanceTokensFromCollectionSlices =

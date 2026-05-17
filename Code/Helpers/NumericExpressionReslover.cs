@@ -109,35 +109,44 @@ public static class NumericExpressionReslover
     {
         switch (token)
         {
-            case ReferenceVariableToken referenceVariable:
+            case IValueToken valueToken:
             {
-                var tmp = MakeTempName();
-                variables[tmp] = new(() =>
+                valueToken.CapableOf<ReferenceValue>(out var referencefGet);
+                valueToken.CapableOf<LiteralValue>(out var literalGet);
+
+                if (referencefGet is null && literalGet is null)
                 {
-                    if (referenceVariable.ExactValue.HasErrored(out var error, out var value))
-                    {
-                        return mainErr + error;
-                    }
-                    
-                    return value.IsValid 
-                        ? value.ToString()
-                        : "invalid";
-                });
-                
-                AppendRaw(tmp);
-                return true;
-            }
-            case IValueToken valueToken when valueToken.CapableOf<LiteralValue>(out var get):
-            {
-                var tmp = MakeTempName();
-                
-                if (valueToken.IsConstant)
-                {
-                    variables[tmp] = get().OnSuccess(s => s.Value, mainErr);
+                    goto default;
                 }
-                else
+                
+                var tmp = MakeTempName();
+
+                if (referencefGet is not null && literalGet is not null)
                 {
-                    variables[tmp] = new(() => get().OnSuccess(s => s.Value, mainErr));
+                    variables[tmp] = new(() =>
+                    {
+                        var literalVal = literalGet();
+                        if (literalVal.WasSuccessful(out var literalValue))
+                        {
+                            return literalValue.Value;
+                        }
+                        
+                        var refVal = referencefGet();
+                        if (refVal.WasSuccessful(out var refValue))
+                        {
+                            return refValue.ToString();
+                        }
+                        
+                        return TryGet<object>.Error($"{valueToken} did not return a reference value nor a literal value.");
+                    });
+                }
+                else if (referencefGet is not null)
+                {
+                    variables[tmp] = new(() => referencefGet.Invoke().OnSuccess(v => v.ToString()));
+                }
+                else if (literalGet is not null)
+                {
+                    variables[tmp] = new(() => literalGet.Invoke().OnSuccess(v => v.Value));
                 }
                 
                 AppendRaw(tmp);

@@ -2,12 +2,15 @@
 using SER.Code.ContextSystem.Contexts.VariableDefinition;
 using SER.Code.ScriptSystem;
 using SER.Code.ValueSystem;
+using SER.Code.ValueSystem.Other;
 using SER.Code.VariableSystem.Variables;
 
 namespace SER.Code.TokenSystem.Tokens.VariableTokens;
 
 public class LiteralVariableToken : VariableToken<LiteralVariable, LiteralValue>
 {
+    public override TypeOfValue PossibleValues => typeof(LiteralValue);
+
     public override RunnableContext GetContext(Script scr)
     {
         return new LiteralVariableDefinitionContext(this)

@@ -2,6 +2,7 @@
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
+using SER.Code.ValueSystem.Other;
 using SER.Code.ValueSystem.PropertySystem;
 using ValueType = SER.Code.ValueSystem.Other.ValueType;
 
@@ -29,14 +30,10 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties
                 var commonBase = types[0];
                 for (var i = 1; i < types.Length; i++)
                 {
-                    var t = types[i];
-                    while (commonBase != null && !commonBase.IsAssignableFrom(t))
-                    {
-                        commonBase = commonBase.BaseType;
-                    }
+                    commonBase = GetCommonSerBase(commonBase, types[i]);
                 }
 
-                if (commonBase == null || commonBase == typeof(Value) || commonBase == typeof(object))
+                if (commonBase == typeof(Value))
                 {
                     throw new CustomScriptRuntimeError("Collection was detected with mixed types.");
                 }
@@ -74,14 +71,10 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties
             var commonBase = types[0];
             for (var i = 1; i < types.Length; i++)
             {
-                var t = types[i];
-                while (commonBase != null && !commonBase.IsAssignableFrom(t))
-                {
-                    commonBase = commonBase.BaseType;
-                }
+                commonBase = GetCommonSerBase(commonBase, types[i]);
             }
 
-            if (commonBase == null || commonBase == typeof(Value) || commonBase == typeof(object))
+            if (commonBase == typeof(Value))
             {
                 throw new CustomScriptRuntimeError("Collection was detected with mixed types.");
             }
@@ -98,6 +91,41 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties
     }
 
     public override int HashCode => CastedValues.GetEnumerableHashCode();
+
+    protected static Type GetCommonSerBase(Type t1, Type t2)
+    {
+        if (t1 == t2) return t1;
+
+        static Type Unwrap(Type t) => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Invalidable<>) ? t.GetGenericArguments()[0] : t;
+
+        Type u1 = Unwrap(t1);
+        Type u2 = Unwrap(t2);
+
+        Type common = u1;
+        while (common != null && !common.IsAssignableFrom(u2))
+        {
+            common = common.BaseType;
+        }
+
+        if (common == null || common == typeof(Value) || common == typeof(object))
+        {
+            common = u2;
+            while (common != null && !common.IsAssignableFrom(u1))
+            {
+                common = common.BaseType;
+            }
+        }
+
+        if (common == null || common == typeof(Value) || common == typeof(object)) return typeof(Value);
+
+        if ((t1.IsGenericType && t1.GetGenericTypeDefinition() == typeof(Invalidable<>)) ||
+            (t2.IsGenericType && t2.GetGenericTypeDefinition() == typeof(Invalidable<>)))
+        {
+            return typeof(Invalidable<>).MakeGenericType(common);
+        }
+
+        return common;
+    }
     
     private class Prop<T>(Func<CollectionValue, T> handler, string? description)
         : IValueWithProperties.PropInfo<CollectionValue, T>(handler, description) where T : Value;
@@ -106,11 +134,11 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties
     {
         ["length"] = new Prop<NumberValue>(c => c.CastedValues.Length, "Amount of values in the collection"),
         ["isEmpty"] = new Prop<BoolValue>(c => c.CastedValues.Length == 0, "Whether the collection is empty"),
-        ["first"] = new Prop<Value>(c => c.CastedValues.Length > 0 ? c.CastedValues[0] : throw new CustomScriptRuntimeError("Collection is empty"), "First value in the collection"),
-        ["last"] = new Prop<Value>(c => c.CastedValues.Length > 0 ? c.CastedValues[^1] : throw new CustomScriptRuntimeError("Collection is empty"), "Last value in the collection"),
-        ["random"] = new Prop<Value>(c => c.CastedValues.Length > 0 ? c.CastedValues[Random.Next(c.CastedValues.Length)] : throw new CustomScriptRuntimeError("Collection is empty"), "Random value from the collection"),
+        ["first"] = new Prop<Invalidable<Value>>(c => c.CastedValues.Length > 0 ? c.CastedValues[0] : new InvalidValue(), "First value in the collection"),
+        ["last"] = new Prop<Invalidable<Value>>(c => c.CastedValues.Length > 0 ? c.CastedValues[^1] : new InvalidValue(), "Last value in the collection"),
+        ["random"] = new Prop<Invalidable<Value>>(c => c.CastedValues.Length > 0 ? c.CastedValues[Random.Next(c.CastedValues.Length)] : new InvalidValue(), "Random value from the collection"),
         ["sum"] = new Prop<NumberValue>(c => c.CastedValues.OfType<NumberValue>().Sum(n => n.Value), "Sum of all numbers in the collection"),
-        ["average"] = new Prop<NumberValue>(c => c.CastedValues.OfType<NumberValue>().Any() ? c.CastedValues.OfType<NumberValue>().Average(n => n.Value) : 0m, "Average of all numbers in the collection"),
+        ["average"] = new Prop<Invalidable<NumberValue>>(c => c.CastedValues.OfType<NumberValue>().Any() ? (NumberValue)c.CastedValues.OfType<NumberValue>().Average(n => n.Value) : new InvalidValue(), "Average of all numbers in the collection"),
         ["valType"] = new Prop<EnumValue<ValueType>>(_ => ValueType.Collection, "The type of the value")
     };
 

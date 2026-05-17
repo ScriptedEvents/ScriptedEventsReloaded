@@ -32,7 +32,7 @@ public class Coll_RemoveMethod : SynchronousMethod
         Script.AddLocalVariable(
             new CollectionVariable(
                 collectionVar.Name,
-                CollectionValue.Remove(collectionVar.Value, value, amountToRemove)
+                CollectionValue.Remove(collectionVar, value, amountToRemove)
             )
         );
     }

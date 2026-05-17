@@ -7,7 +7,7 @@ public class NumberValue(decimal value) : LiteralValue<decimal>(value), IValueWi
 {
     [UsedImplicitly]
     public NumberValue() : this(0m) {}
-
+    
     public static implicit operator NumberValue(decimal value)
     {
         return new(value);

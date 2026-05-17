@@ -20,7 +20,7 @@ public class LogVarMethod : ReturningMethod<TextValue>
     public override void Execute()
     {
         var variable = Args.GetVariable("variable");
-        ReturnValue = $"{variable} = {(variable is LiteralVariable lv ? lv.Value : variable.BaseValue)}"
+        ReturnValue = $"{variable} = {(variable is LiteralVariable lv ? lv.ExactValue : variable.BaseValue)}"
             .ToStaticTextValue();
     }
 }

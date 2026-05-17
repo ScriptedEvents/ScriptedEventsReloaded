@@ -36,6 +36,7 @@ public class ReferenceValue(object? value) : Value, IValueWithDynamicProperties
 
     public override string ToString()
     {
+        if (!IsValid) return new InvalidValue().ToString();
         return $"<{Value.GetType().AccurateName} reference | {Value.GetHashCode()}>";
     }
 
@@ -63,5 +64,5 @@ public class ReferenceValue<T>(T? value) : ReferenceValue(value)
     }
 
     [UsedImplicitly]
-    public new static string FriendlyName => $"reference to {GetFriendlyName(typeof(T))} object";
+    public new static string FriendlyName => $"reference to {typeof(T).AccurateName} object";
 }

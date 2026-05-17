@@ -1,4 +1,5 @@
 using SER.Code.ArgumentSystem.Arguments;
+using SER.Code.ValueSystem;
 using SER.Code.Extensions;
 using SER.Code.FlagSystem.Structures;
 using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
@@ -72,8 +73,8 @@ public class OnCRoleFlag : Flag, IMajorBehaviorFlag
                 script.CompileWithAutomaticThrow();
 
                 script.AddLocalVariables(
-                    new PlayerVariable("evPlayer", new(plr)),
-                    new ReferenceVariable("evCRole", new(role))
+                    new PlayerVariable("evPlayer", new PlayerValue(plr)),
+                    new ReferenceVariable("evCRole", new ReferenceValue(role))
                 );
 
                 script.Run(RunReason.Event);

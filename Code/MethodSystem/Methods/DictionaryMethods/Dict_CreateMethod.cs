@@ -7,7 +7,7 @@ namespace SER.Code.MethodSystem.Methods.DictionaryMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class Dict_EmptyMethod : ReferenceReturningMethod<Dict>, IAdditionalDescription
+public class Dict_CreateMethod : ReferenceReturningMethod<Dict>, IAdditionalDescription
 {
     public override string Description => "Creates an empty dictionary.";
 

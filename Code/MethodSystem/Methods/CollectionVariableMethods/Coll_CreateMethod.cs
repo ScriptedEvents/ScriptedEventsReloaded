@@ -6,7 +6,7 @@ namespace SER.Code.MethodSystem.Methods.CollectionVariableMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class Coll_EmptyMethod : ReturningMethod<CollectionValue>
+public class Coll_CreateMethod : ReturningMethod<CollectionValue>
 {
     public override string Description => "Returns an empty collection.";
 

@@ -1,31 +1,33 @@
 # this script adds a custom kill streak counter
 
 !-- OnEvent Death
+-- require @evPlayer
 
-if {VarExists @evAttacker} is true
-    # increment killer's streak
-    if {HasPlayerData @evAttacker "streak"}
-        $new = {GetPlayerData @evAttacker "streak"} + 1
-    else
-        $new = 1
-    end
+SetPlayerData @evPlayer "streak" 0
+Broadcast @evPlayer 5s "Your killstreak has been reset!"
 
-    # save the new kill streak
-    SetPlayerData @evAttacker "streak" $new
-
-    # inform attacker of kill
-    Broadcast @evAttacker 5s "Killstreak: {$new}"
-
-    # announce milestone
-    if $new is 5
-        Broadcast @all 5s "{@evAttacker -> name} is on a KILLING SPREE (5 Kills)!"
-    elif $new is 10
-        Broadcast @all 5s "{@evAttacker -> name} is UNSTOPPABLE (10 Kills)!"
-    end
+if {VarExists @evAttacker} is false
+    stop
 end
 
-if {VarExists @evPlayer} is true
-    # reset the victim's streak
-    SetPlayerData @evPlayer "streak" 0
-    Broadcast @evPlayer 5s "Your killstreak has been reset!"
+# increment killer's streak
+$streak = GetPlayerData @evAttacker "streak"
+
+if $streak isnt invalid
+    $streak = $streak + 1
+else
+    $streak = 1
+end
+
+# save the new kill streak
+SetPlayerData @evAttacker "streak" $streak
+
+# inform attacker of kill
+Broadcast @evAttacker 5s "Killstreak: {$streak}"
+
+# announce milestone
+if $streak is 5
+    Broadcast @all 5s "{@evAttacker -> name} is on a KILLING SPREE (5 Kills)!"
+elif $streak is 10
+    Broadcast @all 5s "{@evAttacker -> name} is UNSTOPPABLE (10 Kills)!"
 end

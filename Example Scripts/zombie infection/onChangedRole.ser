@@ -1,0 +1,7 @@
+# if a player changes their role, their infection status should be reset 
+# e.g. role is changed by admin, death, other plugin etc.
+
+!-- OnEvent ChangedRole
+-- require @evPlayer
+
+ClearPlayerData @evPlayer date_of_death_by_infection

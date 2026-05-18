@@ -127,7 +127,7 @@ Always validate references before using them:
 ```
 *room = @plr -> roomRef
 
-if {*room -> isInvalid}
+if *room is invalid
     Print "Player is not in a room"
     stop
 end
@@ -216,18 +216,9 @@ run Func
 Print $x  # does NOT print 1, as $x was specific to `Func`
 ```
 
-Preferred way:
+Using `with` in loops and functions:
 ```
 over @all with @plr
-    # @plr only exists here
-end
-```
-
-Another valid way: (carried over from previous versions)
-```
-over @all 
-    with @plr
-
     # @plr only exists here
 end
 ```
@@ -261,7 +252,7 @@ Negative values don't require parentheses in methods:
 $num = -21
 TPPosition @fighter -37 313 -140
 ```
-This is because the whitespace seperates these values into different arguments.
+This is because the whitespace separates these values into different arguments.
 
 ### Percent Sign
 
@@ -350,9 +341,9 @@ You can use natural language or symbols:
 - `<` - less than
 - `and` / `&&` - logical AND
 - `or` / `||` - logical OR
-- `not` / `!` - ILLEGAL, DO NOT USE
-> `!` is illegal because SER relies heavily on spaces, providing `!$var` would break the compiler
-> `not` is illegal because it could confuse `x isnt y` with `x is not y`
+- `not` / `!` - ILLEGAL
+> `!` is illegal because heavy relience on spaces
+> `not` is illegal because could confuse `x isnt y` with `x is not y`
 
 ### Using Properties in Conditions
 
@@ -638,14 +629,6 @@ But event variables might not always be provided by the C# event:
 
 ```
 !-- OnEvent Dying
-
-if {VarExists @evAttacker} is false
-    stop
-end
-```
-or define which are required:
-```
-!-- OnEvent Dying
 -- require @evAttacker
 ```
 
@@ -762,7 +745,7 @@ SER includes several advanced systems you should explore:
 - **Use:** Welcome messages, initial setup, tutorial hints
 - **Variables:** `@evPlayer` (joining player)
 
-**5. ChangedRole** - `!-- OnEvent ChangedRole` - Triggers when role changes
+**5. ChangedRole** - `!-- OnEvent ChangedRole` - Triggers when player's role changes
 - **Use:** Role-specific setups, class transitions, spawn effects
 - **Variables:** `@evPlayer`, `$evOldRole`, `$evNewRole`
 

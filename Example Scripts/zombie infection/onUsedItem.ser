@@ -1,0 +1,12 @@
+# if a player uses a medkit or SCP-500, 
+# his infection will be cleared
+
+!-- OnEvent UsedItem
+-- require @evPlayer *evUsableItem
+
+$type = *evUsableItem -> type
+if $type isnt "Medkit" and $type isnt "SCP500"
+    stop
+end
+
+ClearPlayerData @evPlayer date_of_death_by_infection

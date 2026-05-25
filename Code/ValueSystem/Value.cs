@@ -27,7 +27,7 @@ public abstract class Value : IEquatable<Value>
             }
 
             return typeof(EnumValue<>).MakeGenericType(t);
-        }
+        };
         if (typeof(Color).IsAssignableFrom(t)) return typeof(ColorValue);
         if (t == typeof(bool)) return typeof(BoolValue);
         if (t == typeof(byte) || t == typeof(sbyte) || t == typeof(short) || t == typeof(ushort) ||
@@ -143,11 +143,6 @@ public abstract class Value : IEquatable<Value>
         if (t == typeof(object)) return "any value";
 
         return t.AccurateName;
-    }
-
-    public bool IsInvalid()
-    {
-        return this is InvalidValue || this is IInvalidable { Invalid: true };
     }
 
     public override string ToString()

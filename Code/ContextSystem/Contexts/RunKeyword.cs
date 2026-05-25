@@ -4,7 +4,7 @@ using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.TokenSystem.Tokens.ValueTokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
 
@@ -13,7 +13,7 @@ namespace SER.Code.ContextSystem.Contexts;
 [UsedImplicitly]
 public class RunKeyword : YieldingContext, IMayReturnValueContext
 {
-    private readonly List<ValueToken> _providedValues = [];
+    private readonly List<IValueToken> _providedValues = [];
     private FuncStatement? _functionDefinitionContext;
 
     public override string FriendlyName =>
@@ -42,7 +42,7 @@ public class RunKeyword : YieldingContext, IMayReturnValueContext
 
             _functionDefinitionContext = func;
         }
-        else if (token is ValueToken valToken)
+        else if (token is IValueToken valToken)
         {
             _providedValues.Add(valToken);
         }

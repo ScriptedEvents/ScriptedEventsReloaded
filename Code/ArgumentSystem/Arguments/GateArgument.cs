@@ -4,7 +4,7 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.TokenSystem.Tokens.ValueTokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -35,7 +35,7 @@ public class GateArgument(string name) : EnumHandlingArgument(name)
             {
                 Result rs = $"Value '{token.RawRep}' cannot be interpreted as {InputDescription}.";
 
-                if (token is not ValueToken val || !val.CapableOf<ReferenceValue>(out var func))
+                if (token is not IValueToken val || !val.CapableOf<ReferenceValue>(out var func))
                 {
                     return rs;
                 }

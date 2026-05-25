@@ -4,17 +4,17 @@ using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Slices;
 using SER.Code.TokenSystem.Structures;
-using SER.Code.TokenSystem.Tokens.ValueTokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
 
 namespace SER.Code.TokenSystem.Tokens;
 
-public class ParenthesesToken : ValueToken
+public class ParenthesesToken : BaseToken, IValueToken
 {
-    public override TypeOfValue PossibleValues => typeof(LiteralValue);
+    public TypeOfValue PossibleValues => typeof(LiteralValue);
     
-    public override bool IsConstant => false;
+    public bool IsConstant => false;
     
     public BaseToken[] Tokens { get; private set; } = [];
 
@@ -45,10 +45,10 @@ public class ParenthesesToken : ValueToken
             return error2;
         }
         
-        return expression.Evaluate() ?? new InvalidValue();
+        return expression.Evaluate();
     }
 
-    public override TryGet<Value> Value()
+    public TryGet<Value> Value()
     {
         if (ParseExpression().HasErrored(out var error, out var value))
         {

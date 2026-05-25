@@ -1,13 +1,13 @@
 ﻿using System.Globalization;
 using System.Text;
 using NCalc;
-using NCalc.Domain;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.TokenSystem.Tokens.ValueTokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
+using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.Helpers;
@@ -57,60 +57,46 @@ public static class NumericExpressionReslover
                 return err;
             }
         }
-
-        LogicalExpression expression;
-        try
-        {
-            expression = Expression.Compile(sb.ToString(), false);
-        }
-        catch (EvaluationException err)
-        {
-            return $"Cannot compile expression '{initial}': {err.Message}";
-        }
         
+        var expression = new Expression(sb.ToString());
+
         // Now we have the expression string and a variables dictionary.
         return new CompiledExpression(
             expression, 
-            variables
+            variables, 
+            initial
         );
     }
 
     public readonly struct CompiledExpression(
-        LogicalExpression expression, 
-        Dictionary<string, DynamicTryGet<object>> parameters
+        Expression expression, 
+        Dictionary<string, DynamicTryGet<object>> parameters,
+        string rawRepresentation
     )
     {
-        public object? Evaluate()
+        public TryGet<object> Evaluate()
         {
-            Dictionary<string, object> values = [];
-            foreach (var (key, dtg) in parameters)
-            {
-                if (dtg.Invoke().HasErrored(out var err, out var value))
-                {
-                    return err;
-                }
-
-                values[key] = value;
-            }
-
-            var visitor = new EvaluationVisitor(EvaluateOptions.None)
-            {
-                Parameters = values
-            };
-            
             try
             {
-                expression.Accept(visitor);
-            }   
+                Dictionary<string, object> values = [];
+                foreach (var (key, dtg) in parameters)
+                {
+                    if (dtg.Invoke().HasErrored(out var err, out var value))
+                    {
+                        return err;
+                    }
+                
+                    values[key] = value;
+                }
+
+                expression.Parameters = values;
+                
+                return expression.Evaluate();
+            }
             catch (Exception)
             {
-                // this means that the expression was syntatically valid, but the values were not.
-                // in that case, throwing an error is not ideal.
-                // we will leave this up to the individual implementations.
-                return null;
+                return $"Expression '{rawRepresentation}' is invalid.";
             }
-            
-            return visitor.Result;
         }
     }
 
@@ -123,7 +109,7 @@ public static class NumericExpressionReslover
     {
         switch (token)
         {
-            case ValueToken valueToken:
+            case IValueToken valueToken:
             {
                 valueToken.CapableOf<ReferenceValue>(out var referencefGet);
                 valueToken.CapableOf<LiteralValue>(out var literalGet);
@@ -142,13 +128,13 @@ public static class NumericExpressionReslover
                         var literalVal = literalGet();
                         if (literalVal.WasSuccessful(out var literalValue))
                         {
-                            return TryGet<object>.Success(literalValue.UnderlyingValue);
+                            return literalValue.Value;
                         }
                         
                         var refVal = referencefGet();
                         if (refVal.WasSuccessful(out var refValue))
                         {
-                            return TryGet<object>.Success(refValue.ToString());
+                            return refValue.ToString();
                         }
                         
                         return TryGet<object>.Error($"{valueToken} did not return a reference value nor a literal value.");
@@ -160,7 +146,7 @@ public static class NumericExpressionReslover
                 }
                 else if (literalGet is not null)
                 {
-                    variables[tmp] = new(() => literalGet.Invoke().OnSuccess(v => v.UnderlyingValue));
+                    variables[tmp] = new(() => literalGet.Invoke().OnSuccess(v => v.Value));
                 }
                 
                 AppendRaw(tmp);
@@ -171,7 +157,8 @@ public static class NumericExpressionReslover
                 RawRep: 
                     "==" or "!=" or ">" or ">=" or "<" or "<=" 
                     or "+" or "-" or "*" or "/" or "%" 
-                    or "&&" or "||"
+                    or "&&" or "||" 
+                    or "invalid"
             }:
             {
                 AppendRaw(token.RawRep);

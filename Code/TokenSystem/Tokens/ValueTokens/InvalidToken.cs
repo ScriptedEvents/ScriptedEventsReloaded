@@ -12,7 +12,7 @@ public class InvalidToken : LiteralValueToken<InvalidValue>
             return new Ignore();
         }
         
-        ExactValue = new InvalidValue();
+        Value = new InvalidValue();
         return new Success();
     }
 }

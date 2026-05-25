@@ -3,7 +3,7 @@ using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.Plugin.Commands.HelpSystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.TokenSystem.Tokens.ValueTokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 
 namespace SER.Code.ArgumentSystem.Arguments;
 
@@ -50,7 +50,7 @@ public class EnumArgument<TEnum> : EnumArgument where TEnum : struct, Enum
             return value;
         }
 
-        if (token is not ValueToken valToken || valToken.IsConstant)
+        if (token is not IValueToken valToken || valToken.IsConstant)
         {
             return $"Not a {InputDescription}.";
         }

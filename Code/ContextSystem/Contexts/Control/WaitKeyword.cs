@@ -7,7 +7,7 @@ using SER.Code.Extensions;
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.TokenSystem.Tokens.ValueTokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
@@ -15,7 +15,7 @@ namespace SER.Code.ContextSystem.Contexts.Control;
 [UsedImplicitly]
 public class WaitKeyword : YieldingContext, IKeywordContext
 {
-    private ValueToken? _durationToken;
+    private IValueToken? _durationToken;
     private Func<TryGet<DurationValue>>? _getDuration;
 
     public override string FriendlyName => $"'{KeywordName}' keyword";
@@ -37,7 +37,7 @@ public class WaitKeyword : YieldingContext, IKeywordContext
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
-        if (token is ValueToken val && val.CapableOf<DurationValue>(out var get))
+        if (token is IValueToken val && val.CapableOf<DurationValue>(out var get))
         {
             _durationToken = val;
             _getDuration = get;
@@ -65,6 +65,6 @@ public class WaitKeyword : YieldingContext, IKeywordContext
             throw new ScriptRuntimeError(this, error);
         }
 
-        yield return Timing.WaitForSeconds((float)duration.UnderlyingValue.TotalSeconds);
+        yield return Timing.WaitForSeconds((float)duration.Value.TotalSeconds);
     }
 }

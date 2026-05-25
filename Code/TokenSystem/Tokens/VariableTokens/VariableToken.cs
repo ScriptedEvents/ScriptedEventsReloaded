@@ -3,7 +3,7 @@ using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Structures;
-using SER.Code.TokenSystem.Tokens.ValueTokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
 using SER.Code.VariableSystem.Bases;
@@ -11,7 +11,7 @@ using SER.Code.VariableSystem.Structures;
 
 namespace SER.Code.TokenSystem.Tokens.VariableTokens;
 
-public abstract class VariableToken : ValueToken, IContextableToken, IVariableRepr
+public abstract class VariableToken : BaseToken, IContextableToken, IVariableRepr
 {
     public abstract string Name { get; protected set; }
     
@@ -39,7 +39,7 @@ public abstract class VariableToken : ValueToken, IContextableToken, IVariableRe
     public string RawRepr => $"{Prefix}{Name}";
 }
 
-public abstract class VariableToken<TVariable, TValue> : VariableToken
+public abstract class VariableToken<TVariable, TValue> : VariableToken, IValueToken
     where TVariable : Variable<TValue>
     where TValue : Value
 {
@@ -71,12 +71,12 @@ public abstract class VariableToken<TVariable, TValue> : VariableToken
         return new Success();
     }
 
-    public override TryGet<Value> Value()
+    public TryGet<Value> Value()
     {
         return TryGetVariable().OnSuccess(variable => variable.BaseValue);
     }
 
-    public override TypeOfValue PossibleValues => new TypeOfValue<TValue>();
+    public virtual TypeOfValue PossibleValues => new TypeOfValue<TValue>();
     
-    public override bool IsConstant => false;
+    public bool IsConstant => false;
 }

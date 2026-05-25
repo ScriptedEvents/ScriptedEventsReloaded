@@ -137,8 +137,8 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties
         ["first"] = new Prop<Invalidable<Value>>(c => c.CastedValues.Length > 0 ? c.CastedValues[0] : new InvalidValue(), "First value in the collection"),
         ["last"] = new Prop<Invalidable<Value>>(c => c.CastedValues.Length > 0 ? c.CastedValues[^1] : new InvalidValue(), "Last value in the collection"),
         ["random"] = new Prop<Invalidable<Value>>(c => c.CastedValues.Length > 0 ? c.CastedValues[Random.Next(c.CastedValues.Length)] : new InvalidValue(), "Random value from the collection"),
-        ["sum"] = new Prop<NumberValue>(c => c.CastedValues.OfType<NumberValue>().Sum(n => n.UnderlyingValue), "Sum of all numbers in the collection"),
-        ["average"] = new Prop<Invalidable<NumberValue>>(c => c.CastedValues.OfType<NumberValue>().Any() ? (NumberValue)c.CastedValues.OfType<NumberValue>().Average(n => n.UnderlyingValue) : new InvalidValue(), "Average of all numbers in the collection"),
+        ["sum"] = new Prop<NumberValue>(c => c.CastedValues.OfType<NumberValue>().Sum(n => n.Value), "Sum of all numbers in the collection"),
+        ["average"] = new Prop<Invalidable<NumberValue>>(c => c.CastedValues.OfType<NumberValue>().Any() ? (NumberValue)c.CastedValues.OfType<NumberValue>().Average(n => n.Value) : new InvalidValue(), "Average of all numbers in the collection"),
         ["valType"] = new Prop<EnumValue<ValueType>>(_ => ValueType.Collection, "The type of the value")
     };
 

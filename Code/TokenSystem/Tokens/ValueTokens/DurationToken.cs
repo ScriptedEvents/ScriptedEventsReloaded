@@ -19,7 +19,7 @@ public class DurationToken : LiteralValueToken<DurationValue>
             return new Ignore();
         }
         
-        ExactValue = timeSpan;
+        Value = timeSpan;
         return new Success();
     }
 

@@ -28,10 +28,10 @@ public abstract class TextValue : LiteralValue<string>, IValueWithProperties
     
     public static implicit operator string(TextValue value)
     {
-        return value.UnderlyingValue;
+        return value.Value;
     }
 
-    public override string StringRep => UnderlyingValue;
+    public override string StringRep => Value;
     
     [UsedImplicitly]
     public new static string FriendlyName => "text value";
@@ -93,21 +93,21 @@ public abstract class TextValue : LiteralValue<string>, IValueWithProperties
 
     public Dictionary<string, IValueWithProperties.PropInfo> Properties { get; } = new()
     {
-        ["length"] = new Prop<NumberValue>(t => t.UnderlyingValue.Length, "Amount of characters in the text"),
-        ["upper"] = new Prop<StaticTextValue>(t => t.UnderlyingValue.ToUpper(), "Upper case of the text"),
-        ["lower"] = new Prop<StaticTextValue>(t => t.UnderlyingValue.ToLowerInvariant(), "Lower case of the text"),
-        ["trim"] = new Prop<StaticTextValue>(t => t.UnderlyingValue.Trim(), "Trimmed text"),
-        ["isEmpty"] = new Prop<BoolValue>(t => string.IsNullOrEmpty(t.UnderlyingValue), "Whether the text is empty"),
+        ["length"] = new Prop<NumberValue>(t => t.Value.Length, "Amount of characters in the text"),
+        ["upper"] = new Prop<StaticTextValue>(t => t.Value.ToUpper(), "Upper case of the text"),
+        ["lower"] = new Prop<StaticTextValue>(t => t.Value.ToLowerInvariant(), "Lower case of the text"),
+        ["trim"] = new Prop<StaticTextValue>(t => t.Value.Trim(), "Trimmed text"),
+        ["isEmpty"] = new Prop<BoolValue>(t => string.IsNullOrEmpty(t.Value), "Whether the text is empty"),
         ["valType"] = new Prop<EnumValue<ValueType>>(_ => ValueType.Text, "The type of the value")
     };
 
     public override TryGet<object> ToCSharpObject(Type targetType)
     {
-        if (targetType.IsInstanceOfType(UnderlyingValue)) return UnderlyingValue;
+        if (targetType.IsInstanceOfType(Value)) return Value;
         if (targetType.IsEnum)
         {
-            try { return Enum.Parse(targetType, UnderlyingValue, true); }
-            catch { return $"Cannot parse '{UnderlyingValue}' as {targetType.Name}"; }
+            try { return Enum.Parse(targetType, Value, true); }
+            catch { return $"Cannot parse '{Value}' as {targetType.Name}"; }
         }
         return base.ToCSharpObject(targetType);
     }

@@ -1,6 +1,5 @@
 ﻿using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
-using SER.Code.ArgumentSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
@@ -12,12 +11,12 @@ namespace SER.Code.MethodSystem.Methods.TimeMethods;
 [UsedImplicitly]
 public class TimeInfoMethod : LiteralValueReturningMethod
 {
-    public override string Description => "Returns information about current date and time.";
+    public override string Description => "Returns information about current time.";
 
-    public override TypeOfValue LiteralReturnTypes => new TypesOfValue(
+    public override TypeOfValue LiteralReturnTypes => new TypesOfValue([
         typeof(NumberValue), 
-        typeof(TextValue), 
-        typeof(EnumValue<DayOfWeek>));
+        typeof(TextValue)
+    ]);
     
     public override Argument[] ExpectedArguments { get; } =
     [
@@ -27,39 +26,31 @@ public class TimeInfoMethod : LiteralValueReturningMethod
             "hour",
             "month",
             "year",
-            Option.Enum<DayOfWeek>("dayOfWeek"),
+            "dayOfWeek",
             new("dayOfWeekNumber", "Instead of returning e.g. 'Monday', will return 1"),
             "dayOfMonth",
             "dayOfYear",
-            new("unix","Useful for making discord timestamps - always uses UTC")),
-        new OptionsArgument("time zone",
-            "utc",
-            "local")
-        {
-            DefaultValue = new("local", null)
-        }
+            new("unixTimeUtc","Useful for making discord timestamps "),
+            "unixTimeLocal")
     ];
     
     public override void Execute()
     {
-        var dateTime = Args.GetOption("time zone") is "utc"
-            ? DateTime.UtcNow
-            : DateTime.Now;
-        
         ReturnValue = Args.GetOption("options") switch
         {
-            "second" => new NumberValue(dateTime.Second),
-            "minute" => new NumberValue(dateTime.Minute),
-            "hour" => new NumberValue(dateTime.Hour),
-            "month" => new NumberValue(dateTime.Month),
-            "year" => new NumberValue(dateTime.Year),
-            "dayofweek" => dateTime.DayOfWeek.ToEnumValue(),
-            "dayofweeknumber" => (uint)dateTime.DayOfWeek == 0
+            "second" => new NumberValue(DateTime.Now.Second),
+            "minute" => new NumberValue(DateTime.Now.Minute),
+            "hour" => new NumberValue(DateTime.Now.Hour),
+            "month" => new NumberValue(DateTime.Now.Month),
+            "year" => new NumberValue(DateTime.Now.Year),
+            "dayofweek" => DateTime.Now.DayOfWeek.ToEnumValue(),
+            "dayofweeknumber" => (uint)DateTime.Now.DayOfWeek == 0
                 ? new NumberValue(7)
-                : new NumberValue((uint)dateTime.DayOfWeek),
-            "dayofmonth" => new NumberValue(dateTime.Day),
-            "dayofyear" => new NumberValue(dateTime.DayOfYear),
-            "unix" => new NumberValue(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
+                : new NumberValue((uint)DateTime.Now.DayOfWeek),
+            "dayofmonth" => new NumberValue(DateTime.Now.Day),
+            "dayofyear" => new NumberValue(DateTime.Now.DayOfYear),
+            "unixtimeutc" => new NumberValue(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
+            "unixtimelocal" => new NumberValue(DateTimeOffset.Now.ToUnixTimeSeconds()),
             _ => throw new AndrzejFuckedUpException()
         };
     }

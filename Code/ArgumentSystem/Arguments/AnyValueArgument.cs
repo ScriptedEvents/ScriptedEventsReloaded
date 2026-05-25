@@ -1,7 +1,7 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.TokenSystem.Tokens.ValueTokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -13,7 +13,7 @@ public class AnyValueArgument(string name) : Argument(name)
     [UsedImplicitly]
     public DynamicTryGet<Value> GetConvertSolution(BaseToken token)
     {
-        if (token is ValueToken valToken)
+        if (token is IValueToken valToken)
         {
             return new(valToken.Value);
         }

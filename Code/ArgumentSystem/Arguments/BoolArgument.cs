@@ -19,6 +19,6 @@ public class BoolArgument(string name) : Argument(name)
             return error;
         }
 
-        return new(() => get().OnSuccess(v => v.UnderlyingValue, error));
+        return new(() => get().OnSuccess(v => v.Value, error));
     }
 }

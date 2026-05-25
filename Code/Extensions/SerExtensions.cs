@@ -4,7 +4,7 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.TokenSystem.Tokens.ValueTokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
 
@@ -60,14 +60,14 @@ public static class SerExtensions
         public bool CanReturn<T>([NotNullWhen(true)] out Func<TryGet<T>>? get) where T : Value
         {
             get = null!;
-            if (token is not ValueToken valToken) return false;
+            if (token is not IValueToken valToken) return false;
             return valToken.CapableOf(out get);
         }
         
         public bool CanReturnReference<T>([NotNullWhen(true)] out Func<TryGet<T>>? get)
         {
             get = null!;
-            if (token is not ValueToken valToken) return false;
+            if (token is not IValueToken valToken) return false;
             if (!valToken.CapableOf<ReferenceValue>(out var refFunc)) return false;
 
             get = delegate
@@ -90,13 +90,13 @@ public static class SerExtensions
         
         public TryGet<T> TryGet<T>() where T : Value
         {
-            if (token is not ValueToken valToken) return $"Value '{token.RawRep}' cannot represent a {typeof(T).FriendlyTypeName()}";
+            if (token is not IValueToken valToken) return $"Value '{token.RawRep}' cannot represent a {typeof(T).FriendlyTypeName()}";
         
             return valToken.Value().SuccessTryCast<Value, T>();
         }
     }
 
-    extension(ValueToken valToken)
+    extension(IValueToken valToken)
     {
         public bool CapableOf<T>([NotNullWhen(true)] out Func<TryGet<T>>? get) where T : Value
         {

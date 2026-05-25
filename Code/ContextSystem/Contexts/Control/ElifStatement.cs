@@ -58,8 +58,10 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
 
     protected override IEnumerator<float> Execute()
     {
-        // expression failed -> false
-        var objResult = _expression.Evaluate() ?? false;
+        if (_expression.Evaluate().HasErrored(out var error, out var objResult))
+        {
+            throw new ScriptRuntimeError(this, error);
+        }
 
         if (objResult is not bool result)
         {

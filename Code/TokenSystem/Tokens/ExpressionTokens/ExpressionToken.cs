@@ -1,16 +1,16 @@
-﻿using SER.Code.ContextSystem.ValueExpressions;
+﻿using SER.Code.ContextSystem.Contexts;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Slices;
 using SER.Code.TokenSystem.Structures;
-using SER.Code.TokenSystem.Tokens.ValueTokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
 
 namespace SER.Code.TokenSystem.Tokens.ExpressionTokens;
 
-public class ExpressionToken : ValueToken
+public class ExpressionToken : BaseToken, IValueToken
 {
     private ValueExpressionContext? _context;
     
@@ -75,11 +75,11 @@ public class ExpressionToken : ValueToken
         return expToken;
     }
 
-    public override TryGet<Value> Value()
+    public TryGet<Value> Value()
     {
         _context!.Run().MoveNext();
         return _context.GetValue();
     }
-    public override TypeOfValue PossibleValues => _context!.PossibleValues;
-    public override bool IsConstant => false;
+    public TypeOfValue PossibleValues => _context!.PossibleValues;
+    public bool IsConstant => false;
 }

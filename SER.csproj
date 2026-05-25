@@ -105,7 +105,6 @@
         <None Include="THIRD_PARTY_LICENSES.txt" CopyToOutputDirectory="Always" />
         <EmbeddedResource Include="Example Scripts\*.ser" />
         <EmbeddedResource Include="Example Scripts\custom roles\*.ser" />
-        <EmbeddedResource Include="Example Scripts\zombie infection\*.ser" />
     </ItemGroup>
     
     <ItemGroup>

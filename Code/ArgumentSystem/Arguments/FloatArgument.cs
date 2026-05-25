@@ -67,7 +67,7 @@ public class FloatArgument : Argument
     {
         if (token is NumberToken number)
         {
-            return VerifyRange(number.ExactValue);
+            return VerifyRange(number.Value.Value);
         }
 
         if (!token.CanReturn<NumberValue>(out var func))
@@ -80,7 +80,7 @@ public class FloatArgument : Argument
 
     private TryGet<float> VerifyRange(NumberValue value)
     {
-        var result = (float)value.UnderlyingValue;
+        var result = (float)value.Value;
         if (result < _minValue)
             return $"Value {value} is lower than allowed minimum value {_minValue}.";
 

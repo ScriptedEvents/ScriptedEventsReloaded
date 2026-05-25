@@ -9,7 +9,7 @@ public class BoolToken : LiteralValueToken<BoolValue>
     {
         if (bool.TryParse(Slice.RawRep, out var res1))
         {
-            ExactValue = res1;
+            Value = res1;
             return new Success();
         }
         

@@ -22,44 +22,44 @@ public abstract class LiteralValue : Value
     /// <summary>
     /// Initiates a new literal value.
     /// </summary>
-    /// <param name="underlyingValue">The underlying value OR a function returning the underlying value.</param>
-    protected LiteralValue(object underlyingValue)
+    /// <param name="value">The underlying value OR a function returning the underlying value.</param>
+    protected LiteralValue(object value)
     {
-        if (underlyingValue is Func<object> func)
+        if (value is Func<object> func)
         {
             _valueGetter = func;
             return;
         }
         
-        UnderlyingValue = underlyingValue;
+        Value = value;
     }
     
     public abstract string StringRep { get; }
 
     [field: AllowNull, MaybeNull]
-    public object UnderlyingValue => field 
+    public object Value => field 
                            ?? _valueGetter?.Invoke() 
                            ?? throw new AndrzejFuckedUpException("literal value is null");
 
-    public override bool Equals(Value? other) => other is LiteralValue otherP && UnderlyingValue.Equals(otherP.UnderlyingValue);
+    public override bool Equals(Value? other) => other is LiteralValue otherP && Value.Equals(otherP.Value);
 
     public override string ToString()
     {
         return $"{StringRep} ({FriendlyName})";
     }
 
-    public override int HashCode => UnderlyingValue.GetHashCode();
+    public override int HashCode => Value.GetHashCode();
 
     public override TryGet<object> ToCSharpObject(Type targetType)
     {
-        if (targetType.IsInstanceOfType(UnderlyingValue)) return UnderlyingValue;
+        if (targetType.IsInstanceOfType(Value)) return Value;
         try
         {
-            return Convert.ChangeType(UnderlyingValue, targetType);
+            return Convert.ChangeType(Value, targetType);
         }
         catch
         {
-            return $"Cannot convert {UnderlyingValue.GetType().Name} to {targetType.Name}";
+            return $"Cannot convert {Value.GetType().Name} to {targetType.Name}";
         }
     }
     
@@ -67,9 +67,16 @@ public abstract class LiteralValue : Value
     public new static string FriendlyName => "literal value";
 }
 
-public abstract class LiteralValue<T>(object underlyingValue) : LiteralValue(underlyingValue)
+public abstract class LiteralValue<T>: LiteralValue
     where T : notnull
 {
+    protected LiteralValue(object value) : base(value)
+    {
+    }
 
-    public new T UnderlyingValue => (T)base.UnderlyingValue;
+    protected LiteralValue(Func<object> valueGetter) : base(valueGetter)
+    {
+    }
+
+    public new T Value => (T)base.Value;
 }

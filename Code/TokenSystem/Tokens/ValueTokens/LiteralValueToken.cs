@@ -1,15 +1,17 @@
 ﻿using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
 
 namespace SER.Code.TokenSystem.Tokens.ValueTokens;
 
-public abstract class LiteralValueToken<T> : ValueToken where T : LiteralValue 
+public abstract class LiteralValueToken<T> : BaseToken, IValueToken
+    where T : LiteralValue 
 {
     private bool _set = false;
-    public T ExactValue
+    public T Value
     {
         get => _set ? field : throw new AndrzejFuckedUpException($"Value of a {GetType().AccurateName} was not set.");
         protected set
@@ -19,7 +21,7 @@ public abstract class LiteralValueToken<T> : ValueToken where T : LiteralValue
         }
     } = null!;
     
-    public override TryGet<Value> Value() => ExactValue;
-    public override TypeOfValue PossibleValues => new TypeOfValue<T>();
-    public override bool IsConstant => true;
+    TryGet<Value> IValueToken.Value() => Value;
+    public TypeOfValue PossibleValues => new TypeOfValue<T>();
+    public bool IsConstant => true;
 }

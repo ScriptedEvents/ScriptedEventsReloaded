@@ -6,14 +6,12 @@ public interface IInvalidable
 {
     Type WrappedType { get; }
     Value SafeValue { get; }
-    bool Invalid { get; }
 }
 
 public class Invalidable<T>(T? value) : Value, IInvalidable where T : Value
 {
     public Type WrappedType => typeof(T);
     public Value SafeValue => field ??= value is not null ? value : new InvalidValue();
-    public bool Invalid => SafeValue is InvalidValue;
     
     public override int HashCode => 
         SafeValue.GetHashCode();

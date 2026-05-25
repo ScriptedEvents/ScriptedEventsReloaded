@@ -2,7 +2,7 @@
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.TokenSystem.Tokens.ValueTokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -15,16 +15,16 @@ public class DurationArgument(string name) : Argument(name)
     public DynamicTryGet<TimeSpan> GetConvertSolution(BaseToken token)
     {
         Result rs = $"Value '{token.RawRep}' is not a duration.";
-        if (token is not ValueToken valueToken || !valueToken.CapableOf<DurationValue>(out var get))
+        if (token is not IValueToken valueToken || !valueToken.CapableOf<DurationValue>(out var get))
         {
             return rs;
         }
 
         if (valueToken.IsConstant)
         {
-            return get().OnSuccess(v => v.UnderlyingValue, rs);
+            return get().OnSuccess(v => v.Value, rs);
         }
 
-        return new(() => get().OnSuccess(v => v.UnderlyingValue, rs));
+        return new(() => get().OnSuccess(v => v.Value, rs));
     }
 }

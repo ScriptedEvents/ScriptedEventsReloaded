@@ -2,6 +2,7 @@
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Slices;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.TokenSystem.Tokens.ValueTokens;
 using SER.Code.ValueSystem;
 
@@ -56,13 +57,13 @@ public class BaseToken
         {
             if (textToken.IsDynamic)
             {
-                return new(() => textToken.ExactValue);
+                return new(() => textToken.Value);
             }
             
-            return textToken.ExactValue.UnderlyingValue;
+            return textToken.Value.Value;
         }
 
-        if (this is not ValueToken valueToken || !valueToken.CapableOf<LiteralValue>(out var func))
+        if (this is not IValueToken valueToken || !valueToken.CapableOf<LiteralValue>(out var func))
         {
             return RawRep;
         }

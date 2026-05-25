@@ -2,12 +2,12 @@ using SER.Code.ContextSystem.Structures;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.TokenSystem.Tokens.ValueTokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem.Other;
 
 namespace SER.Code.ValueSystem.PropertySystem;
 
-public class PropertyAccess(BaseToken initialToken, ValueToken root)
+public class PropertyAccess(BaseToken initialToken, IValueToken root)
 {
     private readonly List<string> _propertyNames = [];
 
@@ -28,31 +28,17 @@ public class PropertyAccess(BaseToken initialToken, ValueToken root)
         // type verification
         if (PossibleValues.AreKnown(out var types))
         {
-            if (!VerifyTypes(types, token))
+            foreach (var type in types)
             {
-                return TryAddTokenRes.Error($"'{token.RawRep}' is not a valid property of {PossibleValues}.");
-            }
-        }
-        
-        _propertyNames.Add(token.RawRep);
-        return TryAddTokenRes.Continue();
-    }
+                if (type == typeof(ReferenceValue))
+                {
+                    ExprRepr += $" {token.RawRep}";
+                    PossibleValues = new UnknownTypeOfValue();
+                    goto found;
+                }
 
-    private bool VerifyTypes(Type[] types, BaseToken token)
-    {
-        foreach (var type in types)
-        {
-            if (type == typeof(ReferenceValue))
-            {
-                ExprRepr += $" {token.RawRep}";
-                PossibleValues = new UnknownTypeOfValue();
-                return true;
-            }
-
-            var props = Value.GetPropertiesOfValue(type);
-            switch (props)
-            {
-                case null when type == typeof(LiteralValue):
+                var props = Value.GetPropertiesOfValue(type);
+                if (props == null && type == typeof(LiteralValue))
                 {
                     foreach (var subType in LiteralValue.Subclasses)
                     {
@@ -61,38 +47,37 @@ public class PropertyAccess(BaseToken initialToken, ValueToken root)
                         {
                             ExprRepr += $" {token.RawRep}";
                             PossibleValues = subProp.ReturnType;
-                            return true;
+                            goto found;
                         }
                     }
 
                     ExprRepr += $" {token.RawRep}";
                     PossibleValues = new UnknownTypeOfValue();
-                    return true;
+                    goto found;
                 }
-                case IValueWithProperties.IDynamicPropertyDictionary dynamicDict:
+                if (props is IValueWithProperties.IDynamicPropertyDictionary dynamicDict)
                 {
                     if (dynamicDict.TryGetValue(token.RawRep, out var dynamicProp))
                     {
                         ExprRepr += $" {token.RawRep}";
                         PossibleValues = dynamicProp.ReturnType;
-                        return true;
+                        goto found;
                     }
-                    break;
                 }
-                default:
+                else if (props?.TryGetValue(token.RawRep, out var property) is true)
                 {
-                    if (props?.TryGetValue(token.RawRep, out var property) is true)
-                    {
-                        ExprRepr += $" {token.RawRep}";
-                        PossibleValues = property.ReturnType;
-                        return true;
-                    }
-                    break;
+                    ExprRepr += $" {token.RawRep}";
+                    PossibleValues = property.ReturnType;
+                    goto found;
                 }
             }
+
+            return TryAddTokenRes.Error($"'{token.RawRep}' is not a valid property of {PossibleValues}.");
         }
 
-        return false;
+        found:
+        _propertyNames.Add(token.RawRep);
+        return TryAddTokenRes.Continue();
     }
 
     public TryGet<Value> ResolveValue()

@@ -55,7 +55,7 @@ public class IntArgument : Argument
     {
         if (token is NumberToken number)
         {
-            return VerifyRange(number.ExactValue);
+            return VerifyRange(number.Value.Value);
         }
 
         if (!token.CanReturn<NumberValue>(out var func))
@@ -68,7 +68,7 @@ public class IntArgument : Argument
 
     private TryGet<int> VerifyRange(NumberValue value)
     {
-        var result = (int)value.UnderlyingValue;
+        var result = (int)value.Value;
         if (result < _minValue)
             return $"Value {value} is lower than allowed minimum value {_minValue}.";
 

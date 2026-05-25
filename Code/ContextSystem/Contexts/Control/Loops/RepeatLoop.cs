@@ -4,7 +4,7 @@ using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.TokenSystem.Tokens.ValueTokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.ContextSystem.Contexts.Control.Loops;
@@ -44,7 +44,7 @@ public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
-        if (token is not ValueToken valToken || !valToken.CapableOf<NumberValue>(out var getNumber))
+        if (token is not IValueToken valToken || !valToken.CapableOf<NumberValue>(out var getNumber))
         {
             return TryAddTokenRes.Error($"Value '{token.RawRep}' cannot be interpreted as a number.");
         }
@@ -56,12 +56,12 @@ public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
                 return error;
             }
 
-            if (value.UnderlyingValue < 0)
+            if (value.Value < 0)
             {
                 return $"Value '{value}' cannot be negative.";
             }
 
-            return (uint)value.UnderlyingValue;
+            return (uint)value.Value;
         };
 
         return TryAddTokenRes.End();

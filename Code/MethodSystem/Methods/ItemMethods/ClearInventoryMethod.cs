@@ -11,30 +11,16 @@ public class ClearInventoryMethod : SynchronousMethod
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new PlayersArgument("players"),
-        new OptionsArgument("mode", "destroy", "drop")
-        {
-            DefaultValue = new("destroy", null)
-        }
+        new PlayersArgument("players")
     ];
     
     public override void Execute()
     {
-        if (Args.GetOption("mode") == "drop")
+        foreach (var plr in Args.GetPlayers("players"))
         {
-            foreach (var plr in Args.GetPlayers("players"))
-            {
-                plr.DropEverything();
-            }
-        }
-        else
-        {
-            foreach (var plr in Args.GetPlayers("players"))
-            {
-                plr.Inventory.UserInventory.ReserveAmmo.Clear();
-                plr.Inventory.SendAmmoNextFrame = true;
-                plr.ClearInventory();
-            }
+            plr.Inventory.UserInventory.ReserveAmmo.Clear();
+            plr.Inventory.SendAmmoNextFrame = true;
+            plr.ClearInventory();
         }
     }
 }

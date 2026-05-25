@@ -10,7 +10,7 @@ public class ColorValue(Color color) : LiteralValue<Color>(color), IValueWithPro
     [UsedImplicitly]
     public ColorValue() : this(Color.white) {}
 
-    public override string StringRep => UnderlyingValue.ToHex();
+    public override string StringRep => Value.ToHex();
 
     [UsedImplicitly]
     public new static string FriendlyName => "color value";
@@ -20,11 +20,11 @@ public class ColorValue(Color color) : LiteralValue<Color>(color), IValueWithPro
 
     public Dictionary<string, IValueWithProperties.PropInfo> Properties { get; } = new()
     {
-        ["r"] = new Prop<NumberValue>(c => (decimal)c.UnderlyingValue.r, "Red component of the color (0-1)"),
-        ["g"] = new Prop<NumberValue>(c => (decimal)c.UnderlyingValue.g, "Green component of the color (0-1)"),
-        ["b"] = new Prop<NumberValue>(c => (decimal)c.UnderlyingValue.b, "Blue component of the color (0-1)"),
-        ["a"] = new Prop<NumberValue>(c => (decimal)c.UnderlyingValue.a, "Alpha component of the color (0-1)"),
-        ["hex"] = new Prop<StaticTextValue>(c => c.UnderlyingValue.ToHex(), "Hexadecimal representation of the color"),
+        ["r"] = new Prop<NumberValue>(c => (decimal)c.Value.r, "Red component of the color (0-1)"),
+        ["g"] = new Prop<NumberValue>(c => (decimal)c.Value.g, "Green component of the color (0-1)"),
+        ["b"] = new Prop<NumberValue>(c => (decimal)c.Value.b, "Blue component of the color (0-1)"),
+        ["a"] = new Prop<NumberValue>(c => (decimal)c.Value.a, "Alpha component of the color (0-1)"),
+        ["hex"] = new Prop<StaticTextValue>(c => c.Value.ToHex(), "Hexadecimal representation of the color"),
         ["valType"] = new Prop<EnumValue<ValueType>>(_ => ValueType.Color, "The type of the value")
     };
     

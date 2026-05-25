@@ -22,14 +22,13 @@ if {Chance 50%}
     stop
 end
 
-*date = GetPlayerData @victim date_of_death_by_infection
-
-if *date is invalid
+if {HasPlayerData @victim date_of_death_by_infection} is false
     # set the date of death to 1 minute in the future
     *date = Date.Offset {Date.Current} add 1m
 else
     # when was bit before, remove 20 seconds from the date
     # so the infection happens faster
+    *date = GetPlayerData @victim date_of_death_by_infection
     *date = Date.Offset *date subtract 20s
 end
 

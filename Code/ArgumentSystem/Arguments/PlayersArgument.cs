@@ -16,8 +16,7 @@ public class PlayersArgument(string name) : EnumHandlingArgument(name)
         $"Player variable (e.g. {PlayerVariableToken.Example}), " +
         $"RoleTypeId enum (e.g. ClassD), " +
         $"Team enum (e.g. SCPs), " +
-        $"player id's or name, " +
-        $"or * for every player";
+        $"player id's or name";
 
     [UsedImplicitly]
     public DynamicTryGet<Player[]> GetConvertSolution(BaseToken token)
@@ -32,11 +31,6 @@ public class PlayersArgument(string name) : EnumHandlingArgument(name)
             },
             () =>
             {
-                if (token is SymbolToken { IsJoker: true })
-                {
-                    return new(() => Player.ReadyList.ToArray());
-                }
-
                 if (!token.CanReturn<PlayerValue>(out var get))
                 {
                     return $"{token} does not represent a " +

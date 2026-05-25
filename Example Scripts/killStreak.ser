@@ -11,13 +11,8 @@ if {VarExists @evAttacker} is false
 end
 
 # increment killer's streak
-$streak = GetPlayerData @evAttacker "streak"
-
-if $streak isnt invalid
-    $streak = $streak + 1
-else
-    $streak = 1
-end
+$streak = GetPlayerData @evAttacker "streak" 0
+$streak = $streak + 1
 
 # save the new kill streak
 SetPlayerData @evAttacker "streak" $streak

@@ -2,7 +2,7 @@
 -- availableFor RemoteAdmin
 -- description "Kills a random player currently in the Surface Zone."
 
-Countdown * 10s "A random person on surface is going to be killed in %seconds% seconds!"
+Countdown @all 10s "A random person on surface is going to be killed in %seconds% seconds!"
 wait 11s
 
 # 1. Get all players on the surface and limit the selection to 1 random person.
@@ -10,10 +10,10 @@ wait 11s
 
 # 2. Check if anyone was actually found to avoid a runtime error.
 if {AmountOf @target} isnt 1
-    Broadcast * 5s "No players found in the Surface Zone!"
+    Broadcast @all 5s "No players found in the Surface Zone!"
     stop
 end
 
 # 3. Execute the kill with a custom reason.
 Kill @target "The surface is no longer safe."
-Broadcast * 5s "Eliminated {@target -> name} from the surface."
+Broadcast @all 5s "Eliminated {@target -> name} from the surface."

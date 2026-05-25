@@ -47,7 +47,7 @@ if $effect is 3
     *room = @evPlayer -> roomRef
 
     # explode player if he isnt in a room
-    if *room is invalid
+    if {*room -> isInvalid}
         Explode @evPlayer
         stop
     end
@@ -171,7 +171,7 @@ if $effect is 9
     end
 
     # gets a random player that is not @evPlayer
-    @swapPlayer = Take {Except * @evPlayer} 1
+    @swapPlayer = Take {Except @all @evPlayer} 1
     $swapX = @swapPlayer -> posX
     $swapY = @swapPlayer -> posY
     $swapZ = @swapPlayer -> posZ

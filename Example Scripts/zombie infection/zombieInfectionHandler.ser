@@ -9,16 +9,14 @@ forever
     over @all with @plr
         wait 1ms
 
-        *dateOfDeath = GetPlayerData @plr date_of_death_by_infection
-
-        # invalid -> infection date not set -> not infected
-        if *dateOfDeath is invalid
+        # infection date not set -> not infected
+        if {HasPlayerData @plr date_of_death_by_infection} is false
             continue
         end
-
+        
         # if the current date is "lower" than the date of death
         # it means that the player is not fully infected
-        if {Date.Current} < *dateOfDeath
+        if {Date.Current} < {GetPlayerData @plr date_of_death_by_infection}
             continue
         end
 

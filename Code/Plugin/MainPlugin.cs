@@ -1,6 +1,6 @@
-﻿using LabApi.Events.Arguments.PlayerEvents;
+﻿using Exiled.API.Features;
+using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.CustomHandlers;
-using LabApi.Features;
 using LabApi.Features.Console;
 using MEC;
 using SER.Code.Extensions;
@@ -26,8 +26,6 @@ public class MainPlugin : LabApi.Loader.Features.Plugins.Plugin<Config>
     public override string Description => "The scripting language for SCP:SL.";
     public override Version RequiredApiVersion => LabApiProperties.CurrentVersion;
 #else
-using Exiled.API.Features;
-
 public class MainPlugin : Plugin<Config> 
 {
 #endif

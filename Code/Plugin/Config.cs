@@ -7,8 +7,9 @@ namespace SER.Code.Plugin;
 
 #if EXILED
 public class Config : IConfig
-#endif
+#else
 public class Config
+#endif
 {
     public bool IsEnabled { get; set; } = true;
 

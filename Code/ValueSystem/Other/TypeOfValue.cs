@@ -47,26 +47,13 @@ public class SingleTypeOfValue(Type type) : TypeOfValue(type)
 {
     public readonly Type Type = type;
 
-    private static Type Unwrap(Type type) =>
-        (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Invalidable<>))
-            ? type.GetGenericArguments()[0]
-            : type;
-
     public bool Is(SingleTypeOfValue otherType) => otherType.Type == Type;
     public bool Is<T>() where T : Value => Is(typeof(T));
     
-    public bool IsSameOrHigherThan(SingleTypeOfValue otherType)
-    {
-        if (otherType.Type.IsAssignableFrom(Type)) return true;
-        return Unwrap(otherType.Type).IsAssignableFrom(Unwrap(Type));
-    }
+    public bool IsSameOrHigherThan(SingleTypeOfValue otherType) => otherType.Type.IsAssignableFrom(Type);
     public bool IsSameOrHigherThan<T>() where T : Value => IsSameOrHigherThan(typeof(T));
     
-    public bool CanHold(SingleTypeOfValue otherType)
-    {
-        if (Type.IsAssignableFrom(otherType.Type)) return true;
-        return Unwrap(Type).IsAssignableFrom(Unwrap(otherType.Type));
-    }
+    public bool CanHold(SingleTypeOfValue otherType) => Type.IsAssignableFrom(otherType.Type);
     public bool CanHold<T>() where T : Value => CanHold(typeof(T));
     
     public override string ToString() => Value.GetFriendlyName(Type);

@@ -16,7 +16,6 @@ using SER.Code.TokenSystem;
 using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
-using SER.Code.ValueSystem;
 using SER.Code.VariableSystem;
 using SER.Code.VariableSystem.Bases;
 using SER.Code.VariableSystem.Structures;
@@ -43,12 +42,12 @@ public class Script
             {
                 case RemoteAdminExecutor { Sender: { } sender } when Player.Get(sender) is { } player:
                 {
-                    AddLocalVariable(new PlayerVariable("sender", new PlayerValue(player)));
+                    AddLocalVariable(new PlayerVariable("sender", new(player)));
                     break;
                 }
                 case PlayerConsoleExecutor { Sender: { } hub } when Player.Get(hub) is { } player:
                 {
-                    AddLocalVariable(new PlayerVariable("sender", new PlayerValue(player)));
+                    AddLocalVariable(new PlayerVariable("sender", new(player)));
                     break;
                 }
             }

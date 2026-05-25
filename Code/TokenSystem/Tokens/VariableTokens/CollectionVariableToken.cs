@@ -2,7 +2,6 @@
 using SER.Code.ContextSystem.Contexts.VariableDefinition;
 using SER.Code.ScriptSystem;
 using SER.Code.ValueSystem;
-using SER.Code.ValueSystem.Other;
 using SER.Code.VariableSystem.Variables;
 
 namespace SER.Code.TokenSystem.Tokens.VariableTokens;
@@ -10,8 +9,6 @@ namespace SER.Code.TokenSystem.Tokens.VariableTokens;
 public class CollectionVariableToken : VariableToken<CollectionVariable, CollectionValue>
 {
     public static string Example => "&collection";
-
-    public override TypeOfValue PossibleValues => typeof(CollectionValue);
 
     public override RunnableContext GetContext(Script scr)
     {

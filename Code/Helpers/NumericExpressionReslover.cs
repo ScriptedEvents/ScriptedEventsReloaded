@@ -109,44 +109,35 @@ public static class NumericExpressionReslover
     {
         switch (token)
         {
-            case IValueToken valueToken:
+            case ReferenceVariableToken referenceVariable:
             {
-                valueToken.CapableOf<ReferenceValue>(out var referencefGet);
-                valueToken.CapableOf<LiteralValue>(out var literalGet);
-
-                if (referencefGet is null && literalGet is null)
-                {
-                    goto default;
-                }
-                
                 var tmp = MakeTempName();
-
-                if (referencefGet is not null && literalGet is not null)
+                variables[tmp] = new(() =>
                 {
-                    variables[tmp] = new(() =>
+                    if (referenceVariable.ExactValue.HasErrored(out var error, out var value))
                     {
-                        var literalVal = literalGet();
-                        if (literalVal.WasSuccessful(out var literalValue))
-                        {
-                            return literalValue.Value;
-                        }
-                        
-                        var refVal = referencefGet();
-                        if (refVal.WasSuccessful(out var refValue))
-                        {
-                            return refValue.ToString();
-                        }
-                        
-                        return TryGet<object>.Error($"{valueToken} did not return a reference value nor a literal value.");
-                    });
-                }
-                else if (referencefGet is not null)
+                        return mainErr + error;
+                    }
+                    
+                    return value.IsValid 
+                        ? value.ToString()
+                        : "invalid";
+                });
+                
+                AppendRaw(tmp);
+                return true;
+            }
+            case IValueToken valueToken when valueToken.CapableOf<LiteralValue>(out var get):
+            {
+                var tmp = MakeTempName();
+                
+                if (valueToken.IsConstant)
                 {
-                    variables[tmp] = new(() => referencefGet.Invoke().OnSuccess(v => v.ToString()));
+                    variables[tmp] = get().OnSuccess(s => s.Value, mainErr);
                 }
-                else if (literalGet is not null)
+                else
                 {
-                    variables[tmp] = new(() => literalGet.Invoke().OnSuccess(v => v.Value));
+                    variables[tmp] = new(() => get().OnSuccess(s => s.Value, mainErr));
                 }
                 
                 AppendRaw(tmp);

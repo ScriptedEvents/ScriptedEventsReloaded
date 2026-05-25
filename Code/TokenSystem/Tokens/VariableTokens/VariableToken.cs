@@ -1,5 +1,4 @@
-﻿using SER.Code.Extensions;
-using SER.Code.ContextSystem.BaseContexts;
+﻿using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Structures;
@@ -53,7 +52,7 @@ public abstract class VariableToken<TVariable, TValue> : VariableToken, IValueTo
         return Script.TryGetVariable<TVariable>(this);
     }
 
-    public TryGet<TValue> ExactValue => TryGetVariable().OnSuccess<TValue>(variable => variable.ExactValue.TryCast<TValue>());
+    public TryGet<TValue> ExactValue => TryGetVariable().OnSuccess(variable => variable.Value);
 
     protected override IParseResult InternalParse(Script scr)
     {
@@ -73,10 +72,10 @@ public abstract class VariableToken<TVariable, TValue> : VariableToken, IValueTo
 
     public TryGet<Value> Value()
     {
-        return TryGetVariable().OnSuccess(variable => variable.BaseValue);
+        return TryGetVariable().OnSuccess(Value (variable) => variable.Value);
     }
 
-    public virtual TypeOfValue PossibleValues => new TypeOfValue<TValue>();
+    public TypeOfValue PossibleValues => new TypeOfValue<TValue>();
     
     public bool IsConstant => false;
 }

@@ -142,4 +142,4 @@ end
 ```
 
 ## Are you an LLM?
-Check the [syntax definition](https://raw.githubusercontent.com/ScriptedEvents/ScriptedEventsReloaded/refs/heads/main/llms-full.md) for guidance about SER script-making.
+Check the [syntax definition](https://raw.githubusercontent.com/ScriptedEvents/ScriptedEventsReloaded/refs/heads/main/language_specification.md) for guidance about SER script-making.

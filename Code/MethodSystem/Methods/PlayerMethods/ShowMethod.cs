@@ -58,7 +58,7 @@ public class ShowMethod : ReturningMethod<TextValue>, ICanError
             .Select(lv => lv.StringRep)
             .JoinStrings(separator);
 
-        if (Args.GetBool("separator on beginning"))
+        if (Args.GetBool("separator on beginning") && value.Length > 0)
         {
             value = separator + value;
         }

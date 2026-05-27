@@ -31,7 +31,8 @@ public class Config_GetOptionMethod : ReturningMethod, ICanError, IAdditionalDes
         new ReferenceArgument<CustomConfig>("config"),
         new TextArgument("keys")
         {
-            ConsumesRemainingValues = true
+            ConsumesRemainingValues = true,
+            Description = "If the config is nested, you can provide multiple keys to traverse the option tree."
         }
     ];
 

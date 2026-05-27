@@ -2,7 +2,6 @@
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ValueSystem.PropertySystem;
-using ValueType = SER.Code.ValueSystem.Other.ValueType;
 
 namespace SER.Code.ValueSystem;
 

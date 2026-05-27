@@ -33,7 +33,7 @@ public abstract class Argument(string name)
     /// Sets the default value for this argument, allowing it to be skipped by the user.
     /// Null values are allowed, the method must handle it accordingly.
     /// </summary>
-    public Default? DefaultValue;
+    public Default? DefaultValue { get; init; }
     
     public abstract string InputDescription { get; }
 

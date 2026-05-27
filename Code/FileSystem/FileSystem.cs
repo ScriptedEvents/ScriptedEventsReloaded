@@ -12,6 +12,7 @@ public static class FileSystem
 {
     public static readonly string MainDirPath = Path.Combine(PathManager.Configs.FullName, "Scripted Events Reloaded");
     public static readonly string DbDirPath = Path.Combine(MainDirPath, "Databases");
+    public static readonly string ConfigsDirPath = Path.Combine(MainDirPath, "Custom Configs");
     public static string[] RegisteredScriptPaths = [];
 
     public static void UpdateScriptPathCollection()

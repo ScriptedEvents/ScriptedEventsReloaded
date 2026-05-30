@@ -53,7 +53,7 @@ From most to least used:
 
 Methods perform actions and are written in `PascalCase`.
 
-* **Syntax:** `MethodName Arg1 Arg2` (e.g., `Broadcast @all 5s "Hello"`)
+* **Syntax:** `MethodName Arg1 Arg2` (space separated) (e.g., `Broadcast @all 5s "Hello"`)
 * **Return Values:** Can be stored directly (`$name = ServerInfo name`)
 * **The Wildcard (`*`):** Targets ALL of something, excluding players (`CloseDoor *`)
 * **Omit Arguments (`_`):** Skip optional arguments (`*embed = Embed.Create "Title" _ _ "Author"`)

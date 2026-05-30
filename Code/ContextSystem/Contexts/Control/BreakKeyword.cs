@@ -18,9 +18,7 @@ public class BreakKeyword : StandardContext, IKeywordContext
     public string[] Arguments => [];
 
     public string Example =>
-        $$"""
-          # {{Description}}
-
+          """
           # for example:
           forever
               wait 1s

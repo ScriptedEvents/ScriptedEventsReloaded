@@ -9,14 +9,14 @@ using SER.Code.VariableSystem;
 namespace SER.Code.ContextSystem.Contexts;
 
 [UsedImplicitly]
-public class DeleteContext : StandardContext, IKeywordContext
+public class DeleteKeyword : StandardContext, IKeywordContext
 {
     private VariableToken _variableToken = null!;
     public override string FriendlyName => "delete statement";
 
     public string KeywordName => "delete";
     public string Description => "Deletes a variable.";
-    public string[] Arguments => ["variable to delete"];
+    public string[] Arguments => ["[variable to delete]"];
     public string Example =>
         """
         global $someVar = "value"

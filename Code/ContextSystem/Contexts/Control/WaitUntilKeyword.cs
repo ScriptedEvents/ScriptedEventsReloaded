@@ -14,8 +14,8 @@ namespace SER.Code.ContextSystem.Contexts.Control;
 public class WaitUntilKeyword : YieldingContext, IKeywordContext
 {
     protected readonly List<BaseToken> Tokens = [];
-    
-    private NumericExpressionReslover.CompiledExpression _expression;
+
+    private NumericExpressionReslover.CompiledExpression _expression = null!;
 
     public override string FriendlyName => $"'{KeywordName}' keyword";
     public virtual string KeywordName => "wait_until";

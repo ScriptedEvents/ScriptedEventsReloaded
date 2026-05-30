@@ -3,6 +3,7 @@ using System.Text;
 using CommandSystem;
 using LabApi.Events.Arguments.Interfaces;
 using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.Contexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
@@ -14,7 +15,11 @@ using SER.Code.MethodSystem.BaseMethods.Interfaces;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.Plugin.Commands.Interfaces;
+using SER.Code.ScriptSystem;
+using SER.Code.ScriptSystem.Structures;
+using SER.Code.TokenSystem;
 using SER.Code.TokenSystem.Tokens;
+using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.PropertySystem;
 using SER.Code.VariableSystem;
@@ -42,7 +47,121 @@ public static class DocsProvider
         {
             if (option == HelpOption.Properties && args.Count > 1)
             {
-                return GetPropertiesForType(args.Array[args.Offset + 1], out response);
+                var rawInput = string.Join(" ", args.Skip(1));
+                var anonymousScript = new Script { Name = ScriptName.CreateUnsafe("HelpAnonymous"), Content = string.Empty, Executor = ServerConsoleExecutor.Instance };
+
+                // 1) Handle Method Execution (run:method ...)
+                if (rawInput.StartsWith("run:", StringComparison.OrdinalIgnoreCase))
+                {
+                    var methodLine = rawInput.Substring(4).Trim();
+                    if (Tokenizer.TokenizeLine(methodLine, anonymousScript, null).HasErrored(out var errorMsg, out var tokens))
+                    {
+                        response = $"Error parsing method: {errorMsg}";
+                        return false;
+                    }
+
+                    if (tokens.Length == 0 || tokens[0] is not MethodToken methodToken)
+                    {
+                        response = "The provided input did not resolve to a valid method call.";
+                        return false;
+                    }
+
+                    var context = (MethodContext)methodToken.GetContext(anonymousScript);
+                    if (context.Method is not IReturningMethod returningMethod)
+                    {
+                        response = $"Method '{context.Method.Name}' does not return a value that can be inspected.";
+                        return false;
+                    }
+
+                    // Feed remaining tokens to the dispatcher
+                    foreach (var token in tokens.Skip(1))
+                    {
+                        if (context.TryAddToken(token).HasErrored)
+                        {
+                            response = $"Argument error: {context.TryAddToken(token).ErrorMessage}";
+                            return false;
+                        }
+                    }
+
+                    if (context.VerifyCurrentState().HasErrored(out errorMsg))
+                    {
+                        response = $"Missing arguments: {errorMsg}";
+                        return false;
+                    }
+
+                    // Run it synchronously. ReturningMethods are sync (except for SafeScripts wait).
+                    if (context.Method is SynchronousMethod syncMethod)
+                    {
+                        syncMethod.Execute();
+                        var val = returningMethod.ReturnValue;
+                        if (val is null)
+                        {
+                            response = "The method was executed but returned no value.";
+                            return true;
+                        }
+                        return TryGetPropsFromValue(val, out response);
+                    }
+
+                    response = "Only synchronous returning methods can be inspected.";
+                    return false;
+                }
+
+                // 2) Handle Variables and Types via Tokenization
+                if (Tokenizer.TokenizeLine(rawInput, anonymousScript, null).HasErrored(out _, out var inputTokens) || inputTokens.Length == 0)
+                {
+                    // Fallback to legacy type lookup if tokenization fails or is empty
+                    return GetPropertiesForType(args.Array[args.Offset + 1], out response);
+                }
+
+                var firstToken = inputTokens[0];
+                if (firstToken is VariableToken varToken)
+                {
+                    // Check for @script:name scope
+                    Script? targetScript = null;
+                    var scriptParam = inputTokens.FirstOrDefault(t => t.RawRep.StartsWith("@script:", StringComparison.OrdinalIgnoreCase));
+                    if (scriptParam != null)
+                    {
+                        var scriptName = scriptParam.RawRep.Substring(8);
+                        targetScript = Script.RunningScripts.FirstOrDefault(s => ((string)s.Name).Equals(scriptName, StringComparison.OrdinalIgnoreCase));
+                        if (targetScript == null)
+                        {
+                            response = $"Script '{scriptName}' is not currently running.\nRunning scripts: " + 
+                                       (Script.RunningScripts.Any() ? string.Join(", ", Script.RunningScripts.Select(s => s.Name).ToArray()) : "none");
+                            return false;
+                        }
+                    }
+
+                    Value? resolvedValue = null;
+                    if (targetScript != null)
+                    {
+                        var prefix = varToken.RawRep[0];
+                        var name = varToken.RawRep.Substring(1);
+                        if (targetScript.LocalVariables.Any(v => v.Prefix == prefix && v.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            resolvedValue = targetScript.LocalVariables.First(v => v.Prefix == prefix && v.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).BaseValue;
+                        }
+                        else
+                        {
+                            response = $"Variable '{varToken.RawRep}' was not found in script '{targetScript.Name}'.";
+                            return false;
+                        }
+                    }
+                    else if (VariableIndex.TryGetGlobalVariable(varToken.RawRep[0], varToken.RawRep.Substring(1), out var globalVar))
+                    {
+                        resolvedValue = globalVar.BaseValue;
+                    }
+
+                    if (resolvedValue != null)
+                    {
+                        return TryGetPropsFromValue(resolvedValue, out response);
+                    }
+
+                    response = $"Variable '{varToken.RawRep}' is not defined globally.";
+                    return false;
+                }
+
+                // Default legacy path (or assembly-qualified type)
+                return GetPropertiesForType(rawInput, out response);
             }
             
             if (!GeneralOptions.TryGetValue(option, out var func))
@@ -573,6 +692,85 @@ public static class DocsProvider
         return sb.ToString();
     }
 
+    private static bool TryGetPropsFromValue(Value val, out string response)
+    {
+        var properties = Value.GetPropertiesOfValue(val.GetType());
+        if (properties == null)
+        {
+            response = $"Value {val.FriendlyName} does not have properties.";
+            return false;
+        }
+
+        // Special case for collection of references: show both collection and element props
+        if (val is CollectionValue collection && collection.StoredTypes != null && typeof(ReferenceValue).IsAssignableFrom(collection.StoredTypes))
+        {
+            var elementProps = Value.GetPropertiesOfValue(collection.StoredTypes);
+            if (elementProps != null)
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine($"> Properties for {val.FriendlyName} (showing both collection and element properties)");
+                sb.AppendLine();
+                sb.AppendLine("--- Collection Properties ---");
+                foreach (var (name, info) in properties.OrderBy(p => p.Key))
+                {
+                    sb.AppendLine(RenderPropertyLine(name, info));
+                }
+                sb.AppendLine();
+                sb.AppendLine($"--- Element Properties ({Value.GetFriendlyName(collection.StoredTypes)}) ---");
+                foreach (var (name, info) in elementProps.OrderBy(p => p.Key))
+                {
+                    sb.AppendLine(RenderPropertyLine(name, info));
+                }
+                response = sb.ToString();
+                return true;
+            }
+        }
+
+        response = RenderProperties(val.FriendlyName, properties);
+        return true;
+    }
+
+    private static string RenderProperties(string typeName, IReadOnlyDictionary<string, IValueWithProperties.PropInfo> props, Type? type = null)
+    {
+        var sb = new StringBuilder(
+            $"> Properties for {typeName} value" 
+            + (type is not null ? $" in '{type.Assembly.GetName().Name}' assembly" : "") 
+            + "\n");
+        
+        var sortedProps = props.OrderBy(kvp => kvp.Key).ToList();
+        var custom = sortedProps.Where(p => !p.Value.IsReflected).ToList();
+        var reflected = sortedProps.Where(p => p.Value.IsReflected).ToList();
+
+        if (reflected.Count > 0)
+        {
+            sb.AppendLine("\n--- Base properties ---");
+            foreach (var (name, info) in reflected)
+            {
+                sb.AppendLine(RenderPropertyLine(name, info));
+            }
+        }
+
+        if (custom.Count > 0)
+        {
+            sb.AppendLine("\n--- Custom SER properties ---");
+            foreach (var (name, info) in custom)
+            {
+                sb.AppendLine(RenderPropertyLine(name, info));
+            }
+        }
+        
+        return sb.ToString();
+    }
+
+    private static string RenderPropertyLine(string name, IValueWithProperties.PropInfo info)
+    {
+        var returnTypeFriendlyName = info.ReturnType.ToString();
+        return $"> {name} " +
+               $"({returnTypeFriendlyName}) " +
+               $"{(info.IsSettable ? "[settable] " : "")}" +
+               $"{(string.IsNullOrEmpty(info.Description) ? "" : $"- {info.Description}")}";
+    }
+
     public static string GetPropertiesHelpPage()
     {
         var registeredTypes = ReferencePropertyRegistry.GetRegisteredTypes()
@@ -590,21 +788,38 @@ public static class DocsProvider
         return
             $$"""
             Properties allow you to access internal data of SER values and C# objects using the '->' operator.
-            
+
             Syntax:
             $hp = @player -> hp               - Accesses 'hp' property of a player variable.
             $type = *item -> type             - Accesses 'type' property of a reference variable.
             $key = *json -> someKey           - Accesses 'someKey' from a JSON object.
-            
+
             Print {@sender -> name}           - You can use {} brackets to contain the expression into a single argument.
-            
+
             if {@sender -> role} is "ClassD"  - Or use {} when in a condition.
+
+            
+            --- Enhanced serhelp properties ---
+            You can now inspect properties without knowing the exact type name:
+            
+            From a global variable:
+            > serhelp properties *myVar
+            
+            From a local variable from a running script:
+            > serhelp properties *target @script:round_start
+            
+            From the return value of a method:
+            > serhelp properties run:GetFromMap doors
+            
+            You can also specify the assembly:
+            > serhelp properties Door@LabAPI 
+
             
             --- Basic SER value properties ---
-            
+
             Player:
             - {{playerPropsList}}
-            
+
             Collection:
             - {{collectionPropsList}}
 
@@ -613,15 +828,16 @@ public static class DocsProvider
 
             Text:
             - {{textPropsList}}
-            
+
             Bool:
             - {{boolPropsList}}
-            
+
             Color:
             - {{colorPropsList}}
-            
+
             Duration:
             - {{durationPropsList}}
+
             
             --- Registered C# objects ---
             Use 'serhelp properties <objectName>' to see available properties for these types:
@@ -638,7 +854,24 @@ public static class DocsProvider
 
     public static bool GetPropertiesForType(string typeName, out string response)
     {
-        IReadOnlyDictionary<string, IValueWithProperties.PropInfo> props;
+        string? assemblyFilter = null;
+        if (typeName.Contains("@"))
+        {
+            var parts = typeName.Split('@');
+            typeName = parts[0];
+            assemblyFilter = parts[1];
+
+            // Map friendly names to actual assembly names
+            assemblyFilter = assemblyFilter.ToLowerInvariant() switch
+            {
+                "basegame" => "Assembly-CSharp",
+                "labapi" => "LabApi",
+                "nwlib" => "NorthwoodLib",
+                _ => assemblyFilter
+            };
+        }
+
+        IReadOnlyDictionary<string, IValueWithProperties.PropInfo>? props = null;
 
         if (typeName.Equals("player", StringComparison.OrdinalIgnoreCase))
         {
@@ -713,7 +946,7 @@ public static class DocsProvider
                     var output = new StringBuilder($"Warning! There are {types.Count} defined types with the same name '{typeName}'.\n\n");
                     foreach (var type in types)
                     {
-                        output.AppendLine(GetProperties(typeName, ReferencePropertyRegistry.GetProperties(type), type));
+                        output.AppendLine(RenderProperties(typeName, ReferencePropertyRegistry.GetProperties(type), type));
                     }
                 
                     response = output.ToString();
@@ -725,51 +958,7 @@ public static class DocsProvider
             }
         }
         
-        response = GetProperties(typeName, props, null);
+        response = RenderProperties(typeName, props, null);
         return true;
-
-        static string GetProperties(
-            string typeName,
-            IReadOnlyDictionary<string, IValueWithProperties.PropInfo> props,
-            Type? type)
-        {
-            var sb = new StringBuilder(
-                $"> Properties for {typeName} value" 
-                + (type is not null ? $" in '{type.Assembly.GetName().Name}' assembly" : "") 
-                + "\n");
-            
-            var sortedProps = props.OrderBy(kvp => kvp.Key).ToList();
-            var custom = sortedProps.Where(p => !p.Value.IsReflected).ToList();
-            var reflected = sortedProps.Where(p => p.Value.IsReflected).ToList();
-
-            if (reflected.Count > 0)
-            {
-                sb.AppendLine("\n--- Base properties ---");
-                foreach (var (name, info) in reflected)
-                {
-                    sb.AppendLine(GetTypeInfo(name, info));
-                }
-            }
-
-            if (custom.Count > 0)
-            {
-                sb.AppendLine("\n--- Custom SER properties ---");
-                foreach (var (name, info) in custom)
-                {
-                    sb.AppendLine(GetTypeInfo(name, info));
-                }
-            }
-            
-            return sb.ToString();
-
-            string GetTypeInfo(string name, IValueWithProperties.PropInfo info)
-            {
-                var returnTypeFriendlyName = info.ReturnType.ToString();
-                return $"> {name} " +
-                       $"({returnTypeFriendlyName}) " +
-                       $"{(info.IsSettable ? "[settable] " : "")}" +
-                       $"{(string.IsNullOrEmpty(info.Description) ? "" : $"- {info.Description}")}";
-            }
-        }
     }
 }

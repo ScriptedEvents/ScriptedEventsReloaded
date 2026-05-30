@@ -7,6 +7,7 @@ using PlayerStatsSystem;
 using Respawning;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers;
 using SER.Code.ValueSystem.Other;
 
 namespace SER.Code.ValueSystem.PropertySystem;
@@ -56,7 +57,7 @@ public static class ReferencePropertyRegistry
             var key = prop.Name.LowerFirst();
             if (!combined.ContainsKey(key))
             {
-                combined[key] = new UnsafeReferencePropInfo(type, prop, null);
+                combined[key] = new UnsafeReferencePropInfo(type, prop, XmlDocReader.GetDescription(prop));
             }
         }
 
@@ -65,7 +66,7 @@ public static class ReferencePropertyRegistry
             var key = field.Name.LowerFirst();
             if (!combined.ContainsKey(key))
             {
-                combined[key] = new UnsafeReferencePropInfo(type, field, null);
+                combined[key] = new UnsafeReferencePropInfo(type, field, XmlDocReader.GetDescription(field));
             }
         }
         
@@ -222,12 +223,13 @@ public static class ReferencePropertyRegistry
         private readonly MemberInfo _member;
         private readonly Type _guessedValueType;
         private readonly Type _memberType;
+        private readonly string? _description;
 
         public UnsafeReferencePropInfo(Type ownerType, MemberInfo member, string? description)
         {
             _ownerType = ownerType;
             _member = member;
-            Description = description!;
+            _description = description;
 
             _memberType = member switch
             {
@@ -309,8 +311,6 @@ public static class ReferencePropertyRegistry
         public override SingleTypeOfValue ReturnType => new(_guessedValueType);
         public override bool IsReflected => true;
         public override bool IsSettable { get; }
-
-        [field: AllowNull, MaybeNull]
-        public override string Description => field ?? "";
+        public override string? Description => _description;
     }
 }

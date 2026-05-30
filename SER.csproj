@@ -11,6 +11,8 @@
         <PlatformTarget>x64</PlatformTarget>
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
         <Configurations>Release;Full Debug;Partial Debug;EXILED</Configurations>
@@ -97,7 +99,23 @@
         />
     </Target>
 
+    <PropertyGroup>
+        <LabApiXmlPath>$(UserProfile)\.nuget\packages\northwood.labapi\1.1.6.1\lib\net48\LabApi.xml</LabApiXmlPath>
+    </PropertyGroup>
+
     <ItemGroup>
+        <EmbeddedResource Include="$(OutputPath)$(AssemblyName).xml" Condition="Exists('$(OutputPath)$(AssemblyName).xml')">
+            <LogicalName>$(AssemblyName).xml</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="$(LabApiXmlPath)" Condition="Exists('$(LabApiXmlPath)')">
+            <LogicalName>LabApi.xml</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="$(OutputPath)Exiled.API.xml" Condition="Exists('$(OutputPath)Exiled.API.xml')">
+            <LogicalName>Exiled.API.xml</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="$(OutputPath)Exiled.Events.xml" Condition="Exists('$(OutputPath)Exiled.Events.xml')">
+            <LogicalName>Exiled.Events.xml</LogicalName>
+        </EmbeddedResource>
         <None Include="App.config" />
         <None Include="packages.config" />
         <Content Include=".gitignore" />

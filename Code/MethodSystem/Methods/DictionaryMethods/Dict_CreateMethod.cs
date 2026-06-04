@@ -1,7 +1,7 @@
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
-using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.MethodSystem.Methods.DictionaryMethods.Structures;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.DictionaryMethods;
 

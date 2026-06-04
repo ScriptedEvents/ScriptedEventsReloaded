@@ -1,11 +1,11 @@
 ﻿using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.HealthMethods;
 
-[UsedImplicitly]
-public class HealMethod : SynchronousMethod
+public class HealMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Heals players. Doesn't exceed their max health.";
 

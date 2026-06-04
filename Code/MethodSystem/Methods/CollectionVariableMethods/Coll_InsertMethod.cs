@@ -1,7 +1,7 @@
 ﻿using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
-using SER.Code.MethodSystem.MethodDescriptors;
+using SER.Code.MethodSystem.Structures;
 using SER.Code.ValueSystem;
 using SER.Code.VariableSystem.Variables;
 

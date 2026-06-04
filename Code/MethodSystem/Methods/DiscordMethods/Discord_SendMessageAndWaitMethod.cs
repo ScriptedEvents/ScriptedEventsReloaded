@@ -4,8 +4,8 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
 using SER.Code.MethodSystem.BaseMethods.Yielding;
-using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.MethodSystem.Methods.HTTPMethods;
+using SER.Code.MethodSystem.Structures;
 using SER.Code.ValueSystem;
 using UnityEngine.Networking;
 

@@ -1,4 +1,4 @@
-﻿namespace SER.Code.MethodSystem.MethodDescriptors;
+﻿namespace SER.Code.MethodSystem.Structures;
 
 public interface ICanError
 {

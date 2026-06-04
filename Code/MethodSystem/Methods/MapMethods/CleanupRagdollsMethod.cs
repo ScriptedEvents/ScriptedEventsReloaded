@@ -4,11 +4,11 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.MapMethods;
 
-[UsedImplicitly]
-public class CleanupRagdollsMethod : SynchronousMethod
+public class CleanupRagdollsMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Destroys ragdolls.";
 

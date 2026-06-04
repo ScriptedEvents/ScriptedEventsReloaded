@@ -5,7 +5,7 @@ using SER.Code.Extensions;
 using SER.Code.FlagSystem;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
-using SER.Code.MethodSystem.MethodDescriptors;
+using SER.Code.MethodSystem.Structures;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.ValueSystem;
 using SER.Code.VariableSystem.Bases;

@@ -2,11 +2,11 @@
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.MapMethods;
 
-[UsedImplicitly]
-public class CleanupPickupsMethod : SynchronousMethod
+public class CleanupPickupsMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Cleans pickups (items) from the map.";
 

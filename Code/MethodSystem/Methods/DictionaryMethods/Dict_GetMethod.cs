@@ -2,8 +2,8 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
-using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.MethodSystem.Methods.DictionaryMethods.Structures;
+using SER.Code.MethodSystem.Structures;
 using SER.Code.ValueSystem.Other;
 
 namespace SER.Code.MethodSystem.Methods.DictionaryMethods;

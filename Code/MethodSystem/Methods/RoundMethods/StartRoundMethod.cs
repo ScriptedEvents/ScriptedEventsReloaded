@@ -1,11 +1,11 @@
 ﻿using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.RoundMethods;
 
-[UsedImplicitly]
-public class StartRoundMethod : SynchronousMethod
+public class StartRoundMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Start a round.";
 

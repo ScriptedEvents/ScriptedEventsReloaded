@@ -1,13 +1,14 @@
 ﻿using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.Structures;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.VariableSystem.Bases;
 
 namespace SER.Code.MethodSystem.Methods.ScriptMethods;
 
 [UsedImplicitly]
-public class RunScriptMethod : SynchronousMethod
+public class RunScriptMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Runs a script.";
 

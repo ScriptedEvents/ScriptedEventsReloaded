@@ -1,11 +1,11 @@
 ﻿using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.RoundMethods;
 
-[UsedImplicitly]
-public class EndRoundMethod : SynchronousMethod
+public class EndRoundMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Ends a round.";
 

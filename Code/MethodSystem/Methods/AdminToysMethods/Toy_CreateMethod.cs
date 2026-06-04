@@ -5,7 +5,7 @@ using SER.Code.ArgumentSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
-using SER.Code.MethodSystem.MethodDescriptors;
+using SER.Code.MethodSystem.Structures;
 using CapybaraToy = LabApi.Features.Wrappers.CapybaraToy;
 using LightSourceToy = LabApi.Features.Wrappers.LightSourceToy;
 using PrimitiveObjectToy = LabApi.Features.Wrappers.PrimitiveObjectToy;

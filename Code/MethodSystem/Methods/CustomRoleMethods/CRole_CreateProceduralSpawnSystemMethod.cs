@@ -2,8 +2,8 @@ using PlayerRoles;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
-using SER.Code.MethodSystem.MethodDescriptors;
 using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.CustomRoleMethods;
 

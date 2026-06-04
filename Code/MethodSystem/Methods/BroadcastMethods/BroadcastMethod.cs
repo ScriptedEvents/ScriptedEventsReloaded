@@ -2,11 +2,11 @@
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.BroadcastMethods;
 
-[UsedImplicitly]
-public class BroadcastMethod : SynchronousMethod
+public class BroadcastMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Sends a broadcast to players.";
 

@@ -3,11 +3,12 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.WarheadMethods;
 
 [UsedImplicitly]
-public class WarheadMethod : SynchronousMethod
+public class WarheadMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Manages alpha warhead.";
     

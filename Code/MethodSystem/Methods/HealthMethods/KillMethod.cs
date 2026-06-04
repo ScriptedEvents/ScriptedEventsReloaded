@@ -1,11 +1,11 @@
 ﻿using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.HealthMethods;
 
-[UsedImplicitly]
-public class KillMethod : SynchronousMethod
+public class KillMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Kills players.";
 

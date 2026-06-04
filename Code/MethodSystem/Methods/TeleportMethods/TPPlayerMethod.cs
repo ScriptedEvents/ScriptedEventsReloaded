@@ -1,12 +1,13 @@
 ﻿using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.TeleportMethods;
 
 // ReSharper disable once InconsistentNaming
 [UsedImplicitly]
-public class TPPlayerMethod : SynchronousMethod
+public class TPPlayerMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Teleports players to another player.";
 

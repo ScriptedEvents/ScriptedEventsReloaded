@@ -1,11 +1,11 @@
 ﻿using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.ItemMethods;
 
-[UsedImplicitly]
-public class ClearInventoryMethod : SynchronousMethod
+public class ClearInventoryMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Clears player inventory.";
 

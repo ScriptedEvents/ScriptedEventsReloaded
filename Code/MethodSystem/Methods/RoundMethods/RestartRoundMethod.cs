@@ -1,11 +1,11 @@
 using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.RoundMethods;
 
-[UsedImplicitly]
-public class RestartRoundMethod : SynchronousMethod
+public class RestartRoundMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Restarts the round.";
 

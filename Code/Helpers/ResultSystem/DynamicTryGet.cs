@@ -52,7 +52,7 @@ public class DynamicTryGet<T> : DynamicTryGet
         if (_tryGet is not null) return _tryGet;
         if (_tryGetFunc is not null) return _tryGetFunc();
         
-        return _tryGetFunc!();
+        throw new InvalidOperationException();
     }
     
     public DynamicTryGet(T value)

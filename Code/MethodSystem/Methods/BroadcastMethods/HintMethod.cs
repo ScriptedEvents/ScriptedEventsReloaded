@@ -5,6 +5,7 @@ using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.BroadcastMethods;
 
+[UsedImplicitly]
 public class HintMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Sends a hint to players.";

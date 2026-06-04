@@ -1,0 +1,28 @@
+# this script will show the remaining time for respawn waves
+
+!-- OnEvent RoundStarted
+
+# forever loop makes it continue until the server restarts
+# so we dont have to worry about the respawn timer stopping
+forever
+    wait 1s
+
+    # fetch duration to next wave for chaos
+    $chaosWave = FormatDuration {GetWaveTimer chaosWave} "MMm SSs"
+    $miniChaosWave = FormatDuration {GetWaveTimer miniChaosWave} "MMs SSs"
+
+    # fetch duration to next wave for mtf
+    $mtfWave = FormatDuration {GetWaveTimer mtfWave} "MMm SSs"
+    $miniMtfWave = FormatDuration {GetWaveTimer miniMtfWave} "MMs SSs"
+
+    # create the hint to be sent to spectators
+    $hint = "<size=30>respawn waves:<br></size><size=20>"
+    $hint = $hint + "<color=#008F1C>Chaos Wave - {$chaosWave}</color>               "
+    $hint = $hint + "<color=#0096FF>MTF Wave - {$mtfWave}</color><br>"
+    $hint = $hint + "<color=#008F1C>Mini Chaos Wave - {$miniChaosWave}</color>               "
+    $hint = $hint + "<color=#0096FF>Mini MTF Wave - {$miniMtfWave}</color><br>"
+
+    # send the hint to spectators
+    Hint spectator 2s $hint
+end
+

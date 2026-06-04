@@ -12,7 +12,10 @@ namespace SER.Code.ArgumentSystem.Arguments;
 
 public class DoorArgument(string name) : EnumHandlingArgument(name)
 {
-    public override string InputDescription => $"{nameof(DoorName)} enum, {nameof(FacilityZone)} enum or reference to {nameof(Door)}";
+    public override string InputDescription => 
+        $"{nameof(DoorName)} enum, " +
+        $"{nameof(FacilityZone)} enum " +
+        $"or a {nameof(Door)} reference.";
 
     [UsedImplicitly]
     public DynamicTryGet<Door> GetConvertSolution(BaseToken token)

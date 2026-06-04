@@ -13,7 +13,7 @@ using SER.Code.MethodSystem;
 using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.MethodSystem.BaseMethods.Interfaces;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
-using SER.Code.MethodSystem.MethodDescriptors;
+using SER.Code.MethodSystem.Structures;
 using SER.Code.Plugin.Commands.Interfaces;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
@@ -178,7 +178,7 @@ public static class DocsProvider
             return GetPropertiesForType(args.Array[args.Offset + 1], out response);
         }
         
-        var keyword = KeywordToken.KeywordContextTypes
+        var keyword = ContextableKeywordToken.KeywordContextTypes
             .Select(kType => kType.CreateInstance<IKeywordContext>())
             .FirstOrDefault(keyword => keyword.KeywordName == arg);
         
@@ -332,7 +332,7 @@ public static class DocsProvider
             Here is a list of all keywords available in SER:
             (each of them is of course searchable using 'serhelp keywordName')
             
-            """ + KeywordToken.KeywordContextTypes
+            """ + ContextableKeywordToken.KeywordContextTypes
                 .Select(t => t.CreateInstance<IKeywordContext>())
                 .Select(k => $"> {k.KeywordName}")
                 .JoinStrings("\n");

@@ -9,7 +9,10 @@ namespace SER.Code.ArgumentSystem.Arguments;
 
 public class ItemsArgument(string name) : EnumHandlingArgument(name)
 {
-    public override string InputDescription => $"{nameof(ItemType)} enum, reference to {nameof(Item)}, or * for every item";
+    public override string InputDescription => 
+        $"{nameof(ItemType)} enum, " +
+        $"reference to {nameof(Item)}, " +
+        $"or 'all' for every item";
 
     [UsedImplicitly]
     public DynamicTryGet<Item[]> GetConvertSolution(BaseToken token)
@@ -24,7 +27,7 @@ public class ItemsArgument(string name) : EnumHandlingArgument(name)
             {
                 Result rs = $"Value '{token.RawRep}' cannot be interpreted as {InputDescription}.";
 
-                if (token is SymbolToken { IsJoker: true })
+                if (token is SymbolToken { IsJoker: true } or AllToken)
                 {
                     return Item.List.ToArray();
                 }

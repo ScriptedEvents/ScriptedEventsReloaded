@@ -15,7 +15,7 @@ public static class Tokenizer
 {
     public static readonly Type[] OrderedImportanceTokensFromSingleSlices =
     [
-        typeof(KeywordToken),
+        typeof(ContextableKeywordToken),
         typeof(BoolToken),
         typeof(MethodToken),
         typeof(FlagToken),
@@ -29,7 +29,8 @@ public static class Tokenizer
         typeof(CollectionVariableToken),
         typeof(ReferenceVariableToken),
         typeof(DurationToken),
-        typeof(RunFunctionToken)
+        typeof(RunFunctionToken),
+        typeof(AllToken)
     ];
     
     public static readonly Type[] OrderedImportanceTokensFromCollectionSlices =

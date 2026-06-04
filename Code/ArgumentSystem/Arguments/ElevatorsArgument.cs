@@ -9,7 +9,10 @@ namespace SER.Code.ArgumentSystem.Arguments;
 
 public class ElevatorsArgument(string name) : EnumHandlingArgument(name)
 {
-    public override string InputDescription => $"{nameof(ElevatorGroup)} enum, reference to an elevator or * for every elevator";
+    public override string InputDescription => 
+        $"{nameof(ElevatorGroup)} enum, " +
+        $"reference to an elevator " +
+        $"or 'all' for every elevator";
 
     [UsedImplicitly]
     public DynamicTryGet<Elevator[]> GetConvertSolution(BaseToken token)
@@ -23,7 +26,7 @@ public class ElevatorsArgument(string name) : EnumHandlingArgument(name)
             },
             () =>
             {
-                if (token is SymbolToken { IsJoker: true })
+                if (token is SymbolToken { IsJoker: true } or AllToken) 
                 {
                     return Elevator.List.ToArray();
                 }

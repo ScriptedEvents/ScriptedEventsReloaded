@@ -17,7 +17,7 @@ public class DoorsArgument(string name) : EnumHandlingArgument(name)
         $"{nameof(RoomName)} enum, " +
         $"reference to {nameof(Door)}, " +
         $"reference to {nameof(Room)} " +
-        $"or * for every door";
+        $"or 'all' for every door";
 
     [UsedImplicitly]
     public DynamicTryGet<Door[]> GetConvertSolution(BaseToken token)
@@ -40,7 +40,7 @@ public class DoorsArgument(string name) : EnumHandlingArgument(name)
             {
                 Result rs =
                     $"Value '{token.RawRep}' cannot be interpreted as a door or collection of doors.";
-                if (token.RawRep == "*")
+                if (token is SymbolToken { IsJoker: true } or AllToken)
                 {
                     return Door.List.Where(d => d is not ElevatorDoor).ToArray();
                 }

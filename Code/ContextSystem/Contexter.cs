@@ -256,7 +256,7 @@ public static class Contexter
         {
             _suggestions = [];
             _suggestions.AddRange(MethodIndex.GetMethods().Select(m => m.Name));
-            _suggestions.AddRange(KeywordToken.KeywordContexts.Select(k => k.KeywordName));
+            _suggestions.AddRange(ContextableKeywordToken.KeywordContexts.Select(k => k.KeywordName));
         }
 
         return _suggestions

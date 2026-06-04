@@ -11,7 +11,7 @@ namespace SER.Code.ArgumentSystem.Arguments;
 public class RoomsArgument(string name) : EnumHandlingArgument(name)
 {
     public override string InputDescription =>
-        $"{nameof(RoomName)} enum, {nameof(FacilityZone)} enum, reference to {nameof(Room)}, or * for every room";
+        $"{nameof(RoomName)} enum, {nameof(FacilityZone)} enum, reference to {nameof(Room)}, or 'all' for every room";
 
     [UsedImplicitly]
     public DynamicTryGet<Room[]> GetConvertSolution(BaseToken token)
@@ -26,7 +26,7 @@ public class RoomsArgument(string name) : EnumHandlingArgument(name)
             () =>
             {
                 Result rs = $"Value '{token.RawRep}' cannot be interpreted as {InputDescription}.";
-                if (token is SymbolToken { IsJoker: true })
+                if (token is SymbolToken { IsJoker: true } or AllToken)
                 {
                     return Room.List.ToArray();
                 }

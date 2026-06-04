@@ -7,7 +7,7 @@ using SER.Code.TokenSystem.Structures;
 
 namespace SER.Code.TokenSystem.Tokens;
 
-public class KeywordToken : BaseToken, IContextableToken
+public class ContextableKeywordToken : BaseToken, IContextableToken
 {
     private Type? _keywordType = null;
     

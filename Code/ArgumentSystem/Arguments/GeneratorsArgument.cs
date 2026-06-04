@@ -9,12 +9,14 @@ namespace SER.Code.ArgumentSystem.Arguments;
 
 public class GeneratorsArgument(string name) : EnumHandlingArgument(name)
 {
-    public override string InputDescription => $"reference to {nameof(Generator)} or * for every generator";
+    public override string InputDescription => 
+        $"reference to {nameof(Generator)} " +
+        $"or 'all' for every generator";
 
     [UsedImplicitly]
     public DynamicTryGet<Generator[]> GetConvertSolution(BaseToken token)
     {
-        if (token is SymbolToken { IsJoker: true })
+        if (token is SymbolToken { IsJoker: true } or AllToken)
         {
             return new(() => Generator.List.ToArray());
         }

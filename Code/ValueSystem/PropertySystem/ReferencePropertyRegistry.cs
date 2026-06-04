@@ -7,6 +7,7 @@ using Respawning;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.Helpers;
+using SER.Code.MethodSystem.Methods.PlayerMethods;
 using SER.Code.ValueSystem.Other;
 
 namespace SER.Code.ValueSystem.PropertySystem;
@@ -202,6 +203,16 @@ public static class ReferencePropertyRegistry
         Register<JToken, StaticTextValue>("asString", t => new StaticTextValue(t.ToString()), "The JSON representation of the token");
         Register<JToken, NumberValue>("asNumber", t => new NumberValue(t.Type is JTokenType.Integer or JTokenType.Float ? (decimal)t : 0), "The numeric value of the token");
         Register<JToken, BoolValue>("asBool", t => new BoolValue(t.Type == JTokenType.Boolean && (bool)t), "The boolean value of the token");
+        
+        Register<IPInfo, BoolValue>("isVPN", v => v.IsVPN, "Whether the IP is a VPN.");
+        Register<IPInfo, BoolValue>("isHosting", v => v.IsHosting, "Whether the IP is a hosting/datacenter service.");
+        Register<IPInfo, StaticTextValue>("provider", v => v.Provider, "The ISP or ASN provider name.");
+        Register<IPInfo, StaticTextValue>("country", v => v.Country, "The country of the IP address.");
+        Register<IPInfo, StaticTextValue>("type", v => v.Type, "The type of connection.");
+        Register<IPInfo, NumberValue>("riskScore", v => new NumberValue(v.RiskScore), "The risk score of the IP address (0-100).");
+        Register<IPInfo, NumberValue>("confidence", v => new NumberValue(v.Confidence), "The confidence score of the detection (0-100).");
+        Register<IPInfo, StaticTextValue>("firstSeen", v => v.FirstSeen, "When the IP was first seen in detections.");
+        Register<IPInfo, StaticTextValue>("lastSeen", v => v.LastSeen, "When the IP was last seen in detections.");
 
         foreach (var (key, propInfo) in PlayerValue.PropertyInfoMap)
         {
@@ -240,7 +251,7 @@ public static class ReferencePropertyRegistry
             IsSettable = member switch
             {
                 PropertyInfo prop => prop.CanWrite,
-                FieldInfo field => !field.IsInitOnly && !field.IsLiteral,
+                FieldInfo field => field is { IsInitOnly: false, IsLiteral: false },
                 _ => false
             };
         }

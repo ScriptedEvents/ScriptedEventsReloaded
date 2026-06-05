@@ -5,8 +5,6 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.TokenSystem.Tokens.Interfaces;
-using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.Arguments;
 
@@ -14,63 +12,56 @@ public class DoorArgument(string name) : EnumHandlingArgument(name)
 {
     public override string InputDescription => 
         $"{nameof(DoorName)} enum, " +
+        $"{nameof(RoomName)} enum, " +
         $"{nameof(FacilityZone)} enum " +
         $"or a {nameof(Door)} reference.";
 
     [UsedImplicitly]
     public DynamicTryGet<Door> GetConvertSolution(BaseToken token)
     {
-        return ResolveEnums<Door>(
-            token,
-            new()
+        if (token.CanReturnReference<Door>(out var func))
+        {
+            return func;
+        }
+        
+        return EnumResolver<Door>(token, [
+            new EnumHandler<DoorName, Door>(name =>
             {
-                [typeof(DoorName)] = doorName =>
+                var door = Door.List
+                    .Where(door => door.DoorName == name)
+                    .GetRandomValue();
+                if (door is null)
                 {
-                    var door = Door.List.Where(door => door.DoorName == (DoorName)doorName).GetRandomValue();
-                    if (door is null)
-                    {
-                        return $"Door with name '{doorName}' does not exist.";
-                    }
-
-                    return door;
-                },
-                [typeof(FacilityZone)] = zone =>
-                {
-                    var door = Door.List.Where(d => d.Zone == (FacilityZone)zone)
-                        .Where(d => d is not ElevatorDoor)
-                        .GetRandomValue();
-                    if (door is null)
-                    {
-                        return $"No doors in zone '{zone}' exist.";
-                    }
-
-                    return door;
+                    return $"Door with name '{name}' does not exist.";
                 }
-            },
-            () =>
+                
+                return door;
+            }),
+            new EnumHandler<FacilityZone, Door>(zone =>
             {
-                Result rs = $"Value '{token.RawRep}' cannot be interpreted as {InputDescription}.";
-
-                if (token is not IValueToken val || !val.CapableOf<ReferenceValue>(out var func))
+                var door = Door.List.Where(d => d.Zone == zone)
+                    .Where(d => d is not ElevatorDoor)
+                    .GetRandomValue();
+                if (door is null)
                 {
-                    return rs;
+                    return $"No doors in zone '{zone}' exist.";
                 }
-
-                return new(() =>
+                
+                return door;
+            }),
+            new EnumHandler<RoomName, Door>(name =>
+            {
+                var door = Room.List.Where(r => r.Name == name)
+                    .SelectMany(r => r.Doors)
+                    .Where(d => d is not ElevatorDoor)
+                    .GetRandomValue();
+                if (door is null)
                 {
-                    if (func().HasErrored(out var error, out var refVal))
-                    {
-                        return error;
-                    }
-
-                    if (ReferenceArgument<Door>.TryParse(refVal).WasSuccessful(out var door))
-                    {
-                        return door;
-                    }
-
-                    return rs;
-                });
-            }
-        );
+                    return $"No doors in zone '{name}' exist.";
+                }
+                
+                return door;
+            })
+        ]);
     }
 }

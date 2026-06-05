@@ -1,10 +1,13 @@
 ﻿using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ScriptSystem;
+using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ArgumentSystem.BaseArguments;
 
 public abstract class Argument(string name)
 {
+    protected string GenericError(BaseToken token) => $"{token} cannot be interpreted as {InputDescription}";
+    
     public string Name { get; } = name;
     
     public bool MustBeProvided => DefaultValue is null || DefaultValue.ExplicitSkip;

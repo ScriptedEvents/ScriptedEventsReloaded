@@ -3,7 +3,6 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.Arguments;
 
@@ -17,41 +16,18 @@ public class ItemsArgument(string name) : EnumHandlingArgument(name)
     [UsedImplicitly]
     public DynamicTryGet<Item[]> GetConvertSolution(BaseToken token)
     {
-        return ResolveEnums<Item[]>(
-            token,
-            new()
-            {
-                [typeof(ItemType)] = itemType => Item.GetAll((ItemType)itemType).ToArray()
-            },
-            () =>
-            {
-                Result rs = $"Value '{token.RawRep}' cannot be interpreted as {InputDescription}.";
+        if (token is SymbolToken { IsJoker: true } or AllToken)
+        {
+            return new(() => Item.List.ToArray());
+        }
 
-                if (token is SymbolToken { IsJoker: true } or AllToken)
-                {
-                    return Item.List.ToArray();
-                }
-
-                if (!token.CanReturn<ReferenceValue>(out var get))
-                {
-                    return rs;
-                }
-
-                return new(() =>
-                {
-                    if (get().HasErrored(out var error, out var refValue))
-                    {
-                        return error;
-                    }
-
-                    if (ReferenceArgument<Item>.TryParse(refValue).WasSuccessful(out var item))
-                    {
-                        return new[] { item };
-                    }
-
-                    return rs;
-                });
-            }
-        );
+        if (token.CanReturnReference<Item>(out var get))
+        {
+            return new(() => get().OnSuccess<Item[]>(item => [item]));
+        }
+        
+        return EnumResolver<Item[]>(token, [
+            new EnumHandler<ItemType, Item[]>(itemType => new(() => Item.GetAll(itemType).ToArray()))
+        ]);
     }
 }

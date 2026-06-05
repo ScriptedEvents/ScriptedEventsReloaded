@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using LabApi.Features.Wrappers;
-using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
@@ -64,7 +63,7 @@ public static class SerExtensions
                     return error;
                 }
 
-                if (ReferenceArgument<T>.TryParse(refVal).HasErrored(out error, out var value))
+                if (refVal.GetAs<T>().HasErrored(out error, out var value))
                 {
                     return error;
                 }

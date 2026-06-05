@@ -165,6 +165,7 @@ public class Script
     public void ExternalStop()
     {
         Killed = true;
+        RunningScriptsList.Remove(this);
     }
     
     public static int StopByName(string name)
@@ -239,7 +240,7 @@ public class Script
         InternalExecute().Run(
             this,
             null,
-            () => RunningScriptsList.Remove(this)
+            ExternalStop
         );
         
         return _isEventAllowed;

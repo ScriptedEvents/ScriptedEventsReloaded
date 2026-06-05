@@ -8,83 +8,65 @@ namespace SER.Code.ArgumentSystem.BaseArguments;
 
 public abstract class EnumHandlingArgument(string name) : Argument(name)
 {
-    public DynamicTryGet<T> ResolveEnums<T>(
-        BaseToken token,
-        Dictionary<Type, Func<object, DynamicTryGet<T>>> handlers,
-        Func<DynamicTryGet<T>> fallback,
-        Func<T?>? fallbackForDynamicEnumResolving = null)
+    protected interface IEnumHandler<TReturn>
     {
-        if (InternalEnumResolve() is { } enumResult)
-        {
-            return enumResult;
-        }
+        public Type EnumType { get; }
+        public Func<object, DynamicTryGet<TReturn>> Handler { get; }
+    }
+    
+    protected class EnumHandler<TEnum, TReturn>(Func<TEnum, DynamicTryGet<TReturn>> handler) 
+        : IEnumHandler<TReturn> where TEnum : struct, Enum
+    {
+        public Type EnumType { get; } = typeof(TEnum);
+        public Func<object, DynamicTryGet<TReturn>> Handler { get; } = obj => handler((TEnum) obj);
+    }
 
-        foreach (var enumType in handlers.Keys)
+    /// <summary>
+    /// This function automatically handles an argument that has to handle enums and more.
+    /// </summary>
+    /// <param name="token">The argument token.</param>
+    /// <param name="enumHandlers">
+    ///     This registers the enum handlers. This will be parsed statically when possible,
+    ///     or dynamically when literal variable is detected.
+    /// </param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    protected DynamicTryGet<T> EnumResolver<T>(
+        BaseToken token,
+        IEnumHandler<T>[] enumHandlers)
+    {
+        if (InternalEnumResolve() is { } value1)
         {
-            if (EnumArgument.ConvertOne(token.BestStaticTextRepr(), enumType)
-                .HasErrored(out _, out var enumValue))
-            {
-                continue;
-            }
-
-            var dynamicGet = handlers[enumType](enumValue);
-            if (!dynamicGet.Static)
-            {
-                return dynamicGet;
-            }
-        }
-
-        var result = fallback();
-        if (!result.Static)
-        {
-            return result;
-        }
-
-        if (!result.Invoke().HasErrored(out var err, out var value))
-        {
-            return value;
+            return value1;
         }
 
         if (!token.CanReturn<LiteralValue>(out _))
         {
-            return err;
+            return GenericError(token);
         }
 
-        return new(() => DynamicEnumParse());
-
-        TryGet<T> DynamicEnumParse()
+        return new(() =>
         {
-            if (InternalEnumResolve() is { } enumResult2)
+            if (InternalEnumResolve() is { } value2)
             {
-                return enumResult2;
-            }
-            
-            if (fallbackForDynamicEnumResolving != null && fallbackForDynamicEnumResolving() is { } value2)
-            {
-                return value2;
+                return value2.Invoke();
             }
 
-            return err;
-        }
+            return GenericError(token);
+        });
 
-        TryGet<T>? InternalEnumResolve()
+        DynamicTryGet<T>? InternalEnumResolve()
         {
-            foreach (var enumType in handlers.Keys)
+            var stringRep = token.BestStaticTextRepr();
+            foreach (var enumHandler in enumHandlers)
             {
-                if (EnumArgument.ConvertOne(token.BestStaticTextRepr(), enumType)
+                if (EnumArgument.ConvertOne(stringRep, enumHandler.EnumType)
                     .HasErrored(out _, out var enumValue))
                 {
                     continue;
                 }
-
-                var dynamicGet = handlers[enumType](enumValue);
-
-                if (!dynamicGet.Static)
-                {
-                    return null;
-                }
-
-                return dynamicGet.Invoke();
+                
+                return enumHandler.Handler(enumValue);
             }
 
             return null;

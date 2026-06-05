@@ -3,36 +3,33 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.TokenSystem.Tokens.VariableTokens;
+using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.Arguments;
 
 public class PlayerArgument(string name) : Argument(name)
 {
-    public override string InputDescription => "Player variable e.g. @player, with EXACTLY 1 player.";
+    public override string InputDescription => "Player value e.g. @player, with EXACTLY 1 player.";
 
     [UsedImplicitly]
     public DynamicTryGet<Player> GetConvertSolution(BaseToken token)
     {
-        if (token is not PlayerVariableToken playerVariableToken)
-            return $"Value '{token.RawRep}' is not a player variable.";
-
-        return new(() => DynamicSolver(playerVariableToken));
-    }
-
-    private TryGet<Player> DynamicSolver(PlayerVariableToken token)
-    {
-        if (token.ExactValue.HasErrored(out var error, out var variable))
+        if (token.CanReturn<PlayerValue>(out var value))
         {
-            return error;
+            return new(() => value().OnSuccess(DynamicSolver));
         }
 
-        var plrs = variable.Players;
-        if (plrs.Len != 1)
+        return GenericError(token);
+        
+        TryGet<Player> DynamicSolver(PlayerValue playerValue)
         {
-            return $"The player variable '{token.RawRep}' must have exactly 1 player, but has {plrs.Len} instead.";
-        }
+            var plrs = playerValue.Players;
+            if (plrs.Len != 1)
+            {
+                return $"The player value under '{token.RawRep}' must have exactly 1 player, but has {plrs.Len} instead.";
+            }
 
-        return plrs.First();
+            return plrs[0];
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SER.Code.Exceptions;
+﻿using System.Diagnostics.CodeAnalysis;
+using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ValueSystem.PropertySystem;
@@ -59,4 +60,32 @@ public class ReferenceValue<T>(T? value) : ReferenceValue(value)
 
     [UsedImplicitly]
     public new static string FriendlyName => $"reference to {GetFriendlyName(typeof(T))} object";
+}
+
+public static class ReferenceValueExtensions
+{
+    extension(ReferenceValue value)
+    {
+        public TryGet<T> GetAs<T>()
+        {
+            if (value.Value is T tValue)
+            {
+                return tValue;
+            }
+
+            return $"The {value} reference is not valid {typeof(T).AccurateName} object";
+        }
+        
+        public bool ValueIs<T>([NotNullWhen(true)] out T? value1)
+        {
+            if (value.Value is T tValue)
+            {
+                value1 = tValue;
+                return true;
+            }
+        
+            value1 = default;
+            return false;
+        }
+    }
 }

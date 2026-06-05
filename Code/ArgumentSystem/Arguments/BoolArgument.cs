@@ -13,12 +13,11 @@ public class BoolArgument(string name) : Argument(name)
     [UsedImplicitly]
     public DynamicTryGet<bool> GetConvertSolution(BaseToken token)
     {
-        Result error = $"Value '{token.RawRep}' cannot be interpreted as a boolean value or condition.";
-        if (!token.CanReturn<BoolValue>(out var get))
+        if (token.CanReturn<BoolValue>(out var func))
         {
-            return error;
+            return new(() => func().OnSuccess(v => v.Value));
         }
 
-        return new(() => get().OnSuccess(v => v.Value, error));
+        return GenericError(token);
     }
 }

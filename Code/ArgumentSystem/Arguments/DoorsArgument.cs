@@ -22,54 +22,56 @@ public class DoorsArgument(string name) : EnumHandlingArgument(name)
     [UsedImplicitly]
     public DynamicTryGet<Door[]> GetConvertSolution(BaseToken token)
     {
-        return ResolveEnums<Door[]>(
-            token,
-            new()
+        if (token is SymbolToken { IsJoker: true } or AllToken)
+        {
+            return Door.List.Where(d => d is not ElevatorDoor).ToArray();
+        }
+        
+        if (token.CanReturn<ReferenceValue>(out var get))
+        {
+            return new(() =>
             {
-                [typeof(DoorName)] = doorName =>
-                    Door.List.Where(door => door.DoorName == (DoorName)doorName).ToArray(),
-
-                [typeof(FacilityZone)] = zone =>
-                    Door.List.Where(d => d.Zone == (FacilityZone)zone).Where(d => d is not ElevatorDoor).ToArray(),
-
-                [typeof(RoomName)] = roomName =>
-                    Door.List.Where(d => d.Rooms.Any(r => r.Name == (RoomName)roomName))
-                        .Distinct().Where(d => d is not ElevatorDoor).ToArray()
-            },
-            () =>
-            {
-                Result rs =
-                    $"Value '{token.RawRep}' cannot be interpreted as a door or collection of doors.";
-                if (token is SymbolToken { IsJoker: true } or AllToken)
+                if (get().HasErrored(out var error, out var refToken))
                 {
-                    return Door.List.Where(d => d is not ElevatorDoor).ToArray();
+                    return error;
                 }
 
-                if (!token.CanReturn<ReferenceValue>(out var get))
+                if (refToken.ValueIs<Door>(out var door))
                 {
-                    return rs;
+                    return new[] { door };
                 }
 
-                return new(() =>
+                if (refToken.ValueIs<Room>(out var room))
                 {
-                    if (get().HasErrored(out var error, out var refToken))
-                    {
-                        return error;
-                    }
+                    return room.Doors.ToArray();
+                }
 
-                    if (ReferenceArgument<Door>.TryParse(refToken).WasSuccessful(out var door))
-                    {
-                        return new[] { door };
-                    }
+                return GenericError(token);
+            });
+        }
 
-                    if (ReferenceArgument<Room>.TryParse(refToken).WasSuccessful(out var room))
-                    {
-                        return room.Doors.ToArray();
-                    }
-
-                    return rs;
-                });
-            }
-        );
+        return EnumResolver<Door[]>(token, [
+            new EnumHandler<DoorName, Door[]>(name =>
+            {
+                return Door.List
+                .Where(door => door.DoorName == name)
+                .ToArray();
+            }),
+            new EnumHandler<FacilityZone, Door[]>(zone => 
+            {
+                return Door.List
+                    .Where(door => door.Zone == zone)
+                    .ToArray();
+            }),
+            new EnumHandler<RoomName, Door[]>(name =>
+            {
+                return Door.List
+                    .Where(d => 
+                        d.Rooms.Any(r => r.Name == name) 
+                        && d is not ElevatorDoor)
+                    .Distinct()
+                    .ToArray();
+            })
+        ]);
     }
 }

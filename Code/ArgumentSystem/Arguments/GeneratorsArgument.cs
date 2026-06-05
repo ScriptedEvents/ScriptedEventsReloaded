@@ -18,7 +18,7 @@ public class GeneratorsArgument(string name) : EnumHandlingArgument(name)
     {
         if (token is SymbolToken { IsJoker: true } or AllToken)
         {
-            return new(() => Generator.List.ToArray());
+            return Generator.List.ToArray();
         }
 
         if (!token.CanReturn<ReferenceValue<Generator>>(out var func))

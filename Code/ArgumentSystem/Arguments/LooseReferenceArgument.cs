@@ -50,10 +50,10 @@ public class ReferenceArgument<TValue>(string name) : LooseReferenceArgument(nam
             return $"Value '{token.RawRep}' does not represent a valid reference.";
         }
 
-        return new(() => get().OnSuccess(TryParse));
+        return new(() => get().OnSuccess(GetValue));
     }
 
-    public static TryGet<TValue> TryParse(ReferenceValue value)
+    public static TryGet<TValue> GetValue(ReferenceValue value)
     {
         if (value.Value is TValue tValue)
         {

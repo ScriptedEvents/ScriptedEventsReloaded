@@ -17,27 +17,23 @@ public class ElevatorsArgument(string name) : EnumHandlingArgument(name)
     [UsedImplicitly]
     public DynamicTryGet<Elevator[]> GetConvertSolution(BaseToken token)
     {
-        return ResolveEnums<Elevator[]>(
-            token,
-            new()
-            {
-                [typeof(ElevatorGroup)] = group =>
-                    Elevator.List.Where(elevator => elevator.Group == (ElevatorGroup)group).ToArray()
-            },
-            () =>
-            {
-                if (token is SymbolToken { IsJoker: true } or AllToken) 
-                {
-                    return Elevator.List.ToArray();
-                }
+        if (token is SymbolToken { IsJoker: true } or AllToken) 
+        {
+            return Elevator.List.ToArray();
+        }
 
-                if (token.CanReturnReference<Elevator>(out var func))
-                {
-                    return new(() => func().OnSuccess<Elevator[]>(e => [e]));
-                }
-                
-                return $"Value '{token.RawRep}' cannot be interpreted as an elevator or collection of elevators.";
-            }
+        if (token.CanReturnReference<Elevator>(out var func))
+        {
+            return new(() => func().OnSuccess<Elevator[]>(e => [e]));
+        }
+        
+        return EnumResolver<Elevator[]>(token, [
+            new EnumHandler<ElevatorGroup, Elevator[]>(group =>
+            {
+                return Elevator.List
+                    .Where(elevator => elevator.Group == group)
+                    .ToArray();
+            })]
         );
     }
 }

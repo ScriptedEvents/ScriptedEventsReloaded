@@ -2,7 +2,6 @@
 using PlayerRoles;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
@@ -24,40 +23,52 @@ public class PlayersArgument(string name) : EnumHandlingArgument(name)
     [UsedImplicitly]
     public DynamicTryGet<Player[]> GetConvertSolution(BaseToken token)
     {
-        return ResolveEnums(token, new()
-            {
-                [typeof(Team)] = team => new(
-                    () => Player.ReadyList.Where(player => player.Team == (Team)team).ToArray()),
+        if (token is SymbolToken { IsJoker: true } or AllToken)
+        {
+            return new(() => Player.ReadyList.ToArray());
+        }
 
-                [typeof(RoleTypeId)] = role => new(
-                    () => Player.ReadyList.Where(player => player.Role == (RoleTypeId)role).ToArray())
-            },
-            () =>
-            {
-                if (token is SymbolToken { IsJoker: true } or AllToken)
+        if (token.CanReturn<PlayerValue>(out var get))
+        {
+            return new(() => get().OnSuccess(v => v.Players));
+        }
+        
+        var enumRes = EnumResolver(token, [
+            new EnumHandler<Team, Player[]>(team => new(delegate
                 {
-                    return Player.ReadyList.ToArray();
-                }
-                
-                if (!token.CanReturn<PlayerValue>(out var get))
-                {
-                    return $"{token} does not represent a " +
-                           $"player variable, nor RoleTypeId enum, nor Team enum, nor player id, nor player name";
-                }
-
-                return new(() => get().OnSuccess(v => v.Players));
-            },
-            () =>
+                    return Player.ReadyList
+                        .Where(player => player.Team == team)
+                        .ToArray();
+                })
+            ),
+            new EnumHandler<RoleTypeId, Player[]>(role => new(delegate
             {
-                var list = RAUtils.ProcessPlayerIdOrNamesList(
-                    new ArraySegment<string>([token.BestStaticTextRepr()]),
-                    0,
-                    out _);
-
-                return list.Count > 0
-                    ? Player.Get(list).ToArray()
-                    : null;
-            }
+                return Player.ReadyList
+                    .Where(player => player.Role == role)
+                    .ToArray();
+            }))]
         );
+
+        if (enumRes.Static && enumRes.Result.HasErrored(out var error))
+        {
+            return error;
+        }
+        
+        return new(delegate
+        {
+            if (enumRes.Invoke().WasSuccessful(out var result))
+            {
+                return result;
+            }
+            
+            var list = RAUtils.ProcessPlayerIdOrNamesList(
+                new ArraySegment<string>([token.BestStaticTextRepr()]),
+                0,
+                out _);
+
+            return list.Count > 0
+                ? Player.Get(list).ToArray()
+                : GenericError(token);
+        });
     }
 }

@@ -22,6 +22,10 @@ public class RoundMethod : ReturningMethod<NumberValue>
     
     public override void Execute()
     {
-        ReturnValue = (decimal)Math.Round(Args.GetFloat("number to round"), MidpointRounding.AwayFromZero);
+        ReturnValue = (decimal)Math.Round(
+            Args.GetFloat("number to round"),
+            Args.GetInt("decimal places"), 
+            MidpointRounding.AwayFromZero
+        );
     }
 }

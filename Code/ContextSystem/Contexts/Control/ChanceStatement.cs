@@ -15,8 +15,8 @@ public class ChanceStatement : StatementContext, IExtendableStatement, IKeywordC
 {
     private decimal? _chance;
     private Func<TryGet<NumberValue>>? _chanceGetter;
+    
     public override string FriendlyName => "'chance' statement";
-
     public IExtendableStatement.Signal AllowedSignals => IExtendableStatement.Signal.DidntExecute;
     public Dictionary<IExtendableStatement.Signal, StatementContext> RegisteredSignals { get; } = [];
     public string KeywordName => "chance";
@@ -58,6 +58,11 @@ public class ChanceStatement : StatementContext, IExtendableStatement, IKeywordC
             }
 
             chance = numValue.Value;
+        }
+
+        if (chance is < 0 or > 1)
+        {
+            throw new ScriptRuntimeError(this, $"Chance must be between 0% and 100%, got {Math.Round(chance, 2)*100}%");
         }
         
         if ((decimal)new Random().NextDouble() < chance)

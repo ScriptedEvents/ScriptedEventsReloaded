@@ -10,7 +10,7 @@ namespace SER.Code.MethodSystem.Methods.DatabaseMethods;
 // ReSharper disable once InconsistentNaming
 public class DB_AddMethod : SynchronousMethod, ICanError
 {
-    public override string Description => "Adds a key-value pair to the database.";
+    public override string Description => "Adds or overwrites a key-value pair into the database.";
 
     public string[] ErrorReasons =>
     [

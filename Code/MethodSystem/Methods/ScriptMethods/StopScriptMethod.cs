@@ -16,6 +16,6 @@ public class StopScriptMethod : SynchronousMethod
     
     public override void Execute()
     {
-        Args.GetRunningScript("running script").ExternalStop();
+        Args.GetRunningScript("running script").MarkAsStopped();
     }
 }

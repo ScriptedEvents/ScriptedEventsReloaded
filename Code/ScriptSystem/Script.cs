@@ -156,13 +156,13 @@ public class Script
         var count = RunningScripts.Length;
         foreach (var script in new List<Script>(RunningScripts))
         {
-            script.ExternalStop();
+            script.MarkAsStopped();
         }
 
         return count;
     }
 
-    public void ExternalStop()
+    public void MarkAsStopped()
     {
         Killed = true;
         RunningScriptsList.Remove(this);
@@ -174,7 +174,7 @@ public class Script
             .Where(scr => string.Equals(scr.Name, name, StringComparison.CurrentCultureIgnoreCase))
             .ToArray();
         
-        matches.ForEachItem(scr => scr.ExternalStop());
+        matches.ForEachItem(scr => scr.MarkAsStopped());
         return matches.Length;
     }
 
@@ -240,7 +240,7 @@ public class Script
         InternalExecute().Run(
             this,
             null,
-            ExternalStop
+            MarkAsStopped
         );
         
         return _isEventAllowed;
@@ -366,21 +366,21 @@ public class Script
             }
         }
         
-        for (var i = 0; i < _contexts.Length; i++)
+        foreach (var context in _contexts)
         {
-            var context = _contexts[i];
-            if (context is StandardContext sc)
+            switch (context)
             {
-                sc.Run();
-                continue;
-            }
-
-            if (context is YieldingContext yc)
-            {
-                var handle = yc.Run();
-                while (handle.MoveNext())
+                case StandardContext sc:
+                    sc.Run();
+                    continue;
+                case YieldingContext yc:
                 {
-                    yield return handle.Current;
+                    var handle = yc.Run();
+                    while (handle.MoveNext())
+                    {
+                        yield return handle.Current;
+                    }
+                    break;
                 }
             }
         }

@@ -5,22 +5,37 @@ using SER.Code.MethodSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.ItemMethods;
 
+[UsedImplicitly]
 public class ClearInventoryMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Clears player inventory.";
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new PlayersArgument("players")
+        new PlayersArgument("players"),
+        new OptionsArgument("mode", "drop", "destroy")
+        {
+            DefaultValue = new(null, "destroy")
+        }
     ];
     
     public override void Execute()
     {
-        foreach (var plr in Args.GetPlayers("players"))
+        if (Args.GetOption("mode") == "drop")
         {
-            plr.Inventory.UserInventory.ReserveAmmo.Clear();
-            plr.Inventory.SendAmmoNextFrame = true;
-            plr.ClearInventory();
+            foreach (var plr in Args.GetPlayers("players"))
+            {
+                plr.DropEverything();
+            }
+        }
+        else
+        {
+            foreach (var plr in Args.GetPlayers("players"))
+            {
+                plr.Inventory.UserInventory.ReserveAmmo.Clear();
+                plr.Inventory.SendAmmoNextFrame = true;
+                plr.ClearInventory();
+            }
         }
     }
 }

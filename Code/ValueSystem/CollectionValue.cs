@@ -220,8 +220,9 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties
         return $"[{string.Join(", ", CastedValues.Select(v => v.ToString()))}] ({FriendlyName})";
     }
 
-    public override TryGet<object> ToCSharpObject(Type targetType)
+    public override TryGet<object> ToCSharpObject(Type? targetType)
     {
+        if (targetType is null) return TryGet<object>.Success(CastedValues);
         if (targetType.IsInstanceOfType(value)) return TryGet<object>.Success(value);
 
         Type? elementType = null;

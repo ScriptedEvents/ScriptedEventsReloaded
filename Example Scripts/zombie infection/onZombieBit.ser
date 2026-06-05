@@ -29,7 +29,7 @@ else
     # when was bit before, remove 20 seconds from the date
     # so the infection happens faster
     *date = GetPlayerData @victim date_of_death_by_infection
-    *date = Date.Offset *date subtract 20s
+    *date = Date.Offset *date remove 20s
 end
 
 SetPlayerData @victim date_of_death_by_infection *date

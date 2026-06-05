@@ -50,8 +50,9 @@ public abstract class LiteralValue : Value
 
     public override int HashCode => Value.GetHashCode();
 
-    public override TryGet<object> ToCSharpObject(Type targetType)
+    public override TryGet<object> ToCSharpObject(Type? targetType)
     {
+        if (targetType is null) return TryGet<object>.Success(Value);
         if (targetType.IsInstanceOfType(Value)) return Value;
         try
         {

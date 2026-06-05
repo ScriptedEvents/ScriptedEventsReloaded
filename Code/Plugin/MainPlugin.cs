@@ -70,9 +70,9 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
             "76561198361176072@steam"
         ),
         new(
-            "Tosoks67", 
-            Contribution.CodeContributor | Contribution.Betatester, 
-            "76561199175834203@steam"
+            "Luke", 
+            Contribution.SponsorWithTooMuchMoney | Contribution.Betatester,
+            "76561199023975117@steam"
         ),
         new(
             "Whitty985playz", 
@@ -80,9 +80,9 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
             "76561198859902154@steam"
         ),
         new(
-            "Luke", 
-            Contribution.SponsorWithTooMuchMoney | Contribution.Betatester,
-            "76561199023975117@steam"
+            "Tosoks67", 
+            Contribution.CodeContributor | Contribution.Betatester, 
+            "76561199175834203@steam"
         ),
         new(
             "RetroReul",

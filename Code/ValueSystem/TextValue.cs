@@ -104,8 +104,10 @@ public abstract class TextValue : LiteralValue<string>, IValueWithProperties
         ["valType"] = new Prop<EnumValue<ValueType>>(_ => ValueType.Text, "The type of the value")
     };
 
-    public override TryGet<object> ToCSharpObject(Type targetType)
+    public override TryGet<object> ToCSharpObject(Type? targetType)
     {
+        if (targetType is null) return TryGet<object>.Success(Value);
+        
         if (targetType.IsInstanceOfType(Value)) return Value;
         if (targetType.IsEnum)
         {

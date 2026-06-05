@@ -232,13 +232,14 @@ public class PlayerValue : Value, IValueWithProperties
         [PlayerProperty.LifeId] = new Info<NumberValue>(plr => plr.LifeId, null),
         [PlayerProperty.UnitId] = new Info<NumberValue>(plr => (decimal)plr.UnitId, null),
         [PlayerProperty.Unit] = new Info<TextValue>(plr => NamingRulesManager.ClientFetchReceived(plr.Team, plr.UnitId).ToStaticTextValue(), "Returns the player's unit (e.g FOXTROT-03) if player is NTF or Facility Guard, otherwise returns an empty text value."),
-        [PlayerProperty.CRole] = new Info<ReferenceValue<CRole>>(plr => CRole.LifeIdAssignedRoles.TryGetValue(plr.LifeId, out var role) ? role : null, "Returns the player's CRole if player is a CRole, otherwise returns an empty reference value."),
+        [PlayerProperty.CRole] = new Info<ReferenceValue<CRole>>(plr => CRole.LifeIdAssignedRoles.TryGetValue(plr.LifeId, out var role) ? role : null, "Returns the player's CRole if player has a Custom Role, otherwise returns an invalid reference."),
         [PlayerProperty.IsTransmitting] = new Info<BoolValue>(plr => PersonalRadioPlayback.IsTransmitting(plr.ReferenceHub), "Returns true if player is speaking through a radio, otherwise false."),
         [PlayerProperty.HasRemoteAdminAccess] = new Info<BoolValue>(plr => plr.RemoteAdminAccess, null)
     };
 
-    public override TryGet<object> ToCSharpObject(Type targetType)
+    public override TryGet<object> ToCSharpObject(Type? targetType)
     {
+        if (targetType is null) return TryGet<object>.Success(Players);
         if (targetType == typeof(Player))
         {
             if (Players.Length == 1) return Players[0];

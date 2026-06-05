@@ -70,10 +70,10 @@ public static class NumericExpressionReslover
 
     public class CompiledExpression
     {
-        private readonly Expression expression;
-        private readonly Dictionary<string, DynamicTryGet<object>> parameters;
-        private readonly string rawRepresentation;
-        private readonly Dictionary<string, object> values = [];
+        private readonly Expression _expression;
+        private readonly Dictionary<string, DynamicTryGet<object>> _parameters;
+        private readonly string _rawRepresentation;
+        private readonly Dictionary<string, object> _values = [];
 
         public CompiledExpression(
             Expression expression, 
@@ -81,32 +81,32 @@ public static class NumericExpressionReslover
             string rawRepresentation
         )
         {
-            this.expression = expression;
-            this.parameters = parameters;
-            this.rawRepresentation = rawRepresentation;
-            this.expression.Parameters = values;
+            _expression = expression;
+            _parameters = parameters;
+            _rawRepresentation = rawRepresentation;
+            _expression.Parameters = _values;
         }
 
         public TryGet<object> Evaluate()
         {
             try
             {
-                values.Clear();
-                foreach (var (key, dtg) in parameters)
+                _values.Clear();
+                foreach (var (key, dtg) in _parameters)
                 {
                     if (dtg.Invoke().HasErrored(out var err, out var value))
                     {
                         return err;
                     }
                 
-                    values[key] = value;
+                    _values[key] = value;
                 }
 
-                return expression.Evaluate();
+                return _expression.Evaluate();
             }
             catch (Exception)
             {
-                return $"Expression '{rawRepresentation}' is invalid.";
+                return $"Expression '{_rawRepresentation}' is invalid.";
             }
         }
     }
@@ -120,35 +120,21 @@ public static class NumericExpressionReslover
     {
         switch (token)
         {
-            case ReferenceVariableToken referenceVariable:
-            {
-                var tmp = MakeTempName();
-                variables[tmp] = new(() =>
-                {
-                    if (referenceVariable.ExactValue.HasErrored(out var error, out var value))
-                    {
-                        return mainErr + error;
-                    }
-                    
-                    return value.IsValid 
-                        ? value.ToString()
-                        : "invalid";
-                });
-                
-                AppendRaw(tmp);
-                return true;
-            }
-            case IValueToken valueToken when valueToken.CapableOf<LiteralValue>(out var get):
+            case IValueToken valueToken:
             {
                 var tmp = MakeTempName();
                 
                 if (valueToken.IsConstant)
                 {
-                    variables[tmp] = get().OnSuccess(s => s.Value, mainErr);
+                    variables[tmp] = valueToken
+                        .Value()
+                        .OnSuccess(s => s.ToCSharpObject(null), mainErr);
                 }
                 else
                 {
-                    variables[tmp] = new(() => get().OnSuccess(s => s.Value, mainErr));
+                    variables[tmp] = new(() => valueToken
+                        .Value()
+                        .OnSuccess(s => s.ToCSharpObject(null), mainErr));
                 }
                 
                 AppendRaw(tmp);

@@ -25,9 +25,9 @@ public class ReferenceValue(object? value) : Value, IValueWithDynamicProperties
 
     public override int HashCode => Value.GetHashCode();
 
-    public override TryGet<object> ToCSharpObject(Type targetType)
+    public override TryGet<object> ToCSharpObject(Type? targetType)
     {
-        if (targetType.IsInstanceOfType(Value)) return Value;
+        if (targetType is null || targetType.IsInstanceOfType(Value)) return Value;
         return $"Cannot convert reference to {Value.GetType().Name} to {targetType.Name}";
     }
     

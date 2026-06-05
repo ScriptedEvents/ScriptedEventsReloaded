@@ -160,7 +160,7 @@ public static class Contexter
         for (var index = 1; index < tokens.Length; index++)
         {
             var token = tokens[index];
-            rs = $"Cannot add token {token} to {context}";
+            rs = $"{token} was rejected by {context}";
             if (AttemptsInlineWithKeyword(token, context))
             {
                 if (HandleInlineWithKeyword(tokens.Skip(index), context, scr).HasErrored(out var error))
@@ -231,14 +231,13 @@ public static class Contexter
 
     private static Result HandleCurrentContext(BaseToken token, RunnableContext context, out bool endLineContexting)
     {
-        Result rs = $"Cannot add '{token.RawRep}' to {context}";
         Log.Debug($"Handling token {token} in context {context}");
 
         var result = context.TryAddToken(token);
         if (result.HasErrored)
         {
             endLineContexting = true;
-            return rs + result.ErrorMessage;
+            return result.ErrorMessage;
         }
 
         if (result.ShouldContinueExecution)

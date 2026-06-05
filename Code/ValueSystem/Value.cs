@@ -62,7 +62,7 @@ public abstract class Value : IEquatable<Value>
     
     public abstract int HashCode { get; }
 
-    public abstract TryGet<object> ToCSharpObject(Type targetType);
+    public abstract TryGet<object> ToCSharpObject(Type? targetType);
 
     public static Value Parse(object obj, Script? script)
     {

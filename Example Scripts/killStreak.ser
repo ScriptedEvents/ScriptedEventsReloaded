@@ -10,6 +10,10 @@ if {VarExists @evAttacker} is false
     stop
 end
 
+if {Overlapping @evPlayer @evAttacker}
+    stop
+end
+
 # increment killer's streak
 $streak = GetPlayerData @evAttacker "streak" 0
 $streak = $streak + 1

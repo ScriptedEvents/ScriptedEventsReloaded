@@ -10,14 +10,14 @@ $afterText = "<color=white><size=25><b>"
 # "coin locked" is a property of this player, storing whether a coin can be used.
 # this is because some effects of the coin take time, and we DO NOT want to
 # have the coin be used again WHILE a different effect is still ongoing
-if {GetPlayerData @evPlayer "coin locked"} is true
+if {GetPlayerData @evPlayer "coin locked" false} is true
     Hint @evPlayer 5s "{$hintInfo}You can't use the coin for now!<br><size=20>Come back when the current effect has finished."
     IsAllowed false
     stop
 end
 
 # 50% chance to lose the coin
-if {Chance 50%}
+chance 50%
     Hint @evPlayer 3s "{$hintInfo}Your coin has turned into dust..."
     AdvDestroyItem {@evPlayer -> heldItemRef}
 end

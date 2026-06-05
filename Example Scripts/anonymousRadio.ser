@@ -1,4 +1,5 @@
-# this script makes the name into ??? when talking on the radio
+# this script makes the name into "???" when talking on the radio
+# in order to anonymize the speaker
 
 !-- OnEvent Joined
 -- require @evPlayer

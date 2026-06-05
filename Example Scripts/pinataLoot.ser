@@ -9,12 +9,12 @@ if {@evPlayer -> role} isnt "Scp173"
 end
 
 # Trigger only with 5% chance
-if {Chance 5%} is false
+chance 95%
     stop
 end
 
 # 80% to get pills, 20% to get medkit
-if {Chance 80%} is true
+chance 80%
     *pickup = CreatePickup Painkillers
 else
     *pickup = CreatePickup Medkit

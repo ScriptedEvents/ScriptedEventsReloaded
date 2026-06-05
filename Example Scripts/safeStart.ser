@@ -2,10 +2,10 @@
 
 !-- OnEvent RoundStarted
 
-if {AmountOf @all} isnt 1
+if {AmountOf all} isnt 1
     stop
 end
 
 Print "SER enabled round lock!"
-Broadcast @all 10s "<color=green>SER enabled round lock!"
+Broadcast all 10s "<color=green>SER enabled round lock!"
 SetRoundLock true

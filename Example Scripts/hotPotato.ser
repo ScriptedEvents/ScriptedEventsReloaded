@@ -3,7 +3,7 @@
 !-- OnEvent RoundStarted
 
 # there is a 50% chance that the event will not happen
-if {Chance 50%}
+chance 50%
     Print "Hot Potato event will not be loaded"
     stop
 end
@@ -45,7 +45,7 @@ forever
         Broadcast @all 5s "Player {@potatoCarrier -> name} has failed the Hot Potato!"
         
         # 70% chance that the event to continue, else stop the event
-        if {Chance 70%}
+        chance 70%
             Broadcast @all 5s "The Hot Potato will return soon!"
             continue
         else

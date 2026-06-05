@@ -23,6 +23,6 @@ forever
     $hint = $hint + "<color=#0096FF>Mini MTF Wave - {$miniMtfWave}</color><br>"
 
     # send the hint to spectators
-    Hint spectator 2s $hint
+    Hint @spectatorPlayers 2s $hint
 end
 

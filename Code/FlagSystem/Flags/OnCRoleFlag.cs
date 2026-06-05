@@ -32,7 +32,7 @@ public class OnCRoleFlag : Flag, IMajorBehaviorFlag
                 case > 1: return "Too many arguments, only event name is allowed.";
             }
 
-            if (EnumArgument<CRole.CustomRoleEvent>.ConvertOne(args[0])
+            if (EnumArgument<CRole.CustomRoleEvent>.Convert(args[0])
                 .HasErrored(out var error, out var value))
             {
                 return error;

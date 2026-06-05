@@ -95,7 +95,7 @@ public class EnumArgument<TEnum> : EnumArgument where TEnum : struct, Enum
         return (TEnum)Enum.ToObject(typeof(TEnum), result);
     }
 
-    public static TryGet<TEnum> ConvertOne(string stringRep)
+    public static TryGet<TEnum> Convert(string stringRep)
     {
         return ConvertOne(stringRep, typeof(TEnum)).OnSuccess(v => (TEnum)v);
     }

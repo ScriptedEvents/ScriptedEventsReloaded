@@ -105,4 +105,9 @@ public static class SerExtensions
     {
         return new PlayerValue(players);
     }
+    
+    public static PlayerValue ToPlayerValue(this Player player)
+    {
+        return new PlayerValue(player);
+    }
 }

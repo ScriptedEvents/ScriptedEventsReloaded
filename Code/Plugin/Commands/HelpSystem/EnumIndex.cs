@@ -2,6 +2,7 @@
 using Interactables.Interobjects;
 using LabApi.Features.Enums;
 using MapGeneration;
+using PlayerRoles;
 using SER.Code.FlagSystem.Flags;
 using ValueType = SER.Code.ValueSystem.Other.ValueType;
 
@@ -16,11 +17,14 @@ public static class EnumIndex
         typeof(ItemType),
         typeof(ElevatorGroup),
         typeof(CustomCommandFlag.ConsoleType),
-        typeof(ValueType)
+        typeof(ValueType),
+        typeof(Team)
     ];
     
     private static readonly Type[] ReflectedEnums =
-        Assembly.GetExecutingAssembly().GetTypes()
+        AppDomain.CurrentDomain
+            .GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
             .Where(t => t.IsEnum)
             .ToArray();
 

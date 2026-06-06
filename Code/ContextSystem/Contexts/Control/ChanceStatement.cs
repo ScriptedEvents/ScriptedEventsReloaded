@@ -67,7 +67,7 @@ public class ChanceStatement : StatementContext, IExtendableStatement, IKeywordC
         
         if ((decimal)new Random().NextDouble() < chance)
         {
-            var coro = RunChildren();
+            using var coro = RunChildren();
             while (coro.MoveNext())
             {
                 yield return coro.Current;

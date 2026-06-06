@@ -158,7 +158,7 @@ public class FuncStatement :
     protected override IEnumerator<float> Execute()
     {
         _end = false;
-        var coro = RunChildren(() => _end);
+        using var coro = RunChildren(() => _end);
         while (coro.MoveNext()) yield return coro.Current;
 
         _localVariables.ForEach(v => Script.RemoveLocalVariable(v));

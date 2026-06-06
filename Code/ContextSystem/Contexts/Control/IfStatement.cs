@@ -79,7 +79,7 @@ public class IfStatement : StatementContext, IExtendableStatement, IKeywordConte
             yield break;
         }
 
-        var coro = RunChildren();
+        using var coro = RunChildren();
         while (coro.MoveNext())
         {
             yield return coro.Current;

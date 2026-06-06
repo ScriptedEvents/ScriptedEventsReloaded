@@ -43,7 +43,7 @@ public class AttemptStatement : StatementContext, IExtendableStatement, IKeyword
 
     protected override IEnumerator<float> Execute()
     {
-        var coro = RunChildren();
+        using IEnumerator<float> coro = RunChildren();
         while (true)
         {
             bool isRunning;

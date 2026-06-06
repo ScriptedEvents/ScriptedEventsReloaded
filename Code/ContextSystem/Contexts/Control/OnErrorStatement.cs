@@ -138,7 +138,7 @@ public class OnErrorStatement : StatementContext, IStatementExtender, IKeywordCo
             Script.AddLocalVariable(stackTraceVariable);
         }
 
-        var coro = RunChildren();
+        using var coro = RunChildren();
         while (coro.MoveNext())
             yield return coro.Current;
 

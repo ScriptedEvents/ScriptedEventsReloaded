@@ -45,12 +45,6 @@ public sealed class TryGet<TValue>(TValue? value, string? errorMsg)
     }
 
     [Pure]
-    public static implicit operator string(TryGet<TValue> result)
-    {
-        return result.ErrorMsg ?? throw new AndrzejFuckedUpException("implicit operator string(TryGet<TValue> result) called when not errored");
-    }
-
-    [Pure]
     public static implicit operator TryGet<TValue>(TValue value)
     {
         return new TryGet<TValue>(value, string.Empty);

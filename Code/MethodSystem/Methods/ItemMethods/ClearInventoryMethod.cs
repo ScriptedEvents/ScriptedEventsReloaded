@@ -15,7 +15,7 @@ public class ClearInventoryMethod : SynchronousMethod, IEssential
         new PlayersArgument("players"),
         new OptionsArgument("mode", "drop", "destroy")
         {
-            DefaultValue = new(null, "destroy")
+            DefaultValue = new("destroy", null)
         }
     ];
     

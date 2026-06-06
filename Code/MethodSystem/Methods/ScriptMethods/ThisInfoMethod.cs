@@ -45,7 +45,7 @@ public class ThisInfoMethod : ReturningMethod
             "context" => Script.RunReason.ToEnumValue(),
             "duration" => new DurationValue(Script.TimeRunning),
             "name" => new StaticTextValue(Script.Name),
-            "path" => new StaticTextValue(FileSystem.FileSystem.GetScriptPath(Script)),
+            "path" => new StaticTextValue(FileSystem.FileSystem.GetScriptPath(Script).Value ?? "lost"),
             "variables" => new CollectionValue(Script.LocalVariables.Select(v => v.Prefix + v.Name)),
             _ => throw new TosoksFuckedUpException("out of order")
         };

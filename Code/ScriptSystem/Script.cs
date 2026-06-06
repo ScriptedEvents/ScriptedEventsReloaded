@@ -98,10 +98,15 @@ public class Script
 
     public static TryGet<Script> CreateByScriptName(ScriptName name, ScriptExecutor? executor)
     {
+        if (FileSystem.FileSystem.GetScriptPath(name).HasErrored(out var error, out var path))
+        {
+            return error;
+        }
+        
         return new Script
         {
             Name = name,
-            Content = File.ReadAllText(FileSystem.FileSystem.GetScriptPath(name)),
+            Content = File.ReadAllText(path),
             Executor = executor ?? ScriptExecutor.Get()
         };
     }
@@ -113,11 +118,16 @@ public class Script
         {
             return initError;       
         }
+        
+        if (FileSystem.FileSystem.GetScriptPath(scriptName).HasErrored(out var error, out var path))
+        {
+            return error;
+        }
 
         return new Script
         {
             Name = scriptName,
-            Content = File.ReadAllText(FileSystem.FileSystem.GetScriptPath(scriptName)),
+            Content = File.ReadAllText(path),
             Executor = executor ?? ScriptExecutor.Get()
         };
     }

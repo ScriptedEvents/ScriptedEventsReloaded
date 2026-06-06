@@ -1,7 +1,9 @@
 ﻿using LabApi.Features.Console;
 using LabApi.Loader.Features.Paths;
+using SER.Code.Extensions;
 using SER.Code.FlagSystem;
 using SER.Code.Helpers;
+using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using EventHandler = SER.Code.EventSystem.EventHandler;
@@ -79,10 +81,16 @@ public static class FileSystem
         }
     }
     
-    public static string GetScriptPath(ScriptName scriptName)
+    public static TryGet<string> GetScriptPath(ScriptName scriptName)
     {
         UpdateScriptPathCollection();
-        return RegisteredScriptPaths.First(p => Path.GetFileNameWithoutExtension(p) == scriptName);
+        if (RegisteredScriptPaths.FirstOrDefault(p => Path.GetFileNameWithoutExtension(p) == scriptName) is
+            { } path)
+        {
+            return path.AsSuccess();
+        }
+
+        return $"Script '{scriptName}' does not exist anymore".AsError();
     }
     
     public static bool DoesScriptExistByName(string scriptName, out string path)

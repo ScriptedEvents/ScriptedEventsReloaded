@@ -113,14 +113,13 @@ public class CRole : CustomEventsHandler
 
     private void RunHandlers(CustomRoleEvent @event, Player plr)
     {
-        if (EventHandlers.TryGetValue(@event, out var handlers))
+        if (!EventHandlers.TryGetValue(@event, out var handlers)) return;
+        
+        foreach (var handler in handlers)
         {
-            foreach (var handler in handlers)
+            if (handler.ForRoles is not { } roles || roles.Contains(Id))
             {
-                if (handler.ForRoles is not { } roles || roles.Contains(Id))
-                {
-                    handler.Action(plr, this);
-                }
+                handler.Action(plr, this);
             }
         }
     }

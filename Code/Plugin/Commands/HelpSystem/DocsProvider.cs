@@ -53,7 +53,7 @@ public static class DocsProvider
                 // 1) Handle Method Execution (run:method ...)
                 if (rawInput.StartsWith("run:", StringComparison.OrdinalIgnoreCase))
                 {
-                    var methodLine = rawInput.Substring(4).Trim();
+                    var methodLine = rawInput[4..].Trim();
                     if (Tokenizer.TokenizeLine(methodLine, anonymousScript, null).HasErrored(out var errorMsg, out var tokens))
                     {
                         response = $"Error parsing method: {errorMsg}";
@@ -121,7 +121,7 @@ public static class DocsProvider
                     var scriptParam = inputTokens.FirstOrDefault(t => t.RawRep.StartsWith("@script:", StringComparison.OrdinalIgnoreCase));
                     if (scriptParam != null)
                     {
-                        var scriptName = scriptParam.RawRep.Substring(8);
+                        var scriptName = scriptParam.RawRep[8..];
                         targetScript = Script.RunningScripts.FirstOrDefault(s => ((string)s.Name).Equals(scriptName, StringComparison.OrdinalIgnoreCase));
                         if (targetScript == null)
                         {
@@ -135,7 +135,7 @@ public static class DocsProvider
                     if (targetScript != null)
                     {
                         var prefix = varToken.RawRep[0];
-                        var name = varToken.RawRep.Substring(1);
+                        var name = varToken.RawRep[1..];
                         if (targetScript.LocalVariables.Any(v => v.Prefix == prefix && v.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
                         {
                             resolvedValue = targetScript.LocalVariables.First(v => v.Prefix == prefix && v.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).BaseValue;
@@ -146,7 +146,7 @@ public static class DocsProvider
                             return false;
                         }
                     }
-                    else if (VariableIndex.TryGetGlobalVariable(varToken.RawRep[0], varToken.RawRep.Substring(1), out var globalVar))
+                    else if (VariableIndex.TryGetGlobalVariable(varToken.RawRep[0], varToken.RawRep[1..], out var globalVar))
                     {
                         resolvedValue = globalVar.BaseValue;
                     }

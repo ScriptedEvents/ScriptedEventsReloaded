@@ -72,17 +72,17 @@ namespace SER.Code.Helpers
 
             // Remove prefix like T:, M:, P:, etc.
             int colonIndex = cref.IndexOf(':');
-            string name = colonIndex != -1 ? cref.Substring(colonIndex + 1) : cref;
+            string name = colonIndex != -1 ? cref[(colonIndex + 1)..] : cref;
 
             // Handle methods: M:Namespace.Type.Method(Args) -> Method
             int parenIndex = name.IndexOf('(');
             if (parenIndex != -1)
-                name = name.Substring(0, parenIndex);
+                name = name[..parenIndex];
 
             // Get last part of the name
             int lastDot = name.LastIndexOf('.');
             if (lastDot != -1)
-                return name.Substring(lastDot + 1);
+                return name[(lastDot + 1)..];
 
             return name;
         }

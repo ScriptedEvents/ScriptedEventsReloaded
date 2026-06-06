@@ -3,6 +3,7 @@ using System.Reflection;
 using LabApi.Events;
 using LabApi.Events.Arguments.Interfaces;
 using LabApi.Loader;
+using PlayerStatsSystem;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
@@ -11,6 +12,7 @@ using SER.Code.ScriptSystem.Structures;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
 using SER.Code.VariableSystem.Bases;
+using DamageHandlerBase = PlayerStatsSystem.DamageHandlerBase;
 
 namespace SER.Code.EventSystem;
 
@@ -274,7 +276,15 @@ public static class EventHandler
         foreach (var (type, name) in properties)
         {
             if (type is null) continue;
-            variables.Add($"{Value.GetPrefixOfValue(new SingleTypeOfValue(Value.GuessValueType(type)))}ev{name.LowerFirst()}");
+            var typeOfValue = new SingleTypeOfValue(Value.GuessValueType(type));
+            
+            // because of stupid NW design decision, only StandardDamageHandler inherits from DamageHandlerBase
+            if (typeOfValue.Is<ReferenceValue<DamageHandlerBase>>())
+            {
+                typeOfValue = new TypeOfValue<ReferenceValue<StandardDamageHandler>>();
+            }
+            
+            variables.Add($"{Value.GetPrefixOfValue(typeOfValue)}ev{name} ({typeOfValue})");
         }
 
         return variables;

@@ -22,13 +22,13 @@ public class GetWaveTimerMethod : ReturningMethod<DurationValue>, IAdditionalDes
     {
         ReturnValue = TimeSpan.FromSeconds(Args.GetWave("wave type") switch
         {
-            MtfWave => RespawnWaves.PrimaryMtfWave?.TimeLeft ?? 0,
-            MiniMtfWave => RespawnWaves.MiniMtfWave?.TimeLeft ?? 0,
-            ChaosWave => RespawnWaves.PrimaryChaosWave?.TimeLeft ?? 0,
-            MiniChaosWave => RespawnWaves.MiniChaosWave?.TimeLeft ?? 0,
+            MtfWave => RespawnWaves.PrimaryMtfWave?.TimeLeft is {} wave and > 0 ? wave : 0,
+            MiniMtfWave => RespawnWaves.MiniMtfWave?.TimeLeft is {} wave and > 0 ? wave : 0,
+            ChaosWave => RespawnWaves.PrimaryChaosWave?.TimeLeft is {} wave and > 0 ? wave : 0,
+            MiniChaosWave => RespawnWaves.MiniChaosWave?.TimeLeft is {} wave and > 0 ? wave : 0,
             _ => throw new AndrzejFuckedUpException()
         });
     }
 
-    public string AdditionalDescription => "Will return 0s if the wave is not active.";
+    public string AdditionalDescription => "Will return 0s if the wave is not active or spawning.";
 }

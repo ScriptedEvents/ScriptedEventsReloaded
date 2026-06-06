@@ -14,7 +14,9 @@ namespace SER.Code.ValueSystem;
 
 public abstract class TextValue : LiteralValue<string>, IValueWithProperties
 {
-    private static readonly Regex ExpressionRegex = new(@"~?\{.*?\}", RegexOptions.Compiled);
+    private static readonly Regex ExpressionRegex = new(
+        @"~?\{([^{}]|(?<open>\{)|(?<-open>\}))*(?(open)(?!))\}", 
+        RegexOptions.Compiled);
 
     /// <summary>
     /// text needs to be dynamically parsed when the value is requested, so script needs to be provided

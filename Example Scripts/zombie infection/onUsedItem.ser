@@ -5,8 +5,7 @@
 -- require @evPlayer *evUsableItem
 
 $type = *evUsableItem -> type
-if $type isnt "Medkit" and $type isnt "SCP500"
-    stop
-end
 
-ClearPlayerData @evPlayer date_of_death_by_infection
+if $type is "Medkit" or $type is "SCP500"
+    ClearPlayerData @evPlayer date_of_death_by_infection
+end

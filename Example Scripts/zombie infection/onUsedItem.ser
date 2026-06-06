@@ -4,8 +4,15 @@
 !-- OnEvent UsedItem
 -- require @evPlayer *evUsableItem
 
+# dont do anything if the player was not infected
+if {HasPlayerData @evPlayer date_of_death_by_infection} is false
+    stop
+end
+
 $type = *evUsableItem -> type
 
+# if medkit or scp500 was used, heal infection
 if $type is "Medkit" or $type is "SCP500"
     ClearPlayerData @evPlayer date_of_death_by_infection
+    Broadcast @evPlayer 5s "You have healed your infection!"
 end

@@ -170,6 +170,8 @@ public static class ReferencePropertyRegistry
         if (_isInitialized) return;
         _isInitialized = true;
         
+        Register<Item, BoolValue>("inInventory", i => i.CurrentOwner is not null && i.CurrentOwner.Items.Contains(i), "Whether the item is in a player inventory");
+        
         Register<Door, NumberValue>("remainingHealth", d => new NumberValue(d is BreakableDoor bDoor ? (decimal)bDoor.Health : -1), "The remaining health of the door");
         Register<Door, NumberValue>("maxHealth", d => new NumberValue(d is BreakableDoor bDoor ? (decimal)bDoor.MaxHealth : -1), "The maximum health of the door");
         Register<Door, BoolValue>("isGate", d => d is Gate, "Is the door a gate?");

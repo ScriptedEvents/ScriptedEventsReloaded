@@ -1,0 +1,7 @@
+# sends a simple hint when someone gets hurt
+
+!-- OnEvent Hurt
+-- require @evPlayer @evAttacker *evDamageHandler
+
+Hint @evAttacker 1s "Hit {@evPlayer -> name} for {Round {*evDamageHandler -> damage}} HP"
+ 

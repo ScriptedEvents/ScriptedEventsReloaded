@@ -13,7 +13,7 @@ Broadcast @all 5s "Be ready for a Hot Potato!"
 
 # this is the main loop of the event
 forever
-    wait 1m
+    wait {ToDuration {Random 30 90} seconds}
 
     # Get a random player from the alive players that are not SCPs
     @potatoCarrier = Take {Except @alivePlayers @scpPlayers} 1
@@ -23,38 +23,34 @@ forever
         continue
     end
     
-    # if the inventory is full, continue to next attempt
-    if {@potatoCarrier -> inventory -> length} is 8
+    # try and give the GunA7 as the hot potato
+    *item = AdvGiveItem @potatoCarrier GunA7
+    
+    # if failed to give the item, continue to next attempt
+    if {*item -> isInvalid}
         continue
     end
     
-    Hint @potatoCarrier 3s "YOU HAVE THE HOT POTATO! DROP IT OR DIE!"
-    GiveItem @potatoCarrier GunA7
+    # inform the player that they have the hot potato
+    Hint @potatoCarrier 3s "YOU HAVE THE HOT POTATO!<br>DROP IT OR DIE!"
 
     wait 6s
-
-    # Check if they still have the item (GunA7) in their inventory
-    over {@potatoCarrier -> inventory} with *item
-        if {*item -> type} isnt "GunA7"
-            continue
-        end
-
-        # when GunA7 is found, explode the player
-        AdvDestroyItem *item
-        Explode @potatoCarrier
-        Broadcast @all 5s "Player {@potatoCarrier -> name} has failed the Hot Potato!"
-        
-        # 70% chance that the event to continue, else stop the event
-        chance 70%
-            Broadcast @all 5s "The Hot Potato will return soon!"
-            continue
-        else
-            Broadcast @all 5s "The Hot Potato got tired and will not return..."
-            stop
-        end
+    
+    # ITEM WAS NOT DROPPED = EXPLOSION
+    if {*item -> inInventory}
+        Explode {*item -> currentOwner}
+        Broadcast @all 5s "Player {*item -> currentOwner -> name} has failed the Hot Potato!"
     end
-        
-    # if the loop finishes without finding GunA7, it means the player has dropped it
+
+    # remove the item so people dont use it
     AdvDestroyItem *item
-    Broadcast @all 5s "The Hot Potato has been neutralized... but it will return!"
+        
+    # 70% chance for the event to continue
+    chance 70%
+        Broadcast @all 5s "The Hot Potato will return soon!"
+        continue
+    else
+        Broadcast @all 5s "The Hot Potato got tired and will not return..."
+        stop
+    end
 end

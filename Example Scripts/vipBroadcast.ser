@@ -1,0 +1,17 @@
+!-- CustomCommand vipbroadcast
+# available in the player console
+-- availableFor player
+# only players with VIP rank can use this command
+-- neededRank vip
+# VIP player must wait 2 minutes before sending next broadcast
+-- cooldown 2m
+# there must be 30 seconds between VIP broadcasts
+-- globalCooldown 30s
+# VIP can only send 2 broadcasts per round
+-- maxUses 2
+# there can be only 10 vip broadcasts per round in total
+-- globalMaxUses 10
+# the text to send
+-- arguments message
+
+Broadcast @all 10s "<size=10><color=yellow>[VIP Broadcast by {@sender -> name}]</color></size><br>{$message}"

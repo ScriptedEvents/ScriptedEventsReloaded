@@ -170,8 +170,8 @@ if $effect is 9
         stop
     end
 
-    # gets a random player that is not @evPlayer
-    @swapPlayer = Take {Except @all @evPlayer} 1
+    # gets a random alive player that is not @evPlayer
+    @swapPlayer = Take {Except @alivePlayers @evPlayer} 1
     $swapX = @swapPlayer -> posX
     $swapY = @swapPlayer -> posY
     $swapZ = @swapPlayer -> posZ

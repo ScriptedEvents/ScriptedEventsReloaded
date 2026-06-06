@@ -3,6 +3,6 @@
 
 !-- OnCRole spawned
 
-wait 6s
+wait 3s
 
-AnimatedBroadcast @evPlayer 10s "Your custom role is:<br><br><br><size=60><b><wait=2s><charwait=300ms>{@evCRole -> displayName}"
+AnimatedBroadcast @evPlayer 10s "Your custom role is:<br><br><br><wait=1s><charwait=100ms><size=60>{*evCRole -> displayName}</size>"

@@ -25,4 +25,4 @@ Heal @target $healAmount
 
 # inform
 Broadcast @target 4s "{@sender -> name} healed you with {$healAmount} HP!"
-Reply "You have healed {@target -> name} by {$healAmount} HP!"
+Reply "You have healed {@target -> name} ({@target -> role}) by {$healAmount} HP!"

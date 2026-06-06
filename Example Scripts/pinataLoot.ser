@@ -22,4 +22,4 @@ end
 
 SpawnPickupPlayer *pickup @evPlayer
 
-Hint @evAttacker 3s "You hit the piñata!"
+Hint @evAttacker 3s "The piñata dropped some medicaments!"

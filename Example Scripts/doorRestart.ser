@@ -11,9 +11,9 @@ wait 1s
 wait_until {IsCassieSpeaking} is false
 
 # restart effects
-DisableLights * 15s
-CloseDoor *
-LockDoor * NoPower
+DisableLights all 15s
+CloseDoor all
+LockDoor all NoPower
 
 # cassie for spooky effect
 repeat 2
@@ -24,7 +24,7 @@ end
 wait 15s
 
 # revert to unlocked
-UnlockDoor *
+UnlockDoor all
 
 # cassie information that restart was successful
 ClearCassie

@@ -2,4 +2,4 @@
 -- forRoles janitor
 
 TPRoom @evPlayer LczToilets
-GiveItem @evCRole KeycardJanitor
+GiveItem @evPlayer KeycardJanitor

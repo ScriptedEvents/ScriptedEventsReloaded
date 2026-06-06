@@ -1,0 +1,41 @@
+# this script limits when scp 173 can teleport
+# depending on how many players are looking at him
+
+!-- OnEvent Teleporting
+-- require @evPlayer
+
+# when ran, will inform the player that he cant teleport
+# and will disallow him from teleporting
+func Decline
+    Hint @evPlayer 2s "<color=red><b>You cannot move - too many people are looking at you!</b></color>"
+    IsAllowed false
+end
+
+# if previously decided that 173 cant move, respect the decision
+if {GetPlayerData @evPlayer can_teleport true} is false 
+    run Decline
+    stop
+end
+
+$observerCount = AmountOf {Get173Observers @evPlayer}
+
+# we only want to interfere when more than 
+# 2 players are looking at 173
+if $observerCount <= 2
+    stop
+end
+
+run Decline
+
+# disallow the teleporting
+SetPlayerData @evPlayer can_teleport false
+
+# the minimum wait time is always 1 second. 
+# the maximum wait time scales with the number of players looking at 173
+wait {ToDuration {Random 1 $observerCount} seconds}
+
+# allow 173 to teleport again
+SetPlayerData @evPlayer can_teleport true
+
+# inform about the ability to move
+Hint @evPlayer 2s "<color=green><b>You can now move!</b></color>"

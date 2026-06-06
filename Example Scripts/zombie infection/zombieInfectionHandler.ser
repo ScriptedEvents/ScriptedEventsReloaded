@@ -32,6 +32,3 @@ forever
         SetRole @plr Scp0492
     end
 end
-
-
-

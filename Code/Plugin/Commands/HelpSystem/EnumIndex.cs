@@ -1,4 +1,5 @@
-﻿using Interactables.Interobjects;
+﻿using System.Reflection;
+using Interactables.Interobjects;
 using LabApi.Features.Enums;
 using MapGeneration;
 using PlayerRoles;
@@ -20,10 +21,25 @@ public static class EnumIndex
         typeof(Team)
     ];
     
-    private static readonly Type[] ReflectedEnums =
+    private static Type[]? _reflectedEnums;
+    private static Type[] ReflectedEnums => _reflectedEnums ??=
         AppDomain.CurrentDomain
             .GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
+            .SelectMany(assembly =>
+            {
+                try
+                {
+                    return (IEnumerable<Type>)assembly.GetTypes();
+                }
+                catch (ReflectionTypeLoadException re)
+                {
+                    return re.Types.Where(t => t != null);
+                }
+                catch
+                {
+                    return [];
+                }
+            })
             .Where(t => t.IsEnum)
             .ToArray();
 

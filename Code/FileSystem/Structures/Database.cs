@@ -59,12 +59,19 @@ public class Database
         }
         
         string content = File.ReadAllText(path);
-        if (JsonConvert.DeserializeObject<Db>(content, Settings) is not { } db)
+        try
         {
-            return $"Database '{name}' is corrupted!";
+            if (JsonConvert.DeserializeObject<Db>(content, Settings) is not { } db)
+            {
+                return $"Database '{name}' is corrupted!";
+            }
+            
+            return new Database(path, db);
         }
-        
-        return new Database(path, db);
+        catch (Exception ex)
+        {
+            return $"Database '{name}' is corrupted! {ex.Message}";
+        }
     }
 
     public Result TrySet(string key, Value value, bool save = true)

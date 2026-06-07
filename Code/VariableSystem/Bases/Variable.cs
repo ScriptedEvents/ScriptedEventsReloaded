@@ -27,7 +27,8 @@ public abstract class Variable : IVariableRepr
     {
         return value switch
         {
-            LiteralValue lit     => new LiteralVariable(name, lit),
+            // this shit is fuckass
+            LiteralValue lit     => new LiteralVariable(name, lit is DynamicTextValue t ? new StaticTextValue(t.StringRep) : lit),
             CollectionValue coll => new CollectionVariable(name, coll),
             PlayerValue plr      => new PlayerVariable(name, plr),
             ReferenceValue @ref  => new ReferenceVariable(name, @ref),

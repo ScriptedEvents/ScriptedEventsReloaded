@@ -41,7 +41,7 @@ public static class NumericExpressionReslover
         var initial = tokens.Select(t => t.RawRep).JoinStrings(" ");
         Result mainErr = $"Expression '{initial}' is invalid.";
 
-        var variables = new Dictionary<string, DynamicTryGet<object>>(StringComparer.OrdinalIgnoreCase);
+        var variables = new Dictionary<string, (DynamicTryGet<object>, string)>(StringComparer.OrdinalIgnoreCase);
         var sb = new StringBuilder();
         uint tempId = 0;
 
@@ -52,7 +52,7 @@ public static class NumericExpressionReslover
             
             if (ParseToken(token, variables, sb, mainErr, tempId).HasErrored(out var err))
             {
-                return err;
+                return mainErr + err;
             }
         }
         
@@ -69,13 +69,13 @@ public static class NumericExpressionReslover
     public class CompiledExpression
     {
         private readonly Expression _expression;
-        private readonly Dictionary<string, DynamicTryGet<object>> _parameters;
+        private readonly Dictionary<string, (DynamicTryGet<object> value, string repr)> _parameters;
         private readonly string _rawRepresentation;
         private readonly Dictionary<string, object> _values = [];
 
         public CompiledExpression(
             Expression expression, 
-            Dictionary<string, DynamicTryGet<object>> parameters,
+            Dictionary<string, (DynamicTryGet<object>, string)> parameters,
             string rawRepresentation
         )
         {
@@ -87,31 +87,38 @@ public static class NumericExpressionReslover
 
         public TryGet<object> Evaluate()
         {
+            _values.Clear();
+            foreach (var (key, (getter, _)) in _parameters)
+            {
+                if (getter.Invoke().HasErrored(out var err, out var value))
+                {
+                    return err;
+                }
+                
+                _values[key] = value;
+            }
+            
             try
             {
-                _values.Clear();
-                foreach (var (key, dtg) in _parameters)
-                {
-                    if (dtg.Invoke().HasErrored(out var err, out var value))
-                    {
-                        return err;
-                    }
-                
-                    _values[key] = value;
-                }
-
                 return _expression.Evaluate();
             }
             catch (Exception)
             {
-                return $"Expression '{_rawRepresentation}' is invalid.";
+                if (_values.Count <= 0)
+                {
+                    return $"Expression '{_rawRepresentation}' is invalid.";
+                }
+                
+                return $"Expression '{_rawRepresentation}' is invalid. Variable values:\n" +
+                       _values.Select((kvp, _) => $"- {_parameters[kvp.Key].repr} = {kvp.Value}")
+                           .JoinStrings("\n");
             }
         }
     }
 
     private static Result ParseToken(
         BaseToken token,
-        Dictionary<string, DynamicTryGet<object>> variables,
+        Dictionary<string, (DynamicTryGet<object> value, string serRepr)> variables,
         StringBuilder sb, 
         Result mainErr,
         uint tempId)
@@ -124,15 +131,21 @@ public static class NumericExpressionReslover
                 
                 if (valueToken.IsConstant)
                 {
-                    variables[tmp] = valueToken
-                        .Value()
-                        .OnSuccess(s => s.ToCSharpObject(null), mainErr);
+                    variables[tmp] = (
+                        valueToken
+                            .Value()
+                            .OnSuccess(s => s.ToCSharpObject(null), mainErr),
+                        token.RawRep
+                    );
                 }
                 else
                 {
-                    variables[tmp] = new(() => valueToken
-                        .Value()
-                        .OnSuccess(s => s.ToCSharpObject(null), mainErr));
+                    variables[tmp] = (
+                        new(() => valueToken
+                            .Value()
+                            .OnSuccess(s => s.ToCSharpObject(null), mainErr)),
+                        token.RawRep
+                    );
                 }
                 
                 AppendRaw(tmp);
@@ -180,11 +193,11 @@ public static class NumericExpressionReslover
         {
             return "value" + tempId.ToString(CultureInfo.InvariantCulture);
         }
-
-        void AppendRaw(string s)
+        
+        void AppendRaw(string value)
         {
             if (sb.Length > 0) sb.Append(' ');
-            sb.Append(s);
+            sb.Append(value);
         }
     }
 }

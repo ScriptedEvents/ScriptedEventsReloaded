@@ -13,7 +13,6 @@ namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
 {
     private readonly Result _rs = "Cannot create 'repeat' loop.";
-    private ulong? _repeatCount = null;
     private Func<TryGet<ulong>>? _repeatCountExpression = null;
     
     public override string KeywordName => "repeat";
@@ -70,27 +69,22 @@ public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
     public override Result VerifyCurrentState()
     {
         return Result.Assert(
-            _repeatCountExpression != null || _repeatCount.HasValue,
+            _repeatCountExpression != null,
             _rs + "The amount of times to repeat was not provided."
         );
     }
 
     protected override IEnumerator<float> Execute()
     {
-        if (!_repeatCount.HasValue)
+        if (_repeatCountExpression == null)
+            throw new AndrzejFuckedUpException("Repeat context has no amount specified");
+
+        if (_repeatCountExpression().HasErrored(out var error, out var val))
         {
-            if (_repeatCountExpression == null)
-                throw new AndrzejFuckedUpException("Repeat context has no amount specified");
-
-            if (_repeatCountExpression().HasErrored(out var error, out var val))
-            {
-                throw new ScriptRuntimeError(this, error);
-            }
-
-            _repeatCount = val;
+            throw new ScriptRuntimeError(this, error);
         }
 
-        for (ulong i = 0; i < _repeatCount.Value; i++)
+        for (ulong i = 0; i < val; i++)
         {
             SetVariable(i + 1);
             var coro = RunChildren();

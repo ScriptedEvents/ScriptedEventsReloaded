@@ -100,7 +100,7 @@ public static class NumericExpressionReslover
             
             try
             {
-                return _expression.Evaluate();
+                return _expression.Evaluate() ?? throw new Exception();
             }
             catch (Exception)
             {
@@ -109,7 +109,7 @@ public static class NumericExpressionReslover
                     return $"Expression '{_rawRepresentation}' is invalid.";
                 }
                 
-                return $"Expression '{_rawRepresentation}' is invalid. Variable values:\n" +
+                return $"Expression '{_rawRepresentation}' is invalid. Values used:\n" +
                        _values.Select((kvp, _) => $"- {_parameters[kvp.Key].repr} = {kvp.Value}")
                            .JoinStrings("\n");
             }

@@ -13,6 +13,7 @@ public static class Log
         Logger.Raw($"Debug: {obj!.ToString()}", ConsoleColor.Gray);
     }
 
+    [Conditional("SIGNAL")]
     public static void Signal(object o)
     {
         Logger.Raw(o.ToString(), ConsoleColor.Magenta);

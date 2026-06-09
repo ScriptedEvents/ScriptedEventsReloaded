@@ -24,7 +24,7 @@
         <DebugSymbols>true</DebugSymbols>
         <DebugType>embedded</DebugType>
         <Optimize>false</Optimize>
-        <DefineConstants>DEBUG;TRACE;HAVE_NULLABLE_ATTRIBUTES;LABAPI</DefineConstants>
+        <DefineConstants>DEBUG;TRACE;HAVE_NULLABLE_ATTRIBUTES;LABAPI;SIGNAL</DefineConstants>
         <OutputPath>bin\LABAPI\</OutputPath>
     </PropertyGroup>
 
@@ -32,7 +32,7 @@
         <DebugSymbols>true</DebugSymbols>
         <DebugType>embedded</DebugType>
         <Optimize>false</Optimize>
-        <DefineConstants>TRACE;HAVE_NULLABLE_ATTRIBUTES;LABAPI</DefineConstants>
+        <DefineConstants>TRACE;HAVE_NULLABLE_ATTRIBUTES;LABAPI;SIGNAL</DefineConstants>
         <OutputPath>bin\LABAPI\</OutputPath>
     </PropertyGroup>
 

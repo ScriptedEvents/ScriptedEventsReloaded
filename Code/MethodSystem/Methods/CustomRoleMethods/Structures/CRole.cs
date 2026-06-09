@@ -13,7 +13,6 @@ public class CRole
 {
     public CRole()
     {
-        Log.Signal($"role {GetType().AccurateName} init");
         PlayerEvents.Death += OnDeath;
         PlayerEvents.ChangingRole += OnPlayerChangingRole;
         ServerEvents.RoundStarted += OnServerRoundStarted;
@@ -21,7 +20,6 @@ public class CRole
 
     public void Unload()
     {
-        Log.Signal($"role {GetType().AccurateName} deconstr");
         PlayerEvents.Death -= OnDeath;
         PlayerEvents.ChangingRole -= OnPlayerChangingRole;
         ServerEvents.RoundStarted -= OnServerRoundStarted;

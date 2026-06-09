@@ -6,7 +6,6 @@ using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
-using EventHandler = SER.Code.EventSystem.EventHandler;
 
 namespace SER.Code.FileSystem;
 

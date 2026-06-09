@@ -56,8 +56,6 @@ public static class FileSystem
         }
 
         UpdateScriptPathCollection();
-        ScriptFlagHandler.Clear();
-        EventHandler.Clear();
         
         foreach (var scriptPath in RegisteredScriptPaths)
         {

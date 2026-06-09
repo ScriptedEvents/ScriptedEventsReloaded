@@ -27,6 +27,7 @@ public static class EventHandler
     
     public static void Initialize()
     {
+        Clear();
         AvailableEvents = typeof(PluginLoader).Assembly.GetTypes()
             .Where(t => t.FullName?.Equals($"LabApi.Events.Handlers.{t.Name}") is true)
             .Select(t => t.GetEvents(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public 

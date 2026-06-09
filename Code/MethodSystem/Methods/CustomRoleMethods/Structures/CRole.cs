@@ -1,17 +1,30 @@
 using LabApi.Events.Arguments.PlayerEvents;
-using LabApi.Events.CustomHandlers;
+using LabApi.Events.Handlers;
 using LabApi.Features.Wrappers;
 using MEC;
 using PlayerRoles;
+using SER.Code.Extensions;
+using SER.Code.Helpers;
 using Random = System.Random;
 
 namespace SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
 
-public class CRole : CustomEventsHandler
+public class CRole
 {
     public CRole()
     {
-        CustomHandlersManager.RegisterEventsHandler(this);
+        Log.Signal($"role {GetType().AccurateName} init");
+        PlayerEvents.Death += OnDeath;
+        PlayerEvents.ChangingRole += OnPlayerChangingRole;
+        ServerEvents.RoundStarted += OnServerRoundStarted;
+    }
+
+    public void Unload()
+    {
+        Log.Signal($"role {GetType().AccurateName} deconstr");
+        PlayerEvents.Death -= OnDeath;
+        PlayerEvents.ChangingRole -= OnPlayerChangingRole;
+        ServerEvents.RoundStarted -= OnServerRoundStarted;
     }
     
     public enum CustomRoleEvent
@@ -63,9 +76,10 @@ public class CRole : CustomEventsHandler
     {
         LifeIdAssignedRoles.Clear();
         LastRoles.Clear();
-        RegisteredRoles.Clear();
         PlayersInProcessOfReceivingCRole.Clear();
         EventHandlers.Clear();
+        RegisteredRoles.Values.ForEachItem(role => role.Unload());
+        RegisteredRoles.Clear();
     }
     
     public void AssignPlayer(Player plr)
@@ -124,7 +138,7 @@ public class CRole : CustomEventsHandler
         }
     }
 
-    public override void OnServerRoundStarted()
+    public void OnServerRoundStarted()
     {
         Timing.CallDelayed(Timing.WaitForOneFrame, delegate
         {
@@ -202,7 +216,7 @@ public class CRole : CustomEventsHandler
         }
     }
 
-    public static void OnDeath(PlayerDeathEventArgs ev)
+    public void OnDeath(PlayerDeathEventArgs ev)
     {
         if (ev.Player is not {} plr) return;
         if (!LifeIdAssignedRoles.TryGetValue(plr.LifeId, out var role)) return;
@@ -211,21 +225,41 @@ public class CRole : CustomEventsHandler
         role.RemovePlayer(plr);
     }
 
-    public override void OnPlayerChangingRole(PlayerChangingRoleEventArgs ev)
+    public void OnPlayerChangingRole(PlayerChangingRoleEventArgs ev)
     {
         if (ev.Player is not {} plr) return;
         
         if (LifeIdAssignedRoles.TryGetValue(plr.LifeId, out var role))
         {
             role.RemovePlayer(plr);
+            Log.Debug($"removing role {Id} from {plr.DisplayName}");
         }
         
-        if (PlayersInProcessOfReceivingCRole.Contains(plr)) return;
-        if (SpawnSystem is not ChanceSpawn chanceSpawn) return;
-        if (ev.NewRole != chanceSpawn.RoleToReplace) return;
-        if (chanceSpawn.SpawnChance <= new Random().NextDouble()) return;
+        if (SpawnSystem is not ChanceSpawn chanceSpawn)
+        {
+            Log.Debug($"{Id} is not a chance spawn system");
+            return;
+        }
+        
+        if (PlayersInProcessOfReceivingCRole.Contains(plr))
+        {
+            Log.Debug($"player {plr.DisplayName} is already in process of receiving role (checking role: {Id})");
+            return;
+        }
+        
+        if (ev.NewRole != chanceSpawn.RoleToReplace)
+        {
+            Log.Debug($"{Id} role cannot work for {plr.DisplayName}, invalid role");
+            return;
+        }
+        if (chanceSpawn.SpawnChance <= new Random().NextDouble())
+        {
+            Log.Debug($"player {plr.DisplayName} failed chance spawn");
+            return;
+        }
         
         ev.IsAllowed = false;
         AssignPlayer(plr);
+        Log.Debug($"player {plr.DisplayName} successfully received role {Id}");
     }
 }

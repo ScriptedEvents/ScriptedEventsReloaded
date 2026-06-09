@@ -6,6 +6,7 @@ using LabApi.Features;
 using LabApi.Features.Console;
 using MEC;
 using SER.Code.Extensions;
+using SER.Code.FlagSystem;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.Helpers;
 using SER.Code.MethodSystem;
@@ -121,38 +122,44 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
         
         Instance = this;
         
-        Script.StopAll();
-        EventHandler.Initialize();
-        MethodIndex.Initialize();
-        VariableIndex.Initialize();
-        Flag.RegisterFlags();
-        CommandEvents.Initialize();
+
         var fBridge = new FrameworkBridge();
         fBridge.Load();
         SendLogo();
 
+        Events.ServerEvents.MapGenerating += ev =>
+        {
+            Script.StopAll();
+            ScriptFlagHandler.Clear();
+            SetPlayerDataMethod.PlayerData.Clear();
+            TeslaRuleHandler.ResetAll();
+            DamageRuleHandler.ResetAll();
+            CRole.ResetAll();
+            
+            Flag.RegisterFlags();
+            EventHandler.Initialize();
+            MethodIndex.Initialize();
+            VariableIndex.Initialize();
+            CommandEvents.Initialize();
+            FileSystem.FileSystem.Initialize();
+        };
+        
         Events.ServerEvents.WaitingForPlayers += () => OnServerFullyInit(fBridge);
-        Events.ServerEvents.RoundRestarted += PrivateDisable;
         Events.PlayerEvents.Joined += OnJoined;
-
-        FileSystem.FileSystem.Initialize();
+        
         CustomHandlersManager.RegisterEventsHandler(new TeslaRuleHandler());
         CustomHandlersManager.RegisterEventsHandler(new DamageRuleHandler());
     }
     
 #if !EXILED
-    public override void Disable() => PrivateDisable();
+    public override void Disable()
 #else
-    public override void OnDisabled() => PrivateDisable();
+    public override void OnDisabled()
 #endif
-
-    private static void PrivateDisable()
-    {
-        CRole.ResetAll();
+    { 
         Script.StopAll();
-        SetPlayerDataMethod.PlayerData.Clear();
-        TeslaRuleHandler.ResetAll();
-        DamageRuleHandler.ResetAll();
+        ScriptFlagHandler.Clear();
+        EventHandler.Clear();
     }
 
     private void OnServerFullyInit(FrameworkBridge frameworkBridge)

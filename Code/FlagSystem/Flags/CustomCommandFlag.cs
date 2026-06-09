@@ -10,6 +10,7 @@ using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.TokenSystem.Tokens.ValueTokens;
 using SER.Code.ValueSystem;
 using SER.Code.VariableSystem.Variables;
@@ -418,13 +419,32 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
             var slice = provided[index];
             var argVariable = cmd.Usage[index];
             var name = argVariable[0].ToString().ToLowerInvariant() + argVariable[1..];
+            
+            if (Tokenizer.GetTokenFromSlice(slice, null, null)
+                .HasErrored(out error, out var token))
+            {
+                return $"Cannot understand input '{slice.Value}' for argument '{argVariable}'. ".AsError() +
+                       error.AsError();
+            }
+
+            LiteralValue value;
+            if (token is IValueToken { IsConstant: true } valToken 
+                && valToken.Value().WasSuccessful(out var tempVal)
+                && tempVal is LiteralValue tempVal2)
+            {
+                value = tempVal2;
+            }
+            else
+            {
+                value = new StaticTextValue(token.BestStaticTextRepr());
+            }
 
             if (name.Last() == '?')
             {
                 name = name[..^1];
             }
             
-            script.AddLocalVariable(new LiteralVariable<TextValue>(name, new StaticTextValue(slice.Value)));
+            script.AddLocalVariable(new LiteralVariable(name, value));
         }
 
         script.AddLocalVariable(new ReferenceVariable("command", new ReferenceValue<CustomCommand>(cmd)));

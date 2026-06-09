@@ -32,7 +32,7 @@ public class CountdownMethod : SynchronousMethod
         
         foreach (var plr in players)
         {
-            var coro = RunCoroutine(Countdown(plr, duration, title));
+            var coro = Countdown(plr, duration, title).Run(null);
             if (Coroutines.TryGetValue(plr, out var coroutine)) 
                 coroutine.Kill();
             

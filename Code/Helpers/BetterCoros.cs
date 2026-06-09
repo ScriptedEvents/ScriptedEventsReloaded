@@ -11,7 +11,7 @@ public static class BetterCoros
 {
     public static CoroutineHandle Run(
         this IEnumerator<float> coro, 
-        Script scr, 
+        Script? scr, 
         Action<Exception>? onException = null,
         Action? onFinish = null
     )
@@ -26,7 +26,7 @@ public static class BetterCoros
 
     private static IEnumerator<float> Wrapper(
         IEnumerator<float> routine, 
-        Script scr, 
+        Script? scr, 
         Action<Exception>? onException = null,
         Action? onFinish = null
     )
@@ -49,29 +49,29 @@ public static class BetterCoros
             catch (ScriptCompileError compErr)
             {
                 onException?.Invoke(compErr);
-                scr.Error(compErr.Message);
+                scr?.Error(compErr.Message);
                 goto End;
             }
             catch (ScriptRuntimeError runErr)
             {
                 onException?.Invoke(runErr);
-                scr.Error(runErr.Message);
+                scr?.Error(runErr.Message);
                 goto End;
             }
             catch (DeveloperFuckedUpException devErr)
             {
                 onException?.Invoke(devErr);
-                scr.Error(devErr.Message + "\n" + devErr.StackTrace);
+                scr?.Error(devErr.Message + "\n" + devErr.StackTrace);
                 goto End;
             }
             catch (Exception ex)
             {
                 onException?.Invoke(ex);
-                scr.Error($"Coroutine failed with {ex.GetType().AccurateName}: {ex.Message}\n{ex.StackTrace}");
+                scr?.Error($"Coroutine failed with {ex.GetType().AccurateName}: {ex.Message}\n{ex.StackTrace}");
                 goto End;
             }
 
-            if (scr.Killed)
+            if (scr?.Killed is true)
             {
                 goto End;
             }

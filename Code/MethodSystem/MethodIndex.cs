@@ -25,7 +25,7 @@ public static class MethodIndex
     internal static void Initialize()
     {
         NameToMethodIndex.Clear();
-        
+        FrameworkDependentMethods.Clear();
         AddAllDefinedMethodsInAssembly();
     }
     

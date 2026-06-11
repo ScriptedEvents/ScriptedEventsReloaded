@@ -1,0 +1,34 @@
+# this script applies different effects for players in SCP-914
+# depending on the current setting of the knob
+
+!-- OnEvent ProcessingPlayer
+-- require @evPlayer $evKnobSetting
+
+if $evKnobSetting is "Rough"
+    if {@evPlayer -> role} isnt "Scp0492"
+        # change to zombie
+        SetRole @evPlayer Scp0492
+    else
+        # explode if already a zombie
+        Explode @evPlayer
+    end
+
+elif $evKnobSetting is "Coarse"
+    # take 50 hp
+    Damage @evPlayer 50 "SCP-914"
+    # teleport to a random room in HCZ
+    TPRoom @evPlayer HeavyContainment 
+    # make the player not teleport to the out section of scp 914
+    IsAllowed false
+
+elif $evKnobSetting is "OneToOne"
+    # no effect
+
+elif $evKnobSetting is "Fine"
+    # no effect
+
+elif $evKnobSetting is "VeryFine"
+    # add good effects
+    GiveEffect @evPlayer MovementBoost 20s 10
+    GiveEffect @evPlayer AntiScp207 10s
+end

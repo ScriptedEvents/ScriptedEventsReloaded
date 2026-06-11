@@ -41,10 +41,6 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
     public static string DocsLink => "https://scriptedeventsreloaded.gitbook.io/docs/tutorial";
     public static string DiscordLink => "https://discord.gg/3j54zBnbbD";
 
-    // ReSharper disable once FieldCanBeMadeReadOnly.Global
-    // ReSharper disable once ConvertToConstant.Global
-    public static bool AllowDetachedScriptCompilingShenanigans = false;
-
     public static string HelpCommandName => "serhelp";
     public static MainPlugin Instance { get; private set; } = null!;
 

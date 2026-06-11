@@ -1,4 +1,4 @@
-﻿using SER.Code.Plugin;
+﻿using SER.Code.Helpers.ResultSystem;
 
 namespace SER.Code.Extensions;
 
@@ -19,14 +19,19 @@ public static class CollectionExtensions
         public T GetRandomValue()
         {
             var array = enumerable as T[] ?? enumerable.ToArray();
-            
-            // this 
-            if (array.Length == 0 && MainPlugin.AllowDetachedScriptCompilingShenanigans)
-            {
-                return default!;
-            }
-            
             return array[new Random().Next(0, array.Length)];
+        }
+
+        public TryGet<T> TryGetRandomValue(string error)
+        {
+            try
+            {
+                return enumerable.GetRandomValue();
+            }
+            catch
+            {
+                return error;
+            }
         }
     }
 

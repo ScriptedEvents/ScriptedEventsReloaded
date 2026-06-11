@@ -4,6 +4,7 @@ using LabApi.Features.Enums;
 using MapGeneration;
 using PlayerRoles;
 using SER.Code.FlagSystem.Flags;
+using SER.Code.Helpers;
 using ValueType = SER.Code.ValueSystem.Other.ValueType;
 
 namespace SER.Code.Plugin.Commands.HelpSystem;
@@ -27,9 +28,14 @@ public static class EnumIndex
             .GetAssemblies()
             .SelectMany(assembly =>
             {
+                if (!ReflectionHelper.ShouldBeConsidered(assembly))
+                {
+                    return [];
+                }
+                
                 try
                 {
-                    return (IEnumerable<Type>)assembly.GetTypes();
+                    return assembly.GetTypes();
                 }
                 catch (ReflectionTypeLoadException re)
                 {

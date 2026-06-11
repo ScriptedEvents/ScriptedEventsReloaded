@@ -124,17 +124,17 @@ public class OnErrorStatement : StatementContext, IStatementExtender, IKeywordCo
 
         if (_messageVariableToken is not null)
         {
-            messageVariable = Variable.Create(_messageVariableToken.Name, Value.Parse(Exception!.Message, Script));
+            messageVariable = Variable.Create(_messageVariableToken.Name, Value.Parse(Exception!.Message));
             Script.AddLocalVariable(messageVariable);
         }
         if (_typeVariableToken is not null)
         {
-            typeVariable = Variable.Create(_typeVariableToken.Name, Value.Parse(Exception!.GetType().AccurateName, Script));
+            typeVariable = Variable.Create(_typeVariableToken.Name, Value.Parse(Exception!.GetType().AccurateName));
             Script.AddLocalVariable(typeVariable);
         }
         if (_stackTraceVariableToken is not null)
         {
-            stackTraceVariable = Variable.Create(_stackTraceVariableToken.Name, Value.Parse(Exception!.StackTrace, Script));
+            stackTraceVariable = Variable.Create(_stackTraceVariableToken.Name, Value.Parse(Exception!.StackTrace));
             Script.AddLocalVariable(stackTraceVariable);
         }
 

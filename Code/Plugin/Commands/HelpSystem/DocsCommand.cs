@@ -1,8 +1,15 @@
 ﻿using System.Text;
 using CommandSystem;
 using LabApi.Features.Permissions;
+using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Exceptions;
+using SER.Code.Extensions;
+using SER.Code.MethodSystem;
 using SER.Code.Plugin.Commands.Interfaces;
+using SER.Code.TokenSystem.Tokens;
+using SER.Code.ValueSystem.PropertySystem;
+using SER.Code.VariableSystem;
+using SER.Code.VariableSystem.Variables;
 
 namespace SER.Code.Plugin.Commands.HelpSystem;
 
@@ -18,11 +25,70 @@ public class DocsCommand : ICommand, IUsePermissions
             response = "You do not have permission to create documentation.";
             return false;
         }
+        
+        var methodSb = GetBuilder();
+        methodSb.AppendLine(DocsProvider.GetMethodList());
+        methodSb.AppendLine();
+        
+        foreach (var method in MethodIndex.GetMethods())
+        {
+            methodSb.AppendLine(DocsProvider.GetMethodHelp(method));
+            methodSb.AppendLine();
+        }
 
-        var sb = new StringBuilder($"Genrated on [{DateTime.Today.ToLongDateString()}] with SER version [{MainPlugin.Instance.Version}]\n\n");
-
-        var helpOptions = Enum.GetValues(typeof(HelpOption)).Cast<HelpOption>();
-        foreach (var helpOption in helpOptions)
+        MakeDocFile("methods", methodSb);
+        
+        var variableSb = GetBuilder();
+        variableSb.Append(DocsProvider.GetVariableList());
+        
+        MakeDocFile("variables", variableSb);
+        
+        var eventSb = GetBuilder();
+        foreach (var @event in EventSystem.EventHandler.AvailableEvents)
+        {
+            eventSb.AppendLine(DocsProvider.GetEventInfo(@event));
+            eventSb.AppendLine();
+        }
+        
+        MakeDocFile("events", eventSb);
+        
+        var keywordSb = GetBuilder();
+        keywordSb.AppendLine(DocsProvider.GetKeywordHelpPage());
+        keywordSb.AppendLine();
+        
+        foreach (var keyword in ContextableKeywordToken.KeywordContextTypes)
+        {
+            keywordSb.AppendLine(DocsProvider.GetKeywordInfo(keyword.CreateInstance<IKeywordContext>()));
+            keywordSb.AppendLine();
+        }
+        
+        MakeDocFile("keywords", keywordSb);
+        
+        var enumSb = GetBuilder();
+        enumSb.AppendLine(DocsProvider.GetEnumHelpPage());
+        enumSb.AppendLine();
+        
+        foreach (var @enum in EnumIndex.GetNonReflectedEnums())
+        {
+            enumSb.AppendLine(DocsProvider.GetEnum(@enum));
+            enumSb.AppendLine();
+        }
+        
+        MakeDocFile("enums", enumSb);
+        
+        var propertySb = GetBuilder();
+        foreach (var type in ReferencePropertyRegistry.GetRegisteredTypes())
+        {
+            if (DocsProvider.GetPropertiesForType(type.AccurateName, out var resp))
+            {
+                propertySb.AppendLine(resp);
+            }
+        }
+        
+        MakeDocFile("properties", propertySb);
+        
+        var sb = GetBuilder();
+        foreach (var helpOption in Enum.GetValues(typeof(HelpOption)).Cast<HelpOption>())
         {
             if (!DocsProvider.GeneralOptions.TryGetValue(helpOption, out var generalOption))
             {
@@ -35,14 +101,9 @@ public class DocsCommand : ICommand, IUsePermissions
             sb.AppendLine();
         }
 
-        using (var sw = File.CreateText(Path.Combine(FileSystem.FileSystem.MainDirPath, "# Documentation #.txt")))
-        {
-            sw.Write(sb.ToString());
-            sw.Flush();
-            sw.Close();
-        }
+        MakeDocFile("general", sb);
         
-        response = "Documentation successfully generated! Check the file '# Documentation #.txt' in the SER folder.";
+        response = "Documentation successfully generated! Check the 'Documentation' folder in the SER directory.";
         return true;
     }
 
@@ -50,4 +111,18 @@ public class DocsCommand : ICommand, IUsePermissions
     public string[] Aliases => [];
     public string Description => "Generates documentation for the plugin.";
     public string Permission => "ser.docs";
+
+    private static StringBuilder GetBuilder()
+    {
+        return new StringBuilder($"Genrated on [{DateTime.Today.ToLongDateString()}] with SER version [{MainPlugin.Instance.Version}]\n\n");
+    }
+
+    private static void MakeDocFile(string type, StringBuilder content)
+    {
+        var folder = Path.Combine(FileSystem.FileSystem.MainDirPath, "Documentation");
+        if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+        
+        using var sw = File.CreateText(Path.Combine(folder, $"#{type}.txt"));
+        sw.Write(content.ToString());
+    }
 }

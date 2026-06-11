@@ -249,12 +249,13 @@ public static class Contexter
         endLineContexting = true;
         return true;
     }
+    
     public static string[] FindClosestMatches(string input)
     {
         if (_suggestions is null)
         {
             _suggestions = [];
-            _suggestions.AddRange(MethodIndex.GetMethods().Select(m => m.Name));
+            _suggestions.AddRange(MethodIndex.GetMethodNames());
             _suggestions.AddRange(ContextableKeywordToken.KeywordContexts.Select(k => k.KeywordName));
         }
 

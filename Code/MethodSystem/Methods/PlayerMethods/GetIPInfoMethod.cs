@@ -22,20 +22,28 @@ public record struct IPInfo(
 );
 
 [UsedImplicitly]
-public class GetIPInfoMethod : YieldingReferenceReturningMethod<IPInfo>, ICanError, IAdditionalDescription
+public class GetIPInfoMethod : YieldingReferenceReturningMethod<IPInfo>, ICanError, IAdditionalDescription, IHasAliases
 {
     public override string Description => 
-        "Fetches information about a provided player IP address using ProxyCheck.io (Keyless).";
+        "Fetches information about a provided player IP address using ProxyCheck.io.";
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new PlayerArgument("player")
+        new PlayerArgument("player"),
+        new TextArgument("apiKey")
+        {
+            Description = "The API key to use for the request. If not provided, the keyless API will be used.",
+            DefaultValue = new Argument.Default(null, "Keyless")
+        }
     ];
+    
+    public string[] Aliases => ["GetIPInfoWithKey"];
 
     public string AdditionalDescription =>
-        $"The keyless API is limited to 100 queries per day, which may not be enough for a big server. " +
-        $"Consider using {NameOfMethod(typeof(GetIPInfoWithKeyMethod))} with your own API key if you need more.";
-    
+        "The keyless API is limited to 100 queries per day, which may not be enough for a big server. " +
+        "Consider providing your own API key from https://proxycheck.io/ if you need more " +
+        "(up to 1,000 requests per day on the free tier).";
+
     public string[] ErrorReasons { get; } =
     [
         "Failed to fetch IP info: %message%",
@@ -52,8 +60,12 @@ public class GetIPInfoMethod : YieldingReferenceReturningMethod<IPInfo>, ICanErr
             yield break;
         }
 
+        var key = Args.GetText("apiKey");
+
         // v3 keyless is limited to 100 queries per day
-        string url = $"https://proxycheck.io/v3/{ip}";
+        string url = string.IsNullOrEmpty(key) 
+            ? $"https://proxycheck.io/v3/{ip}" 
+            : $"https://proxycheck.io/v3/{ip}?key={key}";
 
         using UnityWebRequest webRequest = UnityWebRequest.Get(url);
 

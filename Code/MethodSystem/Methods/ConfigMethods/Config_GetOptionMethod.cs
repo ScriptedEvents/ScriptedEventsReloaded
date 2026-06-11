@@ -42,8 +42,7 @@ public class Config_GetOptionMethod : ReturningMethod, ICanError, IAdditionalDes
         var keys = Args.GetRemainingArguments<string, TextArgument>("keys");
 
         ReturnValue = Value.Parse(
-            config.GetValue(keys) ?? throw new ScriptRuntimeError(this, ErrorReasons[0]), 
-            Script
+            config.GetValue(keys) ?? throw new ScriptRuntimeError(this, ErrorReasons[0])
         );
     }
 }

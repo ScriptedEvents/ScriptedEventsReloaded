@@ -55,7 +55,7 @@ public class ParenthesesToken : BaseToken, IValueToken
             return error;
         }
 
-        if (ValueSystem.Value.Parse(value, Script) is not LiteralValue literalValue)
+        if (ValueSystem.Value.Parse(value) is not LiteralValue literalValue)
         {
             return RawContent;
         }

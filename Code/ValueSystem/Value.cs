@@ -4,8 +4,8 @@ using LabApi.Features.Wrappers;
 using Newtonsoft.Json.Linq;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
+using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
-using SER.Code.ScriptSystem;
 using SER.Code.ValueSystem.Other;
 using SER.Code.ValueSystem.PropertySystem;
 using UnityEngine;
@@ -16,8 +16,17 @@ public abstract class Value : IEquatable<Value>
 {
     public SingleTypeOfValue Type => new(GetType());
     
-    public static Type GuessValueType(Type t)
+    public static Type GuessValueType(Type t, uint? depth = null)
     {
+        if (depth is >= 5)
+        {
+            Log.Warn($"type {t.AccurateName} is trying to be resolved recursively, aborting");
+            Log.Warn(Log.GetStackTrace());
+            return t;
+        }
+        
+        if (Sanitize() is { } failedResultType) return failedResultType;
+        
         if (typeof(Value).IsAssignableFrom(t)) return t;
         if (typeof(Enum).IsAssignableFrom(t))
         {
@@ -44,12 +53,40 @@ public abstract class Value : IEquatable<Value>
                 .Concat([t])
                 .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                 ?.GetGenericArguments()[0] ?? typeof(object);
+
+            if (itemType == t)
+            {
+                return typeof(ReferenceValue<>).MakeGenericType(t);
+            }
             
-            return typeof(CollectionValue<>).MakeGenericType(GuessValueType(itemType));
+            return typeof(CollectionValue<>).MakeGenericType(GuessValueType(
+                itemType, 
+                depth.HasValue ? depth + 1 : 1
+            ));
         }
         
         return typeof(ReferenceValue<>).MakeGenericType(t);
+
+        // handles things like references to structs
+        Type? Sanitize()
+        {
+            var count = 0;
+            while (t.IsByRef && count++ < 10)
+            {
+                if (t.GetElementType() is { } element)
+                {
+                    t = element;
+                }
+                else
+                {
+                    return typeof(ReferenceValue);
+                }
+            }
+            
+            return null;
+        }
     }
+    
 
     public static char GetPrefixOfValue(SingleTypeOfValue value)
     {
@@ -64,7 +101,7 @@ public abstract class Value : IEquatable<Value>
 
     public abstract TryGet<object> ToCSharpObject(Type? targetType);
 
-    public static Value Parse(object obj, Script? script)
+    public static Value Parse(object obj)
     {
         // ReSharper disable once ConvertIfStatementToSwitchStatement
         if (obj is null) throw new AndrzejFuckedUpException();
@@ -84,8 +121,6 @@ public abstract class Value : IEquatable<Value>
             float n                 => new NumberValue((decimal)n),
             double n                => new NumberValue((decimal)n),
             decimal n               => new NumberValue(n),
-            string s 
-                when script != null => new DynamicTextValue(s, script),
             string s                => new StaticTextValue(s),
             
             Enum e when obj.GetType().IsDefined(typeof(FlagsAttribute)) 

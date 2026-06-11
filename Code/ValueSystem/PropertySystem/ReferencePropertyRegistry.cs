@@ -145,7 +145,7 @@ public static class ReferencePropertyRegistry
 
             if (!jobj.TryGetValue(key, out var val)) return $"Property '{key}' not found in JSON object";
 
-            return Value.Parse(val, null);
+            return Value.Parse(val);
         }
 
         public override SingleTypeOfValue ReturnType => new(typeof(ReferenceValue));
@@ -195,7 +195,7 @@ public static class ReferencePropertyRegistry
         Register<RespawnWave, NumberValue>("influence", w => new NumberValue((decimal)FactionInfluenceManager.Get(w.Faction)), "Faction influence");
         Register<RespawnWave, DurationValue>("timeLeft", w => new DurationValue(TimeSpan.FromSeconds(w.TimeLeft)), "Time left for wave");
 
-        Register<JObject, Value>("value", obj => Value.Parse(obj, null), "The value of the JSON object");
+        Register<JObject, Value>("value", obj => Value.Parse(obj), "The value of the JSON object");
         
         Register<JToken, EnumValue<JTokenType>>("type", t => t.Type.ToEnumValue(), "The type of the JSON token");
         Register<JToken, StaticTextValue>("path", t => new StaticTextValue(t.Path), "The path of the JSON token");
@@ -281,7 +281,7 @@ public static class ReferencePropertyRegistry
                 };
 
                 if (result == null) return "Value is null";
-                return Value.Parse(result, null);
+                return Value.Parse(result);
             }
             catch (Exception e)
             {

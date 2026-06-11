@@ -30,7 +30,12 @@ public static class MethodIndex
     /// <returns>An array of Method instances representing the registered methods.</returns>
     public static Method[] GetMethods()
     {
-        return NameToMethodIndex.Values.ToArray();
+        return NameToMethodIndex.Values.Distinct().ToArray();
+    }
+
+    public static IEnumerable<string> GetMethodNames()
+    {
+        return NameToMethodIndex.Keys;
     }
 
     /// <summary>
@@ -79,6 +84,14 @@ public static class MethodIndex
         }
         
         NameToMethodIndex.Add(method.Name, method);
+
+        if (method is IHasAliases aliases)
+        {
+            foreach (var alias in aliases.Aliases)
+            {
+                NameToMethodIndex.Add(alias, method);
+            }
+        }
         
         // Used to create all arguments, so initializers can do outside work
         // for example, EnumArgument adds its enum type to serhelp command

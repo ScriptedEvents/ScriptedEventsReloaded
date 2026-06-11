@@ -235,7 +235,7 @@ public class NumericExpressionValueHandler(BaseToken initial, Script scr)
 
     public override TryGet<Value> GetReturnValue()
     {
-        return _expression.Value.Evaluate().OnSuccess(obj => Value.Parse(obj, scr));
+        return _expression.Value.Evaluate().OnSuccess(obj => Value.Parse(obj));
     }
 
     public override TryAddTokenRes TryAddToken(BaseToken token)

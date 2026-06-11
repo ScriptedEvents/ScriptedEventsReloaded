@@ -1,5 +1,6 @@
 ﻿using SER.Code.MethodSystem.BaseMethods.Interfaces;
 using SER.Code.ValueSystem;
+using SER.Code.ValueSystem.Other;
 
 namespace SER.Code.MethodSystem.BaseMethods.Yielding;
 
@@ -14,6 +15,8 @@ public abstract class YieldingReferenceReturningMethod : YieldingReturningMethod
 public abstract class YieldingReferenceReturningMethod<T> : YieldingReferenceReturningMethod
 {
     public override Type ReturnType => typeof(T);
+
+    public override TypeOfValue Returns => new TypeOfValue<ReferenceValue<T>>();
 
     protected new T ReturnValue
     {

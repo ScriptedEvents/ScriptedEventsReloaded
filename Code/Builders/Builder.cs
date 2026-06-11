@@ -31,25 +31,41 @@ public static class Builder
         var metadata = new
         {
             Events = SER.Code.EventSystem.EventHandler.AvailableEvents.Select(e => e.Name).Distinct().OrderBy(n => n).ToArray(),
-            Methods = MethodIndex.GetMethods().Select(m => new
+            Methods = MethodIndex.GetMethods().Select(m =>
             {
-                m.Name,
-                Description = DocsProvider.GetMethodHelp(m),
-                m.Subgroup,
-                ReturnType = (m as IReturningMethod)?.Returns.ToString(),
-                Arguments = m.ExpectedArguments.Select(a => new
+                return new
                 {
-                    a.Name,
-                    Type = a.GetType().Name,
-                    IsRequired = a.MustBeProvided, 
-                    HasDefault = a.DefaultValue != null, 
-                    DefaultString = a.DefaultValue?.StringRep ?? (a.DefaultValue?.Value is Enum ? a.DefaultValue.Value.ToString().Replace(", ", "|") : a.DefaultValue?.Value is bool ? a.DefaultValue.Value.ToString().ToLowerInvariant() : a.DefaultValue?.Value?.ToString()),
-                    Options = (a as SER.Code.ArgumentSystem.Arguments.OptionsArgument)?.Options.Select(o => new { o.Value, o.Description }),
-                    EffectTypes = (a as SER.Code.ArgumentSystem.Arguments.EffectTypeArgument) != null ? SER.Code.ArgumentSystem.Arguments.EffectTypeArgument.EffectNames.Keys.ToArray() : null,
-                    EnumValues = a.GetType().IsGenericType && a.GetType().GetGenericTypeDefinition() == typeof(SER.Code.ArgumentSystem.Arguments.EnumArgument<>) 
-                        ? Enum.GetNames(a.GetType().GetGenericArguments()[0]).Union([a.DefaultValue?.Value is Enum ? a.DefaultValue.Value.ToString().Replace(", ", "|") : null
-                        ]).Where(v => v != null).Distinct().ToArray() : null
-                })
+                    m.Name,
+                    Description = DocsProvider.GetMethodHelp(m),
+                    m.Subgroup,
+                    ReturnType = (m as IReturningMethod)?.Returns.ToString(),
+                    Arguments = m.ExpectedArguments.Select(a => new
+                    {
+                        a.Name,
+                        Type = a.GetType().Name,
+                        IsRequired = a.MustBeProvided,
+                        HasDefault = a.DefaultValue != null,
+                        DefaultString = a.DefaultValue?.StringRep ?? (a.DefaultValue?.Value is Enum
+                            ?
+                            a.DefaultValue.Value.ToString().Replace(", ", "|")
+                            : a.DefaultValue?.Value is bool
+                                ? a.DefaultValue.Value.ToString().ToLowerInvariant()
+                                : a.DefaultValue?.Value?.ToString()),
+                        Options = (a as SER.Code.ArgumentSystem.Arguments.OptionsArgument)?.Options.Select(o => new
+                        {
+                            o.Value,
+                            o.Description
+                        }),
+                        EffectTypes = (a as SER.Code.ArgumentSystem.Arguments.EffectTypeArgument) != null
+                            ? SER.Code.ArgumentSystem.Arguments.EffectTypeArgument.EffectNames.Keys.ToArray() : null,
+                        EnumValues = a.GetType().IsGenericType && a.GetType().GetGenericTypeDefinition() ==
+                            typeof(SER.Code.ArgumentSystem.Arguments.EnumArgument<>)
+                                ? Enum.GetNames(a.GetType().GetGenericArguments()[0]).Union([
+                                    a.DefaultValue?.Value is Enum ? a.DefaultValue.Value.ToString().Replace(", ", "|")
+                                        : null
+                                ]).Where(v => v != null).Distinct().ToArray() : null
+                    })
+                };
             }),
             Variables = VariableIndex.GlobalVariables
                 .Select(v => new
@@ -1511,7 +1527,7 @@ public static class Builder
             }),
             errors = (m as ICanError)?.ErrorReasons ?? []
         });
-
+        
         var truthTable = new { methods };
         var json = JsonConvert.SerializeObject(truthTable, Formatting.Indented);
         var content = $"export const SER_TRUTH_TABLE = {json};";

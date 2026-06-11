@@ -21,6 +21,7 @@ using SER.Code.TokenSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
+using SER.Code.ValueSystem.Other;
 using SER.Code.ValueSystem.PropertySystem;
 using SER.Code.VariableSystem;
 using SER.Code.VariableSystem.Variables;
@@ -184,13 +185,7 @@ public static class DocsProvider
         
         if (keyword is not null)
         {
-            response = GetKeywordInfo(
-                keyword.KeywordName,
-                keyword.Description,
-                keyword.Arguments,
-                keyword is StatementContext,
-                keyword.GetType()
-            );
+            response = GetKeywordInfo(keyword);
             return true;
         }
         
@@ -265,9 +260,9 @@ public static class DocsProvider
                 """;
     }
 
-    public static string GetKeywordInfo(string name, string description, string[] arguments, bool isStatement, Type type)
+    public static string GetKeywordInfo(IKeywordContext keyword)
     {
-        var usageInfo = Activator.CreateInstance(type) is IStatementExtender extender
+        var usageInfo = keyword is IStatementExtender extender
             ? $"""
                --- Usage ---
                This statement can ONLY be used after a statement supporting the "{extender.Extends}" signal!
@@ -276,19 +271,19 @@ public static class DocsProvider
                
                somekeyword
                    # some code
-               {name} {arguments.JoinStrings(" ")}
+               {keyword.KeywordName} {keyword.Arguments.JoinStrings(" ")}
                    # some other code
                end
                
                """
             : $"""
                --- Usage ---
-               {name} {arguments.JoinStrings(" ")}
-               {(isStatement ? "\t# some code\nend" : string.Empty)}
+               {keyword.KeywordName} {keyword.Arguments.JoinStrings(" ")}
+               {(keyword is StatementContext ? "\t# some code\nend" : string.Empty)}
                
                """;
         
-        var extendableInfo = Activator.CreateInstance(type) is IExtendableStatement extendable
+        var extendableInfo = keyword is IExtendableStatement extendable
             ? $"""
                --- This statement is extendable! ---
                Other statements can be added after this one, provided they support one of the following signal(s):
@@ -298,7 +293,7 @@ public static class DocsProvider
             : string.Empty;
         
         // exampel
-        var exampel = Activator.CreateInstance(type) is IKeywordContext { Example: {} e}
+        var exampel = keyword is { Example: {} e}
             ? $"""
                --- Example Usage ---
                {e}
@@ -308,8 +303,8 @@ public static class DocsProvider
         
         return 
             $"""
-            ===== {name} keyword =====
-            > {description}
+            ===== {keyword.KeywordName} keyword =====
+            > {keyword.Description}
             
             {usageInfo}
             {extendableInfo}
@@ -589,6 +584,10 @@ public static class DocsProvider
         var sb = new StringBuilder($"=== {method.Name} ===\n");
 
         sb.AppendLine($"> {method.Description}");
+        if (method is IAdditionalDescription addDesc)
+        {
+            sb.AppendLine($"> {addDesc.AdditionalDescription}");
+        }
         
         if (notLoadedFramework is {} framework)
         {
@@ -596,52 +595,28 @@ public static class DocsProvider
             sb.AppendLine($"This method requires the '{framework}' framework in order to be used.");
             return sb.ToString();
         }
-        
-        if (method is IAdditionalDescription addDesc)
+
+        if (method is IReturningMethod retMethod)
         {
             sb.AppendLine();
-            sb.AppendLine($"> {addDesc.AdditionalDescription}");
+            sb.AppendLine($"This method returns {retMethod.Returns}.");
+            
+            // this is stupid, will have to wait for value system rewrite
+            if (retMethod.Returns.AreKnown(out var known))
+            {
+                var possiblePrefixes = known
+                    .Select(t => Value.GetPrefixOfValue(new SingleTypeOfValue(t)))
+                    .Distinct()
+                    .ToArray();
+                
+                if (possiblePrefixes.Length == 1)
+                {
+                    sb.AppendLine($"You can save it to a variable with a '{possiblePrefixes[0]}' prefix.");
+                    var addDots = method.ExpectedArguments.Any(arg => arg.MustBeProvided);
+                    sb.AppendLine($"{possiblePrefixes[0]}myVariable = {method.Name} {(addDots ? "..." : string.Empty)}");
+                }
+            }
         }
-        
-        switch (method)
-        {
-            case LiteralValueReturningMethod ret:
-            {
-                string typeReturn;
-                if (ret.LiteralReturnTypes.AreKnown(out var types))
-                {
-                    typeReturn = types
-                        .Select(Value.GetFriendlyName)
-                        .JoinStrings(" or ") + " value";
-                }
-                else
-                {
-                    typeReturn = "literal value depending on your input";
-                }
-
-                sb.AppendLine();
-                sb.AppendLine($"Returns a {typeReturn}.");
-                break;
-            }
-            case IReturningMethod ret:
-            {
-                string typeReturn;
-                if (ret.Returns.AreKnown(out var returnTypes))
-                {
-                    typeReturn = returnTypes
-                        .Select(Value.GetFriendlyName)
-                        .JoinStrings(" or ");
-                }
-                else
-                {
-                    typeReturn = "value depending on your input";
-                }
-
-                sb.AppendLine();
-                sb.AppendLine($"This method returns a {typeReturn}, which can be saved or used directly. ");
-                break;
-            }
-        } 
 
         if (method.ExpectedArguments.Length == 0)
         {

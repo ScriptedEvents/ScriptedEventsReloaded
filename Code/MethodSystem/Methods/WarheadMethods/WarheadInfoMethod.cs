@@ -1,6 +1,7 @@
 ﻿using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.ArgumentSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.ValueSystem;
@@ -13,10 +14,7 @@ public class WarheadInfoMethod : ReturningMethod
 {
     public override string Description => "Returns information about Alpha Warhead";
 
-    public override TypeOfValue Returns => new TypesOfValue([
-        typeof(BoolValue),
-        typeof(DurationValue)
-    ]);
+    public override TypeOfValue Returns => new TypesOfValue(typeof(BoolValue), typeof(DurationValue));
 
     public override Argument[] ExpectedArguments { get; } =
     [
@@ -26,7 +24,8 @@ public class WarheadInfoMethod : ReturningMethod
             "isArmed",
             "hasStarted",
             "isDetonated",
-            "duration"
+            "timeToDenotation",
+            new Option("duration", "same as timeToDenotation")
         )
     ];
 
@@ -39,7 +38,7 @@ public class WarheadInfoMethod : ReturningMethod
             "isarmed" => new BoolValue(Warhead.LeverStatus),
             "hasstarted" => new BoolValue(Warhead.IsDetonationInProgress),
             "isdetonated" => new BoolValue(Warhead.IsDetonated),
-            "duration" => new DurationValue(TimeSpan.FromSeconds(AlphaWarheadController.TimeUntilDetonation)),
+            "duration" or "timetodenotation" => new DurationValue(TimeSpan.FromSeconds(AlphaWarheadController.TimeUntilDetonation)),
             _ => throw new KrzysiuFuckedUpException()
         };
     }

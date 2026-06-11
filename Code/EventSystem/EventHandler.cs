@@ -264,7 +264,7 @@ public static class EventHandler
             if (value is null) continue;
             variables.Add(Variable.Create(
                 $"ev{name[0].ToString().ToUpper()}{name[1..]}", 
-                Value.Parse(value, null))
+                Value.Parse(value))
             );
         }
 

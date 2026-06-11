@@ -32,6 +32,6 @@ public class Coll_FetchMethod : ReturningMethod
             throw new ScriptRuntimeError(this, error);
         }
 
-        ReturnValue = Value.Parse(value, Script);
+        ReturnValue = Value.Parse(value);
     }
 }

@@ -52,10 +52,6 @@ namespace SER.Code.Helpers
                                     sb.Append(name);
                                 break;
                             case "para":
-                                sb.AppendLine();
-                                sb.Append(ProcessXmlNodes(child));
-                                sb.AppendLine();
-                                break;
                             default:
                                 sb.Append(ProcessXmlNodes(child));
                                 break;

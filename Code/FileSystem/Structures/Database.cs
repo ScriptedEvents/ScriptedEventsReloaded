@@ -133,10 +133,10 @@ public class Database
                 return $"Value for key '{key}' is corrupted";
             }
 
-            return Value.Parse(Player.ReadyList.Where(p => playerIds.Contains(p.UserId)), null);
+            return Value.Parse(Player.ReadyList.Where(p => playerIds.Contains(p.UserId)));
         }
 
-        if (Value.Parse(val.Value, null) is { } value && value.GetType().AccurateName == val.Type)
+        if (Value.Parse(val.Value) is { } value && value.GetType().AccurateName == val.Type)
         {
             return value;
         }

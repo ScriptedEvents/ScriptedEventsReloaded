@@ -19,7 +19,7 @@ public class ElevatorsArgument(string name) : EnumHandlingArgument(name)
     {
         if (token is SymbolToken { IsJoker: true } or AllToken) 
         {
-            return Elevator.List.ToArray();
+            return new(() => Elevator.List.ToArray());
         }
 
         if (token.CanReturnReference<Elevator>(out var func))
@@ -28,12 +28,12 @@ public class ElevatorsArgument(string name) : EnumHandlingArgument(name)
         }
         
         return EnumResolver<Elevator[]>(token, [
-            new EnumHandler<ElevatorGroup, Elevator[]>(group =>
+            new EnumHandler<ElevatorGroup, Elevator[]>(group => new(() =>
             {
                 return Elevator.List
                     .Where(elevator => elevator.Group == group)
                     .ToArray();
-            })]
+            }))]
         );
     }
 }

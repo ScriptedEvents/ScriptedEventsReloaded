@@ -25,43 +25,25 @@ public class DoorArgument(string name) : EnumHandlingArgument(name)
         }
         
         return EnumResolver<Door>(token, [
-            new EnumHandler<DoorName, Door>(name =>
+            new EnumHandler<DoorName, Door>(name => new(() =>
             {
-                var door = Door.List
+                return Door.List
                     .Where(door => door.DoorName == name)
-                    .GetRandomValue();
-                if (door is null)
-                {
-                    return $"Door with name '{name}' does not exist.";
-                }
-                
-                return door;
-            }),
-            new EnumHandler<FacilityZone, Door>(zone =>
+                    .TryGetRandomValue($"Door with name '{name}' does not exist.");
+            })),
+            new EnumHandler<FacilityZone, Door>(zone => new(() =>
             {
-                var door = Door.List.Where(d => d.Zone == zone)
+                return Door.List.Where(d => d.Zone == zone)
                     .Where(d => d is not ElevatorDoor)
-                    .GetRandomValue();
-                if (door is null)
-                {
-                    return $"No doors in zone '{zone}' exist.";
-                }
-                
-                return door;
-            }),
-            new EnumHandler<RoomName, Door>(name =>
+                    .TryGetRandomValue($"No doors in zone '{zone}' exist.");
+            })),
+            new EnumHandler<RoomName, Door>(name => new(() =>
             {
-                var door = Room.List.Where(r => r.Name == name)
+                return Room.List.Where(r => r.Name == name)
                     .SelectMany(r => r.Doors)
                     .Where(d => d is not ElevatorDoor)
-                    .GetRandomValue();
-                if (door is null)
-                {
-                    return $"No doors in zone '{name}' exist.";
-                }
-                
-                return door;
-            })
+                    .TryGetRandomValue($"No doors in room '{name}' exist.");
+            }))
         ]);
     }
 }

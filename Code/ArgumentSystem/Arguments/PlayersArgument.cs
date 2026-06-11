@@ -3,16 +3,13 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.Arguments;
 
 public class PlayersArgument(string name) : Argument(name)
 {
-    public override string InputDescription =>
-        $"Player variable (e.g. {PlayerVariableToken.Example}), " +
-        $"or 'all' for every player.";
+    public override string InputDescription => "Player variable (e.g. @all, @classDPlayers)";
 
     [UsedImplicitly]
     public DynamicTryGet<Player[]> GetConvertSolution(BaseToken token)

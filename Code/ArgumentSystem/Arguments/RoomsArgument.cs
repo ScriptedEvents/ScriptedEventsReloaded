@@ -29,18 +29,18 @@ public class RoomsArgument(string name) : EnumHandlingArgument(name)
         }
 
         return EnumResolver<Room[]>(token, [
-            new EnumHandler<RoomName,Room[]>(roomName =>
+            new EnumHandler<RoomName, Room[]>(roomName => new(() =>
             {
                 return Room.List
                     .Where(room => room.Name == roomName)
                     .ToArray();
-            }),
-            new EnumHandler<FacilityZone,Room[]>(zone =>
+            })),
+            new EnumHandler<FacilityZone, Room[]>(zone => new(() =>
             {
                 return Room.List
                     .Where(room => room.Zone == zone)
                     .ToArray();
-            })
+            }))
         ]);
     }
 }

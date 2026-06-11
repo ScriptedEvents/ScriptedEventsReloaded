@@ -24,7 +24,7 @@ public class DoorsArgument(string name) : EnumHandlingArgument(name)
     {
         if (token is SymbolToken { IsJoker: true } or AllToken)
         {
-            return Door.List.Where(d => d is not ElevatorDoor).ToArray();
+            return new(() => Door.List.Where(d => d is not ElevatorDoor).ToArray());
         }
         
         if (token.CanReturn<ReferenceValue>(out var get))
@@ -51,19 +51,19 @@ public class DoorsArgument(string name) : EnumHandlingArgument(name)
         }
 
         return EnumResolver<Door[]>(token, [
-            new EnumHandler<DoorName, Door[]>(name =>
+            new EnumHandler<DoorName, Door[]>(name => new(() =>
             {
                 return Door.List
                 .Where(door => door.DoorName == name)
                 .ToArray();
-            }),
-            new EnumHandler<FacilityZone, Door[]>(zone => 
+            })),
+            new EnumHandler<FacilityZone, Door[]>(zone => new(() =>
             {
                 return Door.List
                     .Where(door => door.Zone == zone)
                     .ToArray();
-            }),
-            new EnumHandler<RoomName, Door[]>(name =>
+            })),
+            new EnumHandler<RoomName, Door[]>(name => new(() =>
             {
                 return Door.List
                     .Where(d => 
@@ -71,7 +71,7 @@ public class DoorsArgument(string name) : EnumHandlingArgument(name)
                         && d is not ElevatorDoor)
                     .Distinct()
                     .ToArray();
-            })
+            }))
         ]);
     }
 }

@@ -22,18 +22,12 @@ public class GateArgument(string name) : EnumHandlingArgument(name)
         }
         
         return EnumResolver<Gate>(token, [
-            new EnumHandler<DoorName,Gate>(doorName =>
+            new EnumHandler<DoorName, Gate>(doorName => new(() =>
             {
-                var door = Gate.List
+                return Gate.List
                     .Where(gate => gate.DoorName == doorName)
-                    .GetRandomValue();
-                if (door is null)
-                {
-                    return $"Gate with name '{doorName}' does not exist.";
-                }
-
-                return door;
-            })]
+                    .TryGetRandomValue($"Gate with name '{doorName}' does not exist.");
+            }))]
         );
     }
 }

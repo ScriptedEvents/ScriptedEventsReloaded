@@ -80,7 +80,7 @@ public class ValueExpressionContext : AdditionalContext
 
         _handler = symbol switch
         {
-            { IsArrow: false } => new NumericExpressionValueHandler(_initial, Script),
+            { IsArrow: false } => new NumericExpressionValueHandler(_initial),
             { IsArrow: true } => new ValuePropertyHandler(_initial, (IValueToken)_initial)
         };
 
@@ -223,7 +223,7 @@ public class ValuePropertyHandler(
 /// <summary>
 ///     Used for math expressions.
 /// </summary>
-public class NumericExpressionValueHandler(BaseToken initial, Script scr)
+public class NumericExpressionValueHandler(BaseToken initial)
     : ValueExpressionContext.Handler
 {
     private readonly List<BaseToken> _tokens = [initial];
@@ -235,7 +235,7 @@ public class NumericExpressionValueHandler(BaseToken initial, Script scr)
 
     public override TryGet<Value> GetReturnValue()
     {
-        return _expression.Value.Evaluate().OnSuccess(obj => Value.Parse(obj));
+        return _expression.Value.Evaluate().OnSuccess(Value.Parse);
     }
 
     public override TryAddTokenRes TryAddToken(BaseToken token)

@@ -122,12 +122,7 @@ public abstract class Value : IEquatable<Value>
             double n                => new NumberValue((decimal)n),
             decimal n               => new NumberValue(n),
             string s                => new StaticTextValue(s),
-            
-            Enum e when obj.GetType().IsDefined(typeof(FlagsAttribute)) 
-                => (Value)Activator.CreateInstance(typeof(EnumFlagValue<>).MakeGenericType(e.GetType()), e),
-            Enum e
-                => (Value)Activator.CreateInstance(typeof(EnumValue<>).MakeGenericType(e.GetType()), e),
-            
+            Enum e                  => (Value)Activator.CreateInstance(typeof(EnumValue<>).MakeGenericType(e.GetType()), e),
             TimeSpan t              => new DurationValue(t),
             Player p                => new PlayerValue(p),
             IEnumerable<Player> ps  => new PlayerValue(ps),

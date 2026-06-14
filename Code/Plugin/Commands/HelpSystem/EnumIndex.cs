@@ -5,7 +5,7 @@ using MapGeneration;
 using PlayerRoles;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.Helpers;
-using ValueType = SER.Code.ValueSystem.Other.ValueType;
+using ValueType = SER.Code.ValueSystem.ValueType;
 
 namespace SER.Code.Plugin.Commands.HelpSystem;
 

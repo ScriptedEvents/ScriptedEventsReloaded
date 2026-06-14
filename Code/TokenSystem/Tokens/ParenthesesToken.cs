@@ -7,12 +7,13 @@ using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
+using ValueType = SER.Code.ValueSystem.ValueType;
 
 namespace SER.Code.TokenSystem.Tokens;
 
 public class ParenthesesToken : BaseToken, IValueToken
 {
-    public TypeOfValue PossibleValues => typeof(LiteralValue);
+    public ValueType PossibleValueTypes => ValueType.Literal;
     
     public bool IsConstant => false;
     

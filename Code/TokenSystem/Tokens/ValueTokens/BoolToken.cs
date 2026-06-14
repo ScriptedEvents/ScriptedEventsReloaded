@@ -1,5 +1,4 @@
 ﻿using SER.Code.ScriptSystem;
-using SER.Code.ValueSystem;
 
 namespace SER.Code.TokenSystem.Tokens.ValueTokens;
 

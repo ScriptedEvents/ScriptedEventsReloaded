@@ -104,8 +104,8 @@ public static class ReferencePropertyRegistry
         
         combined.Add(
             "valType", 
-            new IValueWithProperties.PropInfo<ReferenceValue, EnumValue<SER.Code.ValueSystem.Other.ValueType>>(
-                _ => SER.Code.ValueSystem.Other.ValueType.Reference, 
+            new IValueWithProperties.PropInfo<ReferenceValue, EnumValue<ValueType>>(
+                _ => ValueType.Reference, 
                 "The type of the value"
             )
         );

@@ -1,6 +1,4 @@
-﻿using SER.Code.ValueSystem;
-
-namespace SER.Code.Extensions;
+﻿namespace SER.Code.Extensions;
 
 public static class EnumExtensions
 {

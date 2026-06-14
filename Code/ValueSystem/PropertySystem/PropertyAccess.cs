@@ -11,7 +11,7 @@ public class PropertyAccess(BaseToken initialToken, IValueToken root)
 {
     private readonly List<string> _propertyNames = [];
 
-    public TypeOfValue PossibleValues { get; private set; } = root.PossibleValues;
+    public TypeOfValue PossibleValues { get; private set; } = root.PossibleValueTypes;
 
     public string ExprRepr { get; private set; } = initialToken.RawRep;
 

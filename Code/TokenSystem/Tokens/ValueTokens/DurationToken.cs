@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
-using SER.Code.ValueSystem;
 
 namespace SER.Code.TokenSystem.Tokens.ValueTokens;
 

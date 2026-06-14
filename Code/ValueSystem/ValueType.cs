@@ -9,9 +9,9 @@ public enum ValueType : ushort
     Number = 1 << 2,
     Bool = 1 << 3,
     Duration = 1 << 4,
-    Enum = 1 << 5,
+    // Enum = 1 << 5,
     Color = 1 << 6,
-    Literal = Text | Number | Bool | Duration | Enum | Color,
+    Literal = Text | Number | Bool | Duration | Color,
     
     Player = 1 << 7,
     

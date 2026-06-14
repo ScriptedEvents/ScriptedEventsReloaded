@@ -8,7 +8,7 @@ public struct TextValue
     {
         return new TextValue
         {
-            Value = Value.FromText(text)
+            Value = Value.Text(text)
         };
     }
 }

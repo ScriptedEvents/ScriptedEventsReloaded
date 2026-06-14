@@ -64,12 +64,11 @@ public class RunFuncMethod : SynchronousMethod, ICanError
                 throw new AndrzejFuckedUpException();
             }
             
-            if (value.Type.IsSameOrHigherThan(varToken.ValueType))
+            if (!varToken.ValueType.CanHold(value.Type))
             {
                 throw new ScriptRuntimeError(this, 
                     $"Function '{scriptToRun.Name}' expects argument {i + 1} to be of type " +
-                    $"{varToken.ValueType.FriendlyTypeName()}, but {value.GetType().FriendlyTypeName()} " +
-                    $"was provided."
+                    $"{varToken.ValueType}, but {value.Type} was provided."
                 );
             }
             

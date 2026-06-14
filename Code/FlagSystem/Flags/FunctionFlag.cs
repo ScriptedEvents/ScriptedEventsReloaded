@@ -63,14 +63,14 @@ public class FunctionFlag : Flag, IMajorBehaviorFlag
             return $"Variable '{missingVariable.Name}' was not provided to the script.";
         }
 
-        (VariableToken, Type) mismatchedTypeVar = provided
-            .Select(x => (x.token, x.var.GetType()))
-            .FirstOrDefault(x => x.token.VariableType != x.Item2);
+        (VariableToken token, Variable var) mismatchedTypeVar = provided
+            .Select(x => (x.token, x.var))
+            .FirstOrDefault(x => !x.token.ValueType.CanHold(x.var.BaseValue.Type));
 
-        if (mismatchedTypeVar is { Item1: {} varToken, Item2: {} type })
+        if (mismatchedTypeVar is { token: {} t, var: {} v })
         {
-            return $"Variable '{varToken.Name}' is not of the correct type. " +
-                   $"Expected '{type.FriendlyTypeName()}', got '{varToken.ValueType.FriendlyTypeName()}'.";
+            return $"Variable '{t.Name}' is not of the correct type. " +
+                   $"Expected '{v.BaseValue.Type}', got '{t.ValueType}'.";
         }
         
         return true;

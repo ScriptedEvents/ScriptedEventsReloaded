@@ -1,7 +1,6 @@
 ﻿using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
-using SER.Code.Extensions;
 using SER.Code.FlagSystem;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;

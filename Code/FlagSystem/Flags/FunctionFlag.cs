@@ -1,5 +1,4 @@
-﻿using SER.Code.Extensions;
-using SER.Code.FlagSystem.Structures;
+﻿using SER.Code.FlagSystem.Structures;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Tokens;

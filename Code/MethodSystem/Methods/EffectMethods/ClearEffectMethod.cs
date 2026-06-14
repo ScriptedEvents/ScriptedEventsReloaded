@@ -29,8 +29,6 @@ public class ClearEffectMethod : SynchronousMethod
     {
         var players = Args.GetPlayers("players");
         var effectType = Args.GetEffectType("effect").MaybeNull();
-
-        var disableEffect = DisableEffectMethod.MakeGenericMethod(effectType);
         
         if (effectType is null)
         {
@@ -41,6 +39,8 @@ public class ClearEffectMethod : SynchronousMethod
         }
         else
         {
+            var disableEffect = DisableEffectMethod.MakeGenericMethod(effectType);
+            
             foreach (var plr in players)
             {
                 disableEffect.Invoke(plr, null);

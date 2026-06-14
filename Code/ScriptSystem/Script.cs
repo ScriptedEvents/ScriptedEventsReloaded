@@ -26,7 +26,7 @@ public class Script
 {
     private Line[] _lines = [];
     private RunnableContext[] _contexts = [];
-    private bool? _isEventAllowed;
+    public bool IsEventAllowed = true;
     
     public required ScriptName Name { get; init; }
     
@@ -253,15 +253,7 @@ public class Script
             MarkAsStopped
         );
         
-        return _isEventAllowed;
-    }
-
-    public void SendControlMessage(ScriptControlMessage msg)
-    {
-        if (msg == ScriptControlMessage.EventNotAllowed)
-        {
-            _isEventAllowed = false;
-        }
+        return IsEventAllowed;
     }
 
     public void DefineLines()

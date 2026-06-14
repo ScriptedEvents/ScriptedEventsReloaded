@@ -2,7 +2,6 @@
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
-using SER.Code.TokenSystem.Structures;
 
 namespace SER.Code.MethodSystem.Methods.EventMethods;
 
@@ -22,9 +21,6 @@ public class IsAllowedMethod : SynchronousMethod, IAdditionalDescription
 
     public override void Execute()
     {
-        if (!Args.GetBool("isAllowed"))
-        {
-            Script.SendControlMessage(ScriptControlMessage.EventNotAllowed);
-        }
+        Script.IsEventAllowed = Args.GetBool("isAllowed");
     }
 }

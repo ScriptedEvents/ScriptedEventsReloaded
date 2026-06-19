@@ -40,7 +40,7 @@ public class SetLightColorMethod : SynchronousMethod
         {
             foreach (var room in rooms)
             {
-                TransitionColor(room, color, duration.ToFloatSeconds()).Run(Script);
+                TransitionColor(room, color, duration.ToFloatSeconds()).Run(null);
             }
             
             return;

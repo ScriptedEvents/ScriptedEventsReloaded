@@ -37,6 +37,8 @@ public struct Value
     // value type metadata
     [FieldOffset(24)] private ValueType _collectionItemValueTypes;
     
+    public ValuePrefixes Prefixes => ValueTypeManager.GetPrefixesOfValue(ValueType);
+    
     public static Value Text(string text) => new()
     {
         ValueType = ValueType.Text,
@@ -97,7 +99,7 @@ public struct Value
     public static Value Collection(IEnumerable collection)
     {
         List<Value> values = [];
-        ValueType itemValueTypes = ValueType.Unknown;
+        ValueType itemValueTypes = ValueType.Invalid;
         foreach (var item in collection)
         {
             var value = Parse(item);

@@ -3,15 +3,14 @@ using MapGeneration;
 using PlayerRoles;
 using SER.Code.Extensions;
 using SER.Code.ScriptSystem;
-using SER.Code.VariableSystem.Bases;
-using SER.Code.VariableSystem.Structures;
-using SER.Code.VariableSystem.Variables;
+using SER.Code.ValueSystem;
+using ValueType = SER.Code.ValueSystem.ValueType;
 
 namespace SER.Code.VariableSystem;
 
 public static class VariableIndex
 {
-    private static readonly Dictionary<(char, string), Variable> _globalVariables = [];
+    private static readonly Dictionary<(ValueType, string), Value> _globalVariables = [];
     public static IEnumerable<Variable> GlobalVariables => _globalVariables.Values;
 
     public static void Initialize()

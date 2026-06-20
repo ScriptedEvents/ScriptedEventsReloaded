@@ -86,7 +86,6 @@ public abstract class Value : IEquatable<Value>
             return null;
         }
     }
-    
 
     public static char GetPrefixOfValue(SingleTypeOfValue value)
     {

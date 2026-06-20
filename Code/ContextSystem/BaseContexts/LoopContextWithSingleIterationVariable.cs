@@ -1,6 +1,6 @@
 ﻿using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
@@ -17,7 +17,7 @@ public abstract class LoopContextWithSingleIterationVariable<TVal> :
     private Variable? _iterationVariable;
     private VariableToken? _iterationVariableToken;
 
-    public Result SetOptionalVariables(params VariableToken[] variableTokens)
+    public OldResult SetOptionalVariables(params VariableToken[] variableTokens)
     {
         if (variableTokens.FirstOrDefault() is not { } varToken) return true;
 

@@ -2,7 +2,7 @@
 using MapGeneration;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -15,7 +15,7 @@ public class RoomArgument(string name) : EnumHandlingArgument(name)
         $"or reference to {nameof(Room)}";
 
     [UsedImplicitly]
-    public DynamicTryGet<Room> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<Room> GetConvertSolution(BaseToken token)
     {
         if (token.CanReturnReference<Room>(out var func))
         {

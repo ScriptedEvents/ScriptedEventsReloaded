@@ -82,7 +82,7 @@ public class Embed_CreateMethod : ReferenceReturningMethod<Embed_CreateMethod.DE
             int g = Mathf.RoundToInt(color.g * 255);
             int b = Mathf.RoundToInt(color.b * 255);
             
-            embed["color"] = (r << 16) | (g << 8) | b;
+            embed["color"] = r << 16 | g << 8 | b;
         }
 
         if (Args.GetReference<Embed_CreateAuthorMethod.DEmbedAuthor>("author") is { } author) embed["author"] = author;

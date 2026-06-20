@@ -3,7 +3,7 @@ using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
@@ -30,7 +30,7 @@ public class FuncStatement :
             ? $"'{FunctionName}' function definition statement"
             : "function definition statement";
 
-    public Result SetOptionalVariables(params VariableToken[] variableTokens)
+    public OldResult SetOptionalVariables(params VariableToken[] variableTokens)
     {
         ExpectedVariables = variableTokens;
         return true;
@@ -99,9 +99,9 @@ public class FuncStatement :
         return TryAddTokenRes.End();
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
-        return Result.Assert(
+        return OldResult.Assert(
             !string.IsNullOrWhiteSpace(FunctionName),
             "Function name was not provided."
         );

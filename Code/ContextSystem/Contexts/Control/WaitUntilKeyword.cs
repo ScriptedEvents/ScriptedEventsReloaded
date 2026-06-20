@@ -5,7 +5,7 @@ using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
@@ -36,7 +36,7 @@ public class WaitUntilKeyword : YieldingContext, IKeywordContext
         return TryAddTokenRes.Continue();
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         if (Tokens.Count == 0)
         {

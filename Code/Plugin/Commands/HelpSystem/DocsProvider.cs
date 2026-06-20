@@ -15,6 +15,7 @@ using SER.Code.MethodSystem.BaseMethods.Interfaces;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
 using SER.Code.Plugin.Commands.Interfaces;
+using SER.Code.PropertySystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem;
@@ -22,7 +23,6 @@ using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
-using SER.Code.ValueSystem.PropertySystem;
 using SER.Code.VariableSystem;
 using SER.Code.VariableSystem.Variables;
 
@@ -147,7 +147,7 @@ public static class DocsProvider
                             return false;
                         }
                     }
-                    else if (VariableIndex.TryGetGlobalVariable(varToken.RawRep[0], varToken.RawRep[1..], out var globalVar))
+                    else if (GlobalVariables.TryGetGlobalVariable(varToken.RawRep[0], varToken.RawRep[1..], out var globalVar))
                     {
                         resolvedValue = globalVar.BaseValue;
                     }
@@ -559,7 +559,7 @@ public static class DocsProvider
     
     public static string GetVariableList()
     {
-        var allVars = VariableIndex.GlobalVariables
+        var allVars = GlobalVariables.Variables
             .OfType<PredefinedPlayerVariable>()
             .ToList();
         

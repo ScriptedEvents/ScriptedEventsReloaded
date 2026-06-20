@@ -1,6 +1,6 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.ValueSystem;
 
@@ -11,7 +11,7 @@ public class ValueArgument<T>(string name) : Argument(name) where T : Value
     public override string InputDescription => $"a value of type {typeof(T).AccurateName}";
 
     [UsedImplicitly]
-    public DynamicTryGet<T> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<T> GetConvertSolution(BaseToken token)
     {
         if (!token.CanReturn<T>(out var get))
         {

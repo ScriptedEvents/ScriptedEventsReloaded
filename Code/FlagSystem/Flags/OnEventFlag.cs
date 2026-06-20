@@ -1,6 +1,6 @@
 ﻿using SER.Code.FlagSystem.Structures;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
@@ -48,7 +48,7 @@ public class OnEventFlag : Flag, IMajorBehaviorFlag
         "!-- OnEvent RoundStarted"
     );
 
-    public override Result OnScriptRunning(Script scr, out bool mustReport)
+    public override OldResult OnScriptRunning(Script scr, out bool mustReport)
     {
         mustReport = true;
         if (base.OnScriptRunning(scr, out _).HasErrored(out var error)) return error;

@@ -2,7 +2,7 @@
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
@@ -26,7 +26,7 @@ public class ElseStatement : StatementContext, IStatementExtender, IKeywordConte
         return TryAddTokenRes.Error("There should be no arguments after `else` keyword");
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         return true;
     }

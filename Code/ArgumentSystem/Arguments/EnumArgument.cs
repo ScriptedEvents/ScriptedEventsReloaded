@@ -1,6 +1,6 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.Plugin.Commands.HelpSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.Interfaces;
@@ -9,7 +9,7 @@ namespace SER.Code.ArgumentSystem.Arguments;
 
 public abstract class EnumArgument(string name) : Argument(name)
 {
-    public static TryGet<object> ConvertOne(string stringRep, Type enumType)
+    public static OldTryGet<object> ConvertOne(string stringRep, Type enumType)
     {
         stringRep = stringRep.Trim();
 
@@ -43,7 +43,7 @@ public class EnumArgument<TEnum> : EnumArgument where TEnum : struct, Enum
         + (_isFlag ? ". Use '|' character to provide multiple e.g. Val1|Val2|Val3" : "");
 
     [UsedImplicitly]
-    public DynamicTryGet<TEnum> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<TEnum> GetConvertSolution(BaseToken token)
     {
         if (InternalConvert(token).WasSuccessful(out var value))
         {
@@ -66,7 +66,7 @@ public class EnumArgument<TEnum> : EnumArgument where TEnum : struct, Enum
         });
     }
 
-    public static TryGet<TEnum> Convert(BaseToken token, bool isFlag)
+    public static OldTryGet<TEnum> Convert(BaseToken token, bool isFlag)
     {
         if (!isFlag)
         {
@@ -95,12 +95,12 @@ public class EnumArgument<TEnum> : EnumArgument where TEnum : struct, Enum
         return (TEnum)Enum.ToObject(typeof(TEnum), result);
     }
 
-    public static TryGet<TEnum> Convert(string stringRep)
+    public static OldTryGet<TEnum> Convert(string stringRep)
     {
         return ConvertOne(stringRep, typeof(TEnum)).OnSuccess(v => (TEnum)v);
     }
 
-    private TryGet<TEnum> InternalConvert(BaseToken token)
+    private OldTryGet<TEnum> InternalConvert(BaseToken token)
     {
         return Convert(token, _isFlag);
     }

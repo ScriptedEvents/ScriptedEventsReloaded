@@ -1,4 +1,4 @@
-﻿using SER.Code.Helpers.ResultSystem;
+﻿using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
 using ValueType = SER.Code.ValueSystem.ValueType;
@@ -10,7 +10,7 @@ public interface IValueToken
     /// <summary>
     /// Returns the value associated with the token.
     /// </summary>
-    public TryGet<Value> Value();
+    public OldTryGet<Value> Value();
     
     /// <summary>
     /// A signature of all possible return values.

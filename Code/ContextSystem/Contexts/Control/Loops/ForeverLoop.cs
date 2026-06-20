@@ -1,7 +1,7 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.Plugin;
 using SER.Code.TokenSystem.Tokens;
 
@@ -10,7 +10,7 @@ namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 [UsedImplicitly]
 public class ForeverLoop : LoopContextWithSingleIterationVariable<NumberValue>, IKeywordContext
 {
-    private readonly Result _mainErr = "Cannot create 'forever' loop.";
+    private readonly OldResult _mainErr = "Cannot create 'forever' loop.";
 
     protected override string Usage =>
         $$"""
@@ -42,7 +42,7 @@ public class ForeverLoop : LoopContextWithSingleIterationVariable<NumberValue>, 
         return TryAddTokenRes.Error(_mainErr + "'forever' loop doesn't expect any arguments.");
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         return true;
     }

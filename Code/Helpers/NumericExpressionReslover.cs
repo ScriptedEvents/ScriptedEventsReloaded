@@ -2,7 +2,7 @@
 using System.Text;
 using NCalc;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem;
 using SER.Code.TokenSystem.Tokens;
@@ -12,7 +12,7 @@ namespace SER.Code.Helpers;
 
 public static class NumericExpressionReslover
 {
-    public static Result IsValidForExpression(BaseToken token)
+    public static OldResult IsValidForExpression(BaseToken token)
     {
         if (ParseToken(token, new(), new(), "Expression is invalid.", 0)
             .HasErrored(out var err))
@@ -23,9 +23,9 @@ public static class NumericExpressionReslover
         return true;
     }
     
-    public static TryGet<CompiledExpression> CompileExpression(string expression, Script scr)
+    public static OldTryGet<CompiledExpression> CompileExpression(string expression, Script scr)
     {
-        Result mainErr = $"Condition '{expression}' is invalid.";
+        OldResult mainErr = $"Condition '{expression}' is invalid.";
         
         if (Tokenizer.TokenizeLine(expression, scr, null)
             .HasErrored(out var err, out var tokens))
@@ -36,12 +36,12 @@ public static class NumericExpressionReslover
         return CompileExpression(tokens.ToArray());
     }
 
-    public static TryGet<CompiledExpression> CompileExpression(BaseToken[] tokens)
+    public static OldTryGet<CompiledExpression> CompileExpression(BaseToken[] tokens)
     {
         var initial = tokens.Select(t => t.RawRep).JoinStrings(" ");
-        Result mainErr = $"Expression '{initial}' is invalid.";
+        OldResult mainErr = $"Expression '{initial}' is invalid.";
 
-        var variables = new Dictionary<string, (DynamicTryGet<object>, string)>(StringComparer.OrdinalIgnoreCase);
+        var variables = new Dictionary<string, (OldDynamicTryGet<object>, string)>(StringComparer.OrdinalIgnoreCase);
         var sb = new StringBuilder();
         uint tempId = 0;
 
@@ -69,13 +69,13 @@ public static class NumericExpressionReslover
     public class CompiledExpression
     {
         private readonly Expression _expression;
-        private readonly Dictionary<string, (DynamicTryGet<object> value, string repr)> _parameters;
+        private readonly Dictionary<string, (OldDynamicTryGet<object> value, string repr)> _parameters;
         private readonly string _rawRepresentation;
         private readonly Dictionary<string, object> _values = [];
 
         public CompiledExpression(
             Expression expression, 
-            Dictionary<string, (DynamicTryGet<object>, string)> parameters,
+            Dictionary<string, (OldDynamicTryGet<object>, string)> parameters,
             string rawRepresentation
         )
         {
@@ -85,7 +85,7 @@ public static class NumericExpressionReslover
             _expression.Parameters = _values;
         }
 
-        public TryGet<object> Evaluate()
+        public OldTryGet<object> Evaluate()
         {
             _values.Clear();
             foreach (var (key, (getter, _)) in _parameters)
@@ -116,11 +116,11 @@ public static class NumericExpressionReslover
         }
     }
 
-    private static Result ParseToken(
+    private static OldResult ParseToken(
         BaseToken token,
-        Dictionary<string, (DynamicTryGet<object> value, string serRepr)> variables,
+        Dictionary<string, (OldDynamicTryGet<object> value, string serRepr)> variables,
         StringBuilder sb, 
-        Result mainErr,
+        OldResult mainErr,
         uint tempId)
     {
         switch (token)

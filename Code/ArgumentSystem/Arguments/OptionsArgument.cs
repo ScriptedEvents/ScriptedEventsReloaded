@@ -1,6 +1,6 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ArgumentSystem.Structures;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -16,7 +16,7 @@ public class OptionsArgument(string name, params Option[] options) : Argument(na
             : $"{o.Value} ({o.Description})"));
 
     [UsedImplicitly]
-    public DynamicTryGet<string> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<string> GetConvertSolution(BaseToken token)
     {
         if (token.BestTextRepr().IsStatic(out var value, out var func))
         {
@@ -26,18 +26,18 @@ public class OptionsArgument(string name, params Option[] options) : Argument(na
         return new(() => InternalConvert(func()));
     }
 
-    private TryGet<string> InternalConvert(string value)
+    private OldTryGet<string> InternalConvert(string value)
     {
         var option = Options.FirstOrDefault(opt
             => opt.Value.Equals(value, StringComparison.CurrentCultureIgnoreCase));
 
         if (option == null)
         {
-            return TryGet<string>.Error(
+            return OldTryGet<string>.Error(
                 $"Value '{value}' does not match any of the following options: " +
                 $"{string.Join(", ", Options.Select(o => o.Value))}");
         }
 
-        return TryGet<string>.Success(option.Value);
+        return OldTryGet<string>.Success(option.Value);
     }
 }

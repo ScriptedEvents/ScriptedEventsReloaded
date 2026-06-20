@@ -1,7 +1,7 @@
 ﻿using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -11,7 +11,7 @@ public class PlayerArgument(string name) : Argument(name)
     public override string InputDescription => "Player value e.g. @player, with EXACTLY 1 player.";
 
     [UsedImplicitly]
-    public DynamicTryGet<Player> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<Player> GetConvertSolution(BaseToken token)
     {
         if (token.CanReturn<PlayerValue>(out var value))
         {
@@ -20,7 +20,7 @@ public class PlayerArgument(string name) : Argument(name)
 
         return GenericError(token);
         
-        TryGet<Player> DynamicSolver(PlayerValue playerValue)
+        OldTryGet<Player> DynamicSolver(PlayerValue playerValue)
         {
             var plrs = playerValue.Players;
             if (plrs.Len != 1)

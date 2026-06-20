@@ -5,7 +5,7 @@ using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.Interfaces;
 
@@ -15,7 +15,7 @@ namespace SER.Code.ContextSystem.Contexts.Control;
 public class WaitKeyword : YieldingContext, IKeywordContext
 {
     private IValueToken? _durationToken;
-    private Func<TryGet<DurationValue>>? _getDuration;
+    private Func<OldTryGet<DurationValue>>? _getDuration;
 
     public override string FriendlyName => $"'{KeywordName}' keyword";
     public virtual string KeywordName => "wait";
@@ -46,7 +46,7 @@ public class WaitKeyword : YieldingContext, IKeywordContext
         return TryAddTokenRes.Error($"'{KeywordName}' keyword expects a duration value, but received {token.RawRep}.");
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         if (_durationToken == null)
         {

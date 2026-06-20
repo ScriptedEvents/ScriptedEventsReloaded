@@ -6,7 +6,7 @@ using LabApi.Loader;
 using PlayerStatsSystem;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.ValueSystem;
@@ -48,7 +48,7 @@ public static class EventHandler
         BindedEvents.Clear();
     }
 
-    public static Result DisableEvent(string evName)
+    public static OldResult DisableEvent(string evName)
     {
         DisabledEvents.Add(evName);
         return BindEvent(evName);
@@ -60,7 +60,7 @@ public static class EventHandler
         return false;
     }
     
-    public static Result AddEventHandler(string evName, ScriptName scriptName) 
+    public static OldResult AddEventHandler(string evName, ScriptName scriptName) 
     {
         if (RegisteredHandlers.Contains($"'{scriptName}' script"))
         {
@@ -83,7 +83,7 @@ public static class EventHandler
         return true;
     }
     
-    public static Result AddEventHandler(string evName, Action<EventArgs?, Variable[]> action, string handlerId) 
+    public static OldResult AddEventHandler(string evName, Action<EventArgs?, Variable[]> action, string handlerId) 
     {
         if (RegisteredHandlers.Contains(handlerId))
         {
@@ -108,7 +108,7 @@ public static class EventHandler
         return true;
     }
 
-    private static Result BindEvent(string evName)
+    private static OldResult BindEvent(string evName)
     {
         if (!BindedEvents.Add(evName))
         {
@@ -137,7 +137,7 @@ public static class EventHandler
     {
         return (ev, variables) =>
         {
-            Result rs = $"Failed to run script '{scrName}' connected to event '{evName}'";
+            OldResult rs = $"Failed to run script '{scrName}' connected to event '{evName}'";
             Log.Debug($"Running script '{scrName}' for event '{evName}'");
 
             if (Script.CreateByScriptName(scrName, ScriptExecutor.Get()).HasErrored(out var error, out var script))
@@ -277,7 +277,7 @@ public static class EventHandler
         foreach (var (type, name) in properties)
         {
             if (type is null) continue;
-            var typeOfValue = new SingleTypeOfValue(Value.GuessValueType(type));
+            var typeOfValue = new SingleTypeOfValue(Value.GuessValueMetadata(type));
             
             // because of stupid NW design decision, only StandardDamageHandler inherits from DamageHandlerBase
             if (typeOfValue.Is<ReferenceValue<DamageHandlerBase>>())

@@ -1,5 +1,5 @@
 using System.Globalization;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using UnityEngine;
 
@@ -18,7 +18,7 @@ public class ColorToken : LiteralValueToken<ColorValue>
         return new Ignore();
     }
     
-    public static TryGet<Color> TryParseColor(string value)
+    public static OldTryGet<Color> TryParseColor(string value)
     {
         var initValue = value;
         if (value.StartsWith("#"))

@@ -1,7 +1,7 @@
 using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.VariableSystem;
@@ -40,9 +40,9 @@ public class DeleteKeyword : StandardContext, IKeywordContext
         return TryAddTokenRes.End();
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
-        return Result.Assert(
+        return OldResult.Assert(
             _variableToken is not null,
             "Variable to delete was not provided."
         );
@@ -51,6 +51,6 @@ public class DeleteKeyword : StandardContext, IKeywordContext
     protected override void Execute()
     {
         Script.RemoveLocalVariable(_variableToken);
-        VariableIndex.RemoveGlobalVariable(_variableToken);
+        GlobalVariables.RemoveGlobalVariable(_variableToken);
     }
 }

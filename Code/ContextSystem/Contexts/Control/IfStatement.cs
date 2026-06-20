@@ -4,7 +4,7 @@ using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
@@ -36,7 +36,7 @@ public class IfStatement : StatementContext, IExtendableStatement, IKeywordConte
         return TryAddTokenRes.Continue();
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         if (NumericExpressionReslover.CompileExpression(_condition.ToArray())
             .HasErrored(out var error, out var cond))

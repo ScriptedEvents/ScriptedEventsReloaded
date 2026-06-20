@@ -14,8 +14,8 @@ using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
 using SER.Code.MethodSystem.Methods.DamageRuleMethods;
 using SER.Code.MethodSystem.Methods.PlayerDataMethods;
 using SER.Code.MethodSystem.Methods.TeslaRuleMethods;
+using SER.Code.PropertySystem;
 using SER.Code.ScriptSystem;
-using SER.Code.ValueSystem.PropertySystem;
 using SER.Code.VariableSystem;
 using EventHandler = SER.Code.EventSystem.EventHandler;
 using Events = LabApi.Events.Handlers;
@@ -137,7 +137,7 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
             Flag.RegisterFlags();
             EventHandler.Initialize();
             MethodIndex.Initialize();
-            VariableIndex.Initialize();
+            GlobalVariables.Initialize();
             CommandEvents.Initialize();
             FileSystem.FileSystem.Initialize();
         };

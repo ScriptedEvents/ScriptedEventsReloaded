@@ -1,6 +1,6 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -16,7 +16,7 @@ public class LooseReferenceArgument(string name, Type type) : Argument(name)
     public override string InputDescription => ValidInput;
 
     [UsedImplicitly]
-    public virtual DynamicTryGet<object> GetConvertSolution(BaseToken token)
+    public virtual OldDynamicTryGet<object> GetConvertSolution(BaseToken token)
     {
         if (!token.CanReturn<ReferenceValue>(out var get))
         {
@@ -26,7 +26,7 @@ public class LooseReferenceArgument(string name, Type type) : Argument(name)
         return new(() => get().OnSuccess(rv => TryParse(rv, type)));
     }
 
-    public TryGet<object> TryParse(ReferenceValue value, Type targetType)
+    public OldTryGet<object> TryParse(ReferenceValue value, Type targetType)
     {
         if (targetType.IsInstanceOfType(value.Value))
         {
@@ -42,7 +42,7 @@ public class ReferenceArgument<TValue>(string name) : LooseReferenceArgument(nam
     public override string InputDescription => ValidInput;
 
     [UsedImplicitly]
-    public new DynamicTryGet<TValue> GetConvertSolution(BaseToken token)
+    public new OldDynamicTryGet<TValue> GetConvertSolution(BaseToken token)
     {
         if (!token.CanReturn<ReferenceValue>(out var get))
         {
@@ -52,7 +52,7 @@ public class ReferenceArgument<TValue>(string name) : LooseReferenceArgument(nam
         return new(() => get().OnSuccess(GetValue));
     }
 
-    public static TryGet<TValue> GetValue(ReferenceValue value)
+    public static OldTryGet<TValue> GetValue(ReferenceValue value)
     {
         if (value.Value is TValue tValue)
         {

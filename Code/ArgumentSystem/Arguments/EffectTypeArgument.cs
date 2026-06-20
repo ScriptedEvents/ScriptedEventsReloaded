@@ -1,7 +1,7 @@
 using CustomPlayerEffects;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -24,7 +24,7 @@ public class EffectTypeArgument(string name) : Argument(name)
         + EffectNames.Keys.Select(n => $"> {n}").JoinStrings("\n");
 
     [UsedImplicitly]
-    public DynamicTryGet<Type> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<Type> GetConvertSolution(BaseToken token)
     {
         if (token.BestTextRepr().IsStatic(out var name, out var func))
         {
@@ -34,7 +34,7 @@ public class EffectTypeArgument(string name) : Argument(name)
         return new(() => InternalConvert(func()));
     }
 
-    private static TryGet<Type> InternalConvert(string name)
+    private static OldTryGet<Type> InternalConvert(string name)
     {
         if (EffectNames.TryGetValue(name, out var type))
         {

@@ -8,18 +8,15 @@ using SER.Code.Extensions;
 using SER.Code.FlagSystem;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.MethodSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem;
 using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
+using SER.Code.ValueSystem;
 using SER.Code.VariableSystem;
-using SER.Code.VariableSystem.Bases;
-using SER.Code.VariableSystem.Structures;
-using SER.Code.VariableSystem.Variables;
-
 namespace SER.Code.ScriptSystem;
 
 public class Script
@@ -73,8 +70,8 @@ public class Script
     private static readonly HashSet<Script> RunningScriptsList = [];
     public static Script[] RunningScripts => RunningScriptsList.ToArray();
     
-    private readonly Dictionary<(char, string), Variable> _localVariables = [];
-    public Variable[] LocalVariables => _localVariables.Values.ToArray();
+    private readonly Dictionary<(char, string), VariableRepr> _localVariables = [];
+    public VariableRepr[] LocalVariables => _localVariables.Values.ToArray();
 
     private readonly Dictionary<string, FuncStatement> _definedFunctions = [];
     public ReadOnlyDictionary<string, FuncStatement> DefinedFunctions => new(_definedFunctions);
@@ -96,7 +93,7 @@ public class Script
         Executor.Error(message, this);
     }
 
-    public static TryGet<Script> CreateByScriptName(ScriptName name, ScriptExecutor? executor)
+    public static OldTryGet<Script> CreateByScriptName(ScriptName name, ScriptExecutor? executor)
     {
         if (FileSystem.FileSystem.GetScriptPath(name).HasErrored(out var error, out var path))
         {
@@ -111,7 +108,7 @@ public class Script
         };
     }
     
-    public static TryGet<Script> CreateByScriptName(string dirtyName, ScriptExecutor? executor)
+    public static OldTryGet<Script> CreateByScriptName(string dirtyName, ScriptExecutor? executor)
     {
         var name = Path.GetFileNameWithoutExtension(dirtyName);
         if (ScriptName.Create(name).HasErrored(out var initError, out var scriptName))
@@ -193,7 +190,7 @@ public class Script
         return ScriptFlagHandler.ScriptsFlags[Name].Any(f => f is T);
     }
 
-    public TryGet<List<Line>> GetFlagLines()
+    public OldTryGet<List<Line>> GetFlagLines()
     {
         DefineLines();
         if (SliceLines().HasErrored(out var err) || TokenizeLines().HasErrored(out err))
@@ -268,13 +265,13 @@ public class Script
         prof?.Stop();
     }
     
-    public Result SliceLines()
+    public OldResult SliceLines()
     {
         var prof = Profile is not null 
             ? new Profile(Profile, nameof(SliceLines))
             : null;
         
-        List<Result> errors = [];
+        List<OldResult> errors = [];
         foreach (var line in _lines)
         {
             if (Tokenizer.SliceLine(line).HasErrored(out var error))
@@ -285,7 +282,7 @@ public class Script
 
         if (errors.Any())
         {
-            return Result.Merge(errors);
+            return OldResult.Merge(errors);
         }
         
         prof?.Stop();
@@ -295,13 +292,13 @@ public class Script
         return true;
     }
 
-    public Result TokenizeLines()
+    public OldResult TokenizeLines()
     {
         var prof = Profile is not null 
             ? new Profile(Profile, nameof(TokenizeLines))
             : null;
         
-        List<Result> errors = [];
+        List<OldResult> errors = [];
         foreach (var line in _lines)
         {
             if (Tokenizer.TokenizeLine(line, this).HasErrored(out var error))
@@ -311,7 +308,7 @@ public class Script
         }
         
         prof?.Stop();
-        if (errors.Any()) return Result.Merge(errors);
+        if (errors.Any()) return OldResult.Merge(errors);
 
         Log.Debug($"Script {Name} tokenized {_lines.Length} lines into {_lines.Sum(l => l.Tokens.Length)} tokens");
         return true;
@@ -320,7 +317,7 @@ public class Script
     public void DefineFunction(string name, FuncStatement context) 
         => _definedFunctions.Add(name, context);
     
-    private Result ContextLines()
+    private OldResult ContextLines()
     {
         var prof = Profile is not null 
             ? new Profile(Profile, nameof(ContextLines))
@@ -337,7 +334,7 @@ public class Script
         return true;
     }
     
-    public Result Compile()
+    public OldResult Compile()
     {
         DefineLines();
         if (SliceLines().HasErrored(out var err) ||
@@ -390,7 +387,7 @@ public class Script
         RunningScriptsList.Remove(this);
     }
 
-    public TryGet<T> TryGetVariable<T>(VariableToken varToken) where T : Variable
+    public OldTryGet<T> TryGetVariable<T>(VariableToken varToken) where T : VariableRepr
     {
         if (_localVariables.TryGetValue((varToken.Prefix, varToken.Name), out var variable))
         {
@@ -398,14 +395,14 @@ public class Script
             {
                 if (variable is not T casted)
                 {
-                    return $"Variable '{varToken.RawRepr}' is not a {Variable.GetFriendlyName(typeof(T))}, but a {variable.FriendlyName} instead.";
+                    return $"Variable '{varToken.RawRepr}' is not a {VariableRepr.GetFriendlyName(typeof(T))}, but a {variable.FriendlyName} instead.";
                 }
 
                 return casted;
             }
         }
         
-        if (VariableIndex.TryGetGlobalVariable(varToken.Prefix, varToken.Name, out var global))
+        if (GlobalVariables.TryGetGlobalVariable(varToken.Prefix, varToken.Name, out var global))
         {
             if (varToken.ValueType.CanHold(global.BaseValue.Type))
             {
@@ -419,9 +416,9 @@ public class Script
         return $"Variable {varToken.RawRepr} doesn't exist or is inaccessible.";
     }
 
-    public void AddLocalVariable(Variable variable)
+    public void AddLocalVariable(string name, Value value)
     {
-        if (!_localVariables.ContainsKey((variable.Prefix, variable.Name)) && VariableIndex.TryGetGlobalVariable(variable.Prefix, variable.Name, out _))
+        if (!_localVariables.ContainsKey((variable.Prefix, variable.Name)) && GlobalVariables.TryGetGlobalVariable(variable.Prefix, variable.Name, out _))
         {
             throw new CustomScriptRuntimeError(
                 $"Tried to create a local variable '{variable}', but there already exists a global variable with the same name.");
@@ -431,7 +428,7 @@ public class Script
         _localVariables[(variable.Prefix, variable.Name)] = variable;
     }
 
-    public void AddLocalVariables(params Variable[] variables)
+    public void AddLocalVariables(params VariableRepr[] variables)
     {
         foreach (var variable in variables)
         {

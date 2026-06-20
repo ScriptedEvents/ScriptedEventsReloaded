@@ -3,7 +3,7 @@ using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
@@ -15,7 +15,7 @@ namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 [UsedImplicitly]
 public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
 {
-    private readonly Result _mainErr = "Cannot create 'over' loop.";
+    private readonly OldResult _mainErr = "Cannot create 'over' loop.";
     private Variable? _indexIterationVariable;
     private VariableToken? _indexIterationVariableToken;
     private Variable? _itemIterationVariable;
@@ -65,7 +65,7 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
         end
         """;
 
-    public Result SetOptionalVariables(params VariableToken[] variableTokens)
+    public OldResult SetOptionalVariables(params VariableToken[] variableTokens)
     {
         if (variableTokens.Length > 2)
             return $"Too many arguments were provided for '{KeywordName}' loop, only 2 are allowed.";
@@ -131,9 +131,9 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
         );
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
-        return Result.Assert(
+        return OldResult.Assert(
             _values is not null,
             _mainErr + "Missing required arguments.");
     }

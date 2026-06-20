@@ -5,7 +5,7 @@ using SER.Code.ArgumentSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.TokenSystem.Tokens;
 
@@ -15,7 +15,7 @@ public class MethodArgumentDispatcher(Method method)
 {
     private class ConverterInfo
     {
-        private Func<Argument, BaseToken, DynamicTryGet> Delegate { get; }
+        private Func<Argument, BaseToken, OldDynamicTryGet> Delegate { get; }
 
         public ConverterInfo(MethodInfo methodInfo)
         {
@@ -28,11 +28,11 @@ public class MethodArgumentDispatcher(Method method)
                 tokenParam
             );
 
-            var lambda = Expression.Lambda<Func<Argument, BaseToken, DynamicTryGet>>(call, instanceParam, tokenParam);
+            var lambda = Expression.Lambda<Func<Argument, BaseToken, OldDynamicTryGet>>(call, instanceParam, tokenParam);
             Delegate = lambda.Compile();
         }
         
-        public DynamicTryGet Invoke(BaseToken token, Argument arg)
+        public OldDynamicTryGet Invoke(BaseToken token, Argument arg)
         {
             try
             {
@@ -40,7 +40,7 @@ public class MethodArgumentDispatcher(Method method)
             }
             catch (Exception ex)
             {
-                return DynamicTryGet.Error($"This error is not an expected one, report it to the developers. {ex.Message} {ex.StackTrace}");
+                return OldDynamicTryGet.Error($"This error is not an expected one, report it to the developers. {ex.Message} {ex.StackTrace}");
             }
         }
     }
@@ -66,9 +66,9 @@ public class MethodArgumentDispatcher(Method method)
         throw new AndrzejFuckedUpException($"No suitable GetConvertSolution method found for {argType.AccurateName}.");
     }
 
-    public TryGet<ArgumentValueInfo?> TryGetValueInfo(BaseToken token, int index)
+    public OldTryGet<ArgumentValueInfo?> TryGetValueInfo(BaseToken token, int index)
     {
-        Result rs = $"Argument {index + 1} '{token.RawRep}' for method {method.Name} is invalid.";
+        OldResult rs = $"Argument {index + 1} '{token.RawRep}' for method {method.Name} is invalid.";
 
         Argument arg;
         if (index >= method.ExpectedArguments.Length)
@@ -92,7 +92,7 @@ public class MethodArgumentDispatcher(Method method)
                 return rs + "This argument is required, you cannot skip providing it by using the floor character.";
             }
 
-            return TryGet<ArgumentValueInfo?>.Success(null);
+            return OldTryGet<ArgumentValueInfo?>.Success(null);
         }
         
         arg.Script = method.Script;

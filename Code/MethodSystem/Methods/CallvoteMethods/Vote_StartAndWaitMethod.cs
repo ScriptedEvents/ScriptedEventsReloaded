@@ -149,7 +149,7 @@ public class Vote_StartAndWaitMethod : YieldingReturningMethod<TextValue>, IAddi
                 }
             }
 
-            string finalResult = topKeys.Count > 1 ? "tie" : (topKeys.Count == 0 ? "none" : topKeys[0]);
+            string finalResult = topKeys.Count > 1 ? "tie" : topKeys.Count == 0 ? "none" : topKeys[0];
             onComplete(finalResult);
         }
     }

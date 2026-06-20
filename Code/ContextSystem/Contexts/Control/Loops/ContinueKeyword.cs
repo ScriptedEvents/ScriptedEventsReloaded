@@ -1,7 +1,7 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ContextSystem.Contexts.Control.Loops;
@@ -25,7 +25,7 @@ public class ContinueKeyword : StandardContext, IKeywordContext
         return TryAddTokenRes.Error("The continue keyword does not expect arguments after it.");
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         return true;
     }

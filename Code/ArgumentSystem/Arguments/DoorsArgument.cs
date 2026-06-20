@@ -3,7 +3,7 @@ using LabApi.Features.Wrappers;
 using MapGeneration;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -19,7 +19,7 @@ public class DoorsArgument(string name) : EnumHandlingArgument(name)
         $"or 'all' for every door";
 
     [UsedImplicitly]
-    public DynamicTryGet<Door[]> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<Door[]> GetConvertSolution(BaseToken token)
     {
         if (token is SymbolToken { IsJoker: true } or AllToken)
         {

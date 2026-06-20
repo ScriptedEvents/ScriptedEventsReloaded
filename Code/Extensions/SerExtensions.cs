@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using LabApi.Features.Wrappers;
 using SER.Code.Exceptions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
@@ -10,19 +10,19 @@ namespace SER.Code.Extensions;
 
 public static class SerExtensions
 {
-    public static TryGet<TOut> SuccessTryCast<TIn, TOut>(this TryGet<TIn> value)
+    public static OldTryGet<TOut> SuccessTryCast<TIn, TOut>(this OldTryGet<TIn> value)
         where TIn : notnull
         where TOut : TIn
     {
         return value.OnSuccess(v => v.TryCast<TOut>());
     }
     
-    public static TryGet<TOut> SuccessTryCast<TOut>(this TryGet<Value> value) where TOut : Value
+    public static OldTryGet<TOut> SuccessTryCast<TOut>(this OldTryGet<Value> value) where TOut : Value
     {
         return value.OnSuccess(v => v.TryCast<TOut>());
     }
     
-    public static TryGet<TOut> TryCast<TOut>(this object value, string rawRep = "")
+    public static OldTryGet<TOut> TryCast<TOut>(this object value, string rawRep = "")
     {
         switch (value)
         {
@@ -43,14 +43,14 @@ public static class SerExtensions
 
     extension(BaseToken token)
     {
-        public bool CanReturn<T>([NotNullWhen(true)] out Func<TryGet<T>>? get) where T : Value
+        public bool CanReturn<T>([NotNullWhen(true)] out Func<OldTryGet<T>>? get) where T : Value
         {
             get = null!;
             if (token is not IValueToken valToken) return false;
             return valToken.CapableOf(out get);
         }
         
-        public bool CanReturnReference<T>([NotNullWhen(true)] out Func<TryGet<T>>? get)
+        public bool CanReturnReference<T>([NotNullWhen(true)] out Func<OldTryGet<T>>? get)
         {
             get = null!;
             if (token is not IValueToken valToken) return false;
@@ -74,7 +74,7 @@ public static class SerExtensions
             return true;
         }
         
-        public TryGet<T> TryGet<T>() where T : Value
+        public OldTryGet<T> TryGet<T>() where T : Value
         {
             if (token is not IValueToken valToken) return $"Value '{token.RawRep}' cannot represent a {typeof(T).FriendlyTypeName()}";
         
@@ -84,7 +84,7 @@ public static class SerExtensions
 
     extension(IValueToken valToken)
     {
-        public bool CapableOf<T>([NotNullWhen(true)] out Func<TryGet<T>>? get) where T : Value
+        public bool CapableOf<T>([NotNullWhen(true)] out Func<OldTryGet<T>>? get) where T : Value
         {
             get = valToken.TryGet<T>;
         
@@ -95,7 +95,7 @@ public static class SerExtensions
             return knownReturnTypes.Any(type => typeof(T).IsAssignableFrom(type) || type.IsAssignableFrom(typeof(T)));
         }
         
-        public TryGet<T> TryGet<T>() where T : Value
+        public OldTryGet<T> TryGet<T>() where T : Value
         {
             return valToken.Value().SuccessTryCast<Value, T>();
         }

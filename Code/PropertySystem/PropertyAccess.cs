@@ -1,17 +1,18 @@
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.Interfaces;
-using SER.Code.ValueSystem.Other;
+using SER.Code.ValueSystem;
+using ValueType = SER.Code.ValueSystem.ValueType;
 
-namespace SER.Code.ValueSystem.PropertySystem;
+namespace SER.Code.PropertySystem;
 
 public class PropertyAccess(BaseToken initialToken, IValueToken root)
 {
     private readonly List<string> _propertyNames = [];
 
-    public TypeOfValue PossibleValues { get; private set; } = root.PossibleValueTypes;
+    public ValueType PossibleValues { get; private set; } = root.PossibleValueTypes;
 
     public string ExprRepr { get; private set; } = initialToken.RawRep;
 
@@ -80,7 +81,7 @@ public class PropertyAccess(BaseToken initialToken, IValueToken root)
         return TryAddTokenRes.Continue();
     }
 
-    public TryGet<Value> ResolveValue()
+    public OldTryGet<Value> ResolveValue()
     {
         var lastPropRes = ResolveLastProp();
         if (lastPropRes.HasErrored(out var error, out var lastProp)) return error;
@@ -88,11 +89,11 @@ public class PropertyAccess(BaseToken initialToken, IValueToken root)
         return lastProp.propInfo.GetValue(lastProp.target);
     }
 
-    public TryGet<(object target, IValueWithProperties.PropInfo propInfo)> ResolveLastProp()
+    public OldTryGet<(object target, IValueWithProperties.PropInfo propInfo)> ResolveLastProp()
     {
         if (root.Value().HasErrored(out var rootError, out var rootValue))
         {
-            return $"Failed to get value from '{ExprRepr}'".AsError() + rootError.AsError();
+            return $"Failed to get value from '{ExprRepr}'".AsOldError() + rootError.AsOldError();
         }
 
         if (_propertyNames.Count == 0)

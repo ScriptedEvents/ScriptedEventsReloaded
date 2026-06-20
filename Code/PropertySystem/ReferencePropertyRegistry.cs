@@ -6,11 +6,12 @@ using PlayerStatsSystem;
 using Respawning;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.MethodSystem.Methods.PlayerMethods;
-using SER.Code.ValueSystem.Other;
+using SER.Code.ValueSystem;
+using ValueType = SER.Code.ValueSystem.ValueType;
 
-namespace SER.Code.ValueSystem.PropertySystem;
+namespace SER.Code.PropertySystem;
 
 public static class ReferencePropertyRegistry
 {
@@ -131,7 +132,7 @@ public static class ReferencePropertyRegistry
 
     private class JTokenDynamicPropInfo(string key) : IValueWithProperties.PropInfo
     {
-        public override TryGet<Value> GetValue(object obj)
+        public override OldTryGet<Value> GetValue(object obj)
         {
             JToken? token = obj switch
             {
@@ -249,7 +250,7 @@ public static class ReferencePropertyRegistry
                 FieldInfo field => field.FieldType,
                 _ => typeof(object)
             };
-            _guessedValueType = Value.GuessValueType(_memberType);
+            _guessedValueType = Value.GuessValueMetadata(_memberType);
             IsSettable = member switch
             {
                 PropertyInfo prop => prop.CanWrite,
@@ -258,7 +259,7 @@ public static class ReferencePropertyRegistry
             };
         }
 
-        public override TryGet<Value> GetValue(object obj)
+        public override OldTryGet<Value> GetValue(object obj)
         {
             object? target = obj switch
             {
@@ -289,7 +290,7 @@ public static class ReferencePropertyRegistry
             }
         }
 
-        public override Result SetValue(object obj, Value value)
+        public override OldResult SetValue(object obj, Value value)
         {
             if (!IsSettable) return "Property is read-only.";
 

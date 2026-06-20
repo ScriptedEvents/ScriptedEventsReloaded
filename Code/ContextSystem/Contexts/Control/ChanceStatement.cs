@@ -3,7 +3,7 @@ using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.ValueTokens;
 
@@ -13,7 +13,7 @@ namespace SER.Code.ContextSystem.Contexts.Control;
 public class ChanceStatement : StatementContext, IExtendableStatement, IKeywordContext
 {
     private decimal? _chance;
-    private Func<TryGet<NumberValue>>? _chanceGetter;
+    private Func<OldTryGet<NumberValue>>? _chanceGetter;
     
     public override string FriendlyName => "'chance' statement";
     public IExtendableStatement.Signal AllowedSignals => IExtendableStatement.Signal.DidntExecute;
@@ -40,9 +40,9 @@ public class ChanceStatement : StatementContext, IExtendableStatement, IKeywordC
         return TryAddTokenRes.Error($"{token} cannot be interpreted as a number.");
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
-        return Result.Assert(
+        return OldResult.Assert(
             _chance.HasValue || _chanceGetter != null,
             "Chance was not provided.");
     }

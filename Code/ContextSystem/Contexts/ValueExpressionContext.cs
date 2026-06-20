@@ -2,15 +2,15 @@ using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.MethodSystem.BaseMethods.Interfaces;
 using SER.Code.MethodSystem.BaseMethods.Yielding;
+using SER.Code.PropertySystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
-using SER.Code.ValueSystem.PropertySystem;
 
 namespace SER.Code.ContextSystem.Contexts;
 
@@ -88,7 +88,7 @@ public class ValueExpressionContext : AdditionalContext
         return _handler.TryAddToken(token);
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         if (_error is not null) return _error;
         if (_handler is null) return true;
@@ -109,7 +109,7 @@ public class ValueExpressionContext : AdditionalContext
     /// <summary>
     ///     REMEMBER TO CALL RUN() FIRST!
     /// </summary>
-    public TryGet<Value> GetValue()
+    public OldTryGet<Value> GetValue()
     {
         if (!_ran)
         {
@@ -126,9 +126,9 @@ public class ValueExpressionContext : AdditionalContext
     {
         public abstract string FriendlyName { get; }
         public abstract TypeOfValue PossibleValues { get; }
-        public abstract TryGet<Value> GetReturnValue();
+        public abstract OldTryGet<Value> GetReturnValue();
         public abstract TryAddTokenRes TryAddToken(BaseToken token);
-        public abstract Result VerifyCurrentState();
+        public abstract OldResult VerifyCurrentState();
         public abstract IEnumerator<float> Run();
     }
 }
@@ -161,7 +161,7 @@ public class MethodHandler : ValueExpressionContext.Handler
         _context.Returns
         ?? throw new AndrzejFuckedUpException("Method has no return type.");
 
-    public override TryGet<Value> GetReturnValue()
+    public override OldTryGet<Value> GetReturnValue()
     {
         if (_context.ReturnedValue is { } value) return value;
         return _context.MissingValueHint;
@@ -172,7 +172,7 @@ public class MethodHandler : ValueExpressionContext.Handler
         return _context.TryAddToken(token);
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         return _context.VerifyCurrentState();
     }
@@ -196,7 +196,7 @@ public class ValuePropertyHandler(
     public override string FriendlyName => "property access";
     public override TypeOfValue PossibleValues => _propertyAccess.PossibleValues;
 
-    public override TryGet<Value> GetReturnValue()
+    public override OldTryGet<Value> GetReturnValue()
     {
         return _propertyAccess.ResolveValue();
     }
@@ -206,9 +206,9 @@ public class ValuePropertyHandler(
         return _propertyAccess.TryAddToken(token);
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
-        return Result.Assert(
+        return OldResult.Assert(
             _propertyAccess.PropertyCount > 0,
             $"The '{SymbolToken.Arrow}' operator was used, but no property to be accessed was specified."
         );
@@ -233,7 +233,7 @@ public class NumericExpressionValueHandler(BaseToken initial)
 
     public override TypeOfValue PossibleValues => new UnknownTypeOfValue();
 
-    public override TryGet<Value> GetReturnValue()
+    public override OldTryGet<Value> GetReturnValue()
     {
         return _expression.Value.Evaluate().OnSuccess(Value.Parse);
     }
@@ -244,7 +244,7 @@ public class NumericExpressionValueHandler(BaseToken initial)
         return TryAddTokenRes.Continue();
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         if (NumericExpressionReslover.CompileExpression(_tokens.ToArray()).HasErrored(out var error, out var compiledExpression))
         {
@@ -272,7 +272,7 @@ public class FunctionCallHandler(Script scr) : ValueExpressionContext.Handler
         _func?.Returns
         ?? throw new AndrzejFuckedUpException("Function has no return type.");
 
-    public override TryGet<Value> GetReturnValue()
+    public override OldTryGet<Value> GetReturnValue()
     {
         if (_func!.ReturnedValue is { } value) return value;
         return _func.MissingValueHint;
@@ -300,9 +300,9 @@ public class FunctionCallHandler(Script scr) : ValueExpressionContext.Handler
         return TryAddTokenRes.Error($"Unexpected token '{token.RawRep}'");
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
-        return Result.Assert(
+        return OldResult.Assert(
             _func is not null,
             "Function to run was not provided."
         );

@@ -1,6 +1,6 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 
@@ -11,7 +11,7 @@ public class CollectionArgument(string name) : Argument(name)
     public override string InputDescription => $"A collection variable e.g. {CollectionVariableToken.Example}";
 
     [UsedImplicitly]
-    public DynamicTryGet<CollectionValue> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<CollectionValue> GetConvertSolution(BaseToken token)
     {
         if (!token.CanReturn<CollectionValue>(out var func))
         {

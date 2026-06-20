@@ -2,7 +2,7 @@
 using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -15,7 +15,7 @@ public class ElevatorsArgument(string name) : EnumHandlingArgument(name)
         $"or 'all' for every elevator";
 
     [UsedImplicitly]
-    public DynamicTryGet<Elevator[]> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<Elevator[]> GetConvertSolution(BaseToken token)
     {
         if (token is SymbolToken { IsJoker: true } or AllToken) 
         {

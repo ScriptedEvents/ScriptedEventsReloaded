@@ -6,7 +6,7 @@ using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.FlagSystem.Structures;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem;
@@ -272,7 +272,7 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
         }
     }
 
-    public override Result OnScriptRunning(Script scr, out bool mustReport)
+    public override OldResult OnScriptRunning(Script scr, out bool mustReport)
     {
         mustReport = true;
         if (base.OnScriptRunning(scr, out _).HasErrored(out var error)) return error;
@@ -344,7 +344,7 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
 
     public CustomCommand Command = null!;
 
-    public static Result RunAttachedScript(CustomCommand cmd, ScriptExecutor sender, string[] args)
+    public static OldResult RunAttachedScript(CustomCommand cmd, ScriptExecutor sender, string[] args)
     {
         if (sender is IPlayerExecutor { Player: { } player } && HandlePlayer(cmd, player) is { } plrErr)
         {
@@ -422,8 +422,8 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
             if (Tokenizer.GetTokenFromSlice(slice, null, null)
                 .HasErrored(out error, out var token))
             {
-                return $"Cannot understand input '{slice.Value}' for argument '{argVariable}'. ".AsError() +
-                       error.AsError();
+                return $"Cannot understand input '{slice.Value}' for argument '{argVariable}'. ".AsOldError() +
+                       error.AsOldError();
             }
 
             LiteralValue value;
@@ -535,7 +535,7 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
         return null;
     }
     
-    private Result AddArguments(string[] args)
+    private OldResult AddArguments(string[] args)
     {
         var onlyOptionals = false;
         foreach (var arg in args)
@@ -566,7 +566,7 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
         return true;
     }
 
-    private Result AddConsoleType(string[] args)
+    private OldResult AddConsoleType(string[] args)
     {
         ConsoleType types = default;
         foreach (var arg in args)
@@ -584,37 +584,37 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
         return true;
     }
 
-    private Result AddDescription(string[] args)
+    private OldResult AddDescription(string[] args)
     {
         Command.Description = args.JoinStrings(" ");
         return true;
     }
 
-    private Result AddNeededPermission(string[] args)
+    private OldResult AddNeededPermission(string[] args)
     {
         Command.NeededPermissions = args;
         return true;
     }
     
-    private Result AddNoPermissionMessage(string[] args)
+    private OldResult AddNoPermissionMessage(string[] args)
     {
         Command.NoPermissionMessage = args.JoinStrings(" ");
         return true;
     }
     
-    private Result AddNeededRank(string[] args)
+    private OldResult AddNeededRank(string[] args)
     {
         Command.NeededRanks = args;
         return true;
     }
 
-    private Result AddInvalidRankMessage(string[] args)
+    private OldResult AddInvalidRankMessage(string[] args)
     {
         Command.InvalidRankMessage = args.JoinStrings(" ");
         return true;
     }
     
-    private Result AddCooldown(string[] args, bool isGlobal)
+    private OldResult AddCooldown(string[] args, bool isGlobal)
     {
         switch (args.Length)
         {
@@ -641,7 +641,7 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
         return true;
     }
 
-    private Result AddOnCooldownMessage(string[] args, bool isGlobal)
+    private OldResult AddOnCooldownMessage(string[] args, bool isGlobal)
     {
         if (isGlobal)
         {
@@ -655,7 +655,7 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
         return true;
     }
 
-    private Result AddMaxUses(string[] args, bool isGlobal)
+    private OldResult AddMaxUses(string[] args, bool isGlobal)
     {
         if (args.Length != 1)
         {
@@ -679,7 +679,7 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
         return true;
     }
 
-    private Result AddOnMaxUsesMessage(string[] args, bool isGlobal)
+    private OldResult AddOnMaxUsesMessage(string[] args, bool isGlobal)
     {
         if (isGlobal)
         {

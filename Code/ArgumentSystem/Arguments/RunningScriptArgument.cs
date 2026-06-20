@@ -1,5 +1,5 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Tokens;
 
@@ -10,7 +10,7 @@ public class RunningScriptArgument(string name) : Argument(name)
     public override string InputDescription => "Name of a currently running script";
 
     [UsedImplicitly]
-    public DynamicTryGet<Script> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<Script> GetConvertSolution(BaseToken token)
     {
         return new(() =>
         {

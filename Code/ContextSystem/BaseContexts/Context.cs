@@ -1,5 +1,5 @@
 using SER.Code.ContextSystem.Structures;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Tokens;
 
@@ -13,7 +13,7 @@ public abstract class Context
 
     public abstract TryAddTokenRes TryAddToken(BaseToken token);
 
-    public abstract Result VerifyCurrentState();
+    public abstract OldResult VerifyCurrentState();
 
     public abstract override string ToString();
 }

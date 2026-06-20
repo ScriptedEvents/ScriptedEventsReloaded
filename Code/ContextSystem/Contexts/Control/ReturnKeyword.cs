@@ -2,7 +2,7 @@
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
@@ -31,7 +31,7 @@ public class ReturnKeyword : YieldingContext, IKeywordContext
         return TryAddTokenRes.Continue();
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         if (_expression is not null) return _expression.VerifyCurrentState();
         return "Return value was not provided.";

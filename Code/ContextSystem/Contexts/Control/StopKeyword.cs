@@ -1,7 +1,7 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
 
@@ -28,7 +28,7 @@ public class StopKeyword : StandardContext, IKeywordContext
             "'stop' keyword is not expecting any arguments after it.");
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         return true;
     }

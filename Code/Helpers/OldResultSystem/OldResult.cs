@@ -1,9 +1,9 @@
 ﻿using SER.Code.Exceptions;
 using SER.Code.Extensions;
 
-namespace SER.Code.Helpers.ResultSystem;
+namespace SER.Code.Helpers.OldResultSystem;
 
-public readonly struct Result(bool wasSuccess, string errorMsg)
+public readonly struct OldResult(bool wasSuccess, string errorMsg)
 {
     public readonly bool WasSuccess = wasSuccess;
     public readonly string ErrorMsg = errorMsg;
@@ -19,40 +19,40 @@ public readonly struct Result(bool wasSuccess, string errorMsg)
         return !WasSuccess;
     }
 
-    public static implicit operator bool(Result result)
+    public static implicit operator bool(OldResult result)
     {
         return result.WasSuccess;
     }
 
-    public static implicit operator string(Result result)
+    public static implicit operator string(OldResult result)
     {
         return result.ErrorMsg;
     }
 
-    public static implicit operator Result(bool res)
+    public static implicit operator OldResult(bool res)
     {
         if (!res)
             throw new AndrzejFuckedUpException("Result cannot be returned as false without an error message.");
 
-        return new Result(true, string.Empty);
+        return new OldResult(true, string.Empty);
     }
 
-    public static implicit operator Result(string msg)
+    public static implicit operator OldResult(string msg)
     {
         if (string.IsNullOrEmpty(msg))
             throw new AndrzejFuckedUpException("Result error message cannot be null or empty.");
 
-        return new Result(false, msg);
+        return new OldResult(false, msg);
     }
 
-    public static Result Assert(bool successWhen, string errorMsg)
+    public static OldResult Assert(bool successWhen, string errorMsg)
     {
         if (successWhen) return true;
 
         return errorMsg;
     }
 
-    public static Result operator +(Result originalREs, Result newRes)
+    public static OldResult operator +(OldResult originalREs, OldResult newRes)
     {
         return new(false, $"{Process(newRes)}\n-> {Process(originalREs)}");
     }
@@ -74,7 +74,7 @@ public readonly struct Result(bool wasSuccess, string errorMsg)
         return value;
     }
 
-    public static Result Merge(params IEnumerable<Result> results)
+    public static OldResult Merge(params IEnumerable<OldResult> results)
     {
         return "\n" + results
             .Select(r => r.ErrorMsg)

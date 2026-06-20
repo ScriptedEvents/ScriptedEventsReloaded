@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 
 namespace SER.Code.TokenSystem.Slices;
 
@@ -12,5 +12,5 @@ public abstract class Slice(char startChar)
 
     public abstract bool CanContinueAfterAdd(char c);
 
-    public abstract Result VerifyState();
+    public abstract OldResult VerifyState();
 }

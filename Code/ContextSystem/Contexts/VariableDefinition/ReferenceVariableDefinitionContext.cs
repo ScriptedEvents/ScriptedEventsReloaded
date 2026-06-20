@@ -1,9 +1,9 @@
 ﻿using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
+using SER.Code.PropertySystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
-using SER.Code.ValueSystem.PropertySystem;
 using SER.Code.VariableSystem.Variables;
 
 namespace SER.Code.ContextSystem.Contexts.VariableDefinition;
@@ -36,7 +36,7 @@ public class ReferenceVariableDefinitionContext(VariableToken<ReferenceVariable,
         return base.TryAddToken(token);
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         if (_propertyAccess is not null)
         {

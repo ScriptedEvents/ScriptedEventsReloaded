@@ -4,7 +4,7 @@ using SER.Code.ContextSystem.Contexts.Control;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.MethodSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Structures;
@@ -19,15 +19,15 @@ public static class Contexter
 {
     private static List<string>? _suggestions = null;
 
-    public static TryGet<RunnableContext[]> ContextLines(Line[] lines, Script scr)
+    public static OldTryGet<RunnableContext[]> ContextLines(Line[] lines, Script scr)
     {
         Stack<StatementContext> statementStack = [];
         List<RunnableContext> contexts = [];
 
-        List<Result> errors = [];
+        List<OldResult> errors = [];
         foreach (var line in lines)
         {
-            Result mainErr = $"Line {line.LineNumber} cannot compile.";
+            OldResult mainErr = $"Line {line.LineNumber} cannot compile.";
             if (ContextLine(line.Tokens, line.LineNumber, scr)
                 .HasErrored(out var error, out var context))
             {
@@ -45,19 +45,19 @@ public static class Contexter
             Log.Debug($"current statement stack: {statementStack.Select(s => s.GetType().Name).JoinStrings(" -> ")}");
         }
 
-        if (errors.Any()) return Result.Merge(errors);
+        if (errors.Any()) return OldResult.Merge(errors);
 
         return contexts.ToArray();
     }
 
-    private static Result TryAddResult(
+    private static OldResult TryAddResult(
         RunnableContext context,
         uint lineNum,
         Stack<StatementContext> statementStack,
         List<RunnableContext> contexts
     )
     {
-        Result rs = $"Invalid {context}";
+        OldResult rs = $"Invalid {context}";
 
         Log.Debug($"Trying to add context {context}");
 
@@ -67,8 +67,8 @@ public static class Contexter
             {
                 if (statementStack.Count == 0)
                     return rs +
-                           "Check if the statement you are trying to close hasn't thrown an error when compiling.".AsError() +
-                           "There is no valid statement to close with the 'end' keyword!".AsError();
+                           "Check if the statement you are trying to close hasn't thrown an error when compiling.".AsOldError() +
+                           "There is no valid statement to close with the 'end' keyword!".AsOldError();
 
                 var lastContext = statementStack.Pop();
                 lastContext.EndLine = context.LineNum;
@@ -112,7 +112,7 @@ public static class Contexter
             extendable.RegisteredSignals[treeExtenderInfo.Extends] = treeExtenderContext;
             statementStack.Pop();
             statementStack.Push(treeExtenderContext);
-            return context.VerifyCurrentState().HasErrored(out error) ? rs + error.AsError() : true;
+            return context.VerifyCurrentState().HasErrored(out error) ? rs + error.AsOldError() : true;
         }
 
         if (currentStatement is not null)
@@ -137,9 +137,9 @@ public static class Contexter
         return true;
     }
 
-    public static TryGet<RunnableContext?> ContextLine(BaseToken[] tokens, uint? lineNum, Script scr)
+    public static OldTryGet<RunnableContext?> ContextLine(BaseToken[] tokens, uint? lineNum, Script scr)
     {
-        Result rs = $"Line {(lineNum.HasValue ? $"{lineNum.Value} " : "")}is invalid";
+        OldResult rs = $"Line {(lineNum.HasValue ? $"{lineNum.Value} " : "")}is invalid";
 
         var firstToken = tokens.FirstOrDefault();
         if (firstToken is null) return null as RunnableContext;
@@ -150,7 +150,7 @@ public static class Contexter
                       + (FindClosestMatches(firstToken.RawRep) is { Length: > 0 } matches
                           ? $" Did you mean to use {matches.Select(x => $"'{x}'").JoinStrings(" or ")}?"
                           : "");
-            return rs + tip.AsError();
+            return rs + tip.AsOldError();
         }
 
         var context = contextable.GetContext(scr);
@@ -195,7 +195,7 @@ public static class Contexter
                && currentContext is StatementContext;
     }
 
-    private static Result HandleInlineWithKeyword(IEnumerable<BaseToken> enumTokens, RunnableContext context, Script scr)
+    private static OldResult HandleInlineWithKeyword(IEnumerable<BaseToken> enumTokens, RunnableContext context, Script scr)
     {
         var tokens = enumTokens.ToArray();
 
@@ -229,7 +229,7 @@ public static class Contexter
         return true;
     }
 
-    private static Result HandleCurrentContext(BaseToken token, RunnableContext context, out bool endLineContexting)
+    private static OldResult HandleCurrentContext(BaseToken token, RunnableContext context, out bool endLineContexting)
     {
         Log.Debug($"Handling token {token} in context {context}");
 

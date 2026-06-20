@@ -1,6 +1,6 @@
 ﻿
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 
 namespace SER.Code.ScriptSystem.Structures;
 
@@ -24,7 +24,7 @@ public readonly record struct ScriptName
         return script;
     }
     
-    public TryGet<Script> GetScript(ScriptExecutor? executor, bool assertCheck = true)
+    public OldTryGet<Script> GetScript(ScriptExecutor? executor, bool assertCheck = true)
     {
         if (assertCheck)
         {
@@ -40,14 +40,14 @@ public readonly record struct ScriptName
 
     public static ScriptName CreateUnsafe(string name) => new(name);
 
-    public static TryGet<ScriptName> Create(string name)
+    public static OldTryGet<ScriptName> Create(string name)
     {
         if (Assert(name).HasErrored(out var error)) return error;
 
         return new ScriptName(name);
     }
 
-    public static Result Assert(string name)
+    public static OldResult Assert(string name)
     {
         name = Path.GetFileNameWithoutExtension(name);
         if (!FileSystem.FileSystem.DoesScriptExistByName(name, out _))

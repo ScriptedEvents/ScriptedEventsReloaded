@@ -1,6 +1,6 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using UnityEngine;
 
@@ -11,7 +11,7 @@ public class ColorArgument(string name) : Argument(name)
     public override string InputDescription => "Color in format RRGGBB or RRGGBBAA.";
 
     [UsedImplicitly]
-    public DynamicTryGet<Color> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<Color> GetConvertSolution(BaseToken token)
     {
         if (!token.CanReturn<ColorValue>(out var func))
         {

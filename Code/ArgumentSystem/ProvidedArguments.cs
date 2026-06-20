@@ -6,7 +6,7 @@ using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.FileSystem.Structures;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
 using SER.Code.ScriptSystem;
@@ -22,7 +22,7 @@ namespace SER.Code.ArgumentSystem;
 
 public class ProvidedArguments(Method method)
 {
-    private Dictionary<(string name, Type type), List<DynamicTryGet>> ArgumentValues { get; } = [];
+    private Dictionary<(string name, Type type), List<OldDynamicTryGet>> ArgumentValues { get; } = [];
 
     public string GetEvent(string argName)
     {
@@ -280,7 +280,7 @@ public class ProvidedArguments(Method method)
         return GetValues<TValue, TArg>(argName)[0].value;
     }
     
-    public DynamicTryGet<TValue> GetGetter<TValue, TArg>(string argName) 
+    public OldDynamicTryGet<TValue> GetGetter<TValue, TArg>(string argName) 
         where TArg : Argument
     {
         return GetValues<TValue, TArg>(argName)[0].getter;
@@ -295,32 +295,32 @@ public class ProvidedArguments(Method method)
         if (evaluator.Result.HasErrored(out var error))
         {
             throw new CustomScriptRuntimeError(
-                $"Fetching argument '{argName}' for method '{method.Name}' failed.".AsError() 
+                $"Fetching argument '{argName}' for method '{method.Name}' failed.".AsOldError() 
                 + error
             );
         }
         
         return evaluator switch
         {
-            DynamicTryGet<TValue> strict => strict.Invoke().Value,
-            DynamicTryGet<TValue?> nullable => nullable.Invoke().Value,
+            OldDynamicTryGet<TValue> strict => strict.Invoke().Value,
+            OldDynamicTryGet<TValue?> nullable => nullable.Invoke().Value,
             _ => throw new AndrzejFuckedUpException(
                 $"Argument '{argName}' evaluator type mismatch. " +
                 $"Got {evaluator.GetType().AccurateName}, expected {typeof(TValue).AccurateName} or {typeof(TValue?).AccurateName}.")
         };
     }
 
-    private List<(TValue value, DynamicTryGet<TValue> getter)> GetValues<TValue, TArg>(string argName)
+    private List<(TValue value, OldDynamicTryGet<TValue> getter)> GetValues<TValue, TArg>(string argName)
         where TArg : Argument
     {
-        Result mainErr = $"Fetching argument '{argName}' for method '{method.Name}' failed.";
+        OldResult mainErr = $"Fetching argument '{argName}' for method '{method.Name}' failed.";
 
         var evaluators = GetValueInternal<TValue, TArg>(argName);
 
-        List<(TValue, DynamicTryGet<TValue>)> resultList = [];
+        List<(TValue, OldDynamicTryGet<TValue>)> resultList = [];
         foreach (var evaluator in evaluators)
         {
-            if (evaluator is not DynamicTryGet<TValue> argEvalRes)
+            if (evaluator is not OldDynamicTryGet<TValue> argEvalRes)
             {
                 throw new AndrzejFuckedUpException(
                     mainErr +
@@ -339,7 +339,7 @@ public class ProvidedArguments(Method method)
         return resultList;
     }
 
-    private List<DynamicTryGet> GetValueInternal<TValue, TArg>(string argName) 
+    private List<OldDynamicTryGet> GetValueInternal<TValue, TArg>(string argName) 
         where TArg : Argument
     {
         if (ArgumentValues.TryGetValue((argName, typeof(TArg)), out var value))
@@ -361,15 +361,15 @@ public class ProvidedArguments(Method method)
         return foundArg.DefaultValue.Value switch
         {
             TValue argValue => [
-                new DynamicTryGet<TValue>(argValue)
+                new OldDynamicTryGet<TValue>(argValue)
             ],
             
             IEnumerable<TValue> listValue => listValue
-                .Select(DynamicTryGet (v) => new DynamicTryGet<TValue>(v))
+                .Select(OldDynamicTryGet (v) => new OldDynamicTryGet<TValue>(v))
                 .ToList(),
             
             null => [
-                new DynamicTryGet<TValue>((TValue)(object)null!)
+                new OldDynamicTryGet<TValue>((TValue)(object)null!)
             ], // magik
             
             _ => throw new AndrzejFuckedUpException(

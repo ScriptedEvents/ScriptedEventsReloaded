@@ -1,7 +1,7 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
@@ -36,7 +36,7 @@ public class AttemptStatement : StatementContext, IExtendableStatement, IKeyword
         return TryAddTokenRes.Error($"A {FriendlyName} does not expect any arguments.");
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         return true;
     }

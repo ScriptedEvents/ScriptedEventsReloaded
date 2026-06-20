@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 
 namespace SER.Code.Helpers;
@@ -68,7 +68,7 @@ public static class ExampleHandler
             // example.Key now contains the folder path (e.g., "Combat/Fireball")
             if (Script.CreateAnonymous(example.Key, example.Value).Compile().HasErrored(out var error))
             {
-                return (new Result(false, $"in example '{example.Key}'") + error.AsError(), examples.Keys.ToArray());
+                return (new OldResult(false, $"in example '{example.Key}'") + error.AsOldError(), examples.Keys.ToArray());
             }
         }
 

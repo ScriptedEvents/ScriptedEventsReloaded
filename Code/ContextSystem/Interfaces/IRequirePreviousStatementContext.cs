@@ -1,5 +1,5 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 
 namespace SER.Code.ContextSystem.Interfaces;
 
@@ -8,5 +8,5 @@ namespace SER.Code.ContextSystem.Interfaces;
 /// </summary>
 public interface IRequirePreviousStatementContext
 {
-    public Result AcceptStatement(StatementContext context);
+    public OldResult AcceptStatement(StatementContext context);
 }

@@ -2,7 +2,7 @@
 using LabApi.Features.Console;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.MethodSystem.Structures;
 
@@ -102,10 +102,10 @@ public static class MethodIndex
     /// </summary>
     /// <param name="name">The name of the method to retrieve.</param>
     /// <returns>
-    /// A <see cref="TryGet{TValue}"/> object containing the retrieved method if successful,
+    /// A <see cref="OldTryGet{TValue}"/> object containing the retrieved method if successful,
     /// or an error message with the closest match if the method does not exist.
     /// </returns>
-    public static TryGet<Method> TryGetMethod(string name)
+    public static OldTryGet<Method> TryGetMethod(string name)
     {
         if (NameToMethodIndex.TryGetValue(name, out var method))
         {

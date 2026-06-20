@@ -1,5 +1,7 @@
-﻿using System.Text;
-using SER.Code.Helpers.ResultSystem;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
+using SER.Code.Helpers.OldResultSystem;
+using SER.Code.ResultSystem;
 using SER.Code.ScriptSystem;
 
 namespace SER.Code.Extensions;
@@ -26,16 +28,20 @@ public static class StringExtensions
         }
         
         [Pure]
-        public Result AsError()
+        public OldResult AsOldError()
         {
-            return new Result(false, str);
+            return new OldResult(false, str);
         }
         
         [Pure]
-        public TryGet<string> AsSuccess()
+        public OldTryGet<string> AsOldSuccess()
         {
-            return TryGet<string>.Success(str);
+            return OldTryGet<string>.Success(str);
         }
+
+        [Pure] 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ErrorList AsError() => new(str); 
         
         [Pure]
         public string Spaceify(bool lowerCase = false)

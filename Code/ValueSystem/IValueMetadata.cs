@@ -1,3 +1,0 @@
-namespace SER.Code.ValueSystem;
-
-

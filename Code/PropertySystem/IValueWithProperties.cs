@@ -1,47 +1,42 @@
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
-using SER.Code.ValueSystem.Other;
+using SER.Code.ResultSystem;
+using SER.Code.ValueSystem;
+using ValueType = SER.Code.ValueSystem.ValueType;
 
-namespace SER.Code.ValueSystem.PropertySystem;
+namespace SER.Code.PropertySystem;
 
 public interface IValueWithProperties
 {
     public abstract class PropInfo
     {
         public abstract TryGet<Value> GetValue(object obj);
-        public virtual Result SetValue(object obj, Value value) => "This property is read-only.";
-        public abstract SingleTypeOfValue ReturnType { get; }
+        public virtual Result SetValue(object obj, Value value) => "This property is read-only.".AsError();
+        public abstract ValueMetadata ReturnType { get; }
         public abstract string? Description { get; }
         public virtual bool IsReflected => false;
         public virtual bool IsSettable => false;
     }
     
-    public abstract class PropInfo<T> : PropInfo
+    public class PropInfo<TIn>(ValueType valueType, Func<TIn, Value> handler, string? description) : PropInfo
     {
-        public abstract Func<T, Value> Func { get; }
-    }
-
-    public class PropInfo<TIn, TOut>(Func<TIn, TOut> handler, string? description) : PropInfo<TIn> 
-        where TOut : Value
-    {
-        public override Func<TIn, Value> Func => handler;
-        protected virtual Func<object, object>? Translator => null;
+        public Func<TIn, Value> Func => handler;
+        protected Func<object, object>? Translator => null;
 
         public override TryGet<Value> GetValue(object obj)
         {
             if (Translator is not null) obj = Translator(obj);
-            if (obj is not TIn inObj) return $"Provided value is not of type {typeof(TIn).AccurateName}";
+            if (obj is not TIn inObj) return $"Provided value is not of type {typeof(TIn).AccurateName}".AsError();
             try
             {
                 return handler(inObj);
             }
             catch (Exception e)
             {
-                return $"Failed to get property: {e.Message}";
+                return $"Failed to get property: {e.Message}".AsError();
             }
         }
 
-        public override SingleTypeOfValue ReturnType => new(typeof(TOut));
+        public override ValueMetadata ReturnType => ValueMetadata.Basic(valueType);
         public override string? Description => description;
     }
     

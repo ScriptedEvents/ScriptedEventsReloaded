@@ -1,6 +1,6 @@
 ﻿using SER.Code.Exceptions;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Slices;
 using SER.Code.TokenSystem.Structures;
@@ -60,7 +60,7 @@ public static class Tokenizer
         return outList.ToArray();
     }
 
-    public static Result SliceLine(Line line)
+    public static OldResult SliceLine(Line line)
     {
         if (SliceLine(line.RawRepresentation).HasErrored(out var err, out var slices))
         {
@@ -76,7 +76,7 @@ public static class Tokenizer
     /// </summary>
     /// <param name="line">Line to parse</param>
     /// <returns>The slices for the specificalious line</returns>
-    public static TryGet<IEnumerable<Slice>> SliceLine(string line)
+    public static OldTryGet<IEnumerable<Slice>> SliceLine(string line)
     {
         List<Slice> outList = [];
         Slice? currentSlice = null;
@@ -123,7 +123,7 @@ public static class Tokenizer
         return outList;
     }
 
-    public static Result TokenizeLine(Line line, Script scr)
+    public static OldResult TokenizeLine(Line line, Script scr)
     {
         if (TokenizeLine(line.Slices, scr, line.LineNumber).HasErrored(out var err, out var tokens))
         {
@@ -134,7 +134,7 @@ public static class Tokenizer
         return true;
     }
 
-    public static TryGet<BaseToken[]> TokenizeLine(string line, Script scr, uint? lineNum)
+    public static OldTryGet<BaseToken[]> TokenizeLine(string line, Script scr, uint? lineNum)
     {
         if (SliceLine(line).HasErrored(out var sliceError, out var slices))
         {
@@ -144,7 +144,7 @@ public static class Tokenizer
         return TokenizeLine(slices, scr, lineNum);
     }
 
-    public static TryGet<BaseToken[]> TokenizeLine(IEnumerable<Slice> slices, Script scr, uint? lineNum)
+    public static OldTryGet<BaseToken[]> TokenizeLine(IEnumerable<Slice> slices, Script scr, uint? lineNum)
     {
         var sliceArray = slices.ToArray();
         List<BaseToken> outList = [];
@@ -152,7 +152,7 @@ public static class Tokenizer
         {
             if (GetTokenFromSlice(slice, scr, lineNum).HasErrored(out var error, out var token))
             {
-                return $"Value '{slice.RawRep}' is invalid.".AsError() + error.AsError();
+                return $"Value '{slice.RawRep}' is invalid.".AsOldError() + error.AsOldError();
             }
             
             outList.Add(token);
@@ -161,7 +161,7 @@ public static class Tokenizer
         return outList.ToArray();
     }
 
-    public static TryGet<BaseToken> GetTokenFromSlice(Slice slice, Script? scr, uint? lineNum)
+    public static OldTryGet<BaseToken> GetTokenFromSlice(Slice slice, Script? scr, uint? lineNum)
     {
         var tokenCollection = slice is CollectionSlice 
             ? OrderedImportanceTokensFromCollectionSlices 
@@ -184,7 +184,7 @@ public static class Tokenizer
         return unspecified;
     }
 
-    public static TryGet<BaseToken> GetTokenFromString(string str, Script? scr, uint? lineNum)
+    public static OldTryGet<BaseToken> GetTokenFromString(string str, Script? scr, uint? lineNum)
     {
         if (SliceLine(str).HasErrored(out var err, out var slices))
         {

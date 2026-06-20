@@ -1,16 +1,16 @@
 using System.Diagnostics.CodeAnalysis;
 using SER.Code.Exceptions;
 
-namespace SER.Code.Helpers.ResultSystem;
+namespace SER.Code.Helpers.OldResultSystem;
 
-public class DynamicGet<T>
+public class OldDynamicGet<T>
 {
-    public DynamicGet(T? value)
+    public OldDynamicGet(T? value)
     {
         _value = value;
     }
 
-    public DynamicGet(Func<T>? valueFunc)
+    public OldDynamicGet(Func<T>? valueFunc)
     {
         _valueFunc = valueFunc;
     }
@@ -18,9 +18,9 @@ public class DynamicGet<T>
     private readonly T? _value;
     private readonly Func<T>? _valueFunc;
     
-    public static implicit operator DynamicGet<T>(T value) => new(value: value);
+    public static implicit operator OldDynamicGet<T>(T value) => new(value: value);
 
-    public static implicit operator DynamicGet<T>(Func<T> valueFunc) => new(valueFunc: valueFunc);
+    public static implicit operator OldDynamicGet<T>(Func<T> valueFunc) => new(valueFunc: valueFunc);
 
     public T Value => _value ?? _valueFunc!.Invoke();
 

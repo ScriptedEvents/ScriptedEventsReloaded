@@ -5,7 +5,7 @@ using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.MethodSystem.BaseMethods.Interfaces;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
@@ -54,9 +54,9 @@ public class MethodContext(MethodToken methodToken) : YieldingContext, IMayRetur
         return TryAddTokenRes.Continue();
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
-        return Result.Assert(_providedArguments >= Method.ExpectedArguments.Count(arg => arg.MustBeProvided),
+        return OldResult.Assert(_providedArguments >= Method.ExpectedArguments.Count(arg => arg.MustBeProvided),
             $"Method '{Method.Name}' is missing required arguments: " +
             $"{", ".Join(Method.ExpectedArguments
                 .Skip(_providedArguments)

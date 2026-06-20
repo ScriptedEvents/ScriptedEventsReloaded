@@ -1,4 +1,4 @@
-﻿using SER.Code.Helpers.ResultSystem;
+﻿using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 
 namespace SER.Code.ContextSystem.Interfaces;
@@ -8,5 +8,5 @@ namespace SER.Code.ContextSystem.Interfaces;
 /// </summary>
 public interface IAcceptOptionalVariableDefinitionsContext
 {
-    public Result SetOptionalVariables(params VariableToken[] variableTokens);
+    public OldResult SetOptionalVariables(params VariableToken[] variableTokens);
 }

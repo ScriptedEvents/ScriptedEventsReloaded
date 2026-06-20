@@ -2,7 +2,7 @@
 using LabApi.Features.Console;
 using SER.Code.Extensions;
 using SER.Code.FlagSystem.Structures;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 
@@ -15,11 +15,11 @@ public abstract class Flag
     public readonly record struct Argument(
         string Name, 
         string Description, 
-        Func<string[], Result> Handler, 
+        Func<string[], OldResult> Handler, 
         bool IsRequired,
         string Example
     ) {
-        public Result AddArgument(string[] values) => Handler(values);
+        public OldResult AddArgument(string[] values) => Handler(values);
     }
 
     public abstract Argument? InlineArgument { get; }
@@ -32,7 +32,7 @@ public abstract class Flag
     
     public abstract void Unbind();
     
-    public virtual Result OnScriptRunning(Script scr, out bool mustReport)
+    public virtual OldResult OnScriptRunning(Script scr, out bool mustReport)
     {
         mustReport = true;
         if (this is IMajorBehaviorFlag)
@@ -78,7 +78,7 @@ public abstract class Flag
             .ToDictionary(t => t.Name.Replace("Flag", ""), t => t);
     }
 
-    public static TryGet<Flag> TryGet(string flagName, ScriptName scriptName) 
+    public static OldTryGet<Flag> TryGet(string flagName, ScriptName scriptName) 
     {
         if (!FlagInfos.TryGetValue(flagName, out var type))
         {

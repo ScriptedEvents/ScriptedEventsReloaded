@@ -6,8 +6,8 @@ using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.MethodSystem;
 using SER.Code.Plugin.Commands.Interfaces;
+using SER.Code.PropertySystem;
 using SER.Code.TokenSystem.Tokens;
-using SER.Code.ValueSystem.PropertySystem;
 
 namespace SER.Code.Plugin.Commands.HelpSystem;
 

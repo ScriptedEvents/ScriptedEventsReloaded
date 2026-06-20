@@ -13,7 +13,7 @@ public class GlobalVariablesMethod : ReturningMethod<CollectionValue>
     
     public override void Execute()
     {
-        ReturnValue = new CollectionValue(VariableIndex.GlobalVariables
+        ReturnValue = new CollectionValue(GlobalVariables.Variables
             .Select(variable => variable.Prefix + variable.Name));
     }
 }

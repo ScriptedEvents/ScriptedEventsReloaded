@@ -1,5 +1,5 @@
 ﻿using SER.Code.Exceptions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Structures;
 using StringBuilder = System.Text.StringBuilder;
 
@@ -94,8 +94,8 @@ public class CollectionSlice : Slice
         return true;
     }
 
-    public override Result VerifyState()
+    public override OldResult VerifyState()
     {
-        return Result.Assert(_contexts.Count == 0, $"Collection '{RawRep}' was not closed.");
+        return OldResult.Assert(_contexts.Count == 0, $"Collection '{RawRep}' was not closed.");
     }
 }

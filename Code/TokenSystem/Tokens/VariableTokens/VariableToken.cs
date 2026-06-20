@@ -1,5 +1,5 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens.Interfaces;
@@ -30,7 +30,7 @@ public abstract class VariableToken : BaseToken, IContextableToken, IVariableRep
     
     public char Prefix => VariablePrefixes.First(pair => pair.varTypeToken == GetType()).prefix;
     
-    public TryGet<Variable> TryGetVariable()
+    public OldTryGet<Variable> TryGetVariable()
     {
         return Script.TryGetVariable<Variable>(this);
     }
@@ -47,12 +47,12 @@ public abstract class VariableToken<TVariable, TValue> : VariableToken, IValueTo
     public override Type VariableType => typeof(TVariable);
     public override SingleTypeOfValue ValueType => new(typeof(TValue));
 
-    public new TryGet<TVariable> TryGetVariable()
+    public new OldTryGet<TVariable> TryGetVariable()
     {
         return Script.TryGetVariable<TVariable>(this);
     }
 
-    public TryGet<TValue> ExactValue => TryGetVariable().OnSuccess(variable => variable.Value);
+    public OldTryGet<TValue> ExactValue => TryGetVariable().OnSuccess(variable => variable.Value);
 
     protected override IParseResult InternalParse(Script scr)
     {
@@ -70,7 +70,7 @@ public abstract class VariableToken<TVariable, TValue> : VariableToken, IValueTo
         return new Success();
     }
 
-    public TryGet<Value> Value()
+    public OldTryGet<Value> Value()
     {
         return TryGetVariable().OnSuccess(Value (variable) => variable.Value);
     }

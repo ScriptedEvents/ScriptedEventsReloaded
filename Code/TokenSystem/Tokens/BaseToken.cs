@@ -1,5 +1,5 @@
 ﻿using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Slices;
 using SER.Code.TokenSystem.Tokens.Interfaces;
@@ -47,9 +47,9 @@ public class BaseToken
     
     public string BestStaticTextRepr() => InternalBestTextExpr().Value;
     
-    public DynamicGet<string> BestTextRepr() => InternalBestTextExpr();
+    public OldDynamicGet<string> BestTextRepr() => InternalBestTextExpr();
     
-    public DynamicGet<string> InternalBestTextExpr()
+    public OldDynamicGet<string> InternalBestTextExpr()
     {
         // ReSharper disable once ConvertIfStatementToSwitchStatement
         if (this is TextToken textToken)
@@ -80,7 +80,7 @@ public class BaseToken
         return $"token '{RawRep}' ({GetType().AccurateName})";
     }
 
-    public static TryGet<T> TryParse<T>(string rawRep, Script scr) where T : BaseToken
+    public static OldTryGet<T> TryParse<T>(string rawRep, Script scr) where T : BaseToken
     {
         if (Tokenizer.TokenizeLine(rawRep, scr, null).HasErrored(out var error, out var tokens))
         {

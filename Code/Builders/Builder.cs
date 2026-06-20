@@ -18,7 +18,7 @@ public static class Builder
     {
         if (MethodIndex.GetMethods().Length == 0) MethodIndex.Initialize();
         if (Flag.FlagInfos.Count == 0) Flag.RegisterFlags();
-        if (!VariableIndex.GlobalVariables.Any()) VariableIndex.Initialize();
+        if (!GlobalVariables.Variables.Any()) GlobalVariables.Initialize();
         try
         {
             SER.Code.EventSystem.EventHandler.Initialize();
@@ -56,7 +56,7 @@ public static class Builder
                             o.Value,
                             o.Description
                         }),
-                        EffectTypes = (a as SER.Code.ArgumentSystem.Arguments.EffectTypeArgument) != null
+                        EffectTypes = a as SER.Code.ArgumentSystem.Arguments.EffectTypeArgument != null
                             ? SER.Code.ArgumentSystem.Arguments.EffectTypeArgument.EffectNames.Keys.ToArray() : null,
                         EnumValues = a.GetType().IsGenericType && a.GetType().GetGenericTypeDefinition() ==
                             typeof(SER.Code.ArgumentSystem.Arguments.EnumArgument<>)
@@ -67,7 +67,7 @@ public static class Builder
                     })
                 };
             }),
-            Variables = VariableIndex.GlobalVariables
+            Variables = GlobalVariables.Variables
                 .Select(v => new
                 {
                     v.Name,

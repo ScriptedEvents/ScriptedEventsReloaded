@@ -26,6 +26,8 @@ public struct ValuePrefixes
         _count++;
     }
     
+    public char Single => _item0;
+    
     public readonly ReadOnlySpan<char> AsSpan()
     {
         unsafe

@@ -4,7 +4,7 @@ using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ContextSystem.Contexts.Control;
@@ -39,7 +39,7 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
         return TryAddTokenRes.Continue();
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         if (NumericExpressionReslover.CompileExpression(_condition.ToArray())
             .HasErrored(out var error, out var cond))
@@ -49,7 +49,7 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
 
         _expression = cond;
 
-        return Result.Assert(
+        return OldResult.Assert(
             _condition.Count > 0,
             "An elif statement expects to have a condition, but none was provided!"
         );

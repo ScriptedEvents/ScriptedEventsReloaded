@@ -1,6 +1,6 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 
@@ -11,7 +11,7 @@ public class VariableNameArgument(string name) : Argument(name)
     public override string InputDescription => "A variable name (doesn't have to be real)";
 
     [UsedImplicitly]
-    public DynamicTryGet<VariableToken> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<VariableToken> GetConvertSolution(BaseToken token)
     {
         if (token is not VariableToken variableToken)
         {
@@ -30,7 +30,7 @@ public class VariableNameArgument<T>(string name) : Argument(name)
     public override string InputDescription => $"A {TypeName} variable name (doesn't have to be real)";
 
     [UsedImplicitly]
-    public DynamicTryGet<T> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<T> GetConvertSolution(BaseToken token)
     {
         if (token is not T variableToken)
         {

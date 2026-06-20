@@ -3,7 +3,7 @@ using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ContextSystem.Contexts.Control.Loops;
@@ -13,7 +13,7 @@ public class WhileLoop : LoopContextWithSingleIterationVariable<NumberValue>
 {
     private readonly List<BaseToken> _condition = [];
 
-    private readonly Result _rs = "Cannot create 'while' loop.";
+    private readonly OldResult _rs = "Cannot create 'while' loop.";
     private NumericExpressionReslover.CompiledExpression _expression = null!;
     public override string KeywordName => "while";
 
@@ -44,7 +44,7 @@ public class WhileLoop : LoopContextWithSingleIterationVariable<NumberValue>
         return TryAddTokenRes.Continue();
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         if (NumericExpressionReslover.CompileExpression(_condition.ToArray())
             .HasErrored(out var error, out var cond))
@@ -54,7 +54,7 @@ public class WhileLoop : LoopContextWithSingleIterationVariable<NumberValue>
 
         _expression = cond;
 
-        return Result.Assert(
+        return OldResult.Assert(
             _condition.Count > 0,
             _rs + "The condition was not provided.");
     }

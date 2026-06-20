@@ -1,5 +1,5 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
@@ -11,7 +11,7 @@ public class AnyValueArgument(string name) : Argument(name)
     public override string InputDescription => "Any value";
 
     [UsedImplicitly]
-    public DynamicTryGet<Value> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<Value> GetConvertSolution(BaseToken token)
     {
         if (token is IValueToken valToken)
         {

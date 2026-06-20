@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 
 namespace SER.Code.TokenSystem.Tokens.ValueTokens;
@@ -22,7 +22,7 @@ public class DurationToken : LiteralValueToken<DurationValue>
         return new Success();
     }
 
-    public static TryGet<TimeSpan?> Parse(string value)
+    public static OldTryGet<TimeSpan?> Parse(string value)
     {
         if (TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out var result) && result.TotalMilliseconds > 0)
         {

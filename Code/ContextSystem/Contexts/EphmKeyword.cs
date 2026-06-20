@@ -3,7 +3,7 @@ using SER.Code.ContextSystem.Contexts.VariableDefinition;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 
@@ -34,7 +34,7 @@ public class EphmKeyword : YieldingContext, IKeywordContext
         return TryAddTokenRes.Continue();
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         if (ParentContext is null) return "To define an ephemeral variable, it must be inside a statement.";
 

@@ -1,6 +1,6 @@
 ﻿using SER.Code.Extensions;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Slices;
 using SER.Code.TokenSystem.Structures;
@@ -32,14 +32,14 @@ public class ParenthesesToken : BaseToken, IValueToken
         if (Tokenizer.TokenizeLine(Slice.Value, Script, LineNum)
             .HasErrored(out var tokenizeError, out var tokens))
         {
-            return new Error($"In parentheses {RawRep}".AsError() + tokenizeError.AsError());
+            return new Error($"In parentheses {RawRep}".AsOldError() + tokenizeError.AsOldError());
         }
         
         Tokens = tokens;
         return new Success();
     }
 
-    public TryGet<object> ParseExpression()
+    public OldTryGet<object> ParseExpression()
     {
         if (NumericExpressionReslover.CompileExpression(Tokens).HasErrored(out var error2, out var expression))
         {
@@ -49,7 +49,7 @@ public class ParenthesesToken : BaseToken, IValueToken
         return expression.Evaluate();
     }
 
-    public TryGet<Value> Value()
+    public OldTryGet<Value> Value()
     {
         if (ParseExpression().HasErrored(out var error, out var value))
         {

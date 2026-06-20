@@ -2,7 +2,7 @@ using LabApi.Features.Wrappers;
 using Respawning;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -21,7 +21,7 @@ public class WaveArgument(string name) : Argument(name)
         + WaveTypes.Select(t => $"> {t.Name.LowerFirst()}").JoinStrings("\n");
 
     [UsedImplicitly]
-    public DynamicTryGet<RespawnWave?> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<RespawnWave?> GetConvertSolution(BaseToken token)
     {
         if (!token.BestTextRepr().IsStatic(out var name, out var func))
         {
@@ -36,7 +36,7 @@ public class WaveArgument(string name) : Argument(name)
         return new(() => GetWave(type));
     }
 
-    private static TryGet<Type> GetType(string name)
+    private static OldTryGet<Type> GetType(string name)
     {
         if (WaveTypes.FirstOrDefault(t => string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase)) is { } type)
         {

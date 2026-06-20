@@ -1,4 +1,4 @@
-﻿using SER.Code.Helpers.ResultSystem;
+﻿using SER.Code.Helpers.OldResultSystem;
 
 namespace SER.Code.Extensions;
 
@@ -22,7 +22,7 @@ public static class CollectionExtensions
             return array[new Random().Next(0, array.Length)];
         }
 
-        public TryGet<T> TryGetRandomValue(string error)
+        public OldTryGet<T> TryGetRandomValue(string error)
         {
             try
             {

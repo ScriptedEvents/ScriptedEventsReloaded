@@ -2,7 +2,7 @@
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
@@ -53,7 +53,7 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
         return Expression.TryAddToken(token);
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         if (!EqualSignSet) return $"Value for variable '{varToken.RawRep}' was not provided (missing equals sign).";
         if (Expression is null) return $"Value for variable '{varToken.RawRep}' was not provided.";

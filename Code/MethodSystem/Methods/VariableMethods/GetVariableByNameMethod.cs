@@ -40,9 +40,9 @@ public class GetVariableByNameMethod : ReturningMethod, ICanError
         
         ReturnValue =
             Script.LocalVariables
-                .FirstOrDefault(variable => Variable.AreSyntacticallySame(variable, variableToken))?.BaseValue
-            ?? VariableIndex.GlobalVariables
-                .FirstOrDefault(global => Variable.AreSyntacticallySame(global, variableToken))?.BaseValue
+                .FirstOrDefault(variable => VariableRepr.AreSyntacticallySame(variable, variableToken))?.BaseValue
+            ?? GlobalVariables.Variables
+                .FirstOrDefault(global => VariableRepr.AreSyntacticallySame(global, variableToken))?.BaseValue
             ?? throw new ScriptRuntimeError(this, ErrorReasons[1]);
     }
 

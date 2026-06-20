@@ -1,7 +1,7 @@
 ﻿using LabApi.Features.Wrappers;
 using Newtonsoft.Json;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ValueSystem;
 using Db = System.Collections.Generic.Dictionary<string, SER.Code.FileSystem.Structures.Database.DatabaseValue>;
 
@@ -45,7 +45,7 @@ public class Database
         file.Close();
     }
     
-    public static TryGet<Database> TryGet(string name)
+    public static OldTryGet<Database> TryGet(string name)
     {
         if (AllDatabases.FirstOrDefault(d => d._name == name) is { } foundDb)
         {
@@ -74,7 +74,7 @@ public class Database
         }
     }
 
-    public Result TrySet(string key, Value value, bool save = true)
+    public OldResult TrySet(string key, Value value, bool save = true)
     {
         object saveVal;
         switch (value)
@@ -104,7 +104,7 @@ public class Database
         if (save) Save();
     }
 
-    public TryGet<DatabaseValue> HasKey(string key)
+    public OldTryGet<DatabaseValue> HasKey(string key)
     {
         if (!_db.TryGetValue(key, out var val))
         {
@@ -114,7 +114,7 @@ public class Database
         return val;
     }
 
-    public TryGet<Value> Get(string key)
+    public OldTryGet<Value> Get(string key)
     {
         if (HasKey(key).HasErrored(out var err, out var val))
         {

@@ -34,7 +34,7 @@ public class IntercomInfoMethod : ReturningMethod
     
     public override void Execute()
     {
-        ReturnValue = (Args.GetOption("mode")) switch
+        ReturnValue = Args.GetOption("mode") switch
         {
             "state" => Intercom.State.ToEnumValue(),
             "speaker" => new PlayerValue(Player.ReadyList.ToList().Where(plr => plr.ReferenceHub == Intercom._singleton._curSpeaker)),

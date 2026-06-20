@@ -5,7 +5,7 @@ using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
-using SER.Code.ValueSystem.PropertySystem;
+using SER.Code.PropertySystem;
 
 namespace SER.Code.MethodSystem.Methods.PlayerMethods;
 
@@ -45,7 +45,7 @@ public class ShowMethod : ReturningMethod<TextValue>, ICanError
 
         if (!PlayerValue.PropertyInfoMap.TryGetValue(property, out var propInfo) ||
             propInfo is not IValueWithProperties.PropInfo<Player> { ReturnType: var type, Func: var handler } ||
-            !typeof(LiteralValue).IsAssignableFrom(type.Type)) 
+            !typeof(LiteralValue).IsAssignableFrom(type.ValueType)) 
         {
             throw new ScriptRuntimeError(this, ErrorReasons[0]);
         }

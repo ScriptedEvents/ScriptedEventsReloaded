@@ -1,6 +1,6 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.VariableSystem.Bases;
@@ -15,7 +15,7 @@ public class VariableArgument(string name) : Argument(name)
     public override string InputDescription => "Any existing variable e.g. $name or @players";
 
     [UsedImplicitly]
-    public DynamicTryGet<Variable> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<Variable> GetConvertSolution(BaseToken token)
     {
         if (token is not VariableToken variableToken)
         {
@@ -31,7 +31,7 @@ public class VariableArgument<T>(string name) : Argument(name) where T : Variabl
     public override string InputDescription => $"A {Variable.GetFriendlyName(typeof(T))}";
 
     [UsedImplicitly]
-    public DynamicTryGet<T> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<T> GetConvertSolution(BaseToken token)
     {
         if (token is not VariableToken variableToken)
         {

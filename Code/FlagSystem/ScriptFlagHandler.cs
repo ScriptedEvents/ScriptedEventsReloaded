@@ -2,7 +2,7 @@
 using SER.Code.Extensions;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem.Structures;
@@ -57,7 +57,7 @@ public static class ScriptFlagHandler
         _currentFlag = null;
     }
 
-    public static Result DoFlagsApproveExecution(Script scr, out bool mustReport)
+    public static OldResult DoFlagsApproveExecution(Script scr, out bool mustReport)
     {
         mustReport = true;
         if (!ScriptsFlags.TryGetValue(scr.Name, out var scriptFlags))
@@ -69,7 +69,7 @@ public static class ScriptFlagHandler
         {
             if (flag.OnScriptRunning(scr, out mustReport).HasErrored(out var error))
             {
-                Result rs = $"Flag '{flag.Name}' disallows script execution.";
+                OldResult rs = $"Flag '{flag.Name}' disallows script execution.";
                 return rs + error;
             }
         }
@@ -77,7 +77,7 @@ public static class ScriptFlagHandler
         return true;
     }
 
-    private static Result HandleFlagArgument(string argName, string[] arguments)
+    private static OldResult HandleFlagArgument(string argName, string[] arguments)
     {
         if (_currentFlag is null)
         {
@@ -98,10 +98,10 @@ public static class ScriptFlagHandler
         return true;
     }
 
-    private static TryGet<Flag> HandleFlag(string name, string[] arguments, ScriptName scriptName)
+    private static OldTryGet<Flag> HandleFlag(string name, string[] arguments, ScriptName scriptName)
     {
         _currentFlag?.OnParsingComplete();
-        var rs = $"Flag '{name}' failed when parsing.".AsError();
+        var rs = $"Flag '{name}' failed when parsing.".AsOldError();
         
         if (Flag.TryGet(name, scriptName).HasErrored(out var getErr, out var flag))
         {

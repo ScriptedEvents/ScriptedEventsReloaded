@@ -1,6 +1,6 @@
 ﻿using SER.Code.ContextSystem.Contexts;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Slices;
 using SER.Code.TokenSystem.Structures;
@@ -60,7 +60,7 @@ public class ExpressionToken : BaseToken, IValueToken
         return new Success();
     }
 
-    public static TryGet<ExpressionToken> TryParse(CollectionSlice slice, Script script)
+    public static OldTryGet<ExpressionToken> TryParse(CollectionSlice slice, Script script)
     {
         if (Tokenizer.GetTokenFromSlice(slice, script, null).HasErrored(out var error, out var val))
         {
@@ -75,7 +75,7 @@ public class ExpressionToken : BaseToken, IValueToken
         return expToken;
     }
 
-    public TryGet<Value> Value()
+    public OldTryGet<Value> Value()
     {
         _context!.Run().MoveNext();
         return _context.GetValue();

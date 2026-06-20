@@ -2,7 +2,7 @@
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.Interfaces;
 
@@ -11,8 +11,8 @@ namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 [UsedImplicitly]
 public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
 {
-    private readonly Result _rs = "Cannot create 'repeat' loop.";
-    private Func<TryGet<ulong>>? _repeatCountExpression = null;
+    private readonly OldResult _rs = "Cannot create 'repeat' loop.";
+    private Func<OldTryGet<ulong>>? _repeatCountExpression = null;
     
     public override string KeywordName => "repeat";
     public override string Description => "Repeats everything inside its body a given amount of times.";
@@ -65,9 +65,9 @@ public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
         return TryAddTokenRes.End();
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
-        return Result.Assert(
+        return OldResult.Assert(
             _repeatCountExpression != null,
             _rs + "The amount of times to repeat was not provided."
         );

@@ -1,6 +1,6 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -11,7 +11,7 @@ public class TokenArgument<T>(string name) : Argument(name) where T : BaseToken
     public override string InputDescription => $"A {typeof(T).FriendlyTypeName(true)}";
 
     [UsedImplicitly]
-    public DynamicTryGet<T> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<T> GetConvertSolution(BaseToken token)
     {
         if (token is not T cToken)
         {

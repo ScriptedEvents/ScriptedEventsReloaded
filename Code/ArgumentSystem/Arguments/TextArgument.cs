@@ -1,6 +1,6 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -14,13 +14,13 @@ public class TextArgument(string name, bool allowsSpaces = true) : Argument(name
     public bool AllowsSpaces => allowsSpaces;
 
     [UsedImplicitly]
-    public DynamicTryGet<string> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<string> GetConvertSolution(BaseToken token)
     {
         if (token.BestTextRepr().IsStatic(out var value, out var func))
         {
-            return value.AsSuccess();
+            return value.AsOldSuccess();
         }
 
-        return new(() => func().AsSuccess());
+        return new(() => func().AsOldSuccess());
     }
 }

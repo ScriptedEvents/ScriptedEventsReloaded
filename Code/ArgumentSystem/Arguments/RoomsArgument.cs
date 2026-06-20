@@ -2,7 +2,7 @@
 using MapGeneration;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -16,7 +16,7 @@ public class RoomsArgument(string name) : EnumHandlingArgument(name)
         $"or 'all' for every room";
 
     [UsedImplicitly]
-    public DynamicTryGet<Room[]> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<Room[]> GetConvertSolution(BaseToken token)
     {
         if (token is SymbolToken { IsJoker: true } or AllToken)
         {

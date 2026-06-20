@@ -1,7 +1,7 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.ValueTokens;
 
@@ -50,7 +50,7 @@ public class IntArgument : Argument
     }
 
     [UsedImplicitly]
-    public DynamicTryGet<int> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<int> GetConvertSolution(BaseToken token)
     {
         if (token is NumberToken number)
         {
@@ -65,7 +65,7 @@ public class IntArgument : Argument
         return new(() => func().OnSuccess(VerifyRange));
     }
 
-    private TryGet<int> VerifyRange(NumberValue value)
+    private OldTryGet<int> VerifyRange(NumberValue value)
     {
         var result = (int)value.Value;
         if (result < _minValue)

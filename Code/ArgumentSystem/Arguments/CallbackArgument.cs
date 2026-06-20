@@ -2,7 +2,7 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ContextSystem.Contexts;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
@@ -26,7 +26,7 @@ public class CallbackArgument(string argumentName, params (SingleTypeOfValue typ
         );
 
     [UsedImplicitly]
-    public DynamicTryGet<Callback> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<Callback> GetConvertSolution(BaseToken token)
     {
         if (token.BestTextRepr().IsStatic(out var value, out var func))
         {
@@ -36,7 +36,7 @@ public class CallbackArgument(string argumentName, params (SingleTypeOfValue typ
         return new(() => Verify(func()));
     }
 
-    private TryGet<Callback> Verify(string funcName)
+    private OldTryGet<Callback> Verify(string funcName)
     {
         if (FetchFunc(Script, funcName).HasErrored(out var err))
         {
@@ -56,7 +56,7 @@ public class CallbackArgument(string argumentName, params (SingleTypeOfValue typ
 
     private void GetCallback(Value[] args, Action<Script>? modifier)
     {
-        var mainError = $"Failed getting the callback function '{FuncName}' from script '{Script.Name}'.".AsError();
+        var mainError = $"Failed getting the callback function '{FuncName}' from script '{Script.Name}'.".AsOldError();
 
         // create new instance of the script since there may have been changes to it, 
         // which the old object will not know about
@@ -64,21 +64,21 @@ public class CallbackArgument(string argumentName, params (SingleTypeOfValue typ
             || hostScript.Compile().HasErrored(out error)
             || FetchFunc(hostScript, FuncName).HasErrored(out error, out var func))
         {
-            throw new CustomScriptRuntimeError(mainError + error.AsError());
+            throw new CustomScriptRuntimeError(mainError + error.AsOldError());
         }
 
         if (func.LineNum is not { } startLine)
         {
             throw new CustomScriptRuntimeError(
                 mainError
-                + $"Cannot find the beginning of the '{FuncName}' function - this should not happen.".AsError());
+                + $"Cannot find the beginning of the '{FuncName}' function - this should not happen.".AsOldError());
         }
 
         if (func.EndLine is not { } endLine)
         {
             throw new CustomScriptRuntimeError(
                 mainError
-                + $"Cannot find the end of the '{FuncName}' function - this should not happen.".AsError());
+                + $"Cannot find the end of the '{FuncName}' function - this should not happen.".AsOldError());
         }
 
         var funcContent = hostScript
@@ -114,7 +114,7 @@ public class CallbackArgument(string argumentName, params (SingleTypeOfValue typ
         }
     }
 
-    private TryGet<FuncStatement> FetchFunc(Script functionHolder, string functionName)
+    private OldTryGet<FuncStatement> FetchFunc(Script functionHolder, string functionName)
     {
         if (!functionHolder.DefinedFunctions.TryGetValue(functionName, out var func))
         {

@@ -1,6 +1,6 @@
 ﻿using SER.Code.Exceptions;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
@@ -21,7 +21,7 @@ public abstract class LiteralValueToken<T> : BaseToken, IValueToken
         }
     } = null!;
     
-    TryGet<Value> IValueToken.Value() => Value;
+    OldTryGet<Value> IValueToken.Value() => Value;
     public TypeOfValue PossibleValues => new TypeOfValue<T>();
     public virtual bool IsConstant => true;
 }

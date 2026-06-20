@@ -3,7 +3,7 @@ using SER.Code.ContextSystem.Contexts.VariableDefinition;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.VariableSystem;
@@ -35,7 +35,7 @@ public class GlobalKeyword : YieldingContext, IKeywordContext
         return TryAddTokenRes.Continue();
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         if (_variableToken is null)
             return "Variable name and value haven't been provided.";
@@ -55,6 +55,6 @@ public class GlobalKeyword : YieldingContext, IKeywordContext
             throw new TosoksFuckedUpException();
         }
 
-        VariableIndex.AddGlobalVariable(_variableContext.DefinedVariable);
+        GlobalVariables.AddGlobalVariable(_variableContext.DefinedVariable);
     }
 }

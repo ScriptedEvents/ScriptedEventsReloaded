@@ -1,4 +1,4 @@
-﻿using SER.Code.Helpers.ResultSystem;
+﻿using SER.Code.Helpers.OldResultSystem;
 
 namespace SER.Code.TokenSystem.Slices;
 
@@ -13,7 +13,7 @@ public class SingleSlice(char startChar) : Slice(startChar)
         return true;
     }
 
-    public override Result VerifyState()
+    public override OldResult VerifyState()
     {
         return true;
     }

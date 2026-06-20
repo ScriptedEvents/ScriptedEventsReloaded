@@ -2,7 +2,7 @@
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 using SER.Code.ValueSystem;
@@ -30,7 +30,7 @@ public class OnErrorStatement : StatementContext, IStatementExtender, IKeywordCo
         }
     }
 
-    public Result SetOptionalVariables(params VariableToken[] variableTokens)
+    public OldResult SetOptionalVariables(params VariableToken[] variableTokens)
     {
         if (variableTokens.Length > 3)
             return $"Too many arguments provided for {FriendlyName}, only up to 3 are allowed.";
@@ -111,7 +111,7 @@ public class OnErrorStatement : StatementContext, IStatementExtender, IKeywordCo
         return TryAddTokenRes.Error($"A {FriendlyName} does not expect any arguments.");
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
         return true;
     }

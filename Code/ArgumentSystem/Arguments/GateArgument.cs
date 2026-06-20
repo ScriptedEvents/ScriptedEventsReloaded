@@ -2,7 +2,7 @@ using LabApi.Features.Enums;
 using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ArgumentSystem.Arguments;
@@ -14,7 +14,7 @@ public class GateArgument(string name) : EnumHandlingArgument(name)
         $"or reference to {nameof(Gate)}";
 
     [UsedImplicitly]
-    public DynamicTryGet<Gate> GetConvertSolution(BaseToken token)
+    public OldDynamicTryGet<Gate> GetConvertSolution(BaseToken token)
     {
         if (token.CanReturnReference<Gate>(out var func))
         {

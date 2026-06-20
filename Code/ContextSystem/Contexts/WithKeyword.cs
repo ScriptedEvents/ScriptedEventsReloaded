@@ -2,7 +2,7 @@
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Helpers;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
 
@@ -52,7 +52,7 @@ public class WithKeyword : StandardContext, IKeywordContext, INotRunningContext,
         # end
         """;
 
-    public Result AcceptStatement(StatementContext context)
+    public OldResult AcceptStatement(StatementContext context)
     {
         if (context is not IAcceptOptionalVariableDefinitionsContext receiver)
         {
@@ -74,15 +74,15 @@ public class WithKeyword : StandardContext, IKeywordContext, INotRunningContext,
         return TryAddTokenRes.Continue();
     }
 
-    public override Result VerifyCurrentState()
+    public override OldResult VerifyCurrentState()
     {
-        Result err = "The statement above does not accept provided variables.";
+        OldResult err = "The statement above does not accept provided variables.";
         if (_receiver.Value.SetOptionalVariables(_variables.ToArray()).HasErrored(out var error))
         {
             return err + error;
         }
 
-        return Result.Assert(
+        return OldResult.Assert(
             _variables.Count > 0,
             "No variables were provided."
         );

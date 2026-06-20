@@ -1,6 +1,6 @@
 ﻿using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.Extensions;
-using SER.Code.Helpers.ResultSystem;
+using SER.Code.Helpers.OldResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
 namespace SER.Code.ArgumentSystem.BaseArguments;
@@ -10,14 +10,14 @@ public abstract class EnumHandlingArgument(string name) : Argument(name)
     protected interface IEnumHandler<TReturn>
     {
         public Type EnumType { get; }
-        public Func<object, DynamicTryGet<TReturn>> Handler { get; }
+        public Func<object, OldDynamicTryGet<TReturn>> Handler { get; }
     }
     
-    protected class EnumHandler<TEnum, TReturn>(Func<TEnum, DynamicTryGet<TReturn>> handler) 
+    protected class EnumHandler<TEnum, TReturn>(Func<TEnum, OldDynamicTryGet<TReturn>> handler) 
         : IEnumHandler<TReturn> where TEnum : struct, Enum
     {
         public Type EnumType { get; } = typeof(TEnum);
-        public Func<object, DynamicTryGet<TReturn>> Handler { get; } = obj => handler((TEnum) obj);
+        public Func<object, OldDynamicTryGet<TReturn>> Handler { get; } = obj => handler((TEnum) obj);
     }
 
     /// <summary>
@@ -30,7 +30,7 @@ public abstract class EnumHandlingArgument(string name) : Argument(name)
     /// </param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    protected DynamicTryGet<T> EnumResolver<T>(
+    protected OldDynamicTryGet<T> EnumResolver<T>(
         BaseToken token,
         IEnumHandler<T>[] enumHandlers)
     {
@@ -54,7 +54,7 @@ public abstract class EnumHandlingArgument(string name) : Argument(name)
             return GenericError(token);
         });
 
-        DynamicTryGet<T>? InternalEnumResolve()
+        OldDynamicTryGet<T>? InternalEnumResolve()
         {
             var stringRep = token.BestStaticTextRepr();
             foreach (var enumHandler in enumHandlers)

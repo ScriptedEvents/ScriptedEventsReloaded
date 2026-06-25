@@ -12,7 +12,7 @@ public class PropertyAccess(BaseToken initialToken, IValueToken root)
 {
     private readonly List<string> _propertyNames = [];
 
-    public ValueType PossibleValues { get; private set; } = root.PossibleValueTypes;
+    public ValueType PossibleValues { get; private set; } = root.ValueTypes;
 
     public string ExprRepr { get; private set; } = initialToken.RawRep;
 
@@ -91,7 +91,7 @@ public class PropertyAccess(BaseToken initialToken, IValueToken root)
 
     public OldTryGet<(object target, IValueWithProperties.PropInfo propInfo)> ResolveLastProp()
     {
-        if (root.Value().HasErrored(out var rootError, out var rootValue))
+        if (root.TryGetValue().HasErrored(out var rootError, out var rootValue))
         {
             return $"Failed to get value from '{ExprRepr}'".AsOldError() + rootError.AsOldError();
         }

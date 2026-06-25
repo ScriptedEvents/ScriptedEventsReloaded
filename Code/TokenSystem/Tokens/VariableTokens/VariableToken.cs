@@ -1,5 +1,6 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.Helpers.OldResultSystem;
+using SER.Code.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens.Interfaces;
@@ -70,7 +71,7 @@ public abstract class VariableToken<TVariable, TValue> : VariableToken, IValueTo
         return new Success();
     }
 
-    public OldTryGet<Value> Value()
+    public TryGet<Value> TryGetValue()
     {
         return TryGetVariable().OnSuccess(Value (variable) => variable.Value);
     }

@@ -133,7 +133,7 @@ public static class NumericExpressionReslover
                 {
                     variables[tmp] = (
                         valueToken
-                            .Value()
+                            .TryGetValue()
                             .OnSuccess(s => s.ToCSharpObject(null), mainErr),
                         token.RawRep
                     );
@@ -142,7 +142,7 @@ public static class NumericExpressionReslover
                 {
                     variables[tmp] = (
                         new(() => valueToken
-                            .Value()
+                            .TryGetValue()
                             .OnSuccess(s => s.ToCSharpObject(null), mainErr)),
                         token.RawRep
                     );

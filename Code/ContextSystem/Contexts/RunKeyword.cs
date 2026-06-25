@@ -67,7 +67,7 @@ public class RunKeyword : YieldingContext, IMayReturnValueContext
         List<Value> varsToProvide = [];
         foreach (var valToken in _providedValues)
         {
-            if (valToken.Value().HasErrored(out var error, out var variable))
+            if (valToken.TryGetValue().HasErrored(out var error, out var variable))
             {
                 throw new ScriptRuntimeError(this,
                     $"Cannot run {_functionDefinitionContext!}: {error}"

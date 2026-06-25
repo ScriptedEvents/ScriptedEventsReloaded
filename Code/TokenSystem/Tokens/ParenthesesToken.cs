@@ -1,6 +1,7 @@
 ﻿using SER.Code.Extensions;
 using SER.Code.Helpers;
 using SER.Code.Helpers.OldResultSystem;
+using SER.Code.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Slices;
 using SER.Code.TokenSystem.Structures;
@@ -13,7 +14,7 @@ namespace SER.Code.TokenSystem.Tokens;
 
 public class ParenthesesToken : BaseToken, IValueToken
 {
-    public ValueType PossibleValueTypes => ValueType.Literal;
+    public ValueType ValueTypes => ValueType.Literal;
     
     public bool IsConstant => false;
     
@@ -49,7 +50,7 @@ public class ParenthesesToken : BaseToken, IValueToken
         return expression.Evaluate();
     }
 
-    public OldTryGet<Value> Value()
+    public TryGet<Value> TryGetValue()
     {
         if (ParseExpression().HasErrored(out var error, out var value))
         {

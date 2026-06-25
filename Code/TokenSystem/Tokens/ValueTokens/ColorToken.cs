@@ -1,24 +1,30 @@
 using System.Globalization;
-using SER.Code.Helpers.OldResultSystem;
+using SER.Code.Extensions;
+using SER.Code.ResultSystem;
 using SER.Code.ScriptSystem;
 using UnityEngine;
+using ValueType = SER.Code.ValueSystem.ValueType;
 
 namespace SER.Code.TokenSystem.Tokens.ValueTokens;
 
-public class ColorToken : LiteralValueToken<ColorValue>
+public class ColorToken : ValueToken
 {
+    public override ValueType ValueTypes => ValueType.Color;
+
+    public override bool IsConstant => true;
+
     protected override IParseResult InternalParse(Script scr)
     {
-        if (TryParseColor(RawRep).WasSuccessful(out var color))
+        if (TryParseColor(RawRep).HasSucceeded(out var color))
         {
-            Value = new ColorValue(color);
+            Value = ValueSystem.Value.Color(color);
             return new Success();
         }
         
         return new Ignore();
     }
     
-    public static OldTryGet<Color> TryParseColor(string value)
+    public static TryGet<Color> TryParseColor(string value)
     {
         var initValue = value;
         if (value.StartsWith("#"))
@@ -47,7 +53,7 @@ public class ColorToken : LiteralValueToken<ColorValue>
                 return new Color(r, g, b, a);
             }
             default:
-                return $"Invalid color format. Expected RRGGBB (6) or RRGGBBAA (8), got '{initValue}' ({value.Length}).";
+                return $"Invalid color format. Expected RRGGBB (6) or RRGGBBAA (8), got '{initValue}' ({value.Length}).".AsError();
         }
     }
 }

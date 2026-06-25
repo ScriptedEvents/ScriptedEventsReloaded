@@ -15,7 +15,7 @@ public class AnyValueArgument(string name) : Argument(name)
     {
         if (token is IValueToken valToken)
         {
-            return new(valToken.Value);
+            return new(valToken.TryGetValue);
         }
 
         return $"Value '{token.RawRep}' does not represent any kind of value";

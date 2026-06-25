@@ -428,7 +428,7 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
 
             LiteralValue value;
             if (token is IValueToken { IsConstant: true } valToken 
-                && valToken.Value().WasSuccessful(out var tempVal)
+                && valToken.TryGetValue().WasSuccessful(out var tempVal)
                 && tempVal is LiteralValue tempVal2)
             {
                 value = tempVal2;

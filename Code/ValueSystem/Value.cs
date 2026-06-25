@@ -63,7 +63,7 @@ public struct Value
 
     public static Value Player(Player player) => new()
     {
-        Metadata = new() { ValueType = ValueType.Player },
+        Metadata = ValueMetadata.Basic(ValueType.Player),
         _players = [player]
     };
 
@@ -75,21 +75,13 @@ public struct Value
 
     public static Value Enum(Enum value) => new()
     {
-        Metadata = new()
-        {
-            ValueType = ValueType.Text, 
-            EnumType = value.GetType()
-        },
+        Metadata = ValueMetadata.Enum(value.GetType()),
         _text = value.ToString(),
     };
 
     public static Value Reference<T>(T reference) => new()
     {
-        Metadata = new()
-        {
-            ValueType = ValueType.Reference, 
-            ReferenceType = typeof(T)
-        },
+        Metadata = ValueMetadata.Reference<T>(),
         _reference = reference,
     };
 
@@ -106,7 +98,7 @@ public struct Value
     public static Value Collection(IEnumerable collection)
     {
         List<Value> values = [];
-        ValueType itemValueTypes = ValueSystem.ValueType.Invalid;
+        ValueType itemValueTypes = ValueType.Invalid;
         foreach (var item in collection)
         {
             var value = Parse(item);
@@ -137,47 +129,47 @@ public struct Value
     public TryGet<string> AsText()
     {
         if (ValueType != ValueType.Text)
-            return InvalidRangeError(ValueSystem.ValueType.Text);
+            return InvalidRangeError(ValueType.Text);
         
         return _text ?? throw new InvalidOperationException();
     }
 
     public TryGet<bool> AsBool()
     {
-        if (SingleValueType != SingleValueType.Bool) 
-            return InvalidRangeError(ValueSystem.ValueType.Bool);
+        if (ValueType != ValueType.Bool) 
+            return InvalidRangeError(ValueType.Bool);
         
         return _bool;
     }
 
     public TryGet<decimal> AsNumber()
     {
-        if (SingleValueType != SingleValueType.Number)
-            return InvalidRangeError(ValueSystem.ValueType.Number);
+        if (ValueType != ValueType.Number)
+            return InvalidRangeError(ValueType.Number);
 
         return _number;
     }
 
     public TryGet<TimeSpan> AsDuration()
     {
-        if (SingleValueType != SingleValueType.Duration)
-            return InvalidRangeError(ValueSystem.ValueType.Duration);
+        if (ValueType != ValueType.Duration)
+            return InvalidRangeError(ValueType.Duration);
 
         return _duration;
     }
 
     public TryGet<Color> AsColor()
     {
-        if (SingleValueType != SingleValueType.Color)
-            return InvalidRangeError(ValueSystem.ValueType.Color);
+        if (ValueType != ValueType.Color)
+            return InvalidRangeError(ValueType.Color);
 
         return _color;
     }
 
     public TryGet<Player> AsPlayer()
     {
-        if (SingleValueType != SingleValueType.Player)
-            return InvalidRangeError(ValueSystem.ValueType.Player);
+        if (ValueType != ValueType.Player)
+            return InvalidRangeError(ValueType.Player);
 
         if (_players == null || _players.Length == 0)
             return "Value contains no players".AsError();
@@ -187,24 +179,24 @@ public struct Value
 
     public TryGet<Player[]> AsPlayers()
     {
-        if (SingleValueType != SingleValueType.Player)
-            return InvalidRangeError(ValueSystem.ValueType.Player);
+        if (ValueType != ValueType.Player)
+            return InvalidRangeError(ValueType.Player);
 
         return _players ?? throw new InvalidOperationException();
     }
     
     public TryGet<object> AsReference()
     {
-        if (SingleValueType != SingleValueType.Reference)
-            return InvalidRangeError(ValueSystem.ValueType.Reference);
+        if (ValueType != ValueType.Reference)
+            return InvalidRangeError(ValueType.Reference);
 
         return _reference ?? throw new InvalidOperationException();
     }
 
     public TryGet<T> AsReference<T>()
     {
-        if (SingleValueType != SingleValueType.Reference)
-            return InvalidRangeError(ValueSystem.ValueType.Reference);
+        if (ValueType != ValueType.Reference)
+            return InvalidRangeError(ValueType.Reference);
 
         if (_reference is T t)
             return t;
@@ -214,8 +206,8 @@ public struct Value
 
     public TryGet<Value[]> AsCollection()
     {
-        if (SingleValueType != SingleValueType.Collection)
-            return InvalidRangeError(ValueSystem.ValueType.Collection);
+        if (ValueType != ValueType.Collection)
+            return InvalidRangeError(ValueType.Collection);
 
         return _collection ?? throw new InvalidOperationException();
     }
@@ -224,7 +216,7 @@ public struct Value
     {
         if (obj is null) throw new AndrzejFuckedUpException();
         if (obj is Value v) return v;
-        
+
         return obj switch
         {   
             bool b                => Bool(b),
@@ -271,10 +263,7 @@ public struct Value
         
         if (typeof(IEnumerable).IsAssignableFrom(t))
         {
-            var itemType = t.GetInterfaces()
-                .Concat([t])
-                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                ?.GetGenericArguments()[0] ?? typeof(object);
+            var itemType = GetEnumerableItemType(t);
 
             return t == itemType ? ValueType.Reference : ValueType.Collection;
         }
@@ -282,8 +271,12 @@ public struct Value
         return ValueType.Reference;
     }
     
-    public static TryGet<ValueMetadata> TryGuessValueMetadata(Type t)
+    public static ValueMetadata GuessValueMetadata(Type t)
     {
+        if (t == typeof(Value)) throw new ArgumentException("Cannot guess metadata for Value type.", nameof(t));
+        if (t == typeof(ValueMetadata)) throw new ArgumentException("Cannot guess metadata for ValueMetadata type.", nameof(t));
+        if (t == typeof(CollectionItemValueMetadata)) throw new ArgumentException("Cannot guess metadata for CollectionItemValueMetadata type.", nameof(t));
+        
         var count = 0;
         while (t.IsByRef)
         {
@@ -302,22 +295,10 @@ public struct Value
         {
             if (t.IsDefined(typeof(FlagsAttribute), true))
             {
-                return new ValueMetadata
-                {
-                    ValueType = SingleValueType.Collection,
-                    EnumType = t,
-                    CollectionItemMetadata = new()
-                    {
-                        Type = ValueType.Text
-                    }
-                };
+                return ValueMetadata.EnumFlags(t);
             }
 
-            return new ValueMetadata
-            {
-                ValueType = SingleValueType.Text,
-                EnumType = t
-            };
+            return ValueMetadata.Enum(t);
         }
 
         var valType = GuessValueType(t);
@@ -329,43 +310,38 @@ public struct Value
             ValueType.Number or 
             ValueType.Player)
         {
-            return new ValueMetadata
-            {
-                ValueType = new(valType)
-            };
+            return ValueMetadata.Basic(valType);
         }
 
         if (valType is ValueType.Collection)
         {
-            var itemType = t.GetInterfaces()
-                .Concat([t])
-                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                ?.GetGenericArguments()[0] ?? typeof(object);
+            var itemType = GetEnumerableItemType(t);
 
             if (itemType == t)
             {
-                return new ValueMetadata
-                {
-                    ReferenceType = t,
-                    ValueType = SingleValueType.Reference
-                };
+                return ValueMetadata.Reference(t);
             }
 
-            return new ValueMetadata
-            {
-                ValueType = SingleValueType.Collection,
-                CollectionItemMetadata = new()
-                {
-                    Type = GuessValueType(itemType)
-                },
-            };
+            return ValueMetadata.Collection(new() { Type = GuessValueType(itemType) });
         }
 
-        return new ValueMetadata
+        return ValueMetadata.Reference(t);
+    }
+
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static Type GetEnumerableItemType(Type t)
+    {
+        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+            return t.GetGenericArguments()[0];
+
+        foreach (var i in t.GetInterfaces())
         {
-            ValueType = SingleValueType.Reference,
-            ReferenceType = t
-        };
+            if (i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                return i.GetGenericArguments()[0];
+        }
+
+        return typeof(object);
     }
 
     [Pure]

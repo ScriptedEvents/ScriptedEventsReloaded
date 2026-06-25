@@ -1,16 +1,19 @@
 ﻿using SER.Code.ContextSystem.Contexts;
 using SER.Code.Extensions;
 using SER.Code.Helpers.OldResultSystem;
+using SER.Code.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Slices;
 using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens.Interfaces;
+using SER.Code.TokenSystem.Tokens.ValueTokens;
 using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
+using ValueType = SER.Code.ValueSystem.ValueType;
 
 namespace SER.Code.TokenSystem.Tokens.ExpressionTokens;
 
-public class ExpressionToken : BaseToken, IValueToken
+public class ExpressionToken : ValueToken
 {
     private ValueExpressionContext? _context;
     
@@ -60,7 +63,7 @@ public class ExpressionToken : BaseToken, IValueToken
         return new Success();
     }
 
-    public static OldTryGet<ExpressionToken> TryParse(CollectionSlice slice, Script script)
+    public static TryGet<ExpressionToken> TryParse(CollectionSlice slice, Script script)
     {
         if (Tokenizer.GetTokenFromSlice(slice, script, null).HasErrored(out var error, out var val))
         {
@@ -75,11 +78,12 @@ public class ExpressionToken : BaseToken, IValueToken
         return expToken;
     }
 
-    public OldTryGet<Value> Value()
+    public TryGet<Value> TryGetValue()
     {
         _context!.Run().MoveNext();
         return _context.GetValue();
     }
+    public override ValueType ValueTypes { get; }
     public TypeOfValue PossibleValues => _context!.PossibleValues;
     public bool IsConstant => false;
 }

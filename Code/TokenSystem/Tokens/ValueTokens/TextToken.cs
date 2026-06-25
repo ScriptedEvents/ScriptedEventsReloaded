@@ -1,12 +1,15 @@
 ﻿using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Slices;
 using SER.Code.TokenSystem.Structures;
+using ValueType = SER.Code.ValueSystem.ValueType;
 
 namespace SER.Code.TokenSystem.Tokens.ValueTokens;
 
-public class TextToken : LiteralValueToken<TextValue>
+public class TextToken : ValueToken
 {
-    public override bool IsConstant => Value is StaticTextValue;
+    public override ValueType ValueTypes => ValueType.Text;
+
+    public override bool IsConstant => true;
 
     protected override IParseResult InternalParse(Script scr)
     {
@@ -14,19 +17,8 @@ public class TextToken : LiteralValueToken<TextValue>
         {
             return new Ignore();
         }
-
-        if (!TextValue.HasExpression(Slice.Value))
-        {
-            Value = new StaticTextValue(Slice.Value);
-            return new Success();
-        }
-
-        if (TextValue.Lint(Slice.Value, scr).HasErrored(out var error))
-        {
-            return new Error(error);
-        }
-
-        Value = new DynamicTextValue(Slice.Value, scr);
+        
+        Value = ValueSystem.Value.Text(Slice.Value);
         return new Success();
     }
 }

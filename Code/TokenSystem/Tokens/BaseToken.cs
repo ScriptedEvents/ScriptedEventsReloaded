@@ -1,5 +1,6 @@
 ﻿using SER.Code.Extensions;
 using SER.Code.Helpers.OldResultSystem;
+using SER.Code.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Slices;
 using SER.Code.TokenSystem.Tokens.Interfaces;
@@ -38,7 +39,7 @@ public class BaseToken
     /// <summary>
     /// Used when there was a clear intent of using this token, but parsing still failed. This will cause a compile error.
     /// </summary>
-    public record struct Error(string Message) : IParseResult;
+    public record struct Error(ErrorList Message) : IParseResult;
 
     protected virtual IParseResult InternalParse(Script scr)
     {
@@ -49,7 +50,7 @@ public class BaseToken
     
     public OldDynamicGet<string> BestTextRepr() => InternalBestTextExpr();
     
-    public OldDynamicGet<string> InternalBestTextExpr()
+    private OldDynamicGet<string> InternalBestTextExpr()
     {
         // ReSharper disable once ConvertIfStatementToSwitchStatement
         if (this is TextToken textToken)

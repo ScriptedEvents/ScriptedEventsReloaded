@@ -118,7 +118,7 @@ public class ValueExpressionContext : AdditionalContext
         }
         
         return _handler?.GetReturnValue()
-               ?? _initialValueToken?.Value()
+               ?? _initialValueToken?.TryGetValue()
                ?? throw new AndrzejFuckedUpException();
     }
 
@@ -313,7 +313,7 @@ public class FunctionCallHandler(Script scr) : ValueExpressionContext.Handler
         List<Value> varsToProvide = [];
         foreach (var valToken in _providedValues)
         {
-            if (valToken.Value().HasErrored(out var error, out var variable))
+            if (valToken.TryGetValue().HasErrored(out var error, out var variable))
             {
                 throw new ScriptRuntimeError(_func!,
                     $"Cannot run {_func!.FriendlyName}: {error}"

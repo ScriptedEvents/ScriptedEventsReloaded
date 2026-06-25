@@ -78,7 +78,7 @@ public static class SerExtensions
         {
             if (token is not IValueToken valToken) return $"Value '{token.RawRep}' cannot represent a {typeof(T).FriendlyTypeName()}";
         
-            return valToken.Value().SuccessTryCast<Value, T>();
+            return valToken.TryGetValue().SuccessTryCast<Value, T>();
         }
     }
 
@@ -89,7 +89,7 @@ public static class SerExtensions
             get = valToken.TryGet<T>;
         
             // if unknown, its always assumed that it may return T
-            if (!valToken.PossibleValueTypes.AreKnown(out var knownReturnTypes)) return true;
+            if (!valToken.ValueTypes.AreKnown(out var knownReturnTypes)) return true;
         
             // if any of known types is assignable to T, or T to type, then it may return T
             return knownReturnTypes.Any(type => typeof(T).IsAssignableFrom(type) || type.IsAssignableFrom(typeof(T)));
@@ -97,7 +97,7 @@ public static class SerExtensions
         
         public OldTryGet<T> TryGet<T>() where T : Value
         {
-            return valToken.Value().SuccessTryCast<Value, T>();
+            return valToken.TryGetValue().SuccessTryCast<Value, T>();
         }
     }
 

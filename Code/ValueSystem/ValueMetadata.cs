@@ -11,4 +11,35 @@ public readonly record struct ValueMetadata
     {
         ValueType = valueType
     };
+    
+    public static ValueMetadata EnumFlags(Type enumType) => new()
+    {
+        ValueType = ValueType.Collection,
+        EnumType = enumType,
+        CollectionItemMetadata = new() { Type = ValueType.Text }
+    };
+
+    public static ValueMetadata Enum(Type enumType) => new()
+    {
+        ValueType = ValueType.Text,
+        EnumType = enumType
+    };
+    
+    public static ValueMetadata Reference(Type referenceType) => new()
+    {
+        ValueType = ValueType.Reference,
+        ReferenceType = referenceType
+    };
+    
+    public static ValueMetadata Reference<T>() => new()
+    {
+        ValueType = ValueType.Reference,
+        ReferenceType = typeof(T)
+    };
+    
+    public static ValueMetadata Collection(CollectionItemValueMetadata collectionItemMetadata) => new()
+    {
+        ValueType = ValueType.Collection,
+        CollectionItemMetadata = collectionItemMetadata
+    };
 }

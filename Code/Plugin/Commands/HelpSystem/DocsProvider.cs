@@ -169,6 +169,12 @@ public static class DocsProvider
             {
                 throw new AndrzejFuckedUpException($"Option {option} was not added to the help system.");
             }
+
+            if (option == HelpOption.Methods && args.Count > 1 && args.Array?[args.Offset + 1].ToLowerInvariant() == "all")
+            {
+                response = GetMethodList(true);
+                return true;
+            }
             
             response = func();
             return true;
@@ -484,10 +490,11 @@ public static class DocsProvider
             """;
     }
 
-    private static Dictionary<string, List<Method>> MethodsByCategory()
+    private static Dictionary<string, List<Method>> MethodsByCategory(IEnumerable<Method>? methods = null)
     {
+        methods ??= MethodIndex.GetMethods();
         Dictionary<string, List<Method>> methodsByCategory = new();
-        foreach (var method in MethodIndex.GetMethods())
+        foreach (var method in methods)
         {
             if (methodsByCategory.ContainsKey(method.Subgroup))
             {
@@ -504,13 +511,28 @@ public static class DocsProvider
 
     public static string GetMethodList()
     {
+        return GetMethodList(false);
+    }
+
+    public static string GetMethodList(bool all)
+    {
         const string retsSuffix = " [rets]";
 
-        var sb = new StringBuilder($"Hi! There are {MethodIndex.GetMethods().Length} methods available for your use!\n");
+        var allMethods = MethodIndex.GetMethods();
+        if (!all)
+        {
+            allMethods = allMethods.Where(m => m is IEssential).ToArray();
+        }
+
+        var sb = new StringBuilder($"Hi! There are {allMethods.Length} {(all ? string.Empty : "essential ")}methods available for your use!\n");
         sb.AppendLine($"If a method has {retsSuffix.TrimStart()}, it means that this method returns a value.");
+        if (!all)
+        {
+            sb.AppendLine("This list ONLY shows essential methods. To see ALL methods, use 'serhelp methods all'.");
+        }
         sb.AppendLine("If you want to get specific information about a given method, just do 'serhelp <MethodName>'!");
 
-        foreach (var kvp in MethodsByCategory().OrderBy(kvp => kvp.Key[0]))
+        foreach (var kvp in MethodsByCategory(allMethods).OrderBy(kvp => kvp.Key[0]))
         {
             var descDistance = DescDistance(kvp.Value);
             
@@ -525,11 +547,14 @@ public static class DocsProvider
         foreach (var (framework, methods) in MethodIndex.FrameworkDependentMethods
                      .Where(kvp => FrameworkBridge.Found.All(fb => fb.Type != kvp.Key)))
         {
-            var descDistance = DescDistance(methods);
+            var shownMethods = all ? methods : methods.Where(m => m is IEssential).ToList();
+            if (shownMethods.Count == 0) continue;
+            
+            var descDistance = DescDistance(shownMethods);
             
             sb.AppendLine();
             sb.AppendLine($"--- (not accessible) {framework} framework methods ---");
-            foreach (var method in methods)
+            foreach (var method in shownMethods)
             {
                 sb.AppendLine(GetFormatted(method, descDistance));
             }

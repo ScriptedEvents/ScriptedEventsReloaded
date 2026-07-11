@@ -162,6 +162,7 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
 
     private void OnServerFullyInit(FrameworkBridge frameworkBridge)
     {
+        Timing.CallDelayed(2f, frameworkBridge.Finish);
         if (!Config.SendInitMessage) return;
 
         Logger.Raw(
@@ -175,8 +176,6 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
              """,
             ConsoleColor.Cyan
         );
-
-        Timing.CallDelayed(2f, frameworkBridge.Finish);
     }
 
     private static void SendLogo()

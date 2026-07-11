@@ -43,137 +43,25 @@ public static class DocsProvider
 
     public static bool GetGeneralOutput(ArraySegment<string> args, out string response)
     {
-        var arg = args.Array?[args.Offset].ToLowerInvariant() ?? throw new Exception("argument provided in invalid format");
+        var arg = args.Array?[args.Offset].ToLowerInvariant() 
+                  ?? throw new Exception("argument provided in invalid format");
+        
         if (Enum.TryParse(arg, true, out HelpOption option))
         {
             if (option == HelpOption.Properties && args.Count > 1)
             {
-                var rawInput = string.Join(" ", args.Skip(1));
-                var anonymousScript = new Script { Name = ScriptName.CreateUnsafe("HelpAnonymous"), Content = string.Empty, Executor = ServerConsoleExecutor.Instance };
+                return GetPropertiesAdvanced(args, out response);
+            }
 
-                // 1) Handle Method Execution (run:method ...)
-                if (rawInput.StartsWith("run:", StringComparison.OrdinalIgnoreCase))
-                {
-                    var methodLine = rawInput[4..].Trim();
-                    if (Tokenizer.TokenizeLine(methodLine, anonymousScript, null).HasErrored(out var errorMsg, out var tokens))
-                    {
-                        response = $"Error parsing method: {errorMsg}";
-                        return false;
-                    }
-
-                    if (tokens.Length == 0 || tokens[0] is not MethodToken methodToken)
-                    {
-                        response = "The provided input did not resolve to a valid method call.";
-                        return false;
-                    }
-
-                    var context = (MethodContext)methodToken.GetContext(anonymousScript);
-                    if (context.Method is not IReturningMethod returningMethod)
-                    {
-                        response = $"Method '{context.Method.Name}' does not return a value that can be inspected.";
-                        return false;
-                    }
-
-                    // Feed remaining tokens to the dispatcher
-                    foreach (var token in tokens.Skip(1))
-                    {
-                        if (context.TryAddToken(token).HasErrored)
-                        {
-                            response = $"Argument error: {context.TryAddToken(token).ErrorMessage}";
-                            return false;
-                        }
-                    }
-
-                    if (context.VerifyCurrentState().HasErrored(out errorMsg))
-                    {
-                        response = $"Missing arguments: {errorMsg}";
-                        return false;
-                    }
-
-                    // Run it synchronously. ReturningMethods are sync (except for SafeScripts wait).
-                    if (context.Method is SynchronousMethod syncMethod)
-                    {
-                        syncMethod.Execute();
-                        var val = returningMethod.ReturnValue;
-                        if (val is null)
-                        {
-                            response = "The method was executed but returned no value.";
-                            return true;
-                        }
-                        return TryGetPropsFromValue(val, out response);
-                    }
-
-                    response = "Only synchronous returning methods can be inspected.";
-                    return false;
-                }
-
-                // 2) Handle Variables and Types via Tokenization
-                if (Tokenizer.TokenizeLine(rawInput, anonymousScript, null).HasErrored(out _, out var inputTokens) || inputTokens.Length == 0)
-                {
-                    // Fallback to legacy type lookup if tokenization fails or is empty
-                    return GetPropertiesForType(args.Array[args.Offset + 1], out response);
-                }
-
-                var firstToken = inputTokens[0];
-                if (firstToken is VariableToken varToken)
-                {
-                    // Check for @script:name scope
-                    Script? targetScript = null;
-                    var scriptParam = inputTokens.FirstOrDefault(t => t.RawRep.StartsWith("@script:", StringComparison.OrdinalIgnoreCase));
-                    if (scriptParam != null)
-                    {
-                        var scriptName = scriptParam.RawRep[8..];
-                        targetScript = Script.RunningScripts.FirstOrDefault(s => ((string)s.Name).Equals(scriptName, StringComparison.OrdinalIgnoreCase));
-                        if (targetScript == null)
-                        {
-                            response = $"Script '{scriptName}' is not currently running.\nRunning scripts: " + 
-                                       (Script.RunningScripts.Any() ? string.Join(", ", Script.RunningScripts.Select(s => s.Name).ToArray()) : "none");
-                            return false;
-                        }
-                    }
-
-                    Value? resolvedValue = null;
-                    if (targetScript != null)
-                    {
-                        var prefix = varToken.RawRep[0];
-                        var name = varToken.RawRep[1..];
-                        if (targetScript.LocalVariables.Any(v => v.Prefix == prefix && v.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
-                        {
-                            resolvedValue = targetScript.LocalVariables.First(v => v.Prefix == prefix && v.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).BaseValue;
-                        }
-                        else
-                        {
-                            response = $"Variable '{varToken.RawRep}' was not found in script '{targetScript.Name}'.";
-                            return false;
-                        }
-                    }
-                    else if (VariableIndex.TryGetGlobalVariable(varToken.RawRep[0], varToken.RawRep[1..], out var globalVar))
-                    {
-                        resolvedValue = globalVar.BaseValue;
-                    }
-
-                    if (resolvedValue != null)
-                    {
-                        return TryGetPropsFromValue(resolvedValue, out response);
-                    }
-
-                    response = $"Variable '{varToken.RawRep}' is not defined globally.";
-                    return false;
-                }
-
-                // Default legacy path (or assembly-qualified type)
-                return GetPropertiesForType(rawInput, out response);
+            if (option == HelpOption.Methods && args.Count > 1 && args.Array?[args.Offset + 1] == "essential")
+            {
+                response = GetMethodList(true);
+                return true;
             }
             
             if (!GeneralOptions.TryGetValue(option, out var func))
             {
                 throw new AndrzejFuckedUpException($"Option {option} was not added to the help system.");
-            }
-
-            if (option == HelpOption.Methods && args.Count > 1 && args.Array?[args.Offset + 1].ToLowerInvariant() == "all")
-            {
-                response = GetMethodList(true);
-                return true;
             }
             
             response = func();
@@ -514,21 +402,21 @@ public static class DocsProvider
         return GetMethodList(false);
     }
 
-    public static string GetMethodList(bool all)
+    public static string GetMethodList(bool essential)
     {
         const string retsSuffix = " [rets]";
 
         var allMethods = MethodIndex.GetMethods();
-        if (!all)
+        if (essential)
         {
             allMethods = allMethods.Where(m => m is IEssential).ToArray();
         }
 
-        var sb = new StringBuilder($"Hi! There are {allMethods.Length} {(all ? string.Empty : "essential ")}methods available for your use!\n");
+        var sb = new StringBuilder($"Hi! There are {allMethods.Length} {(essential ? "essential " : string.Empty)}methods available for your use!\n");
         sb.AppendLine($"If a method has {retsSuffix.TrimStart()}, it means that this method returns a value.");
-        if (!all)
+        if (essential)
         {
-            sb.AppendLine("This list ONLY shows essential methods. To see ALL methods, use 'serhelp methods all'.");
+            sb.AppendLine("This list ONLY shows essential methods..");
         }
         sb.AppendLine("If you want to get specific information about a given method, just do 'serhelp <MethodName>'!");
 
@@ -547,7 +435,7 @@ public static class DocsProvider
         foreach (var (framework, methods) in MethodIndex.FrameworkDependentMethods
                      .Where(kvp => FrameworkBridge.Found.All(fb => fb.Type != kvp.Key)))
         {
-            var shownMethods = all ? methods : methods.Where(m => m is IEssential).ToList();
+            var shownMethods = !essential ? methods : methods.Where(m => m is IEssential).ToList();
             if (shownMethods.Count == 0) continue;
             
             var descDistance = DescDistance(shownMethods);
@@ -806,7 +694,7 @@ public static class DocsProvider
             > serhelp properties *myVar
             
             From a local variable from a running script:
-            > serhelp properties *target @script:round_start
+            > serhelp properties *target script:round_start
             
             From the return value of a method:
             > serhelp properties run:GetFromMap doors
@@ -944,5 +832,125 @@ public static class DocsProvider
         
         response = RenderProperties(typeName, props);
         return true;
+    }
+
+    // ai
+    public static bool GetPropertiesAdvanced(ArraySegment<string> args, out string response)
+    {
+        var rawInput = string.Join(" ", args.Skip(1));
+        var anonymousScript = new Script { Name = ScriptName.CreateUnsafe("HelpAnonymous"), Content = string.Empty, Executor = ServerConsoleExecutor.Instance };
+
+        // 1) Handle Method Execution (run:method ...)
+        if (rawInput.StartsWith("run:", StringComparison.OrdinalIgnoreCase))
+        {
+            var methodLine = rawInput[4..].Trim();
+            if (Tokenizer.TokenizeLine(methodLine, anonymousScript, null).HasErrored(out var errorMsg, out var tokens))
+            {
+                response = $"Error parsing method: {errorMsg}";
+                return false;
+            }
+
+            if (tokens.Length == 0 || tokens[0] is not MethodToken methodToken)
+            {
+                response = "The provided input did not resolve to a valid method call.";
+                return false;
+            }
+
+            var context = (MethodContext)methodToken.GetContext(anonymousScript);
+            if (context.Method is not IReturningMethod returningMethod)
+            {
+                response = $"Method '{context.Method.Name}' does not return a value that can be inspected.";
+                return false;
+            }
+
+            // Feed remaining tokens to the dispatcher
+            foreach (var token in tokens.Skip(1))
+            {
+                if (context.TryAddToken(token).HasErrored)
+                {
+                    response = $"Argument error: {context.TryAddToken(token).ErrorMessage}";
+                    return false;
+                }
+            }
+
+            if (context.VerifyCurrentState().HasErrored(out errorMsg))
+            {
+                response = $"Missing arguments: {errorMsg}";
+                return false;
+            }
+
+            // Run it synchronously. ReturningMethods are sync (except for SafeScripts wait).
+            if (context.Method is SynchronousMethod syncMethod)
+            {
+                syncMethod.Execute();
+                var val = returningMethod.ReturnValue;
+                if (val is null)
+                {
+                    response = "The method was executed but returned no value.";
+                    return true;
+                }
+                return TryGetPropsFromValue(val, out response);
+            }
+
+            response = "Only synchronous returning methods can be inspected.";
+            return false;
+        }
+
+        // 2) Handle Variables and Types via Tokenization
+        if (Tokenizer.TokenizeLine(rawInput, anonymousScript, null).HasErrored(out _, out var inputTokens) || inputTokens.Length == 0)
+        {
+            // Fallback to legacy type lookup if tokenization fails or is empty
+            return GetPropertiesForType(args.Array![args.Offset + 1], out response);
+        }
+
+        var firstToken = inputTokens[0];
+        if (firstToken is VariableToken varToken)
+        {
+            // Check for script:name scope
+            Script? targetScript = null;
+            var scriptParam = inputTokens.FirstOrDefault(t => t.RawRep.StartsWith("script:", StringComparison.OrdinalIgnoreCase));
+            if (scriptParam != null)
+            {
+                var scriptName = scriptParam.RawRep["script:".Length..];
+                targetScript = Script.RunningScripts.FirstOrDefault(s => ((string)s.Name).Equals(scriptName, StringComparison.OrdinalIgnoreCase));
+                if (targetScript == null)
+                {
+                    response = $"Script '{scriptName}' is not currently running.\nRunning scripts: " + 
+                               (Script.RunningScripts.Any() ? string.Join(", ", Script.RunningScripts.Select(s => s.Name).ToArray()) : "none");
+                    return false;
+                }
+            }
+
+            Value? resolvedValue = null;
+            if (targetScript != null)
+            {
+                var prefix = varToken.RawRep[0];
+                var name = varToken.RawRep[1..];
+                if (targetScript.LocalVariables.Any(v => v.Prefix == prefix && v.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    resolvedValue = targetScript.LocalVariables.First(v => v.Prefix == prefix && v.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).BaseValue;
+                }
+                else
+                {
+                    response = $"Variable '{varToken.RawRep}' was not found in script '{targetScript.Name}'.";
+                    return false;
+                }
+            }
+            else if (VariableIndex.TryGetGlobalVariable(varToken.RawRep[0], varToken.RawRep[1..], out var globalVar))
+            {
+                resolvedValue = globalVar.BaseValue;
+            }
+
+            if (resolvedValue != null)
+            {
+                return TryGetPropsFromValue(resolvedValue, out response);
+            }
+
+            response = $"Variable '{varToken.RawRep}' is not defined globally.";
+            return false;
+        }
+
+        // Default legacy path (or assembly-qualified type)
+        return GetPropertiesForType(rawInput, out response);
     }
 }

@@ -9,7 +9,7 @@ namespace SER.Code.ArgumentSystem.Arguments;
 
 public class DurationArgument(string name) : Argument(name)
 {
-    public override string InputDescription => "Duration in format #ms (milliseconds), #s (seconds), #m (minutes) etc., e.g. 5s or 2m";
+    public override string InputDescription => "Duration in format #ms, #s, #m, #h (e.g. 5s or 2m)";
 
     [UsedImplicitly]
     public DynamicTryGet<TimeSpan> GetConvertSolution(BaseToken token)

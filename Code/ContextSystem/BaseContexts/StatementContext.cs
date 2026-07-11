@@ -27,7 +27,6 @@ public abstract class StatementContext : YieldingContext
         // If we can run the whole thing synchronously right now, do it.
         // This still bypasses allocating OUR state machine.
         return RunChildrenInternal(endCond) ?? Enumerable.Empty<float>().GetEnumerator(); 
-        // optimization tip: Use a cached, static empty enumerator instance instead of Enumerable.Empty
     }
     
     // The compiler only builds a state machine for this helper method

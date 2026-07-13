@@ -16,6 +16,33 @@ public static class FileSystem
     public static readonly string ConfigsDirPath = Path.Combine(MainDirPath, "Custom Configs");
     public static string[] RegisteredScriptPaths = [];
 
+    public static TryGet<string> GetContainedPath(string rootDirectory, string name, string extension)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return TryGet<string>.Error("A file name cannot be empty.");
+        }
+
+        try
+        {
+            var root = Path.GetFullPath(rootDirectory)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var path = Path.GetFullPath(Path.Combine(root, name + extension));
+            var rootPrefix = root + Path.DirectorySeparatorChar;
+
+            if (!path.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return TryGet<string>.Error($"Path '{name}' resolves outside the SER data directory.");
+            }
+
+            return path.AsSuccess();
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return TryGet<string>.Error($"Path '{name}' is invalid: {ex.Message}");
+        }
+    }
+
     public static void UpdateScriptPathCollection()
     {
         List<string> paths = [];

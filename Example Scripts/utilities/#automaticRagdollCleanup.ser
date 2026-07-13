@@ -1,0 +1,19 @@
+# Disabled by default: remove # from the filename to enable this script.
+# Automatic ragdoll cleanup
+# Replaces a simple ragdoll cleaner plugin.
+# Change both occurrences of 5m to adjust the interval.
+
+!-- OnEvent RoundStarted
+
+# Leave the first bodies for a while so players can inspect the scene.
+wait 5m
+
+forever
+    Broadcast @all 5s "<color=#f0c75e>Facility cleanup in 10 seconds.</color>"
+    wait 10s
+
+    CleanupRagdolls
+    Print "Automatic cleanup removed all ragdolls."
+
+    wait 5m
+end

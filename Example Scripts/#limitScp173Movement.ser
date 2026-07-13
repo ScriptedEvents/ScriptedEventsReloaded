@@ -1,3 +1,4 @@
+# Disabled by default: remove # from the filename to enable this script.
 # this script limits when scp 173 can teleport
 # depending on how many players are looking at him
 

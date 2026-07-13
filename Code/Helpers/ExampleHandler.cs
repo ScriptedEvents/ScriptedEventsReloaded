@@ -72,6 +72,47 @@ public static class ExampleHandler
             }
         }
 
+        var regressionScripts = new Dictionary<string, string>
+        {
+            ["event_toggle_returns"] =
+                "$disabled = DisableEvent \"Hurting\"\n$enabled = EnableEvent \"Hurting\"",
+            ["sermethod_returning_shape"] = "DB.Exists \"..\""
+        };
+
+        foreach (var regressionScript in regressionScripts)
+        {
+            var script = Script.CreateAnonymous(regressionScript.Key, regressionScript.Value);
+            if (script.Compile().HasErrored(out var error))
+            {
+                return (new Result(false, $"in regression script '{regressionScript.Key}'") + error.AsError(),
+                    examples.Keys.ToArray());
+            }
+
+            if (regressionScript.Key == "sermethod_returning_shape" &&
+                !script.IsSingleSynchronousReturningMethod)
+            {
+                return ("The sermethod regression was not recognized as a synchronous returning method.",
+                    examples.Keys.ToArray());
+            }
+        }
+
+        var invalidScripts = new Dictionary<string, string>
+        {
+            ["missing_end"] = "if true\n    Print \"this block is intentionally not closed\"",
+            ["extra_end"] = "end"
+        };
+
+        foreach (var invalidScript in invalidScripts)
+        {
+            if (!Script.CreateAnonymous(invalidScript.Key, invalidScript.Value)
+                    .Compile()
+                    .HasErrored())
+            {
+                return ($"The validator accepted invalid regression script '{invalidScript.Key}'.",
+                    examples.Keys.ToArray());
+            }
+        }
+
         return (null, examples.Keys.ToArray());
     }
 }

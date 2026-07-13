@@ -1,6 +1,7 @@
 ﻿using CommandSystem;
 using LabApi.Features.Permissions;
 using SER.Code.Plugin.Commands.Interfaces;
+using SER.Code.ValueSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 
@@ -27,13 +28,38 @@ public class MethodCommand : ICommand, IUsePermissions
             Executor = ScriptExecutor.Get(sender)
         };
         
+        if (script.Compile().HasErrored(out var compileError))
+        {
+            response = compileError;
+            return false;
+        }
+
+        if (script.IsSingleSynchronousReturningMethod)
+        {
+            if (script.RunSingleSynchronousReturningMethod(RunReason.BaseCommand)
+                .HasErrored(out var runtimeError, out var result))
+            {
+                response = runtimeError;
+                return false;
+            }
+
+            response = $"Method executed. Result: {FormatResult(result)}";
+            return true;
+        }
+
         script.Run(RunReason.BaseCommand);
         response = "Method executed.";
         return true;
     }
+
+    private static string FormatResult(Value value) => value switch
+    {
+        LiteralValue literal => literal.StringRep,
+        _ => value.ToString()
+    };
     
     public string Command => "sermethod";
     public string[] Aliases => [];
-    public string Description => "Runs the provied arguments at it was a line in a script.";
+    public string Description => "Runs the provided arguments as a single line of a script.";
     public string Permission => RunPermission;
 }

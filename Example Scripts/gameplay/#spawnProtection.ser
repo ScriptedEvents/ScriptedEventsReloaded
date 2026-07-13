@@ -1,0 +1,15 @@
+# Disabled by default: remove # from the filename to enable this script.
+# Short spawn protection
+# Replaces a basic spawn-protection plugin.
+# Change 5s and the effect intensity to match your server balance.
+
+!-- OnEvent ChangedRole
+-- require @evPlayer $evNewRole
+
+# Spectators and unassigned players do not need protection.
+if $evNewRole is "Spectator" or $evNewRole is "None"
+    stop
+end
+
+GiveEffect @evPlayer DamageReduction 5s 255
+Hint @evPlayer 5s "<color=#73ff73>Spawn protection active for 5 seconds.</color>"

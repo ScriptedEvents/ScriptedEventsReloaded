@@ -1,0 +1,12 @@
+# Disabled by default: remove # from the filename to enable this script.
+# Public .rules command
+# Replaces a basic rules command plugin.
+# Edit the text below to match your own rules.
+
+!-- CustomCommand rules
+-- availableFor player remoteAdmin
+-- description "Shows the most important server rules"
+-- cooldown 5s
+-- onCooldownMessage "Please wait %time% seconds before using .rules again."
+
+Reply "<color=#8dfcef><b>SERVER RULES</b></color><br>1. Do not cheat, exploit bugs or team.<br>2. Do not harass other players.<br>3. Follow staff instructions.<br>4. Keep voice chat usable.<br>Use the server's website or Discord for the complete rules."

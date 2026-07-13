@@ -11,8 +11,14 @@ public static class CommandEvents
     
     public static void Initialize()
     {
-        UsedCommandTypes.Clear();
+        Clear();
         ServerEvents.CommandExecuting += CaptureCommand;
+    }
+
+    public static void Clear()
+    {
+        ServerEvents.CommandExecuting -= CaptureCommand;
+        UsedCommandTypes.Clear();
     }
 
     // for reference this method was once called CaptureComamnd

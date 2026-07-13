@@ -1,3 +1,4 @@
+# Disabled by default: remove # from the filename to enable this script.
 # this script makes SCP-173 drop pills or a medkit on damage, like a pinata
 
 !-- OnEvent Hurt

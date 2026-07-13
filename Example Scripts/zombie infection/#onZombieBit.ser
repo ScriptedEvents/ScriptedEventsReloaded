@@ -1,3 +1,4 @@
+# Disabled by default: remove # from the filename to enable this script.
 # this script is responsible for registering bites of zombies
 # and setting the time of death by infection for victims
 

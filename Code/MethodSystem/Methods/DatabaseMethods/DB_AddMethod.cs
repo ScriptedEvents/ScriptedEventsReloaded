@@ -14,7 +14,8 @@ public class DB_AddMethod : SynchronousMethod, ICanError
 
     public string[] ErrorReasons =>
     [
-        "Provided value cannot be stored in databases"
+        "Provided value cannot be stored in databases.",
+        "The database could not be saved."
     ];
 
     public override Argument[] ExpectedArguments { get; } =

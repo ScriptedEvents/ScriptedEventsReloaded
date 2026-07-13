@@ -1,4 +1,5 @@
 ﻿using LabApi.Events.Arguments.PlayerEvents;
+using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.CustomHandlers;
 #if !EXILED
 using LabApi.Features;
@@ -43,6 +44,10 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
 
     public static string HelpCommandName => "serhelp";
     public static MainPlugin Instance { get; private set; } = null!;
+
+    private FrameworkBridge? _frameworkBridge;
+    private TeslaRuleHandler? _teslaRuleHandler;
+    private DamageRuleHandler? _damageRuleHandler;
 
     public record Contributor(string Name, Contribution Contribution, string? Id = null);
 
@@ -120,33 +125,19 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
         Instance = this;
         
 
-        var fBridge = new FrameworkBridge();
-        fBridge.Load();
+        _frameworkBridge = new FrameworkBridge();
+        _frameworkBridge.Load();
         SendLogo();
 
-        Events.ServerEvents.MapGenerating += ev =>
-        {
-            Script.StopAll();
-            ScriptFlagHandler.Clear();
-            SetPlayerDataMethod.PlayerData.Clear();
-            TeslaRuleHandler.ResetAll();
-            DamageRuleHandler.ResetAll();
-            CRole.ResetAll();
-            
-            ReferencePropertyRegistry.Initialize();
-            Flag.RegisterFlags();
-            EventHandler.Initialize();
-            MethodIndex.Initialize();
-            VariableIndex.Initialize();
-            CommandEvents.Initialize();
-            FileSystem.FileSystem.Initialize();
-        };
+        Events.ServerEvents.MapGenerating += OnMapGenerating;
         
-        Events.ServerEvents.WaitingForPlayers += () => OnServerFullyInit(fBridge);
+        Events.ServerEvents.WaitingForPlayers += OnServerFullyInit;
         Events.PlayerEvents.Joined += OnJoined;
-        
-        CustomHandlersManager.RegisterEventsHandler(new TeslaRuleHandler());
-        CustomHandlersManager.RegisterEventsHandler(new DamageRuleHandler());
+
+        _teslaRuleHandler = new TeslaRuleHandler();
+        _damageRuleHandler = new DamageRuleHandler();
+        CustomHandlersManager.RegisterEventsHandler(_teslaRuleHandler);
+        CustomHandlersManager.RegisterEventsHandler(_damageRuleHandler);
     }
     
 #if !EXILED
@@ -154,15 +145,49 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
 #else
     public override void OnDisabled()
 #endif
-    { 
+    {
         Script.StopAll();
         ScriptFlagHandler.Clear();
         EventHandler.Clear();
+        CommandEvents.Clear();
+
+        Events.ServerEvents.MapGenerating -= OnMapGenerating;
+        Events.ServerEvents.WaitingForPlayers -= OnServerFullyInit;
+        Events.PlayerEvents.Joined -= OnJoined;
+
+        if (_teslaRuleHandler is not null)
+            CustomHandlersManager.UnregisterEventsHandler(_teslaRuleHandler);
+        if (_damageRuleHandler is not null)
+            CustomHandlersManager.UnregisterEventsHandler(_damageRuleHandler);
+
+        _frameworkBridge?.Finish();
+        _frameworkBridge = null;
+        _teslaRuleHandler = null;
+        _damageRuleHandler = null;
     }
 
-    private void OnServerFullyInit(FrameworkBridge frameworkBridge)
+    private void OnMapGenerating(MapGeneratingEventArgs _)
     {
-        Timing.CallDelayed(2f, frameworkBridge.Finish);
+        Script.StopAll();
+        ScriptFlagHandler.Clear();
+        SetPlayerDataMethod.PlayerData.Clear();
+        TeslaRuleHandler.ResetAll();
+        DamageRuleHandler.ResetAll();
+        CRole.ResetAll();
+
+        ReferencePropertyRegistry.Initialize();
+        Flag.RegisterFlags();
+        EventHandler.Initialize();
+        MethodIndex.Initialize();
+        VariableIndex.Initialize();
+        CommandEvents.Initialize();
+        FileSystem.FileSystem.Initialize();
+    }
+
+    private void OnServerFullyInit()
+    {
+        if (_frameworkBridge is not null)
+            Timing.CallDelayed(2f, _frameworkBridge.Finish);
         if (!Config.SendInitMessage) return;
 
         Logger.Raw(

@@ -25,7 +25,8 @@ public class CRole_CreateBracketSpawnSystemMethod : ReferenceReturningMethod<Cus
         new EnumArgument<RoleTypeId>("role to replace"),
         new ReferenceArgument<SpawnBracket>("spawn brackets")
         {
-            Description = "The spawn brackets to use for this role."
+            Description = "The spawn brackets to use for this role.",
+            ConsumesRemainingValues = true
         }
     ];
 

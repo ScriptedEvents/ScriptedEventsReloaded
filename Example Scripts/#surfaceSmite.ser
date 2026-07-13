@@ -1,3 +1,4 @@
+# Disabled by default: remove # from the filename to enable this script.
 !-- CustomCommand surfacesmite
 -- availableFor RemoteAdmin
 -- description "Kills a random player currently in the Surface Zone."

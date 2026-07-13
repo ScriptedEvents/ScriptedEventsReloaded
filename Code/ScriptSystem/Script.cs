@@ -10,6 +10,7 @@ using SER.Code.FlagSystem.Flags;
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem;
+using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem;
 using SER.Code.TokenSystem.Structures;
@@ -19,6 +20,7 @@ using SER.Code.VariableSystem;
 using SER.Code.VariableSystem.Bases;
 using SER.Code.VariableSystem.Structures;
 using SER.Code.VariableSystem.Variables;
+using SER.Code.ValueSystem;
 
 namespace SER.Code.ScriptSystem;
 
@@ -348,6 +350,50 @@ public class Script
         }
 
         return true;
+    }
+
+    internal bool IsSingleSynchronousReturningMethod =>
+        _contexts is [MethodContext { Method: ReturningMethod }];
+
+    internal TryGet<Value> RunSingleSynchronousReturningMethod(RunReason reason)
+    {
+        if (_contexts is not [MethodContext { Method: ReturningMethod } methodContext])
+        {
+            return "The command is not a single synchronous returning method.";
+        }
+
+        StartTime = DateTime.Now;
+        RunReason = reason;
+        RunningScriptsList.Add(this);
+
+        try
+        {
+            var execution = methodContext.Run();
+            while (execution.MoveNext())
+            {
+                // A synchronous method can only yield the optional SafeScripts frame.
+                // Command responses must be produced before ICommand.Execute returns.
+            }
+
+            if (methodContext.ReturnedValue is not { } returnedValue)
+            {
+                return methodContext.MissingValueHint;
+            }
+
+            return returnedValue;
+        }
+        catch (ScriptRuntimeError error)
+        {
+            return error.Message;
+        }
+        catch (Exception error)
+        {
+            return $"Method failed with {error.GetType().AccurateName}: {error.Message}";
+        }
+        finally
+        {
+            RunningScriptsList.Remove(this);
+        }
     }
     
     public void CompileWithAutomaticThrow()

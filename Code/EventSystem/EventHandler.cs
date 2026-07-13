@@ -48,16 +48,46 @@ public static class EventHandler
         BindedEvents.Clear();
     }
 
-    public static Result DisableEvent(string evName)
+    public static TryGet<bool> DisableEvent(string evName)
     {
-        DisabledEvents.Add(evName);
-        return BindEvent(evName);
+        if (GetCancellableEvent(evName).HasErrored(out var error))
+        {
+            return error;
+        }
+
+        if (BindEvent(evName).HasErrored(out error))
+        {
+            return error;
+        }
+
+        return DisabledEvents.Add(evName);
     }
 
-    public static bool EnableEvent(string evName)
+    public static TryGet<bool> EnableEvent(string evName)
     {
-        DisabledEvents.Remove(evName);
-        return false;
+        if (GetCancellableEvent(evName).HasErrored(out var error))
+        {
+            return error;
+        }
+
+        return DisabledEvents.Remove(evName);
+    }
+
+    private static TryGet<EventInfo> GetCancellableEvent(string evName)
+    {
+        var eventInfo = AvailableEvents.FirstOrDefault(e => e.Name == evName);
+        if (eventInfo is null)
+        {
+            return $"Event '{evName}' does not exist!";
+        }
+
+        var eventArgsType = eventInfo.EventHandlerType?.GetGenericArguments().FirstOrDefault();
+        if (eventArgsType is null || !typeof(ICancellableEvent).IsAssignableFrom(eventArgsType))
+        {
+            return $"Event '{evName}' cannot be disabled because it is not cancellable!";
+        }
+
+        return eventInfo;
     }
     
     public static Result AddEventHandler(string evName, ScriptName scriptName) 
@@ -110,16 +140,16 @@ public static class EventHandler
 
     private static Result BindEvent(string evName)
     {
-        if (!BindedEvents.Add(evName))
-        {
-            // already binded
-            return true;
-        }
-
         EventInfo? matchingEventInfo = AvailableEvents.FirstOrDefault(e => e.Name == evName);
         if (matchingEventInfo is null)
         {
             return $"Event '{evName}' does not exist!"; 
+        }
+
+        if (!BindedEvents.Add(evName))
+        {
+            // already binded
+            return true;
         }
         
         var genericType = matchingEventInfo.EventHandlerType.GetGenericArguments().FirstOrDefault();
@@ -197,6 +227,9 @@ public static class EventHandler
     private static void OnNonArgumentedEvent(string evName)
     {
         Log.Debug($"[NonArg] Event '{evName}' triggered.");
+
+        if (DisabledEvents.Contains(evName))
+            return;
 
         if (!OnEventActions.TryGetValue(evName, out var actions))
             return;

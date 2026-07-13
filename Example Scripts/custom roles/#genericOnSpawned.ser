@@ -1,3 +1,4 @@
+# Disabled by default: remove # from the filename to enable this script.
 # when a player with any custom role is spawned, 
 # this will tell the player the role he has
 

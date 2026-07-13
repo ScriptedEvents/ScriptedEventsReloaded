@@ -1,0 +1,17 @@
+# Disabled by default: remove # from the filename to enable this script.
+# Public .suicide command
+# Replaces a simple suicide command plugin.
+
+!-- CustomCommand suicide
+-- availableFor player
+-- description "Kills your current character"
+-- cooldown 10s
+-- onCooldownMessage "Please wait %time% seconds before using .suicide again."
+
+if {@sender -> isAlive} is false
+    Reply "You are already dead."
+    stop
+end
+
+Reply "Your character has been terminated."
+Kill @sender

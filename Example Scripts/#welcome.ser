@@ -1,3 +1,4 @@
+# Disabled by default: remove # from the filename to enable this script.
 # this script is connected to the 'Joined' event, which means that this script will run when a player joins
 # this event provides us with the @evPlayer variable with the player who just joined
 

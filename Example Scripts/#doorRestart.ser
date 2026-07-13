@@ -1,3 +1,4 @@
+# Disabled by default: remove # from the filename to enable this script.
 !-- CustomCommand doorrestart
 -- description "Does a door restart sequence"
 -- availableFor server remoteAdmin

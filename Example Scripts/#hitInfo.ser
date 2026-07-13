@@ -1,3 +1,4 @@
+# Disabled by default: remove # from the filename to enable this script.
 # sends a simple hint when someone gets hurt
 
 !-- OnEvent Hurt

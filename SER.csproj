@@ -121,9 +121,7 @@
         <Content Include=".gitignore" />
         <Content Include="README.md" />
         <None Include="THIRD_PARTY_LICENSES.txt" CopyToOutputDirectory="Always" />
-        <EmbeddedResource Include="Example Scripts\*.ser" />
-        <EmbeddedResource Include="Example Scripts\custom roles\*.ser" />
-        <EmbeddedResource Include="Example Scripts\zombie infection\*.ser" />
+        <EmbeddedResource Include="Example Scripts\**\*.ser" />
     </ItemGroup>
     
     <ItemGroup>
@@ -138,7 +136,7 @@
 
     <!-- nuget refs -->
     <ItemGroup>
-        <PackageReference Include="AudioPlayerApi" Version="1.1.2" />
+        <PackageReference Include="AudioPlayerApi" Version="1.1.3" />
         <PackageReference Include="Callvote.LabAPI" Version="6.8.0" />
         <PackageReference Include="ExMod.Exiled" Version="9.13.3" />
         <PackageReference Include="NCalc" Version="1.3.8" />

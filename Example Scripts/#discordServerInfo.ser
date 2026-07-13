@@ -1,3 +1,4 @@
+# Disabled by default: remove # from the filename to enable this script.
 # this script creates a discord webhook informing of the players currently on the server
 
 !-- OnEvent WaitingForPlayers

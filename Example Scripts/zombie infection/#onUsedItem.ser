@@ -1,3 +1,4 @@
+# Disabled by default: remove # from the filename to enable this script.
 # if a player uses a medkit or SCP-500, 
 # his infection will be cleared
 

@@ -1,3 +1,4 @@
+# Disabled by default: remove # from the filename to enable this script.
 # if a player changes their role, their infection status should be reset 
 # e.g. role is changed by admin, death, other plugin etc.
 

@@ -1,0 +1,21 @@
+# Disabled by default: remove # from the filename to enable this script.
+# Limited .medic command
+# Replaces a small self-heal/VIP utility plugin.
+# Add a neededRank or neededPermission flag if this should be restricted.
+
+!-- CustomCommand medic
+-- availableFor player
+-- description "Restores 35 health once per round"
+-- cooldown 30s
+-- onCooldownMessage "You must wait %time% seconds before healing again."
+-- maxUses 1
+-- onMaxUsesMessage "You have already used your medic charge this round."
+
+if {@sender -> isAlive} is false
+    Reply "You must be alive to use this command."
+    stop
+end
+
+Heal @sender 35
+Hint @sender 4s "<color=#73ff73>Medic charge used: +35 HP</color>"
+Reply "Medic charge used."

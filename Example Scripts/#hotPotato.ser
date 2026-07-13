@@ -1,3 +1,4 @@
+# Disabled by default: remove # from the filename to enable this script.
 # this script adds a custom "hot potato" event
 
 !-- OnEvent RoundStarted

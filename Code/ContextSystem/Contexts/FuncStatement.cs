@@ -49,17 +49,15 @@ public class FuncStatement :
         $sum = run $Add 5 3
         Print $sum
 
-
         func @SigmasOnly
-            return RemovePlayers * @classDPlayers
+            return Except @all @classDPlayers
         end
 
         @sigmas = run @SigmasOnly
         Explode @sigmas
 
-
         func ExplodeAll
-            Explode *
+            Explode @all
         end
 
         run ExplodeAll

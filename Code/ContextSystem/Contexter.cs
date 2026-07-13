@@ -47,6 +47,15 @@ public static class Contexter
 
         if (errors.Any()) return Result.Merge(errors);
 
+        if (statementStack.Count > 0)
+        {
+            var unclosedStatements = statementStack
+                .Select(statement => $"{statement.FriendlyName} at line {statement.LineNum}")
+                .JoinStrings(", ");
+
+            return $"The following statement(s) were not closed with 'end': {unclosedStatements}.";
+        }
+
         return contexts.ToArray();
     }
 

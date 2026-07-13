@@ -1,5 +1,6 @@
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.Exceptions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Methods.ConfigMethods.Structures;
 using SER.Code.MethodSystem.Structures;
@@ -8,7 +9,7 @@ namespace SER.Code.MethodSystem.Methods.ConfigMethods;
 
 // ReSharper disable once InconsistentNaming
 [UsedImplicitly]
-public class Config_ReadMethod : ReferenceReturningMethod<CustomConfig?>, IAdditionalDescription
+public class Config_ReadMethod : ReferenceReturningMethod<CustomConfig?>, IAdditionalDescription, ICanError
 {
     public override string Description => "Reads and returns a config.";
 
@@ -26,14 +27,26 @@ public class Config_ReadMethod : ReferenceReturningMethod<CustomConfig?>, IAddit
 
     public override void Execute()
     {
-        var ymlPath = Path.Combine(FileSystem.FileSystem.ConfigsDirPath, Args.GetText("config name") + ".yml");
+        if (FileSystem.FileSystem.GetContainedPath(
+                FileSystem.FileSystem.ConfigsDirPath, Args.GetText("config name"), ".yml")
+            .HasErrored(out var error, out var ymlPath))
+        {
+            throw new ScriptRuntimeError(this, error);
+        }
+
         if (File.Exists(ymlPath))
         {
             ReturnValue = new CustomConfig(File.ReadAllText(ymlPath));
             return;
         }
-        
-        var yamlPath = Path.Combine(FileSystem.FileSystem.ConfigsDirPath, Args.GetText("config name") + ".yaml");
+
+        if (FileSystem.FileSystem.GetContainedPath(
+                FileSystem.FileSystem.ConfigsDirPath, Args.GetText("config name"), ".yaml")
+            .HasErrored(out error, out var yamlPath))
+        {
+            throw new ScriptRuntimeError(this, error);
+        }
+
         if (File.Exists(yamlPath))
         {
             ReturnValue = new CustomConfig(File.ReadAllText(yamlPath));
@@ -42,4 +55,6 @@ public class Config_ReadMethod : ReferenceReturningMethod<CustomConfig?>, IAddit
         
         ReturnValue = null;
     }
+
+    public string[] ErrorReasons => ["The config name resolves outside the SER custom config directory."];
 }

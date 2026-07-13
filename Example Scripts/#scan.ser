@@ -1,3 +1,4 @@
+# Disabled by default: remove # from the filename to enable this script.
 !-- CustomCommand scan
 -- description "Scans the facility"
 -- availableFor server remoteAdmin

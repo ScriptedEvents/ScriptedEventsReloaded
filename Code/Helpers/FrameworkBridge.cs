@@ -30,6 +30,9 @@ public class FrameworkBridge
 
     public void Load()
     {
+        Timing.KillCoroutines(_handles.ToArray());
+        _handles.Clear();
+        Found.Clear();
 #if EXILED
         MethodIndex.LoadMethodsOfFramework(Type.Exiled);
 #endif

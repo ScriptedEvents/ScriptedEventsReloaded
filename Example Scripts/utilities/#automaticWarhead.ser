@@ -1,0 +1,24 @@
+# Disabled by default: remove # from the filename to enable this script.
+# Automatic late-round warhead
+# Replaces a simple auto-nuke plugin and prevents excessively long rounds.
+# Change 15m to the desired maximum round duration.
+
+!-- OnEvent RoundStarted
+
+wait 15m
+
+# The round may have ended while this script was waiting.
+if {RoundInfo isInProgress} is false
+    stop
+end
+
+# Do not restart or interfere with a warhead that is already counting down.
+if {WarheadInfo hasStarted}
+    stop
+end
+
+Broadcast @all 10s "<color=red>Maximum round time reached. Automatic warhead sequence initiated.</color>"
+Cassie jingle "maximum round duration reached . automatic warhead sequence initiated" "Maximum round duration reached.<split>Automatic warhead sequence initiated."
+
+Warhead lock
+Warhead start

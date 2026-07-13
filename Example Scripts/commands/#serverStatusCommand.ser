@@ -1,0 +1,17 @@
+# Disabled by default: remove # from the filename to enable this script.
+# Public .status command
+# Replaces a simple server/round status plugin.
+
+!-- CustomCommand status
+-- availableFor player remoteAdmin server
+-- description "Shows current round and population information"
+-- cooldown 3s
+
+$roundTime = FormatDuration {RoundInfo duration} "MMm SSs"
+$message = "Round time: {$roundTime}"
+$message = $message + "<br>Players: {AmountOf @all} ({AmountOf @alivePlayers} alive)"
+$message = $message + "<br>SCPs: {AmountOf @scpPlayers}"
+$message = $message + "<br>Class-D: {AmountOf @classDPlayers} | Scientists: {AmountOf @scientistPlayers}"
+$message = $message + "<br>Foundation: {AmountOf @foundationForcePlayers} | Chaos: {AmountOf @chaosInsurgencyPlayers}"
+
+Reply $message

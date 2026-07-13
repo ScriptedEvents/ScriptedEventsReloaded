@@ -7,3 +7,5 @@ SER.sln.DotSettings.user
 *.user
 /SER Visual Editor.html
 /ser_method_info.js
+/VS Code Extension/node_modules
+/VS Code Extension/out/ser_method_info.js

@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using SER.Code.ArgumentSystem.Arguments;
+using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.MethodSystem;
 using SER.Code.MethodSystem.BaseMethods.Interfaces;
@@ -1493,25 +1494,31 @@ public static class Builder
         CreateSerMethodInfo();
     }
 
+    private static string GetArgumentSyntax(Argument a)
+    {
+        var name = a.Name.Replace(" ", "_");
+
+        name = a switch
+        {
+            PlayersArgument or PlayerArgument => $"@{name}",
+            TextArgument { AllowsSpaces: true } => $"\"{name}\"",
+            LooseReferenceArgument => $"*{name}",
+            LiteralVariableArgument => $"${name}",
+            CollectionArgument => $"&{name}",
+            _ => name
+        };
+        
+        if (a.ConsumesRemainingValues) name += "...";
+        if (!a.MustBeProvided) name += "?";
+                
+        return name;
+    }
+
     private static void CreateSerMethodInfo()
     {
         var methods = MethodIndex.GetMethods().ToDictionary(m => m.Name, object (m) => new
         {
-            syntax = $"{m.Name} " + string.Join(" ", m.ExpectedArguments.Select(a =>
-            {
-                var name = a.Name.Replace(" ", "_");
-
-                name = a switch
-                {
-                    PlayersArgument or PlayerArgument => $"@{name}",
-                    TextArgument { AllowsSpaces: true } => $"\"{name}\"",
-                    _ => name
-                };
-                if (a.ConsumesRemainingValues) name += "...";
-                if (!a.MustBeProvided) name += "?";
-                
-                return name;
-            })),
+            syntax = $"{m.Name} " + string.Join(" ", m.ExpectedArguments.Select(GetArgumentSyntax)),
             description = m.Description,
             additionalDescription = (m as IAdditionalDescription)?.AdditionalDescription,
             requiredFramework = (m as IDependOnFramework)?.DependsOn.ToString(),
@@ -1523,7 +1530,8 @@ public static class Builder
                 type = a.InputDescription,
                 description = a.Description,
                 defaultValue = a.DefaultValue?.StringRep ?? a.DefaultValue?.Value?.ToString(),
-                consumesRemainingValues = a.ConsumesRemainingValues
+                consumesRemainingValues = a.ConsumesRemainingValues,
+                syntax = GetArgumentSyntax(a)
             }),
             errors = (m as ICanError)?.ErrorReasons ?? []
         });

@@ -1,0 +1,196 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "SER",
+  "scopeName": "source.txt",
+  "patterns": [
+    {"include": "#comments"},
+    {"include": "#flags"},
+    {"include": "#strings"},
+    {"include": "#functions"},
+    {"include": "#keywords"},
+    {"include": "#methods"},
+    {"include": "#curly-expressions"},
+    {"include": "#round-expressions"},
+    {"include": "#variables"},
+    {"include": "#operators"},
+    {"include": "#constants"},
+    {"include": "#assignments"}
+  ],
+  "repository": {
+    "comments": {
+      "match": "(\\s\\s+|^\\s*)#\\s.*$",
+      "name": "comment.line.ser"
+    },
+    "flags": {
+      "patterns": [
+        {
+          "match": "^\\s*(!--)\\s+(OnEvent|OnCRole|InteractableToyEvent|OnCustomTrigger|CustomCommand|Function)(\\s*)",
+          "captures": {
+            "1": {"name": "keyword.control.ser"},
+            "2": {"name": "keyword.control.ser"},
+            "3": {
+              "patterns": [
+                {"include": "#strings"}
+              ]
+            }
+          }
+        },
+        {
+          "match": "^\\s*(--)\\s+([a-zA-Z]+)(\\s*)",
+          "captures": {
+            "1": {"name": "keyword.control.ser"},
+            "2": {"name": "keyword.control.ser"},
+            "3": {
+              "patterns": [
+                {"include": "#strings"},
+                {"include": "#variables"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "strings": {
+      "begin": "\"",
+      "beginCaptures": [
+        {"name": "string.quoted.double"}
+      ],
+      "endCaptures": [
+        {"name": "string.quoted.double"}
+      ],
+      "end": "\"",
+      "patterns": [
+        {"include": "#variables" },
+        {"include": "#curly-expressions" },
+        {
+          "match": "<\\S*?>",
+          "name": "string.formatting.ser"
+        },
+        { 
+          "match": "(%)(\\w+)(%)",
+          "captures": {
+            "1": {"name": "punctuation.definition.variable.ser"},
+            "2": {"name": "variable.other.ser"},
+            "3": {"name": "punctuation.definition.variable.ser"}
+          }
+        },
+        {
+          "match": "([^\\{\"%<]|%(?!\\w+%)|<(?=\\s|>))+",
+          "name": "string.quoted.double.ser"
+        },
+        {
+          "match": ".",
+          "name": "string.quoted.double.ser"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "match": "^\\s*(global|with|attempt|elif|else|end|if|on_error|return|stop|wait|wait_until|break|continue|forever|over|repeat|while|delete|ephm|chance)(?=\\s|$)",
+          "name": "keyword.control.ser"
+        },
+        {
+          "match": "\\s+with\\s",
+          "name": "keyword.control.ser"
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "match": "^\\s*(func)\\s+([\\$@\\*&])?([A-Za-z_][A-Za-z0-9_]*)(?=\\s|$)",
+          "captures": {
+            "1": {"name": "keyword.control.ser"},
+            "2": {"name": "punctuation.definition.variable.ser"},
+            "3": {"name": "entity.name.function.ser"}
+          }
+        },
+        {
+          "match": "(?:\\s+|^)(run)\\s+([\\$@\\*&])?([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {"name": "keyword.control.ser"},
+            "2": {"name": "punctuation.definition.variable.ser"},
+            "3": {"name": "entity.name.function.ser"}
+          }
+        }
+      ]
+    },
+    "methods": {
+      "match": "(?<=(^\\s*|=\\s+|return\\s+))([A-Z][A-Za-z0-9\\.]*)(?=\\s|$|\\{)",
+      "name": "support.function.ser"
+    },
+    "curly-expressions": {
+      "begin": "\\{",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.separator" }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.separator" }
+      },
+      "patterns": [
+        {
+          "match": "(?<=\\{)\\s*([A-Z][A-Za-z0-9\\.]*)(?=\\s|\\b)",
+          "name": "support.function.ser"
+        },
+        {"include": "#curly-expressions"},
+        {"include": "#variables"},
+        {"include": "#strings"},
+        {"include": "#operators"},
+        {"include": "#constants"}
+      ]
+    },
+    "round-expressions": {
+      "begin": "\\(",
+      "beginCaptures": {
+        "0": {"name": "punctuation.section.parens.begin.ser"}
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": {"name": "punctuation.section.parens.end.ser"}
+      },
+      "patterns": [
+        {"include": "#curly-expressions"},
+        {"include": "#variables"},
+        {"include": "#strings"},
+        {"include": "#operators"},
+        {"include": "#constants"}
+      ]
+    },
+    "variables": {
+      "match": "([@\\$&\\*])([a-z_][a-zA-Z0-9_]*)",
+      "captures": {
+        "1": {"name": "punctuation.definition.variable.ser"},
+        "2": {"name": "variable.ser"}
+      }
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "(?<=\\s)(not|is|isnt|isn't|isnot|and|or|in|<=?|>=?|!=|==|\\+|-|\\*|/|%|&&|\\||!|->|_|\\?\\?)(?=\\s|$|\\}|\\))",
+          "name": "keyword.operator.ser"
+        },
+        {
+          "match": "(?<=\\s)(=)(?=\\s)",
+          "name": "keyword.operator.ser"
+        },
+        {
+          "match": "(?<=\\s)(\\*)(?=\\s|$|\\}|\\))",
+          "name": "keyword.operator.ser"
+        }
+      ]
+    },
+    "constants": {
+      "match": "\\b(true|false)\\b",
+      "name": "constant.language.ser"
+    },
+    "assignments": {
+      "match": "([\\$@\\*&][a-z_][a-zA-Z0-9_]*)\\s+(=)\\s+",
+      "captures": {
+        "1": {"name": "variable.other.ser"},
+        "2": {"name": "keyword.operator.ser"}
+      }
+    }
+  }
+}

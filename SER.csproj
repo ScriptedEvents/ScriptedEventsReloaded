@@ -101,6 +101,9 @@
 
     <PropertyGroup>
         <LabApiXmlPath>$(UserProfile)\.nuget\packages\northwood.labapi\1.1.6.1\lib\net48\LabApi.xml</LabApiXmlPath>
+        <!-- The extension is versioned with SER; the installed copy is updated after a successful build. -->
+        <SerExtensionDirectory Condition="'$(SerExtensionDirectory)' == ''">$(MSBuildProjectDirectory)\VS Code Extension</SerExtensionDirectory>
+        <SerExtensionInstallDirectory Condition="'$(SerExtensionInstallDirectory)' == ''">$(UserProfile)\.vscode\extensions\ser</SerExtensionInstallDirectory>
     </PropertyGroup>
 
     <ItemGroup>
@@ -297,6 +300,47 @@ finally
 
     <Target Name="RunValidation" AfterTargets="Build">
         <RunDllValidation AssemblyPath="$(TargetPath)" ReferencePath="$(SL_DEV_REFERENCES)" />
+    </Target>
+
+    <!-- Keep the VS Code extension and its generated SER truth table in sync with the plugin build. -->
+    <Target Name="ExportSerExtension" AfterTargets="RunValidation" Condition="Exists('$(SerExtensionDirectory)')">
+        <PropertyGroup>
+            <SerTruthTablePath>$(MSBuildProjectDirectory)\ser_method_info.js</SerTruthTablePath>
+            <SerExtensionTruthTablePath>$(SerExtensionDirectory)\out\ser_method_info.js</SerExtensionTruthTablePath>
+        </PropertyGroup>
+
+        <Copy
+            SourceFiles="$(SerTruthTablePath)"
+            DestinationFiles="$(SerExtensionTruthTablePath)"
+            Condition="Exists('$(SerTruthTablePath)') and Exists('$(SerExtensionDirectory)\out')"
+            SkipUnchangedFiles="true"
+        />
+
+        <ItemGroup>
+            <!-- node_modules is intentionally not part of the install export. -->
+            <SerExtensionFiles
+                Include="$(SerExtensionDirectory)\**\*"
+                Exclude="$(SerExtensionDirectory)\node_modules\**\*"
+            />
+            <SerExtensionDestinationDirectories
+                Include="@(SerExtensionFiles->'$(SerExtensionInstallDirectory)\%(RecursiveDir)')"
+            />
+            <SerExtensionDestinationFiles
+                Include="@(SerExtensionFiles->'$(SerExtensionInstallDirectory)\%(RecursiveDir)%(Filename)%(Extension)')"
+            />
+        </ItemGroup>
+
+        <MakeDir Directories="@(SerExtensionDestinationDirectories)" />
+        <Copy
+            SourceFiles="@(SerExtensionFiles)"
+            DestinationFiles="@(SerExtensionDestinationFiles)"
+            SkipUnchangedFiles="true"
+        />
+
+        <Message
+            Importance="High"
+            Text=">>> VS Code extension exported to $(SerExtensionInstallDirectory)"
+        />
     </Target>
 
     <UsingTask TaskName="CountLinesTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">

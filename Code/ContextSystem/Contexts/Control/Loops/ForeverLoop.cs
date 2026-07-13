@@ -23,7 +23,7 @@ public class ForeverLoop : LoopContextWithSingleIterationVariable<NumberValue>, 
           # this will send an ad every 2 minutes
           forever
               wait 2m
-              Broadcast * 10s "Join our discord server! {{MainPlugin.DiscordLink}}"
+              Broadcast @all 10s "Join our discord server! {{MainPlugin.DiscordLink}}"
           end
 
           # ========================================

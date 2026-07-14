@@ -42,17 +42,20 @@ public readonly record struct ScriptName
 
     public static TryGet<ScriptName> Create(string name)
     {
-        if (Assert(name).HasErrored(out var error)) return error;
+        if (FileSystem.FileSystem.GetScriptSection(CreateUnsafe(name))
+            .HasErrored(out var error, out var section))
+        {
+            return error;
+        }
 
-        return new ScriptName(name);
+        return section.Name;
     }
 
     public static Result Assert(string name)
     {
-        name = Path.GetFileNameWithoutExtension(name);
-        if (!FileSystem.FileSystem.DoesScriptExistByName(name, out _))
+        if (FileSystem.FileSystem.GetScriptSection(CreateUnsafe(name)).HasErrored(out var error))
         {
-            return $"Script '{name}' does not exist in the SER folder or is inaccessible.";
+            return error;
         }
 
         return true;

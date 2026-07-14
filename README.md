@@ -27,6 +27,20 @@ All you need to get started is a text editor and a server!
 
 # Examples
 (these scripts may be outdated, check the `Example Scripts` folder for the latest example scripts)
+
+One `.ser` file may contain multiple independent handlers. Each `!--` flag starts a new section that ends immediately before the next flag. Multi-section files can be addressed as `filename:1`, `filename:2`, and so on.
+
+```ser
+!-- OnEvent RoundStarted
+Print "Round started"
+
+!-- OnEvent Died
+Print "A player died"
+
+!-- CustomCommand status
+Reply "Online"
+```
+
 ### Welcome message
 ```
 !-- OnEvent Joined

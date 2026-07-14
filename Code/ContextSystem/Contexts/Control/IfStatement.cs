@@ -22,7 +22,7 @@ public class IfStatement : StatementContext, IExtendableStatement, IKeywordConte
     public Dictionary<IExtendableStatement.Signal, StatementContext> RegisteredSignals { get; } = [];
     public string KeywordName => "if";
     public string Description => "This statement will execute only if the provided condition is met.";
-    public string[] Arguments => ["[condition]"];
+    public string[] Arguments => ["$condition"];
     public string? Example => null;
 
     public override TryAddTokenRes TryAddToken(BaseToken token)

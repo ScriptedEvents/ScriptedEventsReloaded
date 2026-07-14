@@ -19,6 +19,7 @@ public class IsRunningMethod : ReturningMethod<BoolValue>
     public override void Execute()
     {
         var name = Args.GetText("script name");
-        ReturnValue = Script.RunningScripts.Any(scr => scr.Name == name);
+        ReturnValue = Script.RunningScripts.Any(script =>
+            FileSystem.FileSystem.IsScriptOrFileName(script, name));
     }
 }

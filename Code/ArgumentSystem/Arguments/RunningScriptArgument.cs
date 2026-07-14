@@ -15,12 +15,20 @@ public class RunningScriptArgument(string name) : Argument(name)
         return new(() =>
         {
             var name = token.BestStaticTextRepr();
-            if (Script.RunningScripts.FirstOrDefault(scr => scr.Name == name) is not { } runningScript)
+            var matches = Script.RunningScripts
+                .Where(script => FileSystem.FileSystem.IsScriptOrFileName(script, name))
+                .ToArray();
+            if (matches.Length == 0)
             {
                 return $"There is no running script named '{name}'";
             }
 
-            return runningScript;
+            if (matches.Length > 1)
+            {
+                return $"More than one section of script '{name}' is running. Use a section name such as '{name}:1'.";
+            }
+
+            return matches[0];
         });
     }
 }

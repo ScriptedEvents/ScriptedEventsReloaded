@@ -1,0 +1,20 @@
+# Disabled by default: remove # from the filename to enable this script.
+# One physical file can contain several independent scripts.
+# Every !-- flag begins a new section and ends the section above it.
+
+!-- OnEvent RoundStarted
+
+Print "The RoundStarted section from multiSectionHandlers is running."
+Broadcast @all 5s "A new round has started."
+
+!-- OnEvent Dying
+-- require @evPlayer
+
+Print "{@evPlayer -> name} is dying."
+
+!-- CustomCommand multistatus
+-- availableFor Player RemoteAdmin Server
+-- description "Demonstrates a custom command stored alongside event handlers"
+
+$sectionName = ThisInfo name
+Reply "This response came from {$sectionName}."

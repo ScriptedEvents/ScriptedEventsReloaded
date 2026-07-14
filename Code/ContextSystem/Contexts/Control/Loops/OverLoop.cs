@@ -26,7 +26,7 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
     public override string Description =>
         "Repeats its body for each player in the player variable or a value in a collection variable, " +
         "assigning it its own custom variable.";
-    public override string[] Arguments => ["[player/collection variable]"];
+    public override string[] Arguments => ["@players with @player"];
 
     protected override string Usage =>
         """

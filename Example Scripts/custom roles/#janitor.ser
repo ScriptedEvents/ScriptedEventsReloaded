@@ -1,9 +1,0 @@
-# Disabled by default: remove # from the filename to enable this script.
-# registers the janitor custom role 
-# when the server is ready to accept players
-
-!-- OnEvent WaitingForPlayers
-
-*spawnSystem = CRole.CreateChanceSpawnSystem ClassD 20%
-CRole.Register janitor "LCZ Janitor" ClassD *spawnSystem
-

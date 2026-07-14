@@ -132,11 +132,24 @@ end
 
 ## 6. Script Entry Points (Flags)
 
-A script can optionally start with **one** flag, defining how it triggers. Use `serreload` if modifying a flagged script on a live server.
+A file can contain multiple flagged script sections. Every `!--` declaration starts a new independent script, and its section continues up to (but not including) the next `!--` declaration. Named `--` arguments belong to the nearest flag above them. Use `serreload` after changing flags or section boundaries on a live server.
+
+```ser
+!-- OnEvent RoundStarted
+Print "The round started"
+
+!-- OnEvent Died
+Print "A player died"
+
+!-- CustomCommand status
+Reply "The server is online"
+```
+
+The sections of a multi-section file named `roundHandlers.ser` can be addressed manually as `roundHandlers:1`, `roundHandlers:2`, and `roundHandlers:3`. A bare name is accepted only for flagless and single-section files. Only blank lines and comments may appear before the first flag in a multi-section file.
 
 | Flag Type          | Syntax Example                                            | Description                               |
 |--------------------|-----------------------------------------------------------|-------------------------------------------|
-| **Utility**        | *(No flag)*                                               | Run manually via `serrun` or `RunScript`. |
+| **Utility**        | *(No flags in the file)*                                  | Run manually via `serrun` or `RunScript`. |
 | **Custom Command** | `!-- CustomCommand heal`<br>`-- availableFor RemoteAdmin` | Binds the script to a custom command.     |
 | **Event**          | `!-- OnEvent Dying`<br>`-- require @evPlayer`             | Triggers on a LabAPI game event.          |
 

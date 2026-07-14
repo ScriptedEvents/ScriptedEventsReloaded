@@ -13,27 +13,29 @@ namespace SER.Code.FlagSystem;
 public static class ScriptFlagHandler
 {
     public static readonly Dictionary<ScriptName, List<Flag>> ScriptsFlags = [];
-    public static Flag[] GetScriptFlags(ScriptName scriptName) => ScriptsFlags[scriptName].ToArray();
+    public static Flag[] GetScriptFlags(ScriptName scriptName) => ScriptsFlags.TryGetValue(scriptName, out var flags)
+        ? flags.ToArray()
+        : [];
     
-    private static Flag? _currentFlag;
-
     internal static void Clear()
     {
-        _currentFlag = null;
         ScriptsFlags.Values.ForEachItem(script => script.ForEach(flag => flag.Unbind()));
         ScriptsFlags.Clear();
     }
     
-    internal static void RegisterScript(List<Line> scriptLinesWithFlags, ScriptName scriptName)
+    internal static Result RegisterScript(List<Line> scriptLinesWithFlags, ScriptName scriptName)
     {
+        Flag? currentFlag = null;
+        List<Flag> parsedFlags = [];
+
         foreach (var line in scriptLinesWithFlags)
         {
             var tokens = line.Tokens;
             var name = tokens.Skip(1).FirstOrDefault()?.RawRep;
             if (name is null)
             {
-                Log.CompileError(scriptName, line.LineNumber, "Name of the flag is missing.");
-                return;
+                RollBack(parsedFlags);
+                return $"Line {line.LineNumber}: Name of the flag is missing.";
             }
             
             var args = tokens.Skip(2).Select(t => t.BestStaticTextRepr()).ToArray();
@@ -41,20 +43,21 @@ public static class ScriptFlagHandler
             
             var result = prefix switch
             {
-                FlagToken => HandleFlag(name, args, scriptName).Result,
-                FlagArgumentToken => HandleFlagArgument(name, args),
+                FlagToken => HandleFlag(name, args, scriptName, parsedFlags, ref currentFlag).Result,
+                FlagArgumentToken => HandleFlagArgument(name, args, currentFlag),
                 _ => throw new AndrzejFuckedUpException($"{prefix} not flag or flag arg")
             };
             
             if (result.HasErrored(out var error))
             {
-                Log.CompileError(scriptName, line.LineNumber, error);
-                return;
+                RollBack(parsedFlags);
+                return $"Line {line.LineNumber}: {error}";
             }
         }
-        
-        _currentFlag?.OnParsingComplete();
-        _currentFlag = null;
+
+        ScriptsFlags[scriptName] = parsedFlags;
+        parsedFlags.ForEach(flag => flag.OnParsingComplete());
+        return true;
     }
 
     public static Result DoFlagsApproveExecution(Script scr, out bool mustReport)
@@ -77,30 +80,34 @@ public static class ScriptFlagHandler
         return true;
     }
 
-    private static Result HandleFlagArgument(string argName, string[] arguments)
+    private static Result HandleFlagArgument(string argName, string[] arguments, Flag? currentFlag)
     {
-        if (_currentFlag is null)
+        if (currentFlag is null)
         {
             return $"Tried to add argument '{argName}', but there is no valid flag above.";
         }
 
-        var arg = _currentFlag.Arguments.FirstOrDefault(arg => arg.Name == argName);
+        var arg = currentFlag.Arguments.FirstOrDefault(arg => arg.Name == argName);
         if (string.IsNullOrEmpty(arg.Name))
         {
-            return $"Flag {_currentFlag.Name} does not accept a '{argName}' argument.";
+            return $"Flag {currentFlag.Name} does not accept a '{argName}' argument.";
         }
 
         if (arg.AddArgument(arguments).HasErrored(out var error))
         {
-            return $"Error while handling flag argument '{argName}' for '{_currentFlag.Name}': {error}";
+            return $"Error while handling flag argument '{argName}' for '{currentFlag.Name}': {error}";
         }
 
         return true;
     }
 
-    private static TryGet<Flag> HandleFlag(string name, string[] arguments, ScriptName scriptName)
+    private static TryGet<Flag> HandleFlag(
+        string name,
+        string[] arguments,
+        ScriptName scriptName,
+        List<Flag> parsedFlags,
+        ref Flag? currentFlag)
     {
-        _currentFlag?.OnParsingComplete();
         var rs = $"Flag '{name}' failed when parsing.".AsError();
         
         if (Flag.TryGet(name, scriptName).HasErrored(out var getErr, out var flag))
@@ -113,13 +120,29 @@ public static class ScriptFlagHandler
             return rs + error;
         }
 
-        if (ScriptsFlags.TryGetValue(scriptName, out var scriptFlags) && scriptFlags.Any(f => f.Name == flag.Name))
+        if (parsedFlags.Any(f => f.Name == flag.Name))
         {
             return rs + $"A '{flag.Name}' flag has been already registered once - one script cannot have two of the same flags.";
         }
         
-        ScriptsFlags.AddOrInitListWithKey(scriptName, flag);
-        return _currentFlag = flag;
+        parsedFlags.Add(flag);
+        currentFlag = flag;
+        return flag;
+    }
+
+    private static void RollBack(IEnumerable<Flag> flags)
+    {
+        foreach (var flag in flags)
+        {
+            try
+            {
+                flag.Unbind();
+            }
+            catch (Exception exception)
+            {
+                Log.Error($"Failed to roll back flag '{flag.Name}': {exception.Message}");
+            }
+        }
     }
 }
 

@@ -94,6 +94,6 @@ public class OnEventFlag : Flag, IMajorBehaviorFlag
 
     public override void Unbind()
     {
-        // done by event handler
+        EventHandler.RemoveEventHandler(_event, ScriptName);
     }
 }

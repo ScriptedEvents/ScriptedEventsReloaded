@@ -1,0 +1,106 @@
+# Disabled by default: remove # from the filename to enable this script.
+
+# this script handles infections done by zombie players
+# and turning infected players into other zombies
+
+!-- OnEvent RoundStarted
+
+forever
+    wait 1s
+    
+    over @all with @plr
+        wait 1ms
+
+        # infection date not set -> not infected
+        if {HasPlayerData @plr date_of_death_by_infection} is false
+            continue
+        end
+        
+        # if the current date is "lower" than the date of death
+        # it means that the player is not fully infected
+        if {Date.Current} < {GetPlayerData @plr date_of_death_by_infection}
+            continue
+        end
+
+        # now, we initiate the changing into a zombie
+
+        # 1) clear the infection status
+        ClearPlayerData @plr date_of_death_by_infection
+
+        # 2) drop inventory so the items dont get lost
+        ClearInventory @plr drop
+
+        # 3) change player to zombie
+        SetRole @plr Scp0492
+    end
+end
+
+
+# this script is responsible for registering bites of zombies
+# and setting the time of death by infection for victims
+
+!-- OnEvent Hurt
+-- require @evPlayer @evAttacker
+
+@attacker = @evAttacker
+@victim = @evPlayer
+
+# if attacking player is not a zombie -> no infection
+if {@attacker -> role} isnt "Scp0492"
+    stop
+end
+
+# cant infect an SCP
+if {@victim -> team} is "SCPs"
+    stop
+end
+
+# 50% chance for the victim to get infected
+chance 50%
+    stop
+end
+
+if {HasPlayerData @victim date_of_death_by_infection} is false
+    # set the date of death to 1 minute in the future
+    Broadcast @attacker 3s "You infected {@victim -> name}!"
+    *date = Date.Offset {Date.Current} add 1m
+else
+    # when was bit before, remove 20 seconds from the date
+    # so the infection happens faster
+    Broadcast @attacker 3s "You infected {@victim -> name} even more!"
+    *date = GetPlayerData @victim date_of_death_by_infection
+    *date = Date.Offset *date remove 20s
+end
+
+SetPlayerData @victim date_of_death_by_infection *date
+
+Broadcast @victim 7s "You are infected by a zombie - use a medkit or SCP-500 to not turn into a zombie!"
+
+
+# if a player changes their role, their infection status should be reset 
+# e.g. role is changed by admin, death, other plugin etc.
+
+!-- OnEvent ChangedRole
+-- require @evPlayer
+
+ClearPlayerData @evPlayer date_of_death_by_infection
+
+
+# if a player uses a medkit or SCP-500, 
+# his infection will be cleared
+
+!-- OnEvent UsedItem
+-- require @evPlayer *evUsableItem
+
+# dont do anything if the player was not infected
+if {HasPlayerData @evPlayer date_of_death_by_infection} is false
+    stop
+end
+
+$type = *evUsableItem -> type
+
+# if medkit or scp500 was used, heal infection
+if $type is "Medkit" or $type is "SCP500"
+    ClearPlayerData @evPlayer date_of_death_by_infection
+    Broadcast @evPlayer 5s "You have healed your infection!"
+end

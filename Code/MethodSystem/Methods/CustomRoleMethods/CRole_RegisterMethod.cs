@@ -17,7 +17,6 @@ public class CRole_RegisterMethod : SynchronousMethod, ICanError
 
     public string[] ErrorReasons =>
     [
-        "Provided custom role id is already registered.",
         "Display name uses an invalid format."
     ];
 
@@ -42,27 +41,20 @@ public class CRole_RegisterMethod : SynchronousMethod, ICanError
     public override void Execute()
     {
         var id = Args.GetText("id");
-        if (CRole.RegisteredRoles.ContainsKey(id))
-        {
-            throw new ScriptRuntimeError(this, $"Provided custom role id {id} is already registered.");
-        }
         
         var displayName = Args.GetText("display name");
         if (!Player.ValidateCustomInfo(displayName, out var reason))
         {
             throw new ScriptRuntimeError(this, $"Display name uses an invalid format: {reason}");
         }
-        
-        CRole.RegisteredRoles.Add(
-            id,
-            new()
-            {
-                Id = id,
-                DisplayName = displayName,
-                RoleType = Args.GetEnum<RoleTypeId>("role type"),
-                RemoveRoleOnDeath = Args.GetBool("remove role on death"),
-                SpawnSystem = Args.GetReference<CustomRoleSpawnSystem>("spawn system")
-            }
-        );
+
+        CRole.Register(new CRole
+        {
+            Id = id,
+            DisplayName = displayName,
+            RoleType = Args.GetEnum<RoleTypeId>("role type"),
+            RemoveRoleOnDeath = Args.GetBool("remove role on death"),
+            SpawnSystem = Args.GetReference<CustomRoleSpawnSystem>("spawn system")
+        });
     }
 }

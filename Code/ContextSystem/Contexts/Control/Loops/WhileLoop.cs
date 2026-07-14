@@ -21,7 +21,7 @@ public class WhileLoop : LoopContextWithSingleIterationVariable<NumberValue>
     public override string Description =>
         "A loop which will execute its body as long as the provided condition is evaluated to true.";
 
-    public override string[] Arguments => ["[condition...]"];
+    public override string[] Arguments => ["$condition"];
 
     protected override string Usage =>
         """

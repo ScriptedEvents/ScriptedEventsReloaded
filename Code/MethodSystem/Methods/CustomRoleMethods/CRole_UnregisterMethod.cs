@@ -18,6 +18,6 @@ public class CRole_UnregisterMethod : SynchronousMethod
     
     public override void Execute()
     {
-        CRole.RegisteredRoles.Remove(Args.GetCustomRole("custom role").Id);
+        CRole.Unregister(Args.GetCustomRole("custom role"));
     }
 }

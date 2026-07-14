@@ -22,7 +22,7 @@ public class WaitUntilKeyword : YieldingContext, IKeywordContext
 
     public virtual string Description => "Halts execution of the script until a condition is met.";
 
-    public virtual string[] Arguments => ["<condition...>"];
+    public virtual string[] Arguments => ["$condition"];
 
     public virtual string Example => ExampleHandler.GetExample($"{KeywordName}KeywordExample") ??
                                      """

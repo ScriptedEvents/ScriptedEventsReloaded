@@ -19,7 +19,7 @@ public class ScriptExistsMethod : ReturningMethod
     public override void Execute()
     {
         var scriptName = Args.GetText("script name");
-        ReturnValue = new BoolValue(FileSystem.FileSystem.RegisteredScriptPaths.Any(p => Path.GetFileNameWithoutExtension(p) == scriptName));
+        ReturnValue = new BoolValue(FileSystem.FileSystem.DoesScriptExistByName(scriptName, out _));
     }
 
     public override TypeOfValue Returns => new SingleTypeOfValue(typeof(BoolValue));

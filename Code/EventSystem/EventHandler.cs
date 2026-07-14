@@ -20,6 +20,7 @@ public static class EventHandler
 {
     private static readonly List<Action> UnsubscribeActions = [];
     private static readonly Dictionary<string, List<Action<EventArgs?, Variable[]>>> OnEventActions = [];
+    private static readonly Dictionary<(ScriptName Script, string Event), Action<EventArgs?, Variable[]>> ScriptEventActions = [];
     private static readonly HashSet<string> DisabledEvents = [];
     public static List<EventInfo> AvailableEvents = [];
     public static readonly HashSet<string> RegisteredHandlers = [];
@@ -39,6 +40,7 @@ public static class EventHandler
     {
         RegisteredHandlers.Clear();
         OnEventActions.Clear();
+        ScriptEventActions.Clear();
         foreach (var unsubscribeAction in UnsubscribeActions)
         {
             unsubscribeAction();
@@ -92,7 +94,8 @@ public static class EventHandler
     
     public static Result AddEventHandler(string evName, ScriptName scriptName) 
     {
-        if (RegisteredHandlers.Contains($"'{scriptName}' script"))
+        var handlerId = $"'{scriptName}' script";
+        if (ScriptEventActions.ContainsKey((scriptName, evName)))
         {
             return true;
         }
@@ -102,15 +105,38 @@ public static class EventHandler
             return error;
         }
         
-        RegisteredHandlers.Add($"'{scriptName}' script");
+        var action = RunScriptOnEvent(scriptName, evName);
+        ScriptEventActions[(scriptName, evName)] = action;
+        RegisteredHandlers.Add(handlerId);
         if (OnEventActions.TryGetValue(evName, out var actions))
         {
-            actions.Add(RunScriptOnEvent(scriptName, evName));
+            actions.Add(action);
             return true;
         }
         
-        OnEventActions.Add(evName, [RunScriptOnEvent(scriptName, evName)]);
+        OnEventActions.Add(evName, [action]);
         return true;
+    }
+
+    public static void RemoveEventHandler(string evName, ScriptName scriptName)
+    {
+        if (!ScriptEventActions.TryGetValue((scriptName, evName), out var action))
+        {
+            return;
+        }
+
+        ScriptEventActions.Remove((scriptName, evName));
+
+        if (OnEventActions.TryGetValue(evName, out var actions))
+        {
+            actions.Remove(action);
+            if (actions.Count == 0)
+            {
+                OnEventActions.Remove(evName);
+            }
+        }
+
+        RegisteredHandlers.Remove($"'{scriptName}' script");
     }
     
     public static Result AddEventHandler(string evName, Action<EventArgs?, Variable[]> action, string handlerId) 

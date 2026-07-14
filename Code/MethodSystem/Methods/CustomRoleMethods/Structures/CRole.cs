@@ -11,6 +11,8 @@ namespace SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
 
 public class CRole
 {
+    private static readonly Random SpawnRandom = new();
+
     public CRole()
     {
         PlayerEvents.Death += OnDeath;
@@ -62,6 +64,7 @@ public class CRole
     public static readonly Dictionary<int, CRole> LifeIdAssignedRoles = [];
     public static readonly Dictionary<Player, CRole> LastRoles = [];
     public static readonly List<Player> PlayersInProcessOfReceivingCRole = [];
+    private static readonly HashSet<Player> PlayersQueuedForCRole = [];
     public static readonly Dictionary<CustomRoleEvent, HashSet<Handler>> EventHandlers = [];
 
     public required string Id;
@@ -75,27 +78,82 @@ public class CRole
         LifeIdAssignedRoles.Clear();
         LastRoles.Clear();
         PlayersInProcessOfReceivingCRole.Clear();
+        PlayersQueuedForCRole.Clear();
         EventHandlers.Clear();
         RegisteredRoles.Values.ForEachItem(role => role.Unload());
         RegisteredRoles.Clear();
+    }
+
+    public static void Register(CRole role)
+    {
+        if (RegisteredRoles.TryGetValue(role.Id, out var previousRole))
+        {
+            Unregister(previousRole);
+        }
+
+        RegisteredRoles[role.Id] = role;
+    }
+
+    public static void Unregister(CRole role)
+    {
+        if (RegisteredRoles.TryGetValue(role.Id, out var registeredRole)
+            && ReferenceEquals(registeredRole, role))
+        {
+            RegisteredRoles.Remove(role.Id);
+        }
+
+        foreach (var player in Player.ReadyList
+                     .Where(player => LifeIdAssignedRoles.TryGetValue(player.LifeId, out var assignedRole)
+                                      && ReferenceEquals(assignedRole, role))
+                     .ToArray())
+        {
+            role.RemovePlayer(player);
+        }
+
+        role.Unload();
     }
     
     public void AssignPlayer(Player plr)
     {
         if (LifeIdAssignedRoles.TryGetValue(plr.LifeId, out var previousRole))
         {
+            if (ReferenceEquals(previousRole, this))
+            {
+                return;
+            }
+
             LastRoles[plr] = previousRole;
+            previousRole.RemovePlayer(plr);
         }
-        
+
+        if (PlayersInProcessOfReceivingCRole.Contains(plr))
+        {
+            return;
+        }
+
         PlayersInProcessOfReceivingCRole.Add(plr);
-        
-        plr.SetRole(RoleType);
-        LifeIdAssignedRoles[plr.LifeId] = this;
-        
-        PlayersInProcessOfReceivingCRole.Remove(plr);
+        try
+        {
+            if (plr.Role != RoleType)
+            {
+                plr.SetRole(RoleType);
+            }
+
+            LifeIdAssignedRoles[plr.LifeId] = this;
+        }
+        finally
+        {
+            PlayersInProcessOfReceivingCRole.Remove(plr);
+        }
 
         Timing.CallDelayed(Timing.WaitForOneFrame, () =>
         {
+            if (!LifeIdAssignedRoles.TryGetValue(plr.LifeId, out var currentRole)
+                || !ReferenceEquals(currentRole, this))
+            {
+                return;
+            }
+
             plr.InfoArea = PlayerInfoArea.CustomInfo;
             plr.CustomInfo = $"{plr.DisplayName}\n{DisplayName}";
         });
@@ -115,6 +173,12 @@ public class CRole
 
     public void RemovePlayer(Player plr)
     {
+        if (!LifeIdAssignedRoles.TryGetValue(plr.LifeId, out var currentRole)
+            || !ReferenceEquals(currentRole, this))
+        {
+            return;
+        }
+
         LifeIdAssignedRoles.Remove(plr.LifeId);
         
         plr.CustomInfo = "";
@@ -140,9 +204,10 @@ public class CRole
     {
         Timing.CallDelayed(Timing.WaitForOneFrame, delegate
         {
-            foreach (var role in RegisteredRoles.Values)
+            if (RegisteredRoles.TryGetValue(Id, out var registeredRole)
+                && ReferenceEquals(registeredRole, this))
             {
-                HandleRoleRoundStart(role);
+                HandleRoleRoundStart(this);
             }
         });
     }
@@ -157,6 +222,7 @@ public class CRole
                 var pool = Player
                     .ReadyList
                     .Where(p => p.Role == procedural.RoleToReplace)
+                    .Where(p => !LifeIdAssignedRoles.ContainsKey(p.LifeId))
                     .ToArray();
                 
                 if (pool.Length < procedural.StartSpawningWhen)
@@ -165,15 +231,13 @@ public class CRole
                 }
 
                 var playersToAssign = pool
-                    .Where(p => !LifeIdAssignedRoles.ContainsKey(p.LifeId))
-                    .Where(_ => procedural.SpawnChance > new Random().NextDouble())
+                    .Where(_ => PassesSpawnChance(procedural.SpawnChance))
                     .ToList();
 
                 playersToAssign.ShuffleList();
-                if (procedural.MaxAmountToSpawn is { } maxAmountToSpawn)
-                {
-                    playersToAssign = playersToAssign.Take(maxAmountToSpawn).ToList();
-                }
+                playersToAssign = playersToAssign
+                    .Take(GetCappedSpawnCount(playersToAssign.Count, procedural.MaxAmountToSpawn))
+                    .ToList();
 
                 foreach (var plr in playersToAssign)
                 {
@@ -187,26 +251,21 @@ public class CRole
                 var pool = Player
                     .ReadyList
                     .Where(p => p.Role == bracketSpawn.RoleToReplace)
+                    .Where(p => !LifeIdAssignedRoles.ContainsKey(p.LifeId))
                     .ToArray();
 
-                foreach (var bracket in bracketSpawn.SpawnBrackets)
+                var bracket = bracketSpawn.SpawnBrackets.FirstOrDefault(candidate =>
+                    candidate.LowerBound <= pool.Length && pool.Length <= candidate.UpperBound);
+                if (bracket is null)
                 {
-                    if (bracket.LowerBound > pool.Length || pool.Length > bracket.UpperBound)
-                    {
-                        return;
-                    }
+                    return;
+                }
 
-                    var availablePlayers = pool
-                        .Where(p => !LifeIdAssignedRoles.ContainsKey(p.LifeId))
-                        .ToList();
-
-                    for (int i = 0; i < bracket.AmountToSpawn; i++)
-                    {
-                        if (availablePlayers.Count <= 0) return;
-
-                        var plr = availablePlayers.PullRandomItem();
-                        role.AssignPlayer(plr);
-                    }
+                var availablePlayers = pool.ToList();
+                for (var index = 0; index < bracket.AmountToSpawn && availablePlayers.Count > 0; index++)
+                {
+                    var plr = availablePlayers.PullRandomItem();
+                    role.AssignPlayer(plr);
                 }
 
                 return;
@@ -226,22 +285,27 @@ public class CRole
     public void OnPlayerChangingRole(PlayerChangingRoleEventArgs ev)
     {
         if (ev.Player is not {} plr) return;
-        
+
+        if (PlayersInProcessOfReceivingCRole.Contains(plr))
+        {
+            Log.Debug($"player {plr.DisplayName} is already in process of receiving a custom role");
+            return;
+        }
+
         if (LifeIdAssignedRoles.TryGetValue(plr.LifeId, out var role))
         {
             role.RemovePlayer(plr);
-            Log.Debug($"removing role {Id} from {plr.DisplayName}");
+            Log.Debug($"removing role {role.Id} from {plr.DisplayName}");
         }
-        
+
+        if (PlayersQueuedForCRole.Contains(plr))
+        {
+            return;
+        }
+
         if (SpawnSystem is not ChanceSpawn chanceSpawn)
         {
             Log.Debug($"{Id} is not a chance spawn system");
-            return;
-        }
-        
-        if (PlayersInProcessOfReceivingCRole.Contains(plr))
-        {
-            Log.Debug($"player {plr.DisplayName} is already in process of receiving role (checking role: {Id})");
             return;
         }
         
@@ -250,14 +314,52 @@ public class CRole
             Log.Debug($"{Id} role cannot work for {plr.DisplayName}, invalid role");
             return;
         }
-        if (chanceSpawn.SpawnChance <= new Random().NextDouble())
+        if (!PassesSpawnChance(chanceSpawn.SpawnChance))
         {
             Log.Debug($"player {plr.DisplayName} failed chance spawn");
             return;
         }
         
-        ev.IsAllowed = false;
-        AssignPlayer(plr);
-        Log.Debug($"player {plr.DisplayName} successfully received role {Id}");
+        PlayersQueuedForCRole.Add(plr);
+        Timing.CallDelayed(Timing.WaitForOneFrame, () =>
+        {
+            try
+            {
+                if (!RegisteredRoles.TryGetValue(Id, out var registeredRole)
+                    || !ReferenceEquals(registeredRole, this)
+                    || plr.Role != chanceSpawn.RoleToReplace
+                    || LifeIdAssignedRoles.ContainsKey(plr.LifeId))
+                {
+                    return;
+                }
+
+                AssignPlayer(plr);
+                Log.Debug($"player {plr.DisplayName} successfully received role {Id}");
+            }
+            finally
+            {
+                PlayersQueuedForCRole.Remove(plr);
+            }
+        });
+    }
+
+    internal static bool PassesSpawnChance(float spawnChance, double randomValue)
+    {
+        return spawnChance >= 1f || spawnChance > 0f && randomValue < spawnChance;
+    }
+
+    internal static int GetCappedSpawnCount(int candidateCount, int? maximum)
+    {
+        return maximum is { } limit
+            ? Math.Min(candidateCount, Math.Max(0, limit))
+            : candidateCount;
+    }
+
+    private static bool PassesSpawnChance(float spawnChance)
+    {
+        lock (SpawnRandom)
+        {
+            return PassesSpawnChance(spawnChance, SpawnRandom.NextDouble());
+        }
     }
 }

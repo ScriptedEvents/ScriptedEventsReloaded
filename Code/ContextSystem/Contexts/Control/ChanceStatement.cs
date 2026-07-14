@@ -21,7 +21,7 @@ public class ChanceStatement : StatementContext, IExtendableStatement, IKeywordC
     public Dictionary<IExtendableStatement.Signal, StatementContext> RegisteredSignals { get; } = [];
     public string KeywordName => "chance";
     public string Description => "This statement will execute with the provided chance.";
-    public string[] Arguments => ["[chance]"];
+    public string[] Arguments => ["$chance"];
     public string? Example => null;
 
     public override TryAddTokenRes TryAddToken(BaseToken token)

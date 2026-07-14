@@ -40,7 +40,7 @@ public static class Tokenizer
         typeof(TextToken)
     ];
     
-    public static Line[] GetInfoFromMultipleLines(string content)
+    public static Line[] GetInfoFromMultipleLines(string content, uint firstLineNumber = 1)
     {
         List<Line> outList = [];
         
@@ -51,7 +51,7 @@ public static class Tokenizer
             var info = new Line
             {
                 RawRepresentation = line,
-                LineNumber = index + 1
+                LineNumber = firstLineNumber + index
             };
             
             outList.Add(info);

@@ -20,14 +20,14 @@ public class ReloadCommand : ICommand, IUsePermissions
         ScriptFlagHandler.Clear();
         FileSystem.FileSystem.Initialize();
         
-        response = "Successfully reloaded scripts. Changes in script flags are now registered.";
+        response = "Successfully reloaded scripts. Changes in flags and script sections are now registered.";
         return true;
     }
 
     public string Command => "serreload";
     public string[] Aliases => [];
     public string Description => 
-        "Reloads all scripts. Use when you add/remove flags in a script for them to be registered if the server is running.";
+        "Reloads all scripts. Use after changing flags or multi-section boundaries while the server is running.";
 
     public string Permission => "ser.reload";
 }

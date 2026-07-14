@@ -17,7 +17,7 @@ public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
     
     public override string KeywordName => "repeat";
     public override string Description => "Repeats everything inside its body a given amount of times.";
-    public override string[] Arguments => ["[number]"];
+    public override string[] Arguments => ["$number"];
     
     protected override string Usage =>
         """

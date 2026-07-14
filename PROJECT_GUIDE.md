@@ -113,11 +113,13 @@ Lifecycle rule: every event subscription, command registration, custom handler a
 `FileSystem.UpdateScriptPathCollection()` recursively scans the SER config directory for `.ser` and `.txt` files.
 
 - A file whose base filename starts with `#` is ignored.
-- Script identity is the filename without its extension, not its relative path.
+- Physical-file identity is the filename without its extension, not its relative path. Runtime sections add a numbered selector when needed.
 - If two files anywhere in the tree share the same base filename, all scripts with that duplicate name are excluded and an error is logged.
 - Lookups refresh the path collection, so deleted or renamed scripts are detected without retaining a stale path.
 
-During initialization, SER tokenizes only the flag lines of each script and passes them to `ScriptFlagHandler`. Flags can then bind events, custom commands, custom roles or other major behavior. `ScriptFlagHandler.Clear()` calls `Unbind()` on every registered flag before clearing the registry.
+During initialization, SER splits a physical file at every `!--` declaration. Each declaration is inclusive in its section, and the section ends immediately before the next declaration. Multi-section files receive selectors such as `file:1` and `file:2`; flagless and single-section files retain their bare filename. Only blank lines and comments may precede the first declaration in a flagged file. SER tokenizes the flag lines of each section and passes them to `ScriptFlagHandler`. Flags can then bind events, custom commands, custom roles or other major behavior. `ScriptFlagHandler.Clear()` calls `Unbind()` on every registered flag before clearing the registry.
+
+Bindings store the section selector rather than only the physical filename, so callbacks reload and execute the correct slice. Section compilation retains original source-file line numbers. A bare multi-section filename is deliberately ambiguous for manual execution; use its numbered selector. File-level stop and running checks match all of that file's sections.
 
 ## 6. Compilation pipeline
 

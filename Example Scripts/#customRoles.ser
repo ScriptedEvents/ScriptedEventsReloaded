@@ -1,0 +1,40 @@
+# Disabled by default: remove # from the filename to enable this script.
+
+# system for registering custom roles
+!-- OnEvent WaitingForPlayers
+
+*spawnSystem = CRole.CreateChanceSpawnSystem ClassD 20%
+CRole.Register janitor "LCZ Janitor" ClassD *spawnSystem
+
+*spawnSystem = CRole.CreateProceduralSpawnSystem FacilityGuard 70% 1 3
+CRole.Register senior_guard "Senior Guard" FacilityGuard *spawnSystem
+
+
+# system when any custom role spawns
+!-- OnCRole spawned
+
+wait 3s
+
+AnimatedBroadcast @evPlayer 10s "Your custom role is:<br><br><br><wait=1s><charwait=100ms><size=60>{*evCRole -> displayName}</size>"
+
+
+# this spawn system works for janitor only
+!-- OnCRole spawned
+-- forRoles janitor
+
+TPRoom @evPlayer LczToilets
+GiveItem @evPlayer KeycardJanitor
+
+
+# this spawn system works for senior guard only
+!-- OnCRole spawned
+-- forRoles senior_guard
+
+ClearInventory @evPlayer
+GiveItem @evPlayer GunFSP9
+GiveItem @evPlayer KeycardMTFPrivate
+GiveItem @evPlayer Medkit
+GiveItem @evPlayer GrenadeHE
+GiveItem @evPlayer Radio
+GiveItem @evPlayer ArmorCombat
+GiveItem @evPlayer Ammo9x19 3

@@ -1,11 +1,14 @@
 using Newtonsoft.Json;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.Interfaces;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.MethodSystem;
 using SER.Code.MethodSystem.BaseMethods.Interfaces;
 using SER.Code.MethodSystem.Structures;
 using SER.Code.Plugin.Commands.HelpSystem;
+using SER.Code.TokenSystem.Tokens;
 using SER.Code.VariableSystem;
 using SER.Code.VariableSystem.Variables;
 
@@ -1507,10 +1510,10 @@ public static class Builder
             CollectionArgument => $"&{name}",
             _ => name
         };
-        
+
         if (a.ConsumesRemainingValues) name += "...";
         if (!a.MustBeProvided) name += "?";
-                
+
         return name;
     }
 
@@ -1531,14 +1534,102 @@ public static class Builder
                 description = a.Description,
                 defaultValue = a.DefaultValue?.StringRep ?? a.DefaultValue?.Value?.ToString(),
                 consumesRemainingValues = a.ConsumesRemainingValues,
-                syntax = GetArgumentSyntax(a)
+                syntax = GetArgumentSyntax(a),
+                enumValues = a.GetType().IsGenericType &&
+                             a.GetType().GetGenericTypeDefinition() == typeof(EnumArgument<>)
+                    ? Enum.GetNames(a.GetType().GetGenericArguments()[0])
+                    : null,
+                isEnumFlags = a.GetType().IsGenericType &&
+                              a.GetType().GetGenericTypeDefinition() == typeof(EnumArgument<>) &&
+                              a.GetType().GetGenericArguments()[0].IsDefined(typeof(FlagsAttribute), false),
+                options = a is OptionsArgument optionsArgument
+                    ? optionsArgument.Options.Select(option => new
+                    {
+                        value = option.Value,
+                        description = option.Description
+                    }).ToArray()
+                    : null
             }),
             errors = (m as ICanError)?.ErrorReasons ?? []
         });
-        
-        var truthTable = new { methods };
+
+        var keywords = ContextableKeywordToken.KeywordContexts
+            .OrderBy(keyword => keyword.KeywordName)
+            .ToDictionary(keyword => keyword.KeywordName, object (keyword) => new
+            {
+                syntax = $"{keyword.KeywordName} {string.Join(" ", keyword.Arguments)}".TrimEnd(),
+                description = keyword.Description,
+                arguments = keyword.Arguments,
+                example = keyword.Example,
+                isStatement = keyword is StatementContext,
+                extendsSignal = (keyword as IStatementExtender)?.Extends.ToString(),
+                allowedSignals = (keyword as IExtendableStatement)?.AllowedSignals.ToString()
+            });
+
+        // "run" is parsed by RunFunctionToken instead of ContextableKeywordToken,
+        // so it needs to be included in editor metadata explicitly.
+        keywords["run"] = new
+        {
+            syntax = "run [function name] [arguments...]",
+            description = "Runs a function defined earlier in the current script.",
+            arguments = new[] { "[function name]", "[arguments...]" },
+            example = "run myFunction $argument",
+            isStatement = false,
+            extendsSignal = (string?)null,
+            allowedSignals = (string?)null
+        };
+
+        var flags = Flag.FlagInfos
+            .OrderBy(kvp => kvp.Key)
+            .ToDictionary(kvp => kvp.Key, object (kvp) =>
+            {
+                var flag = (Flag)Activator.CreateInstance(kvp.Value);
+                var inlineArgument = flag.InlineArgument;
+
+                return new
+                {
+                    syntax = $"!-- {kvp.Key}" + (inlineArgument is { } inline ? $" {inline.Name}" : string.Empty),
+                    description = flag.Description,
+                    inlineArgument = inlineArgument is { } inlineArg
+                        ? (object)new
+                        {
+                            name = inlineArg.Name,
+                            description = inlineArg.Description,
+                            required = inlineArg.IsRequired,
+                            example = inlineArg.Example
+                        }
+                        : null,
+                    arguments = flag.Arguments.Select(argument => new
+                    {
+                        name = argument.Name,
+                        description = argument.Description,
+                        required = argument.IsRequired,
+                        example = argument.Example
+                    })
+                };
+            });
+
+        var variables = VariableIndex.GlobalVariables
+            .OrderBy(variable => variable.Prefix)
+            .ThenBy(variable => variable.Name)
+            .Select(variable => new
+            {
+                name = variable.Name,
+                prefix = variable.Prefix.ToString(),
+                fullName = variable.ToString(),
+                type = variable.FriendlyName,
+                category = (variable as PredefinedPlayerVariable)?.Category
+            });
+
+        var events = SER.Code.EventSystem.EventHandler.AvailableEvents
+            .Select(eventInfo => eventInfo.Name)
+            .Distinct()
+            .OrderBy(name => name);
+
+        var truthTable = new { methods, keywords, flags, variables, events };
         var json = JsonConvert.SerializeObject(truthTable, Formatting.Indented);
-        var content = $"export const SER_TRUTH_TABLE = {json};";
+        var content = $"const SER_TRUTH_TABLE = {json};{Environment.NewLine}{Environment.NewLine}" +
+                      "module.exports = { SER_TRUTH_TABLE };";
 
         File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), "ser_method_info.js"), content);
     }

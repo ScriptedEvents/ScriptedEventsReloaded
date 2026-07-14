@@ -1,8 +1,8 @@
 {
   "name": "ser",
   "displayName": "Scripted Events Reloaded",
-  "description": "Syntax highlighting for SER scripts",
-  "version": "1.1.2",
+  "description": "Language support, hover documentation and contextual completions for SER scripts",
+  "version": "1.5.7",
   "publisher": "ElektrykAndrzej",
   "main": "./out/extension.js",
   "devDependencies": {

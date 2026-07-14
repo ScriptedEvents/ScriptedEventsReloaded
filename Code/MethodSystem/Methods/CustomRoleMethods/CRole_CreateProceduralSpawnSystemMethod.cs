@@ -24,12 +24,12 @@ public class CRole_CreateProceduralSpawnSystemMethod : ReferenceReturningMethod<
         {
             Description = "Example: setting conversion chance to 30% means that EACH player has a 30% chance to convert."
         },
-        new IntArgument("conversion limit")
+        new IntArgument("conversion limit", 0)
         {
             Description = "The maximum amount of players that can convert.",
             DefaultValue = new(null, "no limit")
         },
-        new IntArgument("minimum required players")
+        new IntArgument("minimum required players", 0)
         {
             Description = "The minimum amount of players that must have the 'role to replace' " +
                           "when the round starts for the conversion to happen.",

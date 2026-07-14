@@ -17,8 +17,6 @@ public class ForeverLoop : LoopContextWithSingleIterationVariable<NumberValue>, 
         $$"""
           # {{Description}}
           # it can be interrupted only when the script is stopped, when "break" keyword is used, or the server restarts
-          # it's VERY IMPORTANT to use yielding methods like "wait"
-          #  or else YOUR SERVER MAY CRASH!!!
 
           # this will send an ad every 2 minutes
           forever
@@ -35,7 +33,8 @@ public class ForeverLoop : LoopContextWithSingleIterationVariable<NumberValue>, 
           end
           """;
     public override string KeywordName => "forever";
-    public override string Description => "Makes the code inside the statement run indefinitely.";
+    public override string Description => "Makes the code inside the statement run indefinitely. " +
+                                          "REMEMBER TO YIELD! - otherwise your server may crash.";
     public override string[] Arguments => [];
 
     public override TryAddTokenRes TryAddToken(BaseToken token)

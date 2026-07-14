@@ -1,6 +1,0 @@
-# Disabled by default: remove # from the filename to enable this script.
-!-- OnCRole spawned
--- forRoles janitor
-
-TPRoom @evPlayer LczToilets
-GiveItem @evPlayer KeycardJanitor

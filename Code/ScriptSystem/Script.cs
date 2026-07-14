@@ -31,6 +31,10 @@ public class Script
     public bool IsEventAllowed = true;
     
     public required ScriptName Name { get; init; }
+
+    public ScriptName FileName { get; init; }
+
+    public uint SourceLineOffset { get; init; }
     
     public required string Content { get; init; }
     
@@ -100,50 +104,53 @@ public class Script
 
     public static TryGet<Script> CreateByScriptName(ScriptName name, ScriptExecutor? executor)
     {
-        if (FileSystem.FileSystem.GetScriptPath(name).HasErrored(out var error, out var path))
+        if (FileSystem.FileSystem.GetScriptSection(name).HasErrored(out var error, out var section))
         {
             return error;
         }
-        
-        return new Script
-        {
-            Name = name,
-            Content = File.ReadAllText(path),
-            Executor = executor ?? ScriptExecutor.Get()
-        };
+
+        return CreateByVerifiedSection(section, executor);
     }
     
     public static TryGet<Script> CreateByScriptName(string dirtyName, ScriptExecutor? executor)
     {
-        var name = Path.GetFileNameWithoutExtension(dirtyName);
-        if (ScriptName.Create(name).HasErrored(out var initError, out var scriptName))
+        if (ScriptName.Create(dirtyName).HasErrored(out var initError, out var scriptName))
         {
             return initError;       
         }
-        
-        if (FileSystem.FileSystem.GetScriptPath(scriptName).HasErrored(out var error, out var path))
-        {
-            return error;
-        }
 
-        return new Script
-        {
-            Name = scriptName,
-            Content = File.ReadAllText(path),
-            Executor = executor ?? ScriptExecutor.Get()
-        };
+        return CreateByScriptName(scriptName, executor);
     }
-    
-    public static Script CreateByVerifiedPath(string path, ScriptExecutor? executor) => new() 
+
+    public static Script CreateByVerifiedSection(ScriptSection section, ScriptExecutor? executor) => new()
     {
-        Name = ScriptName.CreateUnsafe(Path.GetFileNameWithoutExtension(path)),
-        Content = File.ReadAllText(path),
+        Name = section.Name,
+        FileName = section.FileName,
+        Content = section.Content,
+        SourceLineOffset = section.StartLine - 1,
         Executor = executor ?? ScriptExecutor.Get()
     };
+
+    public static Script CreateByVerifiedPath(string path, ScriptExecutor? executor)
+    {
+        if (FileSystem.FileSystem.GetScriptSections(path).HasErrored(out var error, out var sections))
+        {
+            throw new IOException(error);
+        }
+
+        if (sections.Length != 1)
+        {
+            throw new InvalidOperationException(
+                $"Script file '{path}' contains {sections.Length} sections; create a specific section instead.");
+        }
+
+        return CreateByVerifiedSection(sections[0], executor);
+    }
 
     public static Script CreateAnonymous(string name, string content) => new()
     {
         Name = ScriptName.CreateUnsafe(name),
+        FileName = ScriptName.CreateUnsafe(name),
         Content = content,
         Executor = ScriptExecutor.Get()
     };
@@ -157,6 +164,7 @@ public class Script
         return new Script
         {
             Name = ScriptName.CreateUnsafe(name),
+            FileName = ScriptName.CreateUnsafe(name),
             Executor = executor,
             Content = content,
             _beforeExecutionAction = beforeExecutionAction
@@ -183,7 +191,7 @@ public class Script
     public static int StopByName(string name)
     {
         var matches = new List<Script>(RunningScripts)
-            .Where(scr => string.Equals(scr.Name, name, StringComparison.CurrentCultureIgnoreCase))
+            .Where(scr => FileSystem.FileSystem.IsScriptOrFileName(scr, name))
             .ToArray();
         
         matches.ForEachItem(scr => scr.MarkAsStopped());
@@ -217,8 +225,23 @@ public class Script
         {
             MethodIndex.Initialize();
         }
-        
-        return CreateAnonymous(name ?? "test", content).Compile().HasErrored(out var err) ? err : null;
+
+        var scriptName = name ?? "test";
+        if (ScriptSection.Split(scriptName, content).HasErrored(out var splitError, out var sections))
+        {
+            return splitError;
+        }
+
+        foreach (var section in sections)
+        {
+            var script = CreateByVerifiedSection(section, ScriptExecutor.Get());
+            if (script.Compile().HasErrored(out var error))
+            {
+                return $"In section '{section.Name}': {error}";
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -264,7 +287,7 @@ public class Script
             ? new Profile(Profile, nameof(DefineLines))
             : null;
         
-        _lines = Tokenizer.GetInfoFromMultipleLines(Content);
+        _lines = Tokenizer.GetInfoFromMultipleLines(Content, SourceLineOffset + 1);
         
         Log.Debug($"Script {Name} defines {_lines.Length} lines");
         prof?.Stop();

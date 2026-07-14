@@ -5,7 +5,7 @@ using SER.Code.Helpers;
 
 namespace SER.Code.ContextSystem.BaseContexts;
 
-public abstract class LoopContext : StatementContext, IExtendableStatement, IKeywordContext
+public abstract class LoopContext : StatementContext, IKeywordContext
 {
     protected bool ReceivedBreak;
 
@@ -14,7 +14,6 @@ public abstract class LoopContext : StatementContext, IExtendableStatement, IKey
     protected abstract string? Usage { get; }
 
     public sealed override string FriendlyName => $"'{KeywordName}' loop statement";
-    public IExtendableStatement.Signal AllowedSignals => IExtendableStatement.Signal.DidntExecute;
     public Dictionary<IExtendableStatement.Signal, StatementContext> RegisteredSignals { get; } = [];
 
     public abstract string KeywordName { get; }

@@ -1,4 +1,3 @@
-using System.Collections;
 using PlayerRoles;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
@@ -17,6 +16,7 @@ public class CRole_CreateBracketSpawnSystemMethod : ReferenceReturningMethod<Cus
 
     public string[] ErrorReasons { get; } =
     [
+        "At least one spawn bracket is required.",
         "Brackets are overlapping with each other."
     ];
 
@@ -36,38 +36,25 @@ public class CRole_CreateBracketSpawnSystemMethod : ReferenceReturningMethod<Cus
         var spawnBrackets = Args
             .GetRemainingArguments<SpawnBracket, ReferenceArgument<SpawnBracket>>("spawn brackets");
 
-        var length = spawnBrackets.Max(bracket => bracket.UpperBound);
-
-        List<BitArray> brackets = [];
-        foreach (var bracket in spawnBrackets)
+        if (spawnBrackets.Length == 0)
         {
-            var checkingRange = new BitArray(length);
-            for (int i = bracket.LowerBound; i <= bracket.UpperBound; i++)
-            {
-                checkingRange[i] = true;
-            }
-
-            brackets.Add(checkingRange);
+            throw new ScriptRuntimeError(this, ErrorReasons[0]);
         }
 
-        for (int i = 0; i < length; i++)
+        for (var firstIndex = 0; firstIndex < spawnBrackets.Length; firstIndex++)
         {
-            var found = false;
-            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-            foreach (var bracket in brackets)
+            for (var secondIndex = firstIndex + 1; secondIndex < spawnBrackets.Length; secondIndex++)
             {
-                if (!bracket[i]) continue;
-                
-                if (!found)
+                var first = spawnBrackets[firstIndex];
+                var second = spawnBrackets[secondIndex];
+                if (first.LowerBound <= second.UpperBound && second.LowerBound <= first.UpperBound)
                 {
-                    found = true;
-                    continue;
+                    throw new ScriptRuntimeError(
+                        this,
+                        $"Spawn brackets {first.LowerBound}-{first.UpperBound} and " +
+                        $"{second.LowerBound}-{second.UpperBound} overlap."
+                    );
                 }
-
-                throw new ScriptRuntimeError(
-                    this, 
-                    $"The amount of players [{i + 1}] is being claimed by multiple brackets!"
-                );
             }
         }
 

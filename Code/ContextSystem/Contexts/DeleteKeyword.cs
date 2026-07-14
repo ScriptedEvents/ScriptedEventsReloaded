@@ -16,7 +16,7 @@ public class DeleteKeyword : StandardContext, IKeywordContext
 
     public string KeywordName => "delete";
     public string Description => "Deletes a variable.";
-    public string[] Arguments => ["[variable to delete]"];
+    public string[] Arguments => ["$varToDelete"];
     public string Example =>
         """
         global $someVar = "value"

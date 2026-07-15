@@ -260,7 +260,7 @@ public static class EventHandler
         if (!OnEventActions.TryGetValue(evName, out var actions))
             return;
 
-        foreach (var action in actions) action(null, []);
+        foreach (var action in actions.ToArray()) action(null, []);
     }
 
     private static void OnArgumentedEvent<T>(string evName, T ev) where T : EventArgs
@@ -281,7 +281,7 @@ public static class EventHandler
             return;
         }
 
-        foreach (var action in actions) action(ev, variables);
+        foreach (var action in actions.ToArray()) action(ev, variables);
     }
     
     public static Variable[] GetVariablesFromEvent(EventArgs ev)

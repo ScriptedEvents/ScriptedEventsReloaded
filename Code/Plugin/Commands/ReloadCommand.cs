@@ -1,6 +1,5 @@
 ﻿using CommandSystem;
 using LabApi.Features.Permissions;
-using SER.Code.FlagSystem;
 using SER.Code.Plugin.Commands.Interfaces;
 
 namespace SER.Code.Plugin.Commands;
@@ -17,17 +16,16 @@ public class ReloadCommand : ICommand, IUsePermissions
             return false;
         }
         
-        ScriptFlagHandler.Clear();
-        FileSystem.FileSystem.Initialize();
-        
-        response = "Successfully reloaded scripts. Changes in flags and script sections are now registered.";
-        return true;
+        var summary = FileSystem.FileSystem.RefreshAll(true);
+        response = $"Script refresh finished: {summary.Reloaded} reloaded, " +
+                   $"{summary.Unloaded} unloaded, {summary.Failed} failed.";
+        return summary.Failed == 0;
     }
 
     public string Command => "serreload";
     public string[] Aliases => [];
     public string Description => 
-        "Reloads all scripts. Use after changing flags or multi-section boundaries while the server is running.";
+        "Forces an immediate refresh of all scripts. Normal edits and round restarts refresh automatically.";
 
     public string Permission => "ser.reload";
 }

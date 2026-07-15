@@ -89,9 +89,17 @@ public class EnumArgument<TEnum> : EnumArgument where TEnum : struct, Enum
                 return error;
             }
 
-            result |= System.Convert.ToUInt64(value);
+            try
+            {
+                result |= System.Convert.ToUInt64(value);
+            }
+            catch (OverflowException) // usually -1, we assume that all flags are possible then
+            {
+                result = ulong.MaxValue;
+                break;
+            }
         }
-
+        
         return (TEnum)Enum.ToObject(typeof(TEnum), result);
     }
 

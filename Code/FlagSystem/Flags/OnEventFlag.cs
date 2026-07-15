@@ -37,11 +37,6 @@ public class OnEventFlag : Flag, IMajorBehaviorFlag
             }
 
             _event = inlineArgs.First();
-            if (EventHandler.AddEventHandler(_event, ScriptName).HasErrored(out var error))
-            {
-                return error;
-            }
-
             return true;
         },
         true,
@@ -91,6 +86,11 @@ public class OnEventFlag : Flag, IMajorBehaviorFlag
             Example = "-- require @evPlayer *evItem"
         }
     ];
+
+    public override Result Bind()
+    {
+        return EventHandler.AddEventHandler(_event, ScriptName);
+    }
 
     public override void Unbind()
     {

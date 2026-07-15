@@ -20,7 +20,12 @@ public class Speaker_CreateGlobalMethod : SynchronousMethod
             DefaultValue = new(1f, "100%"),
             Description = "The volume of the audio."
         },
-        ..Argument.PlayersArgumentUpdating("target players", playerDefault: new(null, "everyone"))
+        ..Argument.PlayersArgumentUpdating(
+            "target players", 
+            playerDescription: "only these players will hear the audio.",
+            playerDefault: new(null, "everyone"),
+            updateDefault: new(false, "no update")
+        )
     ];
 
     public override void Execute()

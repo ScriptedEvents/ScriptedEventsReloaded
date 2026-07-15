@@ -29,6 +29,12 @@ public abstract class Flag
     public virtual void OnParsingComplete()
     {
     }
+
+    public virtual Result Bind()
+    {
+        OnParsingComplete();
+        return true;
+    }
     
     public abstract void Unbind();
     

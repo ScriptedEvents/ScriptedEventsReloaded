@@ -38,7 +38,12 @@ public class Speaker_CreateOnPositionMethod : SynchronousMethod
             DefaultValue = new(true, null),
             Description = "Whether the audio will be 3D."
         },
-        ..Argument.PlayersArgumentUpdating("target players", playerDefault: new(null, "everyone"))
+        ..Argument.PlayersArgumentUpdating(
+            "target players",
+            playerDescription: "only these players will hear the audio.",
+            playerDefault: new(null, "everyone"),
+            updateDefault: new(false, "no update")
+        )
     ];
 
     public override void Execute()

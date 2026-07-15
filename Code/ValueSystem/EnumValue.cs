@@ -1,5 +1,6 @@
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
+using SER.Code.Helpers;
 using SER.Code.Plugin.Commands.HelpSystem;
 
 namespace SER.Code.ValueSystem;
@@ -14,8 +15,7 @@ public class EnumValue<T> : TextValue where T : struct, Enum
     {
         if (typeof(T).IsDefined(typeof(FlagsAttribute), false))
         {
-            throw new AndrzejFuckedUpException(
-                $"{typeof(T).AccurateName} uses flags = Flags enums are not supported with EnumValue");
+            Log.Warn($"type {typeof(T).AccurateName} uses flags = Flags enums are not supported with EnumValue");
         }
         
         EnumIndex.AddEnum(typeof(T));

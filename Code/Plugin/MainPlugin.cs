@@ -48,6 +48,7 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
     private FrameworkBridge? _frameworkBridge;
     private TeslaRuleHandler? _teslaRuleHandler;
     private DamageRuleHandler? _damageRuleHandler;
+    private bool _scriptsRefreshedDuringMapGeneration;
 
     public record Contributor(string Name, Contribution Contribution, string? Id = null);
 
@@ -147,6 +148,7 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
 #endif
     {
         Script.StopAll();
+        FileSystem.FileSystem.Shutdown();
         ScriptFlagHandler.Clear();
         EventHandler.Clear();
         CommandEvents.Clear();
@@ -182,10 +184,20 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
         VariableIndex.Initialize();
         CommandEvents.Initialize();
         FileSystem.FileSystem.Initialize();
+        _scriptsRefreshedDuringMapGeneration = true;
     }
 
     private void OnServerFullyInit()
     {
+        if (_scriptsRefreshedDuringMapGeneration)
+        {
+            _scriptsRefreshedDuringMapGeneration = false;
+        }
+        else
+        {
+            FileSystem.FileSystem.RefreshAll(true);
+        }
+
         if (_frameworkBridge is not null)
             Timing.CallDelayed(2f, _frameworkBridge.Finish);
         if (!Config.SendInitMessage) return;

@@ -77,6 +77,5 @@ public class FunctionFlag : Flag, IMajorBehaviorFlag
 
     public override void Unbind()
     {
-        _expectedVarTokens.Clear();
     }
 }

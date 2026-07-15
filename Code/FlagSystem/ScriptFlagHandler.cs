@@ -19,11 +19,23 @@ public static class ScriptFlagHandler
     
     internal static void Clear()
     {
-        ScriptsFlags.Values.ForEachItem(script => script.ForEach(flag => flag.Unbind()));
-        ScriptsFlags.Clear();
+        foreach (var scriptName in ScriptsFlags.Keys.ToArray())
+        {
+            UnregisterScript(scriptName);
+        }
     }
     
     internal static Result RegisterScript(List<Line> scriptLinesWithFlags, ScriptName scriptName)
+    {
+        if (PrepareScript(scriptLinesWithFlags, scriptName).HasErrored(out var error, out var flags))
+        {
+            return error;
+        }
+
+        return BindScript(scriptName, flags);
+    }
+
+    internal static TryGet<List<Flag>> PrepareScript(List<Line> scriptLinesWithFlags, ScriptName scriptName)
     {
         Flag? currentFlag = null;
         List<Flag> parsedFlags = [];
@@ -34,7 +46,6 @@ public static class ScriptFlagHandler
             var name = tokens.Skip(1).FirstOrDefault()?.RawRep;
             if (name is null)
             {
-                RollBack(parsedFlags);
                 return $"Line {line.LineNumber}: Name of the flag is missing.";
             }
             
@@ -50,14 +61,52 @@ public static class ScriptFlagHandler
             
             if (result.HasErrored(out var error))
             {
-                RollBack(parsedFlags);
                 return $"Line {line.LineNumber}: {error}";
             }
         }
 
-        ScriptsFlags[scriptName] = parsedFlags;
-        parsedFlags.ForEach(flag => flag.OnParsingComplete());
+        return parsedFlags;
+    }
+
+    internal static Result BindScript(ScriptName scriptName, List<Flag> flags)
+    {
+        List<Flag> boundFlags = [];
+        ScriptsFlags[scriptName] = flags;
+        foreach (var flag in flags)
+        {
+            Result bindResult;
+            try
+            {
+                bindResult = flag.Bind();
+            }
+            catch (Exception exception)
+            {
+                bindResult = $"Unexpected exception: {exception.Message}";
+            }
+
+            if (bindResult.HasErrored(out var error))
+            {
+                RollBack([flag]);
+                RollBack(boundFlags);
+                ScriptsFlags.Remove(scriptName);
+                return $"Flag '{flag.Name}' failed to bind: {error}";
+            }
+
+            boundFlags.Add(flag);
+        }
+
         return true;
+    }
+
+    internal static void UnregisterScript(ScriptName scriptName)
+    {
+        if (!ScriptsFlags.TryGetValue(scriptName, out var flags))
+        {
+            return;
+        }
+
+        RollBack(flags);
+        ScriptsFlags.Remove(scriptName);
     }
 
     public static Result DoFlagsApproveExecution(Script scr, out bool mustReport)

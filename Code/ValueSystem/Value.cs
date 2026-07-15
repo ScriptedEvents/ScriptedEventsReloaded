@@ -36,7 +36,7 @@ public abstract class Value : IEquatable<Value>
             }
 
             return typeof(EnumValue<>).MakeGenericType(t);
-        };
+        }
         if (typeof(Color).IsAssignableFrom(t)) return typeof(ColorValue);
         if (t == typeof(bool)) return typeof(BoolValue);
         if (t == typeof(byte) || t == typeof(sbyte) || t == typeof(short) || t == typeof(ushort) ||
@@ -121,14 +121,13 @@ public abstract class Value : IEquatable<Value>
             double n                => new NumberValue((decimal)n),
             decimal n               => new NumberValue(n),
             string s                => new StaticTextValue(s),
-            Enum e                  => (Value)Activator.CreateInstance(typeof(EnumValue<>).MakeGenericType(e.GetType()), e),
+            Enum e                  => (Value)Activator.CreateInstance(GuessValueType(e.GetType()), e),
             TimeSpan t              => new DurationValue(t),
             Player p                => new PlayerValue(p),
             IEnumerable<Player> ps  => new PlayerValue(ps),
-            JToken t                => new ReferenceValue<JToken>(t),
             IEnumerable e           => (Value)Activator.CreateInstance(GuessValueType(obj.GetType()), e),
             Color c                 => new ColorValue(c),
-            _                       => (Value)Activator.CreateInstance(typeof(ReferenceValue<>).MakeGenericType(obj.GetType()), obj),
+            _                       => (Value)Activator.CreateInstance(GuessValueType(obj.GetType()), obj),
         };
     }
 

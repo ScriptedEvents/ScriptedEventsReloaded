@@ -1,5 +1,6 @@
 ﻿using SER.Code.Extensions;
 using SER.Code.FlagSystem.Structures;
+using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem.Methods.ScriptMethods;
 using SER.Code.ScriptSystem.Structures;
 
@@ -27,7 +28,6 @@ public class OnCustomTriggerFlag : Flag, IMajorBehaviorFlag
             }
 
             _trigger = inlineArgs.First();
-            ScriptsBoundToTrigger.AddOrInitListWithKey(_trigger, ScriptName);
             return true;
         },
         true,
@@ -35,6 +35,12 @@ public class OnCustomTriggerFlag : Flag, IMajorBehaviorFlag
     );
     
     public override Argument[] Arguments => [];
+
+    public override Result Bind()
+    {
+        ScriptsBoundToTrigger.AddOrInitListWithKey(_trigger, ScriptName);
+        return true;
+    }
 
     public override void Unbind()
     {

@@ -58,7 +58,7 @@ public abstract class Argument(string name)
             }, 
             new BoolArgument($"update {name}")
             {
-                Description = $"Whether to constantly refresh the value provided in the '{name}' argument. {updateDefault}",
+                Description = $"Whether to constantly refresh the value provided in the '{name}' argument.",
                 DefaultValue = updateDefault
             }
         ];

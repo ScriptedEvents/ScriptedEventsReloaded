@@ -57,7 +57,7 @@ public static class FileSystem
         
         var duplicates = RegisteredScriptPaths
             .Select(Path.GetFileNameWithoutExtension)
-            .GroupBy(x => x)
+            .GroupBy(x => x, StringComparer.OrdinalIgnoreCase)
             .Where(g => g.Count() > 1)
             .Select(g => (g.Key, g.Count()))
             .ToList();
@@ -69,7 +69,9 @@ public static class FileSystem
         );
         
         RegisteredScriptPaths = RegisteredScriptPaths
-            .Where(path => !duplicates.Select(d => d.Key).Contains(Path.GetFileNameWithoutExtension(path)))
+            .Where(path => !duplicates.Select(d => d.Key).Contains(
+                Path.GetFileNameWithoutExtension(path),
+                StringComparer.OrdinalIgnoreCase))
             .ToArray();
     }
     
@@ -78,41 +80,18 @@ public static class FileSystem
         if (!Directory.Exists(MainDirPath))
         {
             Directory.CreateDirectory(MainDirPath);
-            return;
         }
 
-        UpdateScriptPathCollection();
-        
-        foreach (var scriptPath in RegisteredScriptPaths)
-        {
-            var fileName = Path.GetFileNameWithoutExtension(scriptPath);
-            if (GetScriptSections(scriptPath).HasErrored(out var splitError, out var sections))
-            {
-                Log.CompileError(fileName, splitError);
-                continue;
-            }
-
-            foreach (var section in sections)
-            {
-                var script = Script.CreateByVerifiedSection(section, ServerConsoleExecutor.Instance);
-                if (script.GetFlagLines().HasErrored(out var error, out var lines))
-                {
-                    Log.CompileError(section.Name, error);
-                    continue;
-                }
-
-                if (lines.IsEmpty())
-                {
-                    continue;
-                }
-
-                if (ScriptFlagHandler.RegisterScript(lines, section.Name).HasErrored(out error))
-                {
-                    Log.CompileError(section.Name, error);
-                }
-            }
-        }
+        ScriptCatalog.RefreshAll(true);
+        ScriptCatalog.StartWatching();
     }
+
+    public static ScriptCatalog.RefreshSummary RefreshAll(bool force = false) => ScriptCatalog.RefreshAll(force);
+
+    public static ScriptCatalog.RefreshSummary RefreshScript(ScriptName scriptName) =>
+        ScriptCatalog.RefreshScript(scriptName);
+
+    public static void Shutdown() => ScriptCatalog.Shutdown();
 
     public static TryGet<ScriptSection[]> GetScriptSections(string path)
     {
@@ -128,54 +107,12 @@ public static class FileSystem
 
     public static TryGet<ScriptSection> GetScriptSection(ScriptName scriptName)
     {
-        UpdateScriptPathCollection();
-
-        var requestedName = scriptName.ToString();
-        ParseSectionSelector(requestedName, out var fileName, out var requestedSection);
-        var path = RegisteredScriptPaths.FirstOrDefault(p => Path.GetFileNameWithoutExtension(p) == fileName);
-        if (path is null)
-        {
-            return $"Script '{scriptName}' does not exist anymore";
-        }
-
-        if (GetScriptSections(path).HasErrored(out var error, out var sections))
-        {
-            return error;
-        }
-
-        if (requestedSection is { } sectionNumber)
-        {
-            if (sections.Length <= 1)
-            {
-                return $"Script '{fileName}' is not split into multiple sections.";
-            }
-
-            var section = sections.FirstOrDefault(section => section.Number == sectionNumber);
-            return section is not null
-                ? section
-                : $"Script '{fileName}' does not contain section {sectionNumber}.";
-        }
-
-        if (sections.Length > 1)
-        {
-            return $"Script '{fileName}' contains {sections.Length} sections. " +
-                   $"Select one using '{fileName}:1' through '{fileName}:{sections.Length}'.";
-        }
-
-        return sections[0];
+        return ScriptCatalog.GetSection(scriptName);
     }
     
     public static TryGet<string> GetScriptPath(ScriptName scriptName)
     {
-        UpdateScriptPathCollection();
-        ParseSectionSelector(scriptName, out var fileName, out _);
-        if (RegisteredScriptPaths.FirstOrDefault(p => Path.GetFileNameWithoutExtension(p) == fileName) is
-            { } path)
-        {
-            return path.AsSuccess();
-        }
-
-        return $"Script '{scriptName}' does not exist anymore".AsError();
+        return ScriptCatalog.GetPath(scriptName);
     }
     
     public static bool DoesScriptExistByName(string scriptName, out string path)
@@ -194,7 +131,7 @@ public static class FileSystem
     {
         UpdateScriptPathCollection();
         
-        return RegisteredScriptPaths.Any(p => p == path);
+        return RegisteredScriptPaths.Any(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase));
     }
 
     public static bool IsScriptOrFileName(Script script, string name)

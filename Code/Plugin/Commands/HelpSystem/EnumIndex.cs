@@ -21,6 +21,8 @@ public static class EnumIndex
         typeof(ValueType),
         typeof(Team)
     ];
+
+    private static readonly object BaseEnumsLock = new();
     
     private static Type[]? _reflectedEnums;
     private static Type[] ReflectedEnums => _reflectedEnums ??=
@@ -51,25 +53,37 @@ public static class EnumIndex
 
     public static void AddEnum(Type type)
     {
-        if (!BaseEnums.Contains(type))
-            BaseEnums.Add(type);
+        lock (BaseEnumsLock)
+        {
+            if (!BaseEnums.Contains(type))
+                BaseEnums.Add(type);
+        }
     }
     
     public static IEnumerable<Type> GetNonReflectedEnums()
     {
-        return BaseEnums;
+        lock (BaseEnumsLock)
+        {
+            return BaseEnums.ToArray();
+        }
     }
 
     public static IEnumerable<Type> GetAllEnums()
     {
-        foreach (var @enum in BaseEnums)
+        Type[] baseEnums;
+        lock (BaseEnumsLock)
+        {
+            baseEnums = BaseEnums.ToArray();
+        }
+        
+        foreach (var @enum in baseEnums)
         {
             yield return @enum;
         }
 
         foreach (var @enum in ReflectedEnums)
         {
-            if (BaseEnums.Contains(@enum)) continue;
+            if (baseEnums.Contains(@enum)) continue;
             yield return @enum;
         }
     }

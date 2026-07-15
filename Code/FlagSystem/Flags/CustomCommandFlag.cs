@@ -21,6 +21,8 @@ namespace SER.Code.FlagSystem.Flags;
 [UsedImplicitly]
 public class CustomCommandFlag : Flag, IMajorBehaviorFlag
 {
+    private readonly HashSet<ConsoleType> _boundConsoles = [];
+
     public override string Description =>
         """
         Creates a command and binds it to the script. When the command is ran, it executes the script. 
@@ -207,14 +209,15 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
         Server      = 1 << 2
     }
 
-    public override void OnParsingComplete()
+    public override Result Bind()
     {
-        if (ScriptCommands.ContainsKey(Command))
+        if (ScriptCommands.Values.Any(flag => !ReferenceEquals(flag, this)
+                && string.Equals(flag.Command.Command, Command.Command, StringComparison.OrdinalIgnoreCase)))
         {
-            return;
+            return $"A custom command named '{Command.Command}' is already registered by another script.";
         }
         
-        ScriptCommands.Add(Command, this);
+        ScriptCommands[Command] = this;
         
         foreach (var console in Command.ConsoleTypes.GetFlags())
         {
@@ -224,51 +227,63 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
                 {
                     case ConsoleType.Player:
                         QueryProcessor.DotCommandHandler.RegisterCommand(Command);
-                        continue;
+                        break;
                     case ConsoleType.Server:
                         Console.ConsoleCommandHandler.RegisterCommand(Command);
-                        continue;
+                        break;
                     case ConsoleType.RemoteAdmin:
                         CommandProcessor.RemoteAdminCommandHandler.RegisterCommand(Command);
-                        continue;
+                        break;
                     case ConsoleType.None:
                     default:
                         throw new AndrzejFuckedUpException();
                 }
+
+                _boundConsoles.Add(console);
             }
-            catch
+            catch (Exception exception)
             {
-                ScriptCommands.TryGetValue(Command, out var flag);
-                
-                Log.CompileError(
-                    flag?.ScriptName ?? "Unknown script",
-                    $"Failed to register command '{Command.Command}' for {console} console. " +
-                    $"Check if there isn't a command with the same name already registered."
-                );
+                Unbind();
+                return $"Failed to register command '{Command.Command}' for {console} console: " +
+                       exception.Message;
             }
         }
+
+        return true;
     }
 
     public override void Unbind()
     {
         ScriptCommands.Remove(Command);
         
-        foreach (var console in Command.ConsoleTypes.GetFlags())
+        foreach (var console in _boundConsoles.ToArray())
         {
-            switch (console)
+            try
             {
-                case ConsoleType.Player:
-                    QueryProcessor.DotCommandHandler.UnregisterCommand(Command);
-                    break;
-                case ConsoleType.Server:
-                    Console.ConsoleCommandHandler.UnregisterCommand(Command);
-                    break;
-                case ConsoleType.RemoteAdmin:
-                    CommandProcessor.RemoteAdminCommandHandler.UnregisterCommand(Command);
-                    break;
-                case ConsoleType.None:
-                default:
-                    throw new AndrzejFuckedUpException();
+                switch (console)
+                {
+                    case ConsoleType.Player:
+                        QueryProcessor.DotCommandHandler.UnregisterCommand(Command);
+                        break;
+                    case ConsoleType.Server:
+                        Console.ConsoleCommandHandler.UnregisterCommand(Command);
+                        break;
+                    case ConsoleType.RemoteAdmin:
+                        CommandProcessor.RemoteAdminCommandHandler.UnregisterCommand(Command);
+                        break;
+                    case ConsoleType.None:
+                    default:
+                        throw new AndrzejFuckedUpException();
+                }
+            }
+            catch (Exception exception)
+            {
+                Log.Error($"Failed to unregister command '{Command.Command}' from {console} console: " +
+                          exception.Message);
+            }
+            finally
+            {
+                _boundConsoles.Remove(console);
             }
         }
     }
@@ -347,6 +362,29 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
 
     public static Result RunAttachedScript(CustomCommand cmd, ScriptExecutor sender, string[] args)
     {
+        if (ScriptCommands.TryGetValue(cmd, out var attachedFlag))
+        {
+            FileSystem.FileSystem.RefreshScript(attachedFlag.ScriptName);
+        }
+        else
+        {
+            FileSystem.FileSystem.RefreshAll();
+        }
+
+        if (!ScriptCommands.TryGetValue(cmd, out var flag))
+        {
+            flag = ScriptCommands.Values.FirstOrDefault(candidate =>
+                string.Equals(candidate.Command.Command, cmd.Command, StringComparison.OrdinalIgnoreCase));
+            if (flag is null)
+            {
+                return "The script that was supposed to handle this command was not found.";
+            }
+
+            // The command object that dispatched this call may have just been replaced by a reload.
+            // Finish this invocation against the newly registered definition as well as its new body.
+            cmd = flag.Command;
+        }
+
         if (sender is IPlayerExecutor { Player: { } player } && HandlePlayer(cmd, player) is { } plrErr)
         {
             return plrErr;
@@ -383,11 +421,6 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
             cmd.NextEligibleDateForGlobal = DateTime.UtcNow + cmd.GlobalCooldown;
         }
         
-        if (!ScriptCommands.TryGetValue(cmd, out var flag))
-        {
-            return "The script that was supposed to handle this command was not found.";
-        }
-
         if (Tokenizer.SliceLine(args.JoinStrings(" "))
             .HasErrored(out var sliceError, out var outSlices))
         {

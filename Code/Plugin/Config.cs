@@ -21,6 +21,10 @@ public class Config
 
     [Description("If true, SER will slow down scripts in order to prevent them from crashing the server.")]
     public bool SafeScripts { get; set; } = false;
+    
+    [Description("How many seconds a script file must remain unchanged before SER automatically reloads it. " +
+                 "Running a script or using serreload still checks immediately.")]
+    public float AutomaticScriptReloadDelay { get; set; } = 696969f;
 
     [Description("If you wish to remove ranks from players mentioned in the credits, message the developer.")]
     public int RankRemovalKey { get; set; } = 0;

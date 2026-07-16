@@ -17,7 +17,7 @@ public abstract class ReturningMethod<T> : ReturningMethod, IReturningMethod<T>
 
     public new T ReturnValue
     {
-        protected set => base.ReturnValue = value;
         get => (T)base.ReturnValue!;
+        protected set => base.ReturnValue = value;
     }
 }

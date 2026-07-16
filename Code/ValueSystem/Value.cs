@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Reflection;
 using LabApi.Features.Wrappers;
-using Newtonsoft.Json.Linq;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
@@ -105,30 +104,38 @@ public abstract class Value : IEquatable<Value>
         // ReSharper disable once ConvertIfStatementToSwitchStatement
         if (obj is null) throw new AndrzejFuckedUpException();
         if (obj is Value v) return v;
-        
-        return obj switch
-        {   
-            bool b                  => new BoolValue(b),
-            byte n                  => new NumberValue(n),
-            sbyte n                 => new NumberValue(n),
-            short n                 => new NumberValue(n),
-            ushort n                => new NumberValue(n),
-            int n                   => new NumberValue(n),
-            uint n                  => new NumberValue(n),
-            long n                  => new NumberValue(n),
-            ulong n                 => new NumberValue(n),
-            float n                 => new NumberValue((decimal)n),
-            double n                => new NumberValue((decimal)n),
-            decimal n               => new NumberValue(n),
-            string s                => new StaticTextValue(s),
-            Enum e                  => (Value)Activator.CreateInstance(GuessValueType(e.GetType()), e),
-            TimeSpan t              => new DurationValue(t),
-            Player p                => new PlayerValue(p),
-            IEnumerable<Player> ps  => new PlayerValue(ps),
-            IEnumerable e           => (Value)Activator.CreateInstance(GuessValueType(obj.GetType()), e),
-            Color c                 => new ColorValue(c),
-            _                       => (Value)Activator.CreateInstance(GuessValueType(obj.GetType()), obj),
-        };
+
+        try
+        {
+            return obj switch
+            {
+                bool b => new BoolValue(b),
+                byte n => new NumberValue(n),
+                sbyte n => new NumberValue(n),
+                short n => new NumberValue(n),
+                ushort n => new NumberValue(n),
+                int n => new NumberValue(n),
+                uint n => new NumberValue(n),
+                long n => new NumberValue(n),
+                ulong n => new NumberValue(n),
+                float n => new NumberValue((decimal)n),
+                double n => new NumberValue((decimal)n),
+                decimal n => new NumberValue(n),
+                string s => new StaticTextValue(s),
+                Enum => (Value)Activator.CreateInstance(GuessValueType(obj.GetType()), obj),
+                TimeSpan t => new DurationValue(t),
+                Player p => new PlayerValue(p),
+                IEnumerable<Player> ps => new PlayerValue(ps),
+                IEnumerable => (Value)Activator.CreateInstance(GuessValueType(obj.GetType()), obj),
+                Color c => new ColorValue(c),
+                _ => (Value)Activator.CreateInstance(GuessValueType(obj.GetType()), obj),
+            };
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Failed to parse {obj.GetType().AccurateName} to SER value: {e}");
+            return new StaticTextValue(obj.ToString());
+        }
     }
 
     public static Dictionary<string, IValueWithProperties.PropInfo>? GetPropertiesOfValue(Type t)

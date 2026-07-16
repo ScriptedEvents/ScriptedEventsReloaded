@@ -435,17 +435,8 @@ public static class DocsProvider
         foreach (var (framework, methods) in MethodIndex.FrameworkDependentMethods
                      .Where(kvp => FrameworkBridge.Found.All(fb => fb.Type != kvp.Key)))
         {
-            var shownMethods = !essential ? methods : methods.Where(m => m is IEssential).ToList();
-            if (shownMethods.Count == 0) continue;
-            
-            var descDistance = DescDistance(shownMethods);
-            
             sb.AppendLine();
-            sb.AppendLine($"--- (not accessible) {framework} framework methods ---");
-            foreach (var method in shownMethods)
-            {
-                sb.AppendLine(GetFormatted(method, descDistance));
-            }
+            sb.AppendLine($"> {framework} framework (not installed) can add {methods.Count} more methods");
         }
         
         return sb.ToString();

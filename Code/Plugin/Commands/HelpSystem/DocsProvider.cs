@@ -2,6 +2,7 @@
 using System.Text;
 using CommandSystem;
 using LabApi.Events.Arguments.Interfaces;
+using LabApi.Features.Console;
 using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Contexts;
 using SER.Code.ContextSystem.Interfaces;
@@ -572,11 +573,25 @@ public static class DocsProvider
 
     private static bool TryGetPropsFromValue(Value val, out string response)
     {
+        response = string.Empty;
         var properties = Value.GetPropertiesOfValue(val.GetType());
         if (properties == null)
         {
             response = $"Value {val.FriendlyName} does not have properties.";
             return false;
+        }
+        
+        // Special case for shell types
+        if (val is ReferenceValue { Value: IFrameworkTypeShell shell })
+        {
+            var innerType = shell.Object.GetType();
+            if (Value.GetPropertiesOfValue(innerType) is not { } innerProps)
+            {
+                innerProps = ReferencePropertyRegistry.GetProperties(innerType);
+            }
+
+            response = RenderProperties(innerType.AccurateName, innerProps, innerType);
+            return true;
         }
 
         // Special case for collection of references: show both collection and element props

@@ -176,10 +176,10 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
         Flag.RegisterFlags();
         EventHandler.Initialize();
         MethodIndex.Initialize();
+        FrameworkBridge.Initialize();
         VariableIndex.Initialize();
         CommandEvents.Initialize();
         FileSystem.FileSystem.Initialize();
-        FrameworkBridge.Initialize();
         _scriptsRefreshedDuringMapGeneration = true;
     }
 

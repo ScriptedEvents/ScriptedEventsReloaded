@@ -3,18 +3,16 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Helpers;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
+using SER.Code.ValueSystem;
 using UncomplicatedCustomRoles.API.Features;
-using UncomplicatedCustomRoles.API.Interfaces;
 
 namespace SER.Code.MethodSystem.Methods.UCRMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class UCR_GetRoleMethod : ReferenceReturningMethod, IAdditionalDescription, IDependOnFramework
+public class UCR_GetRoleMethod : ReturningMethod<ReferenceValue>, IAdditionalDescription, IDependOnFramework
 {
-    public override Type ReturnType => typeof(ICustomRole);
-
-    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.Ucr;
+    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.UncomplicatedCustomRoles;
     
     public override string Description => "Returns a reference to the UCR role a player has.";
 

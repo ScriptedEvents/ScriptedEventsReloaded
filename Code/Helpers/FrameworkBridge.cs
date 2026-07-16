@@ -1,75 +1,64 @@
 ﻿using LabApi.Features.Console;
 using LabApi.Loader;
-using MEC;
 using SER.Code.Extensions;
 using SER.Code.MethodSystem;
 
 namespace SER.Code.Helpers;
 
-public class FrameworkBridge
+public static class FrameworkBridge
 {
     public record struct Framework(string Name, Type Type);
-    public static readonly List<Framework> Found = [];
-    private readonly List<CoroutineHandle> _handles = [];
+    public static readonly List<Framework> Found = new(4);
 
     public enum Type
     {
         Exiled,
         Callvote,
-        Ucr
+        UncomplicatedCustomRoles,
+        ProjectMapEditorReborn
     }
-    
-    private readonly Framework[] _frameworks =
+
+    private static readonly Framework[] Frameworks =
     [
-        new("Callvote", Type.Callvote),
 #if !EXILED
         new("Exiled Loader", Type.Exiled),
 #endif
-        new("UncomplicatedCustomRoles", Type.Ucr)
+        new("Callvote", Type.Callvote),
+        new("ProjectMER", Type.ProjectMapEditorReborn),
+        new("UncomplicatedCustomRoles", Type.UncomplicatedCustomRoles)
     ];
 
-    public void Load()
+    public static void Initialize()
     {
-        Timing.KillCoroutines(_handles.ToArray());
-        _handles.Clear();
+        Clear();
+        FindAndLoadFrameworkMethods();
+    }
+
+    public static void Clear()
+    {
         Found.Clear();
-#if EXILED
-        MethodIndex.LoadMethodsOfFramework(Type.Exiled);
-#endif
-        Found.Clear();
-        foreach (var framework in _frameworks)
+    }
+
+    public static void FindAndLoadFrameworkMethods()
+    {
+        foreach (var framework in Frameworks.Except(Found))
         {
-            _handles.Add(Timing.RunCoroutine(Await(framework)));
+            if (IsLabAPIComatibleFrameworkLoaded(framework) || IsExiledCompatibleFrameworkLoaded(framework))
+            {
+                MethodIndex.LoadMethodsOfFramework(framework.Type);
+                Found.Add(framework);
+                Logger.Debug($"Found {framework.Name} plugin, adding methods...");
+            }
         }
     }
 
-    public void Finish()
+    public static void PrintFound()
     {
-        Timing.KillCoroutines(_handles.ToArray());
-        _handles.Clear();
-        Logger.Info(Found.Count == 0
+        Logger.Debug(Found.Count == 0
             ? "No supported framework was found, no additional methods were added."
             : $"SER has added methods for {Found.Count} supported framework(s): " +
               $"{Found.Select(f => f.Type.ToString()).JoinStrings(", ")}"
         );
-    }
-
-    private static IEnumerator<float> Await(Framework framework)
-    {
-        // handled from forever repeating when coroutines are killed
-        while (true)
-        {
-            yield return Timing.WaitForSeconds(.5f);
-            
-            if (IsLabAPIComatibleFrameworkLoaded(framework) || IsExiledCompatibleFrameworkLoaded(framework))
-            {
-                break;
-            }
-        }
-        
-        Logger.Debug($"SER found supported framework '{framework.Type}'");
-        Found.Add(framework);
-        MethodIndex.LoadMethodsOfFramework(framework.Type);
     }
 
     private static bool IsLabAPIComatibleFrameworkLoaded(Framework framework)

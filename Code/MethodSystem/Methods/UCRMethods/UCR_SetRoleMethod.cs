@@ -11,7 +11,7 @@ namespace SER.Code.MethodSystem.Methods.UCRMethods;
 [UsedImplicitly]
 public class UCR_SetRoleMethod : SynchronousMethod, IDependOnFramework
 {
-    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.Ucr;
+    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.UncomplicatedCustomRoles;
 
     public override string Description => "Sets the UCR role of a player.";
 

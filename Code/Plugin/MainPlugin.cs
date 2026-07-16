@@ -45,7 +45,6 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
     public static string HelpCommandName => "serhelp";
     public static MainPlugin Instance { get; private set; } = null!;
 
-    private FrameworkBridge? _frameworkBridge;
     private TeslaRuleHandler? _teslaRuleHandler;
     private DamageRuleHandler? _damageRuleHandler;
     private bool _scriptsRefreshedDuringMapGeneration;
@@ -125,9 +124,6 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
         
         Instance = this;
         
-
-        _frameworkBridge = new FrameworkBridge();
-        _frameworkBridge.Load();
         SendLogo();
 
         Events.ServerEvents.MapGenerating += OnMapGenerating;
@@ -152,6 +148,7 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
         ScriptFlagHandler.Clear();
         EventHandler.Clear();
         CommandEvents.Clear();
+        FrameworkBridge.Clear();
 
         Events.ServerEvents.MapGenerating -= OnMapGenerating;
         Events.ServerEvents.WaitingForPlayers -= OnServerFullyInit;
@@ -162,8 +159,6 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
         if (_damageRuleHandler is not null)
             CustomHandlersManager.UnregisterEventsHandler(_damageRuleHandler);
 
-        _frameworkBridge?.Finish();
-        _frameworkBridge = null;
         _teslaRuleHandler = null;
         _damageRuleHandler = null;
     }
@@ -184,6 +179,7 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
         VariableIndex.Initialize();
         CommandEvents.Initialize();
         FileSystem.FileSystem.Initialize();
+        FrameworkBridge.Initialize();
         _scriptsRefreshedDuringMapGeneration = true;
     }
 
@@ -198,8 +194,8 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
             FileSystem.FileSystem.RefreshAll(true);
         }
 
-        if (_frameworkBridge is not null)
-            Timing.CallDelayed(2f, _frameworkBridge.Finish);
+        FrameworkBridge.PrintFound();
+
         if (!Config.SendInitMessage) return;
 
         Logger.Raw(

@@ -14,7 +14,7 @@ namespace SER.Code.MethodSystem.Methods.UCRMethods;
 [UsedImplicitly]
 public class UCR_GetPlayersWithRoleMethod : ReturningMethod<PlayerValue>, IDependOnFramework
 {
-    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.Ucr;
+    public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.UncomplicatedCustomRoles;
 
     public override string Description => "Gets all players who have a provided UCR role.";
 

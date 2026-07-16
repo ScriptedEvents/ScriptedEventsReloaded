@@ -34,6 +34,28 @@ public static class EventHandler
             .Select(t => t.GetEvents(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public 
                                      | BindingFlags.NonPublic | BindingFlags.DeclaredOnly).ToList())
             .Flatten().ToList();
+
+        AddOptionalProjectMerEvents();
+    }
+
+    private static void AddOptionalProjectMerEvents()
+    {
+        Assembly? merAssembly = AppDomain.CurrentDomain.GetAssemblies()
+            .FirstOrDefault(assembly => assembly.GetName().Name == "ProjectMER");
+        if (merAssembly is null)
+            return;
+
+        Type? schematicHandler = merAssembly.GetType("ProjectMER.Events.Handlers.Schematic");
+        if (schematicHandler is null)
+            return;
+
+        foreach (EventInfo eventInfo in schematicHandler.GetEvents(BindingFlags.Public | BindingFlags.Static))
+        {
+            if (AvailableEvents.Any(existing => existing.Name == eventInfo.Name && existing.DeclaringType == eventInfo.DeclaringType))
+                continue;
+
+            AvailableEvents.Add(eventInfo);
+        }
     }
     
     public static void Clear()

@@ -1,5 +1,4 @@
-﻿using SER.Code.MethodSystem.BaseMethods.Interfaces;
-using SER.Code.ValueSystem;
+﻿using SER.Code.ValueSystem;
 using SER.Code.ValueSystem.Other;
 
 namespace SER.Code.MethodSystem.BaseMethods.Yielding;
@@ -7,7 +6,7 @@ namespace SER.Code.MethodSystem.BaseMethods.Yielding;
 /// <summary>
 /// Represents a method that returns a reference to an object that cannot be represented fully in text form (not counting players.)
 /// </summary>
-public abstract class YieldingReferenceReturningMethod : YieldingReturningMethod<ReferenceValue>, IReferenceReturningMethod
+public abstract class YieldingReferenceReturningMethod : YieldingReturningMethod<ReferenceValue>
 {
     public abstract Type ReturnType { get; }
 }

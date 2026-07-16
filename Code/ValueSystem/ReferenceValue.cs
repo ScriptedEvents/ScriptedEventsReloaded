@@ -28,6 +28,10 @@ public class ReferenceValue(object? value) : Value, IValueWithDynamicProperties
     public override TryGet<object> ToCSharpObject(Type? targetType)
     {
         if (targetType is null || targetType.IsInstanceOfType(Value)) return Value;
+
+        if (Value is IFrameworkTypeShell shell && targetType.IsInstanceOfType(shell.Object))
+            return shell.Object;
+
         return $"Cannot convert reference to {Value.GetType().Name} to {targetType.Name}";
     }
     
@@ -39,8 +43,9 @@ public class ReferenceValue(object? value) : Value, IValueWithDynamicProperties
         return $"<{Value.GetType().AccurateName} reference | {Value.GetHashCode()}>";
     }
 
-    public Dictionary<string, IValueWithProperties.PropInfo> Properties => 
-        ReferencePropertyRegistry.GetProperties(ReferenceType);
+    public Dictionary<string, IValueWithProperties.PropInfo> Properties => value is IFrameworkTypeShell shell
+        ? ReferencePropertyRegistry.GetProperties(shell)
+        : ReferencePropertyRegistry.GetProperties(ReferenceType);
 }
 
 [UsedImplicitly]
@@ -73,6 +78,11 @@ public static class ReferenceValueExtensions
                 return tValue;
             }
 
+            if (value.Value is IFrameworkTypeShell shell && shell.Object is T frameworkValue)
+            {
+                return frameworkValue;
+            }
+
             return $"The {value} reference is not valid {typeof(T).AccurateName} object";
         }
         
@@ -81,6 +91,12 @@ public static class ReferenceValueExtensions
             if (value.Value is T tValue)
             {
                 value1 = tValue;
+                return true;
+            }
+
+            if (value.Value is IFrameworkTypeShell shell && shell.Object is T frameworkValue)
+            {
+                value1 = frameworkValue;
                 return true;
             }
         

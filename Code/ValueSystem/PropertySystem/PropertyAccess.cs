@@ -46,7 +46,7 @@ public class PropertyAccess(BaseToken initialToken, IValueToken root)
                         if (subProps?.TryGetValue(token.RawRep, out var subProp) is true)
                         {
                             ExprRepr += $" {token.RawRep}";
-                            PossibleValues = subProp.ReturnType;
+                            PossibleValues = subProp.PossibleReturnTypes;
                             goto found;
                         }
                     }
@@ -60,14 +60,14 @@ public class PropertyAccess(BaseToken initialToken, IValueToken root)
                     if (dynamicDict.TryGetValue(token.RawRep, out var dynamicProp))
                     {
                         ExprRepr += $" {token.RawRep}";
-                        PossibleValues = dynamicProp.ReturnType;
+                        PossibleValues = dynamicProp.PossibleReturnTypes;
                         goto found;
                     }
                 }
                 else if (props?.TryGetValue(token.RawRep, out var property) is true)
                 {
                     ExprRepr += $" {token.RawRep}";
-                    PossibleValues = property.ReturnType;
+                    PossibleValues = property.PossibleReturnTypes;
                     goto found;
                 }
             }

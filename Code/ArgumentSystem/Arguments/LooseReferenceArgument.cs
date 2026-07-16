@@ -29,12 +29,7 @@ public class LooseReferenceArgument(string name, Type type) : Argument(name)
 
     public TryGet<object> TryParse(ReferenceValue value, Type targetType)
     {
-        if (targetType.IsInstanceOfType(value.Value))
-        {
-            return value.Value;
-        }
-
-        return $"The {value} reference is not {ValidInput}";
+        return value.ToCSharpObject(targetType);
     }
 }
 
@@ -55,11 +50,6 @@ public class ReferenceArgument<TValue>(string name) : LooseReferenceArgument(nam
 
     public static TryGet<TValue> GetValue(ReferenceValue value)
     {
-        if (value.Value is TValue tValue)
-        {
-            return tValue;
-        }
-
-        return $"The {value} reference is not valid {typeof(TValue).AccurateName} object";
+        return value.GetAs<TValue>();
     }
 }

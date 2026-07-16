@@ -16,6 +16,7 @@ public static class ReferencePropertyRegistry
 {
     private static readonly Dictionary<Type, Dictionary<string, IValueWithProperties.PropInfo>> RegisteredProperties = new();
     private static readonly Dictionary<Type, Dictionary<string, IValueWithProperties.PropInfo>> CachedCombinedProperties = new();
+    private static readonly Dictionary<(Type Shell, Type Object), Dictionary<string, IValueWithProperties.PropInfo>> CachedShellProperties = new();
 
     public static IEnumerable<Type> GetRegisteredTypes() => RegisteredProperties.Keys;
 
@@ -29,6 +30,7 @@ public static class ReferencePropertyRegistry
         }
         props[name] = new ReferencePropInfo<T, TValue>(handler, description);
         CachedCombinedProperties.Clear(); // Invalidate cache
+        CachedShellProperties.Clear();
     }
 
     public static Dictionary<string, IValueWithProperties.PropInfo> GetProperties(Type type)
@@ -110,10 +112,117 @@ public static class ReferencePropertyRegistry
             )
         );
 
-        CachedCombinedProperties[type] = combined;
-        return type == typeof(JObject) || type == typeof(JToken) || type.IsSubclassOf(typeof(JToken)) 
-            ? new JTokenPropertyDictionary(combined) 
-            : combined;
+        Dictionary<string, IValueWithProperties.PropInfo> result;
+        if (type == typeof(JObject) || type == typeof(JToken) || type.IsSubclassOf(typeof(JToken)))
+            result = new JTokenPropertyDictionary(combined);
+        else if (typeof(IFrameworkTypeShell).IsAssignableFrom(type))
+            result = new FrameworkShellTypePropertyDictionary(combined);
+        else
+            result = combined;
+
+        CachedCombinedProperties[type] = result;
+        return result;
+    }
+
+    public static Dictionary<string, IValueWithProperties.PropInfo> GetProperties(IFrameworkTypeShell shell)
+    {
+        Type shellType = shell.GetType();
+        object? frameworkObject = shell.Object;
+        if (frameworkObject is null)
+            return GetProperties(shellType);
+
+        Type objectType = frameworkObject.GetType();
+        var cacheKey = (shellType, objectType);
+        if (CachedShellProperties.TryGetValue(cacheKey, out var cached))
+            return cached;
+
+        Dictionary<string, IValueWithProperties.PropInfo> combined = new(
+            GetProperties(shellType),
+            StringComparer.OrdinalIgnoreCase);
+
+        foreach (var property in GetProperties(objectType))
+        {
+            if (combined.ContainsKey(property.Key))
+                continue;
+
+            combined[property.Key] = new FrameworkShellForwardedPropInfo(property.Key, property.Value);
+        }
+
+        CachedShellProperties[cacheKey] = combined;
+        return combined;
+    }
+
+    private class FrameworkShellTypePropertyDictionary(Dictionary<string, IValueWithProperties.PropInfo> inner)
+        : Dictionary<string, IValueWithProperties.PropInfo>(inner, StringComparer.OrdinalIgnoreCase), IValueWithProperties.IDynamicPropertyDictionary
+    {
+        public new bool TryGetValue(string key, out IValueWithProperties.PropInfo value)
+        {
+            if (base.TryGetValue(key, out value))
+                return true;
+
+            value = new FrameworkShellDynamicPropInfo(key);
+            return true;
+        }
+    }
+
+    private class FrameworkShellDynamicPropInfo(string propertyName) : IValueWithProperties.PropInfo
+    {
+        public override TryGet<Value> GetValue(object obj) =>
+            $"Wrapped framework object does not have property '{propertyName}'.";
+
+        public override SingleTypeOfValue ReturnType => new(typeof(ReferenceValue));
+        public override TypeOfValue PossibleReturnTypes => new UnknownTypeOfValue();
+        public override string Description => "Property forwarded to the wrapped framework object.";
+    }
+
+    private class FrameworkShellForwardedPropInfo(
+        string propertyName,
+        IValueWithProperties.PropInfo inner) : IValueWithProperties.PropInfo
+    {
+        public override TryGet<Value> GetValue(object obj)
+        {
+            if (!TryGetShell(obj, out IFrameworkTypeShell shell, out string error))
+                return error;
+
+            return inner.GetValue(shell.Object);
+        }
+
+        public override Result SetValue(object obj, Value value)
+        {
+            if (!TryGetShell(obj, out IFrameworkTypeShell shell, out string error))
+                return error;
+
+            Result setResult = inner.SetValue(shell.Object, value);
+            if (setResult.HasErrored(out _))
+                return setResult;
+
+            return shell is IFrameworkTypeShellWriteHandler handler
+                ? handler.OnObjectPropertySet(propertyName)
+                : true;
+        }
+
+        private static bool TryGetShell(
+            object obj,
+            out IFrameworkTypeShell shell,
+            out string error)
+        {
+            object value = obj is ReferenceValue reference ? reference.Value : obj;
+            if (value is IFrameworkTypeShell frameworkShell)
+            {
+                shell = frameworkShell;
+                error = null!;
+                return true;
+            }
+
+            shell = null!;
+            error = "Reference does not contain a framework type shell.";
+            return false;
+        }
+
+        public override SingleTypeOfValue ReturnType => inner.ReturnType;
+        public override string? Description => inner.Description;
+        public override bool IsReflected => inner.IsReflected;
+        public override bool IsSettable => inner.IsSettable;
     }
 
     private class JTokenPropertyDictionary(Dictionary<string, IValueWithProperties.PropInfo> inner) 

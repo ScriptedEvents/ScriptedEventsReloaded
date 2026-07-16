@@ -77,11 +77,17 @@
         <Reference Include="UnityEngine.PhysicsModule">
             <HintPath>$(SL_DEV_REFERENCES)\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.AnimationModule">
+            <HintPath>$(SL_DEV_REFERENCES)\UnityEngine.AnimationModule.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.UnityWebRequestModule">
             <HintPath>$(SL_DEV_REFERENCES)\UnityEngine.UnityWebRequestModule.dll</HintPath>
         </Reference>
         <Reference Include="UncomplicatedCustomRoles-LabAPI">
             <HintPath>$(SL_DEV_REFERENCES)\UncomplicatedCustomRoles-LabAPI.dll</HintPath>
+        </Reference>
+        <Reference Include="ProjectMER">
+            <HintPath>$(SL_DEV_REFERENCES)\ProjectMER.dll</HintPath>
         </Reference>
     </ItemGroup>
     

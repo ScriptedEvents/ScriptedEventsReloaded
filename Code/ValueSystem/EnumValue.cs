@@ -1,4 +1,3 @@
-using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
 using SER.Code.Plugin.Commands.HelpSystem;

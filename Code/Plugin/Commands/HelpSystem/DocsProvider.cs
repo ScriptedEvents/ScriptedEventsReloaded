@@ -2,7 +2,6 @@
 using System.Text;
 using CommandSystem;
 using LabApi.Events.Arguments.Interfaces;
-using LabApi.Features.Console;
 using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Contexts;
 using SER.Code.ContextSystem.Interfaces;

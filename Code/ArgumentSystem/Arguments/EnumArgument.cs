@@ -1,5 +1,6 @@
 ﻿using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
+using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.Plugin.Commands.HelpSystem;
 using SER.Code.TokenSystem.Tokens;
@@ -38,9 +39,17 @@ public class EnumArgument<TEnum> : EnumArgument where TEnum : struct, Enum
         }
     }
 
-    public override string InputDescription =>
-        $"{typeof(TEnum).AccurateName} enum value - found using 'serhelp {typeof(TEnum).AccurateName}' command"
-        + (_isFlag ? ". Use '|' character to provide multiple e.g. Val1|Val2|Val3" : "");
+    public override string InputDescription
+    {
+        get
+        {
+            var documentation = XmlDocReader.GetDocumentation(typeof(TEnum));
+            return $"{typeof(TEnum).AccurateName} enum value - found using " +
+                   $"'serhelp {typeof(TEnum).AccurateName}' command" +
+                   (_isFlag ? ". Use '|' character to provide multiple e.g. Val1|Val2|Val3" : "") +
+                   (string.IsNullOrWhiteSpace(documentation) ? "" : $". {documentation}");
+        }
+    }
 
     [UsedImplicitly]
     public DynamicTryGet<TEnum> GetConvertSolution(BaseToken token)

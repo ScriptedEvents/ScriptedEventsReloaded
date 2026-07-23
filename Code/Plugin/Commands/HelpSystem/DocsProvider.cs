@@ -2,6 +2,7 @@
 using System.Text;
 using CommandSystem;
 using LabApi.Events.Arguments.Interfaces;
+using LabApi.Features.Permissions;
 using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Contexts;
 using SER.Code.ContextSystem.Interfaces;
@@ -41,7 +42,7 @@ public static class DocsProvider
         [HelpOption.Keywords] = GetKeywordHelpPage
     };
 
-    public static bool GetGeneralOutput(ArraySegment<string> args, out string response)
+    public static bool GetGeneralOutput(ArraySegment<string> args, ICommandSender sender, out string response)
     {
         var arg = args.Array?[args.Offset].ToLowerInvariant() 
                   ?? throw new Exception("argument provided in invalid format");
@@ -50,7 +51,7 @@ public static class DocsProvider
         {
             if (option == HelpOption.Properties && args.Count > 1)
             {
-                return GetPropertiesAdvanced(args, out response);
+                return GetPropertiesAdvanced(args, sender, out response);
             }
 
             if (option == HelpOption.Methods && args.Count > 1 && args.Array?[args.Offset + 1] == "essential")
@@ -299,18 +300,31 @@ public static class DocsProvider
 
     public static string GetEventInfo(EventInfo ev)
     {
-        var variables = EventSystem.EventHandler.GetMimicVariables(ev);
-        var cancellable = typeof(ICancellableEvent).IsAssignableFrom(ev.EventHandlerType.GetGenericArguments().FirstOrDefault());
+        var variables = EventSystem.EventHandler.GetMimicVariableInfo(ev);
+        var eventArgsType = ev.EventHandlerType?.GetGenericArguments().FirstOrDefault();
+        var cancellable = eventArgsType is not null &&
+                          typeof(ICancellableEvent).IsAssignableFrom(eventArgsType);
         var msg = variables.Count > 0 
             ? variables.Aggregate(
                 "This event has the following variables attached to it:\n", 
-                (current, variable) => current + $"> {variable}\n"
+                (current, variable) => current + $"> {variable.Display}" +
+                                       (string.IsNullOrWhiteSpace(variable.Description)
+                                           ? "\n"
+                                           : $" - {variable.Description}\n")
             ) 
             : "This event does not have any variables attached to it.";
+
+        var eventDocumentation = XmlDocReader.GetDocumentation(ev);
+        var eventArgsDocumentation = eventArgsType is null
+            ? null
+            : XmlDocReader.GetDocumentation(eventArgsType);
         
         return 
              $"""
               Event {ev.Name} is a part of {ev.DeclaringType?.Name ?? "unknown event group"}.
+              {(string.IsNullOrWhiteSpace(eventDocumentation) ? "" : $"\n{eventDocumentation}\n")}
+              {(eventArgsType is null ? "" : $"Event data type: {eventArgsType.AccurateName}" +
+                  (string.IsNullOrWhiteSpace(eventArgsDocumentation) ? "" : $" - {eventArgsDocumentation}") + "\n")}
               
               Is cancellable? {cancellable}
               
@@ -325,6 +339,8 @@ public static class DocsProvider
         foreach (var category in EventSystem.EventHandler.AvailableEvents.Select(ev => ev.DeclaringType).ToHashSet().OfType<Type>())
         {
             sb.AppendLine($"--- {category.Name} ---");
+            if (XmlDocReader.GetDocumentation(category) is { Length: > 0 } categoryDocumentation)
+                sb.AppendLine(categoryDocumentation);
             sb.AppendLine(string.Join(", ",  EventSystem.EventHandler.AvailableEvents
                 .Where(ev => ev.DeclaringType == category)
                 .Select(ev => ev.Name)));
@@ -349,18 +365,22 @@ public static class DocsProvider
     
     public static string GetEnum(Type enumType)
     {
-        return
-            $"""
-            Enum {enumType.Name} has the following values:
-            {string.Join("\n", Enum.GetValues(enumType)
-                .Cast<Enum>()
-                .Where(e => {
-                    Type type = e.GetType();
-                    FieldInfo field = type.GetField(e.ToString());
-                    return field.GetCustomAttribute<ObsoleteAttribute>() == null;
-                })
-                .Select(e => $"> {e}"))}
-            """;
+        var enumDocumentation = XmlDocReader.GetDocumentation(enumType);
+        var values = enumType
+            .GetFields(BindingFlags.Public | BindingFlags.Static)
+            .Where(field => field.GetCustomAttribute<ObsoleteAttribute>() is null)
+            .Select(field =>
+            {
+                var documentation = XmlDocReader.GetDocumentation(field);
+                return $"> {field.Name}" +
+                       (string.IsNullOrWhiteSpace(documentation) ? "" : $" - {documentation}");
+            });
+
+        return $"""
+                Enum {enumType.Name} has the following values:
+                {(string.IsNullOrWhiteSpace(enumDocumentation) ? "" : $"\n{enumDocumentation}")}
+                {string.Join("\n", values)}
+                """;
     }
 
     public static string GetEnumHelpPage()
@@ -629,6 +649,11 @@ public static class DocsProvider
             $"> Properties for {typeName} value" 
             + (type is not null ? $" in '{type.Assembly.GetName().Name}' assembly" : "") 
             + "\n");
+
+        if (type is not null && XmlDocReader.GetDocumentation(type) is { Length: > 0 } typeDocumentation)
+        {
+            sb.AppendLine(typeDocumentation);
+        }
         
         var sortedProps = props.OrderBy(kvp => kvp.Key).ToList();
         var custom = sortedProps.Where(p => !p.Value.IsReflected).ToList();
@@ -749,6 +774,7 @@ public static class DocsProvider
     public static bool GetPropertiesForType(string typeName, out string response)
     {
         IReadOnlyDictionary<string, IValueWithProperties.PropInfo>? props;
+        Type? reflectedType = null;
 
         if (typeName.Equals("player", StringComparison.OrdinalIgnoreCase))
         {
@@ -830,78 +856,71 @@ public static class DocsProvider
                     return true;
                 }
                 default:
-                    props = ReferencePropertyRegistry.GetProperties(types[0]);
+                    reflectedType = types[0];
+                    props = ReferencePropertyRegistry.GetProperties(reflectedType);
                     break;
             }
         }
         
-        response = RenderProperties(typeName, props);
+        response = RenderProperties(typeName, props, reflectedType);
         return true;
     }
 
     // ai
-    public static bool GetPropertiesAdvanced(ArraySegment<string> args, out string response)
+    public static bool GetPropertiesAdvanced(
+        ArraySegment<string> args,
+        ICommandSender sender,
+        out string response)
     {
         var rawInput = string.Join(" ", args.Skip(1));
-        var anonymousScript = new Script { Name = ScriptName.CreateUnsafe("HelpAnonymous"), Content = string.Empty, Executor = ServerConsoleExecutor.Instance };
+        var executor = ScriptExecutor.Get(sender);
 
         // 1) Handle Method Execution (run:method ...)
         if (rawInput.StartsWith("run:", StringComparison.OrdinalIgnoreCase))
         {
+            if (!sender.HasAnyPermission(MethodCommand.RunPermission))
+            {
+                response = "You do not have permission to run scripts.";
+                return false;
+            }
+
             var methodLine = rawInput[4..].Trim();
-            if (Tokenizer.TokenizeLine(methodLine, anonymousScript, null).HasErrored(out var errorMsg, out var tokens))
+            var methodScript = new Script
             {
-                response = $"Error parsing method: {errorMsg}";
+                Name = ScriptName.CreateUnsafe("HelpAnonymous"),
+                Content = methodLine,
+                Executor = executor
+            };
+
+            if (methodScript.Compile().HasErrored(out var compileError))
+            {
+                response = $"Error parsing method: {compileError}";
                 return false;
             }
 
-            if (tokens.Length == 0 || tokens[0] is not MethodToken methodToken)
+            if (!methodScript.IsSingleSynchronousReturningMethod)
             {
-                response = "The provided input did not resolve to a valid method call.";
+                response = "Only a single synchronous returning method can be inspected.";
                 return false;
             }
 
-            var context = (MethodContext)methodToken.GetContext(anonymousScript);
-            if (context.Method is not IReturningMethod returningMethod)
+            if (methodScript.RunSingleSynchronousReturningMethod(RunReason.BaseCommand)
+                .HasErrored(out var runtimeError, out var value))
             {
-                response = $"Method '{context.Method.Name}' does not return a value that can be inspected.";
+                response = runtimeError;
                 return false;
             }
 
-            // Feed remaining tokens to the dispatcher
-            foreach (var token in tokens.Skip(1))
-            {
-                if (context.TryAddToken(token).HasErrored)
-                {
-                    response = $"Argument error: {context.TryAddToken(token).ErrorMessage}";
-                    return false;
-                }
-            }
-
-            if (context.VerifyCurrentState().HasErrored(out errorMsg))
-            {
-                response = $"Missing arguments: {errorMsg}";
-                return false;
-            }
-
-            // Run it synchronously. ReturningMethods are sync (except for SafeScripts wait).
-            if (context.Method is SynchronousMethod syncMethod)
-            {
-                syncMethod.Execute();
-                var val = returningMethod.ReturnValue;
-                if (val is null)
-                {
-                    response = "The method was executed but returned no value.";
-                    return true;
-                }
-                return TryGetPropsFromValue(val, out response);
-            }
-
-            response = "Only synchronous returning methods can be inspected.";
-            return false;
+            return TryGetPropsFromValue(value, out response);
         }
 
         // 2) Handle Variables and Types via Tokenization
+        var anonymousScript = new Script
+        {
+            Name = ScriptName.CreateUnsafe("HelpAnonymous"),
+            Content = string.Empty,
+            Executor = executor
+        };
         if (Tokenizer.TokenizeLine(rawInput, anonymousScript, null).HasErrored(out _, out var inputTokens) || inputTokens.Length == 0)
         {
             // Fallback to legacy type lookup if tokenization fails or is empty

@@ -28,8 +28,11 @@ public static class FileSystem
                 .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             var path = Path.GetFullPath(Path.Combine(root, name + extension));
             var rootPrefix = root + Path.DirectorySeparatorChar;
+            var pathComparison = Path.DirectorySeparatorChar == '\\'
+                ? StringComparison.OrdinalIgnoreCase
+                : StringComparison.Ordinal;
 
-            if (!path.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase))
+            if (!path.StartsWith(rootPrefix, pathComparison))
             {
                 return TryGet<string>.Error($"Path '{name}' resolves outside the SER data directory.");
             }
@@ -81,14 +84,10 @@ public static class FileSystem
             Directory.CreateDirectory(MainDirPath);
         }
 
-        ScriptCatalog.RefreshAll(true);
-        ScriptCatalog.StartWatching();
+        ScriptCatalog.Initialize();
     }
 
     public static ScriptCatalog.RefreshSummary RefreshAll(bool force = false) => ScriptCatalog.RefreshAll(force);
-
-    public static ScriptCatalog.RefreshSummary RefreshScript(ScriptName scriptName) =>
-        ScriptCatalog.RefreshScript(scriptName);
 
     public static void Shutdown() => ScriptCatalog.Shutdown();
 

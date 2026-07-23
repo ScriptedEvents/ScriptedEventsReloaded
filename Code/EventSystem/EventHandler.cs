@@ -18,6 +18,11 @@ namespace SER.Code.EventSystem;
 
 public static class EventHandler
 {
+    public sealed record EventVariableInfo(string Name, string Type, string? Description)
+    {
+        public string Display => $"{Name} ({Type})";
+    }
+
     private static readonly List<Action> UnsubscribeActions = [];
     private static readonly Dictionary<string, List<Action<EventArgs?, Variable[]>>> OnEventActions = [];
     private static readonly Dictionary<(ScriptName Script, string Event), Action<EventArgs?, Variable[]>> ScriptEventActions = [];
@@ -320,18 +325,21 @@ public static class EventHandler
     }
     
     public static List<string> GetMimicVariables(EventInfo ev)
+        => GetMimicVariableInfo(ev).Select(variable => variable.Display).ToList();
+
+    public static List<EventVariableInfo> GetMimicVariableInfo(EventInfo ev)
     {
         if (ev.EventHandlerType.GetGenericArguments().FirstOrDefault() is not { } genericType)
         {
             return [];
         }
 
-        List<(Type, string)> properties = (
+        List<(Type type, string name, string? description)> properties = (
             from prop in genericType.GetProperties()
             where !Attribute.IsDefined(prop, typeof(ObsoleteAttribute))
             let value = prop.PropertyType
             where value is not null
-            select (value, prop.Name)
+            select (value, prop.Name, XmlDocReader.GetDocumentation(prop))
         ).ToList();
         
         return GetMimicVariablesForEventHelp(properties);
@@ -352,10 +360,11 @@ public static class EventHandler
         return variables.ToArray();
     }
     
-    private static List<string> GetMimicVariablesForEventHelp(List<(Type type, string name)> properties)
+    private static List<EventVariableInfo> GetMimicVariablesForEventHelp(
+        List<(Type type, string name, string? description)> properties)
     {
-        List<string> variables = [];
-        foreach (var (type, name) in properties)
+        List<EventVariableInfo> variables = [];
+        foreach (var (type, name, description) in properties)
         {
             if (type is null) continue;
             var typeOfValue = new SingleTypeOfValue(Value.GuessValueType(type));
@@ -366,7 +375,10 @@ public static class EventHandler
                 typeOfValue = new TypeOfValue<ReferenceValue<StandardDamageHandler>>();
             }
             
-            variables.Add($"{Value.GetPrefixOfValue(typeOfValue)}ev{name} ({typeOfValue})");
+            variables.Add(new EventVariableInfo(
+                $"{Value.GetPrefixOfValue(typeOfValue)}ev{name}",
+                typeOfValue.ToString(),
+                description));
         }
 
         return variables;

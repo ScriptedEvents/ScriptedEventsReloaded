@@ -1,9 +1,13 @@
+using System.Reflection;
+using LabApi.Events.Arguments.Interfaces;
 using Newtonsoft.Json;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
+using SER.Code.Extensions;
 using SER.Code.FlagSystem.Flags;
+using SER.Code.Helpers;
 using SER.Code.MethodSystem;
 using SER.Code.MethodSystem.BaseMethods.Interfaces;
 using SER.Code.MethodSystem.Structures;
@@ -35,6 +39,7 @@ public static class Builder
         var metadata = new
         {
             Events = SER.Code.EventSystem.EventHandler.AvailableEvents.Select(e => e.Name).Distinct().OrderBy(n => n).ToArray(),
+            EventDetails = GetEventDetails(),
             Methods = MethodIndex.GetMethods().Select(m =>
             {
                 return new
@@ -67,7 +72,9 @@ public static class Builder
                                 ? Enum.GetNames(a.GetType().GetGenericArguments()[0]).Union([
                                     a.DefaultValue?.Value is Enum ? a.DefaultValue.Value.ToString().Replace(", ", "|")
                                         : null
-                                ]).Where(v => v != null).Distinct().ToArray() : null
+                                ]).Where(v => v != null).Distinct().ToArray() : null,
+                        EnumDescription = GetEnumTypeDocumentation(a),
+                        EnumDescriptions = GetEnumValueDescriptions(a)
                     })
                 };
             }),
@@ -937,6 +944,18 @@ public static class Builder
                         return [`${obj} -> ${prop}`, serGenerator.ORDER_ATOMIC];
                     };
 
+                    function getMethodTooltip(block, method) {
+                        let tooltip = method.Description.replace(/\n(?!\n)/g, '\n\n');
+                        method.Arguments.forEach(arg => {
+                            const selectedValue = block.getFieldValue(arg.Name);
+                            const enumDescription = arg.EnumDescriptions?.[selectedValue];
+                            if (enumDescription) {
+                                tooltip += `\n\n${arg.Name} — ${selectedValue}: ${enumDescription}`;
+                            }
+                        });
+                        return tooltip;
+                    }
+
                     // Define Flags
                     metadata.Flags.forEach(flag => {
                         Blockly.Blocks['ser_flag_' + flag.Name] = {
@@ -964,7 +983,24 @@ public static class Builder
                                 this.setPreviousStatement(false);
                                 this.setNextStatement(true, null);
                                 this.setColour(290);
-                                this.setTooltip(flag.Description.replace(/\n(?!\n)/g, '\n\n'));
+                                this.setTooltip(() => {
+                                    let tooltip = flag.Description.replace(/\n(?!\n)/g, '\n\n');
+                                    if (flag.Name === "OnEvent") {
+                                        const selectedEvent = block.getFieldValue("INLINE");
+                                        const eventDetails = metadata.EventDetails?.[selectedEvent];
+                                        if (eventDetails?.description) {
+                                            tooltip += `\n\n${eventDetails.description}`;
+                                        }
+                                        if (eventDetails?.variables?.length) {
+                                            tooltip += "\n\nEvent variables:";
+                                            eventDetails.variables.forEach(variable => {
+                                                tooltip += `\n${variable.name} (${variable.type})`;
+                                                if (variable.description) tooltip += ` — ${variable.description}`;
+                                            });
+                                        }
+                                    }
+                                    return tooltip;
+                                });
                             }
                         };
 
@@ -1048,7 +1084,7 @@ public static class Builder
                                 this.setPreviousStatement(true, null);
                                 this.setNextStatement(true, null);
                                 this.setColour(230);
-                                this.setTooltip(method.Description.replace(/\n(?!\n)/g, '\n\n'));
+                                this.setTooltip(() => getMethodTooltip(block, method));
                             }
                         };
 
@@ -1114,7 +1150,7 @@ public static class Builder
                                     this.setInputsInline(true);
                                     this.setOutput(true, typeMap[method.ReturnType] || null);
                                     this.setColour(260); // Use a purple/violet colour for returning methods
-                                    this.setTooltip(method.Description.replace(/\n(?!\n)/g, '\n\n'));
+                                    this.setTooltip(() => getMethodTooltip(block, method));
                                 }
                             };
                         }
@@ -1517,6 +1553,66 @@ public static class Builder
         return name;
     }
 
+    private static Type? GetEnumArgumentType(Argument argument)
+    {
+        var argumentType = argument.GetType();
+        return argumentType.IsGenericType &&
+               argumentType.GetGenericTypeDefinition() == typeof(EnumArgument<>)
+            ? argumentType.GetGenericArguments()[0]
+            : null;
+    }
+
+    private static string? GetEnumTypeDocumentation(Argument argument)
+        => GetEnumArgumentType(argument) is { } enumType
+            ? XmlDocReader.GetDocumentation(enumType)
+            : null;
+
+    private static Dictionary<string, string>? GetEnumValueDescriptions(Argument argument)
+    {
+        if (GetEnumArgumentType(argument) is not { } enumType)
+            return null;
+
+        var descriptions = enumType
+            .GetFields(BindingFlags.Public | BindingFlags.Static)
+            .Where(field => field.GetCustomAttribute<ObsoleteAttribute>() is null)
+            .Select(field => (field.Name, Documentation: XmlDocReader.GetDocumentation(field)))
+            .Where(entry => !string.IsNullOrWhiteSpace(entry.Documentation))
+            .ToDictionary(entry => entry.Name, entry => entry.Documentation!);
+
+        return descriptions.Count == 0 ? null : descriptions;
+    }
+
+    private static Dictionary<string, object> GetEventDetails()
+    {
+        return SER.Code.EventSystem.EventHandler.AvailableEvents
+            .GroupBy(eventInfo => eventInfo.Name)
+            .OrderBy(group => group.Key)
+            .ToDictionary(group => group.Key, object (group) =>
+            {
+                var eventInfo = group.First();
+                var eventArgsType = eventInfo.EventHandlerType?.GetGenericArguments().FirstOrDefault();
+                return new
+                {
+                    description = XmlDocReader.GetDocumentation(eventInfo),
+                    group = eventInfo.DeclaringType?.Name,
+                    eventDataType = eventArgsType?.AccurateName,
+                    eventDataDescription = eventArgsType is null
+                        ? null
+                        : XmlDocReader.GetDocumentation(eventArgsType),
+                    isCancellable = eventArgsType is not null &&
+                                    typeof(ICancellableEvent).IsAssignableFrom(eventArgsType),
+                    variables = SER.Code.EventSystem.EventHandler.GetMimicVariableInfo(eventInfo)
+                        .Select(variable => new
+                        {
+                            name = variable.Name,
+                            type = variable.Type,
+                            description = variable.Description
+                        })
+                        .ToArray()
+                };
+            });
+    }
+
     private static void CreateSerMethodInfo()
     {
         var methods = MethodIndex.GetMethods().ToDictionary(m => m.Name, object (m) => new
@@ -1539,6 +1635,8 @@ public static class Builder
                              a.GetType().GetGenericTypeDefinition() == typeof(EnumArgument<>)
                     ? Enum.GetNames(a.GetType().GetGenericArguments()[0])
                     : null,
+                enumDescription = GetEnumTypeDocumentation(a),
+                enumDescriptions = GetEnumValueDescriptions(a),
                 isEnumFlags = a.GetType().IsGenericType &&
                               a.GetType().GetGenericTypeDefinition() == typeof(EnumArgument<>) &&
                               a.GetType().GetGenericArguments()[0].IsDefined(typeof(FlagsAttribute), false),
@@ -1625,8 +1723,9 @@ public static class Builder
             .Select(eventInfo => eventInfo.Name)
             .Distinct()
             .OrderBy(name => name);
+        var eventDetails = GetEventDetails();
 
-        var truthTable = new { methods, keywords, flags, variables, events };
+        var truthTable = new { methods, keywords, flags, variables, events, eventDetails };
         var json = JsonConvert.SerializeObject(truthTable, Formatting.Indented);
         var content = $"const SER_TRUTH_TABLE = {json};{Environment.NewLine}{Environment.NewLine}" +
                       "module.exports = { SER_TRUTH_TABLE };";

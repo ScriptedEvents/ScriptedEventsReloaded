@@ -1,10 +1,8 @@
 using LabApi.Features.Console;
-using MEC;
 using SER.Code.FlagSystem;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
-using SER.Code.Plugin;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 
@@ -39,13 +37,24 @@ public static class ScriptCatalog
     private static readonly Dictionary<string, FileStamp> FailedFileStamps =
         new(StringComparer.OrdinalIgnoreCase);
 
-    private static FileSystemWatcher? _watcher;
-    private static CoroutineHandle _watcherCoroutine;
-    private static bool _watcherCoroutineRunning;
-    private static int _watcherRefreshPending;
-    private static long _lastWatcherChangeTicks;
-    private static string? _watcherError;
+    private static bool _initialized;
     private static bool _isRefreshing;
+
+    public static RefreshSummary Initialize()
+    {
+        if (!_initialized)
+        {
+            _initialized = true;
+            return RefreshAll(true);
+        }
+
+        foreach (string path in SnapshotsByPath.Keys.ToArray())
+        {
+            RestoreSnapshotBinding(path);
+        }
+
+        return default;
+    }
 
     public static RefreshSummary RefreshAll(bool force)
     {
@@ -104,11 +113,6 @@ public static class ScriptCatalog
 
     public static TryGet<ScriptSection> GetSection(ScriptName requestedName)
     {
-        if (!_isRefreshing)
-        {
-            RefreshScript(requestedName);
-        }
-
         FileSystem.ParseSectionSelector(requestedName, out var fileName, out var requestedSection);
         if (!SnapshotsByFileName.TryGetValue(fileName, out var snapshot))
         {
@@ -139,89 +143,14 @@ public static class ScriptCatalog
 
     public static TryGet<string> GetPath(ScriptName requestedName)
     {
-        if (!_isRefreshing)
-        {
-            RefreshScript(requestedName);
-        }
-
         FileSystem.ParseSectionSelector(requestedName, out var fileName, out _);
         return SnapshotsByFileName.TryGetValue(fileName, out var snapshot)
             ? TryGet<string>.Success(snapshot.Path)
             : TryGet<string>.Error($"Script '{requestedName}' does not exist anymore");
     }
 
-    public static RefreshSummary RefreshScript(ScriptName requestedName)
-    {
-        if (_isRefreshing)
-        {
-            return default;
-        }
-
-        FileSystem.ParseSectionSelector(requestedName, out var fileName, out _);
-        if (!SnapshotsByFileName.TryGetValue(fileName, out var snapshot) || !File.Exists(snapshot.Path))
-        {
-            return RefreshAll(false);
-        }
-
-        _isRefreshing = true;
-        try
-        {
-            return RefreshPath(snapshot.Path, false);
-        }
-        finally
-        {
-            _isRefreshing = false;
-        }
-    }
-
-    public static void StartWatching()
-    {
-        if (_watcher is not null)
-        {
-            return;
-        }
-
-        Directory.CreateDirectory(FileSystem.MainDirPath);
-        _watcher = new FileSystemWatcher(FileSystem.MainDirPath)
-        {
-            IncludeSubdirectories = true,
-            Filter = "*",
-            NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite |
-                           NotifyFilters.CreationTime | NotifyFilters.Size
-        };
-        _watcher.Changed += OnWatcherChanged;
-        _watcher.Created += OnWatcherTreeChanged;
-        _watcher.Deleted += OnWatcherTreeChanged;
-        _watcher.Renamed += OnWatcherRenamed;
-        _watcher.Error += OnWatcherError;
-        _watcher.EnableRaisingEvents = true;
-
-        _watcherCoroutine = Timing.RunCoroutine(ProcessWatcherChanges());
-        _watcherCoroutineRunning = true;
-    }
-
     public static void Shutdown()
     {
-        if (_watcher is not null)
-        {
-            _watcher.EnableRaisingEvents = false;
-            _watcher.Changed -= OnWatcherChanged;
-            _watcher.Created -= OnWatcherTreeChanged;
-            _watcher.Deleted -= OnWatcherTreeChanged;
-            _watcher.Renamed -= OnWatcherRenamed;
-            _watcher.Error -= OnWatcherError;
-            _watcher.Dispose();
-            _watcher = null;
-        }
-
-        if (_watcherCoroutineRunning)
-        {
-            Timing.KillCoroutines(_watcherCoroutine);
-            _watcherCoroutineRunning = false;
-        }
-
-        Interlocked.Exchange(ref _watcherRefreshPending, 0);
-        Interlocked.Exchange(ref _watcherError, null);
         foreach (var snapshot in SnapshotsByPath.Values)
         {
             UnbindSnapshot(snapshot);
@@ -230,6 +159,7 @@ public static class ScriptCatalog
         SnapshotsByPath.Clear();
         SnapshotsByFileName.Clear();
         FailedFileStamps.Clear();
+        _initialized = false;
     }
 
     private static RefreshSummary RefreshPath(string path, bool force)
@@ -415,8 +345,8 @@ public static class ScriptCatalog
             return;
         }
 
-        // A round restart clears all bindings before recompiling. If the edited file is invalid,
-        // put the accepted snapshot back so a bad edit cannot silently disable its handlers.
+        // Map initialization clears live bindings. Rebind the accepted in-memory snapshot
+        // without rereading a file that may have changed since the last explicit reload.
         UnbindSnapshot(snapshot);
         if (RebindSnapshot(snapshot).HasErrored(out var error))
         {
@@ -453,13 +383,6 @@ public static class ScriptCatalog
         {
             SnapshotsByFileName[snapshot.FileName] = snapshot;
         }
-    }
-
-    private static bool IsScriptPath(string path)
-    {
-        var extension = Path.GetExtension(path);
-        return extension.Equals(".ser", StringComparison.OrdinalIgnoreCase)
-               || extension.Equals(".txt", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool TryGetFileStamp(string path, out DateTime lastWriteTimeUtc, out long length)
@@ -520,65 +443,4 @@ public static class ScriptCatalog
         return "The script kept changing while SER tried to read it; it will be retried on the next refresh.";
     }
 
-    private static void QueueWatcherRefresh(string path, bool treeMayHaveChanged = false)
-    {
-        if (!treeMayHaveChanged && !IsScriptPath(path))
-        {
-            return;
-        }
-
-        Interlocked.Exchange(ref _lastWatcherChangeTicks, DateTime.UtcNow.Ticks);
-        Interlocked.Exchange(ref _watcherRefreshPending, 1);
-    }
-
-    private static void OnWatcherChanged(object sender, FileSystemEventArgs args) => QueueWatcherRefresh(args.FullPath);
-
-    private static void OnWatcherTreeChanged(object sender, FileSystemEventArgs args) =>
-        QueueWatcherRefresh(args.FullPath, true);
-
-    private static void OnWatcherRenamed(object sender, RenamedEventArgs args)
-    {
-        QueueWatcherRefresh(args.FullPath, true);
-    }
-
-    private static void OnWatcherError(object sender, ErrorEventArgs args)
-    {
-        Interlocked.Exchange(ref _watcherError, args.GetException().Message);
-        Interlocked.Exchange(ref _watcherRefreshPending, 1);
-        Interlocked.Exchange(ref _lastWatcherChangeTicks, DateTime.UtcNow.Ticks);
-    }
-
-    private static IEnumerator<float> ProcessWatcherChanges()
-    {
-        while (_watcher is not null)
-        {
-            if (Volatile.Read(ref _watcherRefreshPending) == 1)
-            {
-                var lastChange = new DateTime(Interlocked.Read(ref _lastWatcherChangeTicks), DateTimeKind.Utc);
-                if (DateTime.UtcNow - lastChange >= GetAutomaticReloadDelay())
-                {
-                    Interlocked.Exchange(ref _watcherRefreshPending, 0);
-                    if (Interlocked.Exchange(ref _watcherError, null) is { } watcherError)
-                    {
-                        Log.Error($"SER script watcher failed: {watcherError}");
-                    }
-
-                    RefreshAll(false);
-                }
-            }
-
-            yield return Timing.WaitForSeconds(0.25f);
-        }
-    }
-
-    private static TimeSpan GetAutomaticReloadDelay()
-    {
-        var seconds = MainPlugin.Instance.Config.AutomaticScriptReloadDelay;
-        if (float.IsNaN(seconds) || float.IsInfinity(seconds))
-        {
-            seconds = 5f;
-        }
-
-        return TimeSpan.FromSeconds(Math.Max(0.5f, seconds));
-    }
 }

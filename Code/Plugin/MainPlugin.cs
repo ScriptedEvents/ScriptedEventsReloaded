@@ -47,7 +47,7 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
 
     private TeslaRuleHandler? _teslaRuleHandler;
     private DamageRuleHandler? _damageRuleHandler;
-    private bool _scriptsRefreshedDuringMapGeneration;
+    private bool _scriptsLoadedDuringMapGeneration;
 
     public record Contributor(string Name, Contribution Contribution, string? Id = null);
 
@@ -172,26 +172,19 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
         DamageRuleHandler.ResetAll();
         CRole.ResetAll();
 
-        ReferencePropertyRegistry.Initialize();
-        Flag.RegisterFlags();
-        EventHandler.Initialize();
-        MethodIndex.Initialize();
-        FrameworkBridge.Initialize();
-        VariableIndex.Initialize();
-        CommandEvents.Initialize();
-        FileSystem.FileSystem.Initialize();
-        _scriptsRefreshedDuringMapGeneration = true;
+        InitializeRuntime();
+        _scriptsLoadedDuringMapGeneration = true;
     }
 
     private void OnServerFullyInit()
     {
-        if (_scriptsRefreshedDuringMapGeneration)
+        if (_scriptsLoadedDuringMapGeneration)
         {
-            _scriptsRefreshedDuringMapGeneration = false;
+            _scriptsLoadedDuringMapGeneration = false;
         }
         else
         {
-            FileSystem.FileSystem.RefreshAll(true);
+            InitializeRuntime();
         }
 
         FrameworkBridge.PrintFound();
@@ -209,6 +202,18 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
              """,
             ConsoleColor.Cyan
         );
+    }
+
+    private static void InitializeRuntime()
+    {
+        ReferencePropertyRegistry.Initialize();
+        Flag.RegisterFlags();
+        EventHandler.Initialize();
+        MethodIndex.Initialize();
+        FrameworkBridge.Initialize();
+        VariableIndex.Initialize();
+        CommandEvents.Initialize();
+        FileSystem.FileSystem.Initialize();
     }
 
     private static void SendLogo()

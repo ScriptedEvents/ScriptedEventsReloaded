@@ -25,7 +25,7 @@ public class ReloadCommand : ICommand, IUsePermissions
     public string Command => "serreload";
     public string[] Aliases => [];
     public string Description => 
-        "Forces an immediate refresh of all scripts. Normal edits and round restarts refresh automatically.";
+        "Reloads all script files from disk.";
 
     public string Permission => "ser.reload";
 }

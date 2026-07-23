@@ -30,7 +30,7 @@ All you need to get started is a text editor and a server!
 
 One `.ser` file may contain multiple independent handlers. Each `!--` flag starts a new section that ends immediately before the next flag. Multi-section files can be addressed as `filename:1`, `filename:2`, and so on.
 
-SER watches script files and transactionally reloads them after edits, before manual execution, and on round restarts. Automatic edit reloads wait until the file has remained unchanged for five seconds by default; this can be adjusted with `automatic_script_reload_delay`. A changed file is compiled in full before its flags are replaced; if validation fails, the last known-good version stays active and the same unchanged draft is not diagnosed repeatedly. Every successful reload is written to the server info log. `serreload` remains available for an immediate manual refresh.
+SER reads script files when the plugin initializes. File edits are not detected automatically; use the permission-protected `serreload` command to refresh scripts from disk. Reloads are transactional: a changed file is compiled in full before its flags are replaced, and if validation fails the last known-good version stays active. Map changes rebind that accepted in-memory version without rereading edited files.
 
 ```ser
 !-- OnEvent RoundStarted

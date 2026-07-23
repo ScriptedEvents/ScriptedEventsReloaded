@@ -68,8 +68,22 @@ function methodArgumentMarkdown(argument) {
     md += `**Type:** \`${escapeInlineCode(argument.type || 'SER value')}\`\n\n`;
 
     if (argument.enumValues?.length > 0) {
+        if (argument.enumDescription) {
+            md += `${escapeMarkdown(argument.enumDescription)}\n\n`;
+        }
         md += `**Available values:**\n\n`;
-        md += `${argument.enumValues.map(value => `\`${escapeInlineCode(value)}\``).join(', ')}\n\n`;
+        if (argument.enumDescriptions && Object.keys(argument.enumDescriptions).length > 0) {
+            for (const value of argument.enumValues) {
+                md += `- \`${escapeInlineCode(value)}\``;
+                if (argument.enumDescriptions[value]) {
+                    md += ` - ${escapeMarkdown(argument.enumDescriptions[value])}`;
+                }
+                md += '\n';
+            }
+            md += '\n';
+        } else {
+            md += `${argument.enumValues.map(value => `\`${escapeInlineCode(value)}\``).join(', ')}\n\n`;
+        }
         if (argument.isEnumFlags) {
             md += `Multiple values can be joined with \`|\`.\n\n`;
         }
@@ -580,11 +594,31 @@ function flagArgumentCompletions(document, position, typedName) {
 function eventCompletions(position, typedName) {
     const range = completionRange(position, typedName);
     return (SER_TRUTH_TABLE.events || []).map(eventName => {
+        const details = SER_TRUTH_TABLE.eventDetails?.[eventName];
         const item = new vscode.CompletionItem(eventName, vscode.CompletionItemKind.Event);
         item.insertText = eventName;
         item.filterText = eventName;
         item.range = range;
-        item.detail = 'SER event';
+        item.detail = details?.group ? `SER event · ${details.group}` : 'SER event';
+        if (details) {
+            let documentation = details.description ? `${escapeMarkdown(details.description)}\n\n` : '';
+            if (details.eventDataType) {
+                documentation += `**Event data:** \`${escapeInlineCode(details.eventDataType)}\`\n\n`;
+                if (details.eventDataDescription) {
+                    documentation += `${escapeMarkdown(details.eventDataDescription)}\n\n`;
+                }
+            }
+            documentation += `**Cancellable:** ${details.isCancellable ? 'yes' : 'no'}\n\n`;
+            if (details.variables?.length > 0) {
+                documentation += '**Event variables:**\n\n';
+                for (const variable of details.variables) {
+                    documentation += `- \`${escapeInlineCode(variable.name)}\` (\`${escapeInlineCode(variable.type)}\`)`;
+                    if (variable.description) documentation += ` - ${escapeMarkdown(variable.description)}`;
+                    documentation += '\n';
+                }
+            }
+            item.documentation = new vscode.MarkdownString(documentation);
+        }
         return item;
     });
 }
@@ -808,7 +842,10 @@ function enumValueCompletions(position, typedValue, argument) {
         item.filterText = value;
         item.range = range;
         item.detail = `${argument.name} enum value`;
-        item.documentation = methodArgumentDocumentation(argument);
+        const valueDescription = argument.enumDescriptions?.[value];
+        item.documentation = valueDescription
+            ? new vscode.MarkdownString(escapeMarkdown(valueDescription))
+            : methodArgumentDocumentation(argument);
         return item;
     });
 }

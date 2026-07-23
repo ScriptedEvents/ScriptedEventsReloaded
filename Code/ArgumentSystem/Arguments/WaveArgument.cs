@@ -2,6 +2,7 @@ using LabApi.Features.Wrappers;
 using Respawning;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
+using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
@@ -18,7 +19,12 @@ public class WaveArgument(string name) : Argument(name)
 
     public override string InputDescription =>
         "One of the following wave types:\n"
-        + WaveTypes.Select(t => $"> {t.Name.LowerFirst()}").JoinStrings("\n");
+        + WaveTypes.Select(t =>
+        {
+            var documentation = XmlDocReader.GetDocumentation(t);
+            return $"> {t.Name.LowerFirst()}" +
+                   (string.IsNullOrWhiteSpace(documentation) ? "" : $" - {documentation}");
+        }).JoinStrings("\n");
 
     [UsedImplicitly]
     public DynamicTryGet<RespawnWave?> GetConvertSolution(BaseToken token)

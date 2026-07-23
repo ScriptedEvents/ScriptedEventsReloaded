@@ -170,7 +170,7 @@ end
 
 A file can contain multiple flagged script sections. Every `!--` declaration starts a new independent script, and its section continues up to (but not including) the next `!--` declaration. Named `--` arguments belong to the nearest flag above them.
 
-SER automatically checks for changes after a file edit, before a script is run, and on round restarts. Watcher-based reloads wait for five seconds of file inactivity by default (`automatic_script_reload_delay`), giving editors and authors time to finish a save. The complete physical file must compile and register successfully before any of its active sections are replaced. If it does not, SER reports the error once for that file revision and keeps the last known-good version active. Successful reloads produce a server info log. `serreload` can still force an immediate refresh.
+SER reads script files when the plugin initializes and does not watch for later edits. Use the permission-protected `serreload` command to refresh scripts from disk. The complete physical file must compile and register successfully before any active section is replaced; otherwise SER reports the error and keeps the last known-good version active. Map changes rebind that accepted in-memory version without rereading edited files.
 
 ```ser
 !-- OnEvent RoundStarted

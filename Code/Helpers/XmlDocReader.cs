@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace SER.Code.Helpers
@@ -9,6 +10,29 @@ namespace SER.Code.Helpers
         private static readonly Dictionary<Assembly, XmlDocument?> LoadedDocs = new();
 
         public static string? GetDescription(MemberInfo member)
+            => GetDocumentationElement(member, "summary");
+
+        public static string? GetRemarks(MemberInfo member)
+            => GetDocumentationElement(member, "remarks");
+
+        public static string? GetDocumentation(MemberInfo member)
+        {
+            var summary = GetDescription(member);
+            var remarks = GetRemarks(member);
+
+            return (summary, remarks) switch
+            {
+                ({ Length: > 0 }, { Length: > 0 }) => $"{summary}\nRemarks: {remarks}",
+                ({ Length: > 0 }, _) => summary,
+                (_, { Length: > 0 }) => remarks,
+                _ => null
+            };
+        }
+
+        private static string? GetDocumentationElement(
+            MemberInfo member,
+            string elementName,
+            HashSet<string>? visitedMembers = null)
         {
             var assembly = member.Module.Assembly;
             if (!LoadedDocs.TryGetValue(assembly, out var doc))
@@ -20,9 +44,29 @@ namespace SER.Code.Helpers
             if (doc == null) return null;
 
             string memberName = GetMemberXmlName(member);
-            var node = doc.SelectSingleNode($"//member[@name='{memberName}']/summary");
-            
-            return node == null ? null : ProcessXmlNodes(node).Trim();
+            visitedMembers ??= [];
+            var visitKey = $"{assembly.FullName}|{memberName}|{elementName}";
+            if (!visitedMembers.Add(visitKey))
+                return null;
+
+            var memberNode = doc.SelectSingleNode($"//member[@name='{memberName}']");
+            if (memberNode?.SelectSingleNode(elementName) is { } node)
+                return NormalizeDocumentation(ProcessXmlNodes(node));
+
+            var inheritedCref = memberNode?.SelectSingleNode("inheritdoc")?.Attributes?["cref"]?.Value;
+            if (!string.IsNullOrWhiteSpace(inheritedCref) &&
+                doc.SelectSingleNode($"//member[@name='{inheritedCref}']/{elementName}") is { } inheritedNode)
+            {
+                return NormalizeDocumentation(ProcessXmlNodes(inheritedNode));
+            }
+
+            foreach (var inheritedMember in GetInheritedMembers(member))
+            {
+                if (GetDocumentationElement(inheritedMember, elementName, visitedMembers) is { Length: > 0 } inherited)
+                    return inherited;
+            }
+
+            return null;
         }
 
         private static string ProcessXmlNodes(XmlNode node)
@@ -51,7 +95,14 @@ namespace SER.Code.Helpers
                                 if (!string.IsNullOrEmpty(name))
                                     sb.Append(name);
                                 break;
+                            case "br":
+                                sb.Append(' ');
+                                break;
                             case "para":
+                                sb.Append(' ');
+                                sb.Append(ProcessXmlNodes(child));
+                                sb.Append(' ');
+                                break;
                             default:
                                 sb.Append(ProcessXmlNodes(child));
                                 break;
@@ -60,6 +111,49 @@ namespace SER.Code.Helpers
                 }
             }
             return sb.ToString();
+        }
+
+        private static string? NormalizeDocumentation(string value)
+        {
+            var normalized = Regex.Replace(value, @"\s+", " ").Trim();
+            return normalized.Length == 0 ? null : normalized;
+        }
+
+        private static IEnumerable<MemberInfo> GetInheritedMembers(MemberInfo member)
+        {
+            if (member is Type type)
+            {
+                if (type.BaseType is not null)
+                    yield return type.BaseType;
+
+                foreach (var interfaceType in type.GetInterfaces())
+                    yield return interfaceType;
+
+                yield break;
+            }
+
+            for (var baseType = member.DeclaringType?.BaseType;
+                 baseType is not null;
+                 baseType = baseType.BaseType)
+            {
+                foreach (var candidate in baseType
+                             .GetMember(member.Name, BindingFlags.Public | BindingFlags.NonPublic |
+                                                    BindingFlags.Instance | BindingFlags.Static)
+                             .Where(candidate => candidate.MemberType == member.MemberType))
+                {
+                    yield return candidate;
+                }
+            }
+
+            foreach (var interfaceType in member.DeclaringType?.GetInterfaces() ?? [])
+            {
+                foreach (var candidate in interfaceType
+                             .GetMember(member.Name, BindingFlags.Public | BindingFlags.Instance)
+                             .Where(candidate => candidate.MemberType == member.MemberType))
+                {
+                    yield return candidate;
+                }
+            }
         }
 
         private static string FormatCref(string cref)
@@ -143,6 +237,7 @@ namespace SER.Code.Helpers
                 PropertyInfo => 'P',
                 FieldInfo => 'F',
                 MethodInfo => 'M',
+                EventInfo => 'E',
                 _ => '?'
             };
 

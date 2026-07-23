@@ -362,15 +362,6 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
 
     public static Result RunAttachedScript(CustomCommand cmd, ScriptExecutor sender, string[] args)
     {
-        if (ScriptCommands.TryGetValue(cmd, out var attachedFlag))
-        {
-            FileSystem.FileSystem.RefreshScript(attachedFlag.ScriptName);
-        }
-        else
-        {
-            FileSystem.FileSystem.RefreshAll();
-        }
-
         if (!ScriptCommands.TryGetValue(cmd, out var flag))
         {
             flag = ScriptCommands.Values.FirstOrDefault(candidate =>
@@ -380,8 +371,6 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
                 return "The script that was supposed to handle this command was not found.";
             }
 
-            // The command object that dispatched this call may have just been replaced by a reload.
-            // Finish this invocation against the newly registered definition as well as its new body.
             cmd = flag.Command;
         }
 

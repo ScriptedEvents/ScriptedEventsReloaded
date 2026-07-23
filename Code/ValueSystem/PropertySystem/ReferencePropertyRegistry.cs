@@ -59,7 +59,7 @@ public static class ReferencePropertyRegistry
             var key = prop.Name.LowerFirst();
             if (!combined.ContainsKey(key))
             {
-                combined[key] = new UnsafeReferencePropInfo(type, prop, XmlDocReader.GetDescription(prop));
+                combined[key] = new UnsafeReferencePropInfo(type, prop, XmlDocReader.GetDocumentation(prop));
             }
         }
 
@@ -68,7 +68,7 @@ public static class ReferencePropertyRegistry
             var key = field.Name.LowerFirst();
             if (!combined.ContainsKey(key))
             {
-                combined[key] = new UnsafeReferencePropInfo(type, field, XmlDocReader.GetDescription(field));
+                combined[key] = new UnsafeReferencePropInfo(type, field, XmlDocReader.GetDocumentation(field));
             }
         }
         

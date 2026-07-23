@@ -10,11 +10,11 @@ public class HelpCommand : ICommand
     public string[] Aliases => [];
     public string Description => "The help command of SER.";
 
-    public bool Execute(ArraySegment<string> arguments, ICommandSender _, out string response)
+    public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
         if (arguments.Count > 0)
         {
-            return DocsProvider.GetGeneralOutput(arguments, out response);
+            return DocsProvider.GetGeneralOutput(arguments, sender, out response);
         }
 
         response = DocsProvider.GetOptionsList();

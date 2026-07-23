@@ -115,11 +115,11 @@ Lifecycle rule: every event subscription, command registration, custom handler a
 - A file whose base filename starts with `#` is ignored.
 - Physical-file identity is the filename without its extension, not its relative path. Runtime sections add a numbered selector when needed.
 - If two files anywhere in the tree share the same base filename, all scripts with that duplicate name are excluded and an error is logged.
-- A watcher queues filesystem changes onto SER's main-thread coroutine; script lookups also check the catalog so manual execution cannot miss an edit.
+- Files are read when the catalog initializes and when an authorized operator explicitly runs `serreload`. Script lookups never reread files.
 
-`ScriptCatalog` owns the accepted source snapshot and registered flags for each physical file. On an edit, manual execution, forced reload or round restart, SER splits the file at every `!--` declaration and compiles every section before changing live bindings. Each declaration is inclusive in its section, and the section ends immediately before the next declaration. Multi-section files receive selectors such as `file:1` and `file:2`; flagless and single-section files retain their bare filename. Only blank lines and comments may precede the first declaration in a flagged file.
+`ScriptCatalog` owns the accepted source snapshot and registered flags for each physical file. During initial loading or an explicit reload, SER splits the file at every `!--` declaration and compiles every section before changing live bindings. Each declaration is inclusive in its section, and the section ends immediately before the next declaration. Multi-section files receive selectors such as `file:1` and `file:2`; flagless and single-section files retain their bare filename. Only blank lines and comments may precede the first declaration in a flagged file.
 
-Flag parsing is side-effect-free. After every section compiles and every flag parses, the catalog unbinds the accepted snapshot and binds the candidate. A registration failure rolls the candidate back and restores the last known-good snapshot. Invalid edits therefore do not partially replace handlers. Watcher refreshes use the configurable `AutomaticScriptReloadDelay` quiet period and cache failed file stamps so an unchanged draft does not flood the console. Every successful file reload emits a server info log. `serreload` forces the same pipeline instead of maintaining a separate registration path. `ScriptFlagHandler.Clear()` calls `Unbind()` on every registered flag before clearing the registry.
+Flag parsing is side-effect-free. After every section compiles and every flag parses, the catalog unbinds the accepted snapshot and binds the candidate. A registration failure rolls the candidate back and restores the last known-good snapshot. Invalid edits therefore do not partially replace handlers. Every successful file reload emits a server info log. `serreload` uses the same pipeline as initial loading. Map initialization rebinds the accepted snapshots without rereading disk. `ScriptFlagHandler.Clear()` calls `Unbind()` on every registered flag before clearing the registry.
 
 Bindings store the section selector rather than only the physical filename, so callbacks reload and execute the correct slice. Section compilation retains original source-file line numbers. A bare multi-section filename is deliberately ambiguous for manual execution; use its numbered selector. File-level stop and running checks match all of that file's sections.
 
@@ -317,8 +317,8 @@ Before publishing, inspect the final DLL's manifest resources and confirm that r
 - [ ] Enable and disable the plugin without retained event handlers or coroutines.
 - [ ] Generate at least two maps and verify callbacks/commands execute exactly once.
 - [ ] Load valid scripts, reject malformed scripts and reject duplicate filenames cleanly.
-- [ ] Edit single- and multi-section files and verify one info log per successful reload.
-- [ ] Leave a syntax error in an edited file and verify its last known-good event/command bindings stay active.
+- [ ] Edit single- and multi-section files, run `serreload`, and verify one info log per successful reload.
+- [ ] Leave a syntax error in an edited file, run `serreload`, and verify its last known-good event/command bindings stay active.
 - [ ] Run event, command, function, loop, callback and returning-method examples.
 - [ ] Stop/reload scripts while they are waiting or performing network work.
 - [ ] Exercise cancellable event disable/enable behavior and verify returned values.

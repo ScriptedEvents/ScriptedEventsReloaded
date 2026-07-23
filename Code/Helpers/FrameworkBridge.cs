@@ -43,7 +43,8 @@ public static class FrameworkBridge
     {
         foreach (var framework in Frameworks.Except(Found))
         {
-            if (IsLabAPIComatibleFrameworkLoaded(framework) || IsExiledCompatibleFrameworkLoaded(framework))
+            if (IsLabAPIComatibleFrameworkLoaded(framework) 
+                || (IsExiledLoaded() && IsExiledCompatibleFrameworkLoaded(framework)))
             {
                 MethodIndex.LoadMethodsOfFramework(framework.Type);
                 Found.Add(framework);
@@ -66,15 +67,14 @@ public static class FrameworkBridge
         return PluginLoader.EnabledPlugins.Any(plg => plg.Name == framework.Name);
     }
 
+    private static bool IsExiledLoaded()
+    {
+        return PluginLoader.EnabledPlugins.Any(plg => plg.Name == "Exiled Loader");
+    }
+
     private static bool IsExiledCompatibleFrameworkLoaded(Framework framework)
     {
-        // As of right now, Callvote-Exiled is not compatible with SER.
         if (framework.Type == FrameworkBridge.Type.Callvote) 
-        {
-            return false;
-        }
-
-        if (PluginLoader.Plugins.All(plg => plg.Key.Name != "Exiled Loader"))
         {
             return false;
         }

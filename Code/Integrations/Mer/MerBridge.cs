@@ -1,3 +1,4 @@
+using System.Collections;
 using LabApi.Features.Wrappers;
 using ProjectMER.Features;
 using ProjectMER.Features.Enums;
@@ -7,6 +8,7 @@ using ProjectMER.Features.Serializable;
 using ProjectMER.Features.Serializable.Schematics;
 using ProjectMER.Features.ToolGun;
 using UnityEngine;
+using SerFileSystem = SER.Code.FileSystem.FileSystem;
 
 namespace SER.Code.Integrations.Mer;
 
@@ -43,7 +45,12 @@ internal static class MerBridge
             output.Merge(input);
         }
 
-        string path = Path.Combine(ProjectMER.ProjectMER.MapsDir, $"{outputMapName}.yml");
+        if (SerFileSystem.GetContainedPath(ProjectMER.ProjectMER.MapsDir, outputMapName, ".yml")
+            .HasErrored(out var pathError, out var path))
+        {
+            throw new ArgumentException(pathError, nameof(outputMapName));
+        }
+
         File.WriteAllText(path, YamlParser.Serializer.Serialize(output));
     }
 
@@ -86,7 +93,7 @@ internal static class MerBridge
 
     internal static MERObject[] GetObjects(string mapName, string id, string type)
     {
-        MapSchematic map = GetLoadedMapObject(mapName);
+        MapSchematic map = (MapSchematic)GetLoadedMapObject(mapName);
         List<MERObject> objects = [];
         foreach (MapEditorObject mapObject in map.SpawnedObjects)
         {
@@ -107,9 +114,9 @@ internal static class MerBridge
 
     internal static MERObjectDefinition GetObjectDefinition(string mapName, string id)
     {
-        MapSchematic map = GetLoadedMapObject(mapName);
-        SerializableObject definition = GetDefinition(map, id);
-        return WrapDefinition(mapName, id, definition);
+        MapSchematic map = (MapSchematic)GetLoadedMapObject(mapName);
+        SerializableObject definition = (SerializableObject)GetDefinition(map, id, out string canonicalId);
+        return WrapDefinition(mapName, canonicalId, definition);
     }
 
     internal static MERObjectDefinition CreateObject(
@@ -130,7 +137,7 @@ internal static class MerBridge
         if (string.IsNullOrWhiteSpace(id))
             id = Guid.NewGuid().ToString("N")[..8];
 
-        MapSchematic map = GetOrCreateLoadedMap(mapName);
+        MapSchematic map = (MapSchematic)GetOrCreateLoadedMap(mapName);
         if (ContainsDefinition(map, id))
             throw new InvalidOperationException($"MER map '{mapName}' already contains an object with ID '{id}'.");
 
@@ -165,25 +172,31 @@ internal static class MerBridge
     internal static void DeleteObject(object reference)
     {
         GetReferenceIdentity(reference, out string mapName, out string id);
-        MapSchematic map = GetLoadedMapObject(mapName);
-        if (!map.TryRemoveElement(id))
+        MapSchematic map = (MapSchematic)GetLoadedMapObject(mapName);
+        _ = GetDefinition(map, id, out string canonicalId);
+        if (!map.TryRemoveElement(canonicalId))
             throw new KeyNotFoundException($"MER object '{id}' does not exist in map '{mapName}'.");
 
-        map.DestroyObject(id);
+        map.DestroyObject(canonicalId);
     }
 
     internal static MERObjectDefinition RenameObject(object reference, string newId)
     {
         GetReferenceIdentity(reference, out string mapName, out string oldId);
-        MapSchematic map = GetLoadedMapObject(mapName);
+        MapSchematic map = (MapSchematic)GetLoadedMapObject(mapName);
         if (ContainsDefinition(map, newId))
             throw new InvalidOperationException($"MER map '{mapName}' already contains an object with ID '{newId}'.");
 
-        SerializableObject definition = GetDefinition(map, oldId);
+        SerializableObject definition = (SerializableObject)GetDefinition(map, oldId, out string canonicalOldId);
         if (!map.TryAddElement(newId, definition))
             throw new InvalidOperationException($"MER could not assign ID '{newId}'.");
 
-        map.TryRemoveElement(oldId);
+        if (!map.TryRemoveElement(canonicalOldId))
+        {
+            map.TryRemoveElement(newId);
+            throw new InvalidOperationException($"MER could not remove the previous ID '{canonicalOldId}'.");
+        }
+
         map.Reload();
         return WrapDefinition(mapName, newId, definition);
     }
@@ -194,16 +207,22 @@ internal static class MerBridge
         if (string.IsNullOrWhiteSpace(newId))
             newId = oldId;
 
-        MapSchematic oldMap = GetLoadedMapObject(oldMapName);
-        MapSchematic newMap = GetOrCreateLoadedMap(newMapName);
+        MapSchematic oldMap = (MapSchematic)GetLoadedMapObject(oldMapName);
+        MapSchematic newMap = (MapSchematic)GetOrCreateLoadedMap(newMapName);
         if (ContainsDefinition(newMap, newId))
             throw new InvalidOperationException($"MER map '{newMapName}' already contains an object with ID '{newId}'.");
 
-        SerializableObject definition = GetDefinition(oldMap, oldId);
+        SerializableObject definition =
+            (SerializableObject)GetDefinition(oldMap, oldId, out string canonicalOldId);
         if (!newMap.TryAddElement(newId, definition))
             throw new InvalidOperationException($"MER could not move '{oldId}' to map '{newMapName}'.");
 
-        oldMap.TryRemoveElement(oldId);
+        if (!oldMap.TryRemoveElement(canonicalOldId))
+        {
+            newMap.TryRemoveElement(newId);
+            throw new InvalidOperationException($"MER could not remove '{canonicalOldId}' from map '{oldMapName}'.");
+        }
+
         oldMap.Reload();
         if (!ReferenceEquals(oldMap, newMap))
             newMap.Reload();
@@ -220,7 +239,7 @@ internal static class MerBridge
         }
 
         GetReferenceIdentity(reference, out string mapName, out string id);
-        MapSchematic map = GetLoadedMapObject(mapName);
+        MapSchematic map = (MapSchematic)GetLoadedMapObject(mapName);
         foreach (MapEditorObject spawned in map.SpawnedObjects)
         {
             if (!spawned.Id.Equals(id, StringComparison.OrdinalIgnoreCase))
@@ -230,7 +249,8 @@ internal static class MerBridge
             return;
         }
 
-        map.SpawnObject(id, GetDefinition(map, id));
+        SerializableObject definition = (SerializableObject)GetDefinition(map, id, out string canonicalId);
+        map.SpawnObject(canonicalId, definition);
     }
 
     internal static void SetPosition(object reference, string mode, float x, float y, float z)
@@ -244,7 +264,7 @@ internal static class MerBridge
             return;
         }
 
-        SerializableObject definition = GetDefinitionFromReference(reference);
+        SerializableObject definition = (SerializableObject)GetDefinitionFromReference(reference);
         definition.Position = mode.Equals("add", StringComparison.OrdinalIgnoreCase)
             ? definition.Position + value
             : value;
@@ -262,7 +282,7 @@ internal static class MerBridge
             return;
         }
 
-        SerializableObject definition = GetDefinitionFromReference(reference);
+        SerializableObject definition = (SerializableObject)GetDefinitionFromReference(reference);
         definition.Rotation = mode.Equals("add", StringComparison.OrdinalIgnoreCase)
             ? definition.Rotation + value
             : value;
@@ -280,7 +300,7 @@ internal static class MerBridge
             return;
         }
 
-        SerializableObject definition = GetDefinitionFromReference(reference);
+        SerializableObject definition = (SerializableObject)GetDefinitionFromReference(reference);
         definition.Scale = mode.Equals("add", StringComparison.OrdinalIgnoreCase)
             ? definition.Scale + value
             : value;
@@ -313,13 +333,13 @@ internal static class MerBridge
 
     internal static void DestroySchematic(object reference)
     {
-        SchematicObject schematic = GetSchematic(reference);
+        SchematicObject schematic = (SchematicObject)GetSchematic(reference);
         schematic.Destroy();
     }
 
     internal static MERSchematicBlock[] GetSchematicBlocks(object reference)
     {
-        SchematicObject schematic = GetSchematic(reference);
+        SchematicObject schematic = (SchematicObject)GetSchematic(reference);
         List<MERSchematicBlock> blocks = [];
         int index = 1;
         foreach (GameObject block in schematic.AttachedBlocks)
@@ -333,7 +353,7 @@ internal static class MerBridge
 
     internal static MERAnimator[] GetAnimators(object reference)
     {
-        SchematicObject schematic = GetSchematic(reference);
+        SchematicObject schematic = (SchematicObject)GetSchematic(reference);
         IReadOnlyList<Animator> animators = schematic.AnimationController.Animators;
         List<MERAnimator> result = [];
         for (int index = 0; index < animators.Count; index++)
@@ -347,7 +367,7 @@ internal static class MerBridge
 
     internal static void PlayAnimation(object reference, string stateName, int animatorIndex, string animatorName)
     {
-        SchematicObject schematic = GetSchematic(reference);
+        SchematicObject schematic = (SchematicObject)GetSchematic(reference);
         if (!string.IsNullOrWhiteSpace(animatorName))
         {
             schematic.AnimationController.Play(stateName, animatorName);
@@ -363,13 +383,13 @@ internal static class MerBridge
         bool state,
         int animatorIndex)
     {
-        SchematicObject schematic = GetSchematic(reference);
+        SchematicObject schematic = (SchematicObject)GetSchematic(reference);
         schematic.AnimationController.Play(parameterName, state, ToZeroBasedAnimatorIndex(animatorIndex));
     }
 
     internal static void StopAnimation(object reference, int animatorIndex, string animatorName)
     {
-        SchematicObject schematic = GetSchematic(reference);
+        SchematicObject schematic = (SchematicObject)GetSchematic(reference);
         if (!string.IsNullOrWhiteSpace(animatorName))
         {
             schematic.AnimationController.Stop(animatorName);
@@ -381,7 +401,7 @@ internal static class MerBridge
 
     internal static void SetSchematicVisibility(Player[] players, object reference, bool visible)
     {
-        SchematicObject schematic = GetSchematic(reference);
+        SchematicObject schematic = (SchematicObject)GetSchematic(reference);
         foreach (Player player in players)
         {
             if (visible)
@@ -391,7 +411,7 @@ internal static class MerBridge
         }
     }
 
-    private static MapSchematic GetLoadedMapObject(string mapName)
+    private static object GetLoadedMapObject(string mapName)
     {
         if (!MapUtils.LoadedMaps.TryGetValue(mapName, out MapSchematic map))
             throw new KeyNotFoundException($"MER map '{mapName}' is not loaded.");
@@ -399,7 +419,7 @@ internal static class MerBridge
         return map;
     }
 
-    private static MapSchematic GetOrCreateLoadedMap(string mapName)
+    private static object GetOrCreateLoadedMap(string mapName)
     {
         if (MapUtils.LoadedMaps.TryGetValue(mapName, out MapSchematic loaded))
             return loaded;
@@ -412,61 +432,81 @@ internal static class MerBridge
         return map;
     }
 
-    private static bool ContainsDefinition(MapSchematic map, string id)
+    private static bool ContainsDefinition(object map, string id)
     {
-        return TryGetDefinition(map, id, out _);
+        return TryGetDefinition(map, id, out _, out _);
     }
 
-    private static SerializableObject GetDefinition(MapSchematic map, string id)
+    private static object GetDefinition(object rawMap, string id)
     {
-        if (TryGetDefinition(map, id, out SerializableObject definition))
+        return GetDefinition(rawMap, id, out _);
+    }
+
+    private static object GetDefinition(object rawMap, string id, out string canonicalId)
+    {
+        MapSchematic map = (MapSchematic)rawMap;
+        if (TryGetDefinition(map, id, out object definition, out canonicalId))
             return definition;
 
         throw new KeyNotFoundException($"MER object '{id}' does not exist in map '{map.Name}'.");
     }
 
-    private static bool TryGetDefinition(MapSchematic map, string id, out SerializableObject definition)
+    private static bool TryGetDefinition(
+        object rawMap,
+        string id,
+        out object definition,
+        out string canonicalId)
     {
-        if (TryGetDictionaryValue(map.Primitives, id, out definition)) return true;
-        if (TryGetDictionaryValue(map.Lights, id, out definition)) return true;
-        if (TryGetDictionaryValue(map.Doors, id, out definition)) return true;
-        if (TryGetDictionaryValue(map.Workstations, id, out definition)) return true;
-        if (TryGetDictionaryValue(map.ItemSpawnpoints, id, out definition)) return true;
-        if (TryGetDictionaryValue(map.PlayerSpawnpoints, id, out definition)) return true;
-        if (TryGetDictionaryValue(map.Capybaras, id, out definition)) return true;
-        if (TryGetDictionaryValue(map.Texts, id, out definition)) return true;
-        if (TryGetDictionaryValue(map.Interactables, id, out definition)) return true;
-        if (TryGetDictionaryValue(map.Schematics, id, out definition)) return true;
-        if (TryGetDictionaryValue(map.Scp079Cameras, id, out definition)) return true;
-        if (TryGetDictionaryValue(map.ShootingTargets, id, out definition)) return true;
-        if (TryGetDictionaryValue(map.Teleports, id, out definition)) return true;
-        if (TryGetDictionaryValue(map.Lockers, id, out definition)) return true;
-        if (TryGetDictionaryValue(map.Waypoints, id, out definition)) return true;
+        MapSchematic map = (MapSchematic)rawMap;
+        if (TryGetDictionaryValue(map.Primitives, id, out definition, out canonicalId)) return true;
+        if (TryGetDictionaryValue(map.Lights, id, out definition, out canonicalId)) return true;
+        if (TryGetDictionaryValue(map.Doors, id, out definition, out canonicalId)) return true;
+        if (TryGetDictionaryValue(map.Workstations, id, out definition, out canonicalId)) return true;
+        if (TryGetDictionaryValue(map.ItemSpawnpoints, id, out definition, out canonicalId)) return true;
+        if (TryGetDictionaryValue(map.PlayerSpawnpoints, id, out definition, out canonicalId)) return true;
+        if (TryGetDictionaryValue(map.Capybaras, id, out definition, out canonicalId)) return true;
+        if (TryGetDictionaryValue(map.Texts, id, out definition, out canonicalId)) return true;
+        if (TryGetDictionaryValue(map.Interactables, id, out definition, out canonicalId)) return true;
+        if (TryGetDictionaryValue(map.Schematics, id, out definition, out canonicalId)) return true;
+        if (TryGetDictionaryValue(map.Scp079Cameras, id, out definition, out canonicalId)) return true;
+        if (TryGetDictionaryValue(map.ShootingTargets, id, out definition, out canonicalId)) return true;
+        if (TryGetDictionaryValue(map.Teleports, id, out definition, out canonicalId)) return true;
+        if (TryGetDictionaryValue(map.Lockers, id, out definition, out canonicalId)) return true;
+        if (TryGetDictionaryValue(map.Waypoints, id, out definition, out canonicalId)) return true;
 
         definition = null!;
+        canonicalId = string.Empty;
         return false;
     }
 
-    private static bool TryGetDictionaryValue<T>(
-        Dictionary<string, T> dictionary,
+    private static bool TryGetDictionaryValue(
+        IDictionary dictionary,
         string id,
-        out SerializableObject definition) where T : SerializableObject
+        out object definition,
+        out string canonicalId)
     {
-        foreach (KeyValuePair<string, T> entry in dictionary)
+        foreach (DictionaryEntry entry in dictionary)
         {
-            if (!entry.Key.Equals(id, StringComparison.OrdinalIgnoreCase))
+            if (entry.Key is not string key
+                || !key.Equals(id, StringComparison.OrdinalIgnoreCase)
+                || entry.Value is null)
+            {
                 continue;
+            }
 
             definition = entry.Value;
+            canonicalId = key;
             return true;
         }
 
         definition = null!;
+        canonicalId = string.Empty;
         return false;
     }
 
-    private static MERObject WrapMapObject(MapEditorObject mapObject)
+    private static MERObject WrapMapObject(object rawMapObject)
     {
+        MapEditorObject mapObject = (MapEditorObject)rawMapObject;
         return new MERObject(
             mapObject.MapName,
             mapObject.Id,
@@ -478,7 +518,7 @@ internal static class MerBridge
     private static MERObjectDefinition WrapDefinition(
         string mapName,
         string id,
-        SerializableObject definition)
+        object definition)
     {
         return new MERObjectDefinition(mapName, id, GetObjectTypeName(definition), definition);
     }
@@ -516,7 +556,7 @@ internal static class MerBridge
         throw new ArgumentException("The reference is not a MER map object or object definition reference.");
     }
 
-    private static SerializableObject GetDefinitionFromReference(object reference)
+    private static object GetDefinitionFromReference(object reference)
     {
         if (reference is MERObject mapObject && mapObject.Definition is SerializableObject mapDefinition)
             return mapDefinition;
@@ -551,7 +591,7 @@ internal static class MerBridge
         return false;
     }
 
-    private static SchematicObject GetSchematic(object reference)
+    private static object GetSchematic(object reference)
     {
         if (TryGetSchematic(reference, out object rawSchematic) && rawSchematic is SchematicObject schematic)
             return schematic;

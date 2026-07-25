@@ -28,7 +28,7 @@ public class SetAHPMethod : SynchronousMethod
             DefaultValue = new(1.2, null),
             Description = "How much AHP is lost per second."
         },
-        new FloatArgument("efficacy", 0, 1)
+        new FloatArgument("efficacy", 0, 1, true)
         {
             DefaultValue = new(0.7, "70%"),
             Description = "The percent of incoming damage absorbed by AHP."

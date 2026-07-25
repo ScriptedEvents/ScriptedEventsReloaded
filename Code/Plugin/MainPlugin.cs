@@ -100,6 +100,10 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
             Contribution.QualityAssurance | Contribution.CodeContributor
         ),
         new(
+            "Miggas",
+            Contribution.Betatester
+        ),
+        new(
             "Raging Tornado", 
             Contribution.Betatester
         ),

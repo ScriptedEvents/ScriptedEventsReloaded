@@ -31,35 +31,19 @@ public class FloatArgument : Argument
         _preferPercent = preferPercent;
     }
 
-    public override string InputDescription
-    {
-        get
+    public override string InputDescription =>
+        (_minValue.HasValue, _maxValue.HasValue) switch
         {
-            if (_minValue.HasValue && _maxValue.HasValue)
-            {
-                return $"A number which is at least {FormatNum(_minValue.Value)} and most {FormatNum(_maxValue.Value)} e.g. " +
-                       $"{FormatNum(Math.Round((double)new Random().Next((int)_minValue.Value, (int)_maxValue.Value + 1)))}";
-            }
+            (true, true) => $"A number between {FormatNum(_minValue)} and {FormatNum(_maxValue)} (inclusive)",
+            (true, false) => $"A number bigger or equal {FormatNum(_minValue)}",
+            (false, true) => $"A number smaller or equal {FormatNum(_maxValue)}",
+            _ => "Any number"
+        };
 
-            if (_minValue.HasValue)
-            {
-                return $"A number which is at least {FormatNum(_minValue.Value)} e.g. {FormatNum(_minValue.Value + 2f)}";
-            }
-
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (_maxValue.HasValue)
-            {
-                return $"A number which is at most {FormatNum(_maxValue.Value)} e.g. {FormatNum(_maxValue.Value + 1f)}";
-            }
-
-            return $"Any number e.g. {FormatNum(1.5)}";
-        }
-    }
-
-    private string FormatNum(double number)
+    private string FormatNum(double? number)
     {
-        if (!_preferPercent) return number.ToString();
-        return $"{number * 100}%";
+        if (!_preferPercent) return number!.Value.ToString();
+        return $"{number!.Value * 100}%";
     }
 
     [UsedImplicitly]

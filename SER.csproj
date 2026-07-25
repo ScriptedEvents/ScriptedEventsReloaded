@@ -148,10 +148,6 @@
         <PackageReference Include="AudioPlayerApi" Version="1.1.3" />
         <PackageReference Include="Callvote.LabAPI" Version="6.8.0" />
         <PackageReference Include="ExMod.Exiled" Version="9.13.3" />
-        <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.46">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-        </PackageReference>
         <PackageReference Include="NCalc" Version="1.3.8" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="Northwood.LabAPI" Version="1.1.6.1" />
@@ -163,8 +159,6 @@
 
     <!--
       Dependencies loaded by the framework's embedded-resource resolver.
-      AudioPlayerApi and NVorbis are merged by ILRepack.targets instead so an
-      older copy loaded by another plugin cannot override SER's decoder.
     -->
     <Target Name="EmbedSelectedDependencies" AfterTargets="ResolveReferences">
         <ItemGroup>
@@ -172,9 +166,9 @@
                               Condition="'%(Extension)' == '.dll' and
                                  (
                                    '%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'NCalc' or
-                                   
                                    '%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Newtonsoft.Json' or
-                                   
+                                   '%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'AudioPlayerApi' or
+                                   '%(Filename)' == 'NVorbis' or
                                    '%(Filename)' == 'SharpCompress'
                                  )" />
         </ItemGroup>

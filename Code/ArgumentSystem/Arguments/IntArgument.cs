@@ -25,30 +25,14 @@ public class IntArgument : Argument
         _maxValue = maxValue;
     }
 
-    public override string InputDescription
-    {
-        get
+    public override string InputDescription => 
+        (_minValue.HasValue, _maxValue.HasValue) switch
         {
-            if (_minValue.HasValue && _maxValue.HasValue)
-            {
-                return $"Value must be at least {_minValue} and at most {_maxValue} e.g. " +
-                       $"{new Random().Next(_minValue.Value, _maxValue.Value + 1)}";
-            }
-
-            if (_minValue.HasValue)
-            {
-                return $"Value must be at least {_minValue} e.g. {_minValue + 2}";
-            }
-
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (_maxValue.HasValue)
-            {
-                return $"Value must be at most {_maxValue} e.g. {_maxValue - 2}";
-            }
-
-            return "Any number e.g. 2";
-        }
-    }
+            (true, true) => $"A whole number between {_minValue} and {_maxValue} (inclusive)",
+            (true, false) => $"A whole number bigger or equal {_minValue}",
+            (false, true) => $"A whole number smaller or equal {_maxValue}",
+            _ => "Any whole number"
+        };
 
     [UsedImplicitly]
     public DynamicTryGet<int> GetConvertSolution(BaseToken token)

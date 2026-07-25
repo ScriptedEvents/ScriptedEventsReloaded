@@ -1619,12 +1619,15 @@ public static class Builder
         {
             syntax = $"{m.Name} " + string.Join(" ", m.ExpectedArguments.Select(GetArgumentSyntax)),
             description = m.Description,
+            subgroup = m.Subgroup,
+            essential = m is IEssential,
             additionalDescription = (m as IAdditionalDescription)?.AdditionalDescription,
             requiredFramework = (m as IDependOnFramework)?.DependsOn.ToString(),
             returns = (m as IReturningMethod)?.Returns.ToString(),
             arguments = m.ExpectedArguments.Select(a => new
             {
                 name = a.Name,
+                argumentKind = a.GetType().Name,
                 mustBeProvided = a.MustBeProvided,
                 type = a.InputDescription,
                 description = a.Description,
@@ -1725,7 +1728,16 @@ public static class Builder
             .OrderBy(name => name);
         var eventDetails = GetEventDetails();
 
-        var truthTable = new { methods, keywords, flags, variables, events, eventDetails };
+        var truthTable = new
+        {
+            schemaVersion = 1,
+            methods,
+            keywords,
+            flags,
+            variables,
+            events,
+            eventDetails
+        };
         var json = JsonConvert.SerializeObject(truthTable, Formatting.Indented);
         var content = $"const SER_TRUTH_TABLE = {json};{Environment.NewLine}{Environment.NewLine}" +
                       "module.exports = { SER_TRUTH_TABLE };";

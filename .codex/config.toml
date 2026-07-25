@@ -1,0 +1,14 @@
+[mcp_servers.scpsl_console]
+command = "node"
+args = ["tools/scpsl-console-mcp/server.mjs"]
+cwd = "C:\\Users\\Olgie\\RiderProjects\\ScriptedEventsReloaded"
+env_vars = ["SL_DEV_REFERENCES", "LABAPI_PLUGINS"]
+startup_timeout_sec = 15
+tool_timeout_sec = 300
+enabled = true
+
+[mcp_servers.scpsl_console.tools.server_status]
+approval_mode = "auto"
+
+[mcp_servers.scpsl_console.tools.read_console]
+approval_mode = "auto"

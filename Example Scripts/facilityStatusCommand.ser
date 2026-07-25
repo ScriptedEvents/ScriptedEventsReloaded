@@ -1,0 +1,39 @@
+# Disabled by default: remove # from the filename to enable this script.
+# Read-only facility diagnostics available from every command console.
+# Demonstrates map collections, reference iteration and status helpers.
+
+!-- CustomCommand facilitystatus
+-- availableFor player remoteAdmin server
+-- description "Shows warhead, decontamination and map-object status"
+-- cooldown 3s
+
+$warhead = "idle"
+if {WarheadInfo isDetonated}
+    $warhead = "detonated"
+elif {WarheadInfo hasStarted}
+    $warheadTime = FormatDuration {WarheadInfo duration} "MMm SSs"
+    $warhead = "counting down ({$warheadTime})"
+elif {WarheadInfo isLocked}
+    $warhead = "idle (locked)"
+end
+
+$decontamination = "pending"
+if {DecontaminationInfo hasStarted}
+    $decontamination = "active or complete"
+else
+    $deconTime = FormatDuration {DecontaminationInfo timeToStart} "MMm SSs"
+    $decontamination = "starts in {$deconTime}"
+end
+
+&generators = GetFromMap generators
+$engagedGenerators = 0
+over &generators with *generator
+    if {*generator -> engaged}
+        $engagedGenerators = $engagedGenerators + 1
+    end
+end
+
+&pickups = GetPickups
+&ragdolls = GetFromMap ragdolls
+
+Reply "Warhead: {$warhead}<br>Decontamination: {$decontamination}<br>Generators: {$engagedGenerators}/{&generators -> length} engaged<br>Loose pickups: {&pickups -> length} | Ragdolls: {&ragdolls -> length}"

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SER Blocks — Learn Scripted Events Reloaded</title>
+  <!-- SER_TOOLING_STYLES -->
+</head>
+<body>
+  <header class="toolbar" aria-label="Editor toolbar">
+    <div class="brand" aria-label="SER Blocks">
+      <span class="brand-mark" aria-hidden="true">S</span>
+      <span>
+        <strong>SER Blocks</strong>
+        <small>Learn by making a real script</small>
+      </span>
+    </div>
+
+    <button id="recipesBtn" class="toolbar-button accent-button" type="button">
+      Choose an idea
+    </button>
+    <button id="newBtn" class="toolbar-button" type="button">New</button>
+    <button id="saveProjectBtn" class="toolbar-button" type="button">Save blocks</button>
+    <button id="loadProjectBtn" class="toolbar-button" type="button">Open blocks</button>
+    <input id="projectFileInput" class="sr-only" type="file" accept=".json,application/json">
+
+    <span class="toolbar-spacer"></span>
+    <label class="filename-field" for="scriptName">
+      <span>Script name</span>
+      <input id="scriptName" type="text" value="my-first-script" autocomplete="off">
+    </label>
+    <button id="downloadBtn" class="primary-button" type="button">Download .ser</button>
+  </header>
+
+  <div class="learning-path" aria-label="Three steps to make an SER script">
+    <span><b>1</b> Choose when it runs</span>
+    <span aria-hidden="true">→</span>
+    <span><b>2</b> Add what should happen</span>
+    <span aria-hidden="true">→</span>
+    <span><b>3</b> Download and try it</span>
+  </div>
+
+  <div class="app-shell">
+    <main id="main" aria-label="Block workspace">
+      <div id="blocklyDiv"></div>
+      <button id="emptyWorkspaceButton" class="empty-workspace-button" type="button">
+        Not sure where to start? Choose an idea
+      </button>
+    </main>
+
+    <aside id="sidebar" aria-label="Learning guide and generated SER script">
+      <section class="lesson-panel" aria-live="polite">
+        <p class="eyebrow">What this block means</p>
+        <h2 id="lessonTitle">Start with a “When” block</h2>
+        <p id="lessonText">
+          Every script needs a starting point. Choose an event, a player command,
+          or a script you run manually.
+        </p>
+        <p id="lessonTip" class="lesson-tip">Pick a block to see a simple explanation here.</p>
+      </section>
+
+      <section class="output-panel" aria-label="Generated SER script">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">The real script</p>
+            <h2>SER code</h2>
+          </div>
+          <button id="copyBtn" class="small-button" type="button">Copy</button>
+        </div>
+        <textarea id="codeOutput" readonly spellcheck="false" aria-label="Generated SER code"></textarea>
+      </section>
+
+      <section class="diagnostics-panel" aria-label="Script checks">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Before you try it</p>
+            <h2>Script check</h2>
+          </div>
+          <span id="statusBadge">Waiting</span>
+        </div>
+        <ol id="diagnostics"></ol>
+      </section>
+    </aside>
+  </div>
+
+  <dialog id="recipeDialog" aria-labelledby="recipeTitle">
+    <div class="dialog-heading">
+      <div>
+        <p class="eyebrow">Begin with something useful</p>
+        <h1 id="recipeTitle">What do you want to make?</h1>
+        <p>Choose a small script and change it to make it yours.</p>
+      </div>
+      <button id="closeRecipesBtn" class="icon-button" type="button" aria-label="Close">×</button>
+    </div>
+    <div id="recipeGrid" class="recipe-grid"></div>
+    <button id="blankRecipeBtn" class="blank-button" type="button">
+      Start with an empty workspace
+    </button>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- SER_TOOLING_BLOCKLY -->
+  <!-- SER_TOOLING_MANIFEST -->
+  <!-- SER_TOOLING_CORE -->
+  <!-- SER_TOOLING_EDITOR -->
+</body>
+</html>

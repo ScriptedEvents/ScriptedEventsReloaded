@@ -1,2 +1,35 @@
 {
+  "comments": {
+    "lineComment": "#"
+  },
+  "brackets": [
+    ["{", "}"],
+    ["(", ")"]
+  ],
+  "autoClosingPairs": [
+    {
+      "open": "{",
+      "close": "}",
+      "notIn": ["string", "comment"]
+    },
+    {
+      "open": "(",
+      "close": ")",
+      "notIn": ["string", "comment"]
+    },
+    {
+      "open": "\"",
+      "close": "\"",
+      "notIn": ["string", "comment"]
+    }
+  ],
+  "surroundingPairs": [
+    ["{", "}"],
+    ["(", ")"],
+    ["\"", "\""]
+  ],
+  "indentationRules": {
+    "increaseIndentPattern": "^\\s*(?:attempt|chance|elif|else|forever|func|if|on_error|over|repeat|while)\\b.*$",
+    "decreaseIndentPattern": "^\\s*(?:elif|else|end|on_error)\\b.*$"
+  }
 }

@@ -42,6 +42,8 @@ Important root files:
 - `App.config` contains .NET Framework binding redirects.
 - `global.json` selects the .NET SDK used by command-line builds.
 - `SER Visual Editor.html` and `ser_method_info.js` are generated and intentionally ignored by Git.
+- `Tooling` owns the shared JavaScript language core and the maintainable visual-editor source.
+- `VS Code Extension/src` is the maintainable extension source; `out` contains synchronized runtime artifacts.
 - `packages.config` is legacy metadata; `PackageReference` entries in `SER.csproj` control current NuGet restore.
 
 ## 3. Local development and build
@@ -293,7 +295,28 @@ Scripts can reach databases, custom YAML configs, HTTP endpoints, Discord webhoo
 `Builder.CreateFiles()` produces:
 
 - `ser_method_info.js`, a JSON-like truth table of methods and arguments;
-- `SER Visual Editor.html`, a Blockly-based visual script editor.
+- `SER Visual Editor.html`, the generated SER Blocks beginner editor.
+
+The reflection-backed truth table is the tooling contract. It includes a schema
+version and stable method presentation metadata used by both clients. When
+`Tooling/node_modules/blockly` is available, `Directory.Build.targets` runs the
+shared tooling build after validation. That build:
+
+- replaces the generated editor with the offline, bundled editor from
+  `Tooling/visual-editor/src`;
+- synchronizes `VS Code Extension/src` into `out`;
+- embeds the same editor as a VS Code webview;
+- copies the same language core and manifest to both clients.
+
+The editor deliberately exposes a curated learning vocabulary rather than
+generating one Blockly block for every reflected method. Reflection supplies
+event variables, enum values and descriptions, while the maintained block
+design in `Tooling/visual-editor/src` decides which beginner tasks are taught.
+Keep that boundary: adding a runtime method must not automatically add visual
+editor complexity.
+
+Run `npm run verify` from `Tooling` to build both clients and execute their
+manifest synchronization and language-core contract tests.
 
 The build embeds example scripts and selected dependencies (`NCalc`, `Newtonsoft.Json`, `AudioPlayerApi`, `NVorbis`, `SharpCompress`) into the plugin assembly. It also attempts to embed SER and API XML documentation used by help generation.
 

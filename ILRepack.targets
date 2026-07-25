@@ -1,0 +1,36 @@
+<Project>
+  <!--
+    LabAPI resolves embedded DLLs by simple assembly name. If another plugin has
+    already loaded an older NVorbis, LabAPI skips SER's embedded copy and
+    AudioPlayerApi can bind to an API-incompatible version.
+
+    Merge the audio API and its decoder into SER so their calls no longer go
+    through the process-wide AudioPlayerApi/NVorbis assembly identities.
+  -->
+  <Target
+    Name="ILRepack"
+    AfterTargets="CopyFilesToOutputDirectory"
+    BeforeTargets="PostBuildEvent;RunValidation">
+    <ItemGroup>
+      <SerAudioMergeInput
+        Include="@(ReferenceCopyLocalPaths)"
+        Condition="'%(Filename)' == 'AudioPlayerApi' or '%(Filename)' == 'NVorbis'" />
+      <SerAudioMergeAssemblies Include="$(TargetPath)" />
+      <SerAudioMergeAssemblies Include="@(SerAudioMergeInput)" />
+    </ItemGroup>
+
+    <Error
+      Condition="'@(SerAudioMergeInput)' == ''"
+      Text="Could not locate AudioPlayerApi and NVorbis for the SER audio dependency merge." />
+
+    <ILRepack
+      InputAssemblies="@(SerAudioMergeAssemblies)"
+      OutputFile="$(TargetPath)"
+      TargetKind="SameAsPrimaryAssembly"
+      Internalize="true"
+      Parallel="true"
+      DebugInfo="$(DebugSymbols)"
+      XmlDocumentation="true"
+      AllowDuplicateResources="false" />
+  </Target>
+</Project>

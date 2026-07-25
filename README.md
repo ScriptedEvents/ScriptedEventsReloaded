@@ -25,6 +25,24 @@ All you need to get started is a text editor and a server!
 # SER Tutorials
 > https://scriptedeventsreloaded.gitbook.io/docs/tutorial
 
+# SER editing tools
+
+SER ships one synchronized editing system in two forms:
+
+- **SER Blocks**, a standalone beginner editor generated as `SER Visual Editor.html`;
+- a VS Code extension with completions, hovers, shared diagnostics and the same
+  visual editor available through **SER: Open Blocks Editor**.
+
+Both clients are built from SER's reflection-generated language manifest and
+the shared JavaScript language core in `Tooling`. This keeps methods, keywords,
+flags, events and event-variable documentation synchronized with the plugin.
+
+SER Blocks is intentionally not a visual copy of every SER feature. It teaches
+the core model—when something happens, choose players, perform actions and make
+simple decisions—using guided recipes and a small set of safe blocks. The real
+generated SER code stays visible so a learner can move naturally to the VS Code
+extension when they want more control.
+
 # Examples
 (these scripts may be outdated, check the `Example Scripts` folder for the latest example scripts)
 

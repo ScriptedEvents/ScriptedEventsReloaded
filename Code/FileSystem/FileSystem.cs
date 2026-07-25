@@ -169,7 +169,7 @@ public static class FileSystem
         var exampleDir = Directory.CreateDirectory(Path.Combine(MainDirPath, "Example Scripts"));
         foreach (var kvp in examples)
         {
-            var path = Path.Combine(exampleDir.FullName, $"{kvp.Key}.ser");
+            var path = Path.Combine(exampleDir.FullName, $"#{kvp.Key}.ser");
             if (File.Exists(path)) continue;
             
             string? directory = Path.GetDirectoryName(path);

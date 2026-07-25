@@ -1,0 +1,29 @@
+# Disabled by default: remove # from the filename to enable this script.
+# Tracks each player's coin results for the current server session.
+# Demonstrates player data and multiple sections in one file.
+
+!-- OnEvent FlippedCoin
+-- require @evPlayer $evIsTails
+
+if $evIsTails
+    $tails = GetPlayerData @evPlayer "coin_tails" 0
+    $tails = $tails + 1
+    SetPlayerData @evPlayer "coin_tails" $tails
+    Hint @evPlayer 3s "Tails! Your totals: {GetPlayerData @evPlayer "coin_heads" 0} heads / {$tails} tails."
+else
+    $heads = GetPlayerData @evPlayer "coin_heads" 0
+    $heads = $heads + 1
+    SetPlayerData @evPlayer "coin_heads" $heads
+    Hint @evPlayer 3s "Heads! Your totals: {$heads} heads / {GetPlayerData @evPlayer "coin_tails" 0} tails."
+end
+
+!-- CustomCommand coinstats
+-- availableFor player
+-- description "Shows your coin-flip totals"
+-- cooldown 2s
+
+$heads = GetPlayerData @sender "coin_heads" 0
+$tails = GetPlayerData @sender "coin_tails" 0
+$total = $heads + $tails
+
+Reply "Coin results: {$heads} heads, {$tails} tails ({$total} total)."

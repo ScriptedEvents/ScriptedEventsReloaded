@@ -1,0 +1,24 @@
+<Project>
+  <!--
+    SER's validation target generates the reflection-backed language manifest.
+    When the optional frontend dependencies are installed, rebuild both tooling
+    clients before the existing extension export copies them into VS Code.
+  -->
+  <Target
+    Name="BuildSerToolingClients"
+    AfterTargets="RunValidation"
+    BeforeTargets="ExportSerExtension"
+    Condition="Exists('$(MSBuildProjectDirectory)\Tooling\node_modules\blockly\blockly.min.js')">
+    <Exec
+      WorkingDirectory="$(MSBuildProjectDirectory)\Tooling"
+      Command="node scripts\build.mjs" />
+  </Target>
+
+  <Target
+    Name="WarnWhenSerToolingDependenciesAreMissing"
+    AfterTargets="RunValidation"
+    Condition="!Exists('$(MSBuildProjectDirectory)\Tooling\node_modules\blockly\blockly.min.js')">
+    <Warning
+      Text="SER tooling clients were not rebuilt. Run 'npm install' in the Tooling directory to enable the unified visual-editor/extension build." />
+  </Target>
+</Project>

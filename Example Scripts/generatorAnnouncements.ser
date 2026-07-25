@@ -1,0 +1,24 @@
+# Disabled by default: remove # from the filename to enable this script.
+# Announces generator progress without changing generator behavior.
+# Demonstrates object references, map collections and multi-section events.
+
+!-- OnEvent ActivatedGenerator
+-- require @evPlayer *evGenerator
+
+&generators = GetFromMap generators
+$engagedGenerators = 0
+over &generators with *generator
+    if {*generator -> engaged}
+        $engagedGenerators = $engagedGenerators + 1
+    end
+end
+
+*room = *evGenerator -> room
+Broadcast @all 6s "<color=#7ee8fa>{@evPlayer -> name}</color> engaged a generator in {*room -> name}. ({$engagedGenerators}/{&generators -> length})"
+Print "{@evPlayer -> name} engaged the generator in {*room -> name}."
+
+!-- OnEvent DeactivatedGenerator
+-- require @evPlayer *evGenerator
+
+*room = *evGenerator -> room
+Broadcast @all 5s "<color=#ffb86c>{@evPlayer -> name}</color> stopped the generator in {*room -> name}."

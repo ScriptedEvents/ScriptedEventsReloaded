@@ -1,0 +1,20 @@
+# Disabled by default: remove # from the filename to enable this script.
+# Gives successful Class-D and Scientist escapees a small role-appropriate reward.
+# Demonstrates enum event variables and post-escape loadout changes.
+
+!-- OnEvent Escaped
+-- require @evPlayer $evOldRole $evNewRole
+
+if $evOldRole is "ClassD"
+    GiveItem @evPlayer Adrenaline
+    GiveItem @evPlayer Ammo44cal 2
+    Broadcast @evPlayer 6s "<color=#ff8e00>Escape reward:</color> adrenaline and revolver ammunition."
+elif $evOldRole is "Scientist"
+    GiveItem @evPlayer Medkit
+    GiveItem @evPlayer Painkillers
+    Broadcast @evPlayer 6s "<color=#ffff7c>Escape reward:</color> a compact medical kit."
+else
+    stop
+end
+
+Print "{@evPlayer -> name} escaped as {$evOldRole} and became {$evNewRole}."

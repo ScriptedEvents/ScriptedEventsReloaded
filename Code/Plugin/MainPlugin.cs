@@ -36,7 +36,7 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
 #endif
     public override string Name => "SER";
     public override string Author => "Elektryk_Andrzej";
-    public override Version Version => new(1, 0, 0);
+    public override Version Version => new(1, 0, 0, 7);
 
     public static string GitHubLink => "https://github.com/ScriptedEvents/ScriptedEventsReloaded";
     public static string DocsLink => "https://scriptedeventsreloaded.gitbook.io/docs/tutorial";

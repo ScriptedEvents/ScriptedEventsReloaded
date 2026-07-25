@@ -4,7 +4,7 @@
 # Edit the text below to match your own rules.
 
 !-- CustomCommand rules
--- availableFor player remoteAdmin
+-- availableFor player
 -- description "Shows the most important server rules"
 -- cooldown 5s
 -- onCooldownMessage "Please wait %time% seconds before using .rules again."

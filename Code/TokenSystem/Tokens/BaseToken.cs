@@ -81,7 +81,7 @@ public class BaseToken
         return $"token '{RawRep}' ({GetType().AccurateName})";
     }
 
-    public static TryGet<T> TryParse<T>(string rawRep, Script scr) where T : BaseToken
+    public static TryGet<T> TryParse<T>(string rawRep, Script? scr) where T : BaseToken
     {
         if (Tokenizer.TokenizeLine(rawRep, scr, null).HasErrored(out var error, out var tokens))
         {

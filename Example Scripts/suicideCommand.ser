@@ -4,6 +4,7 @@
 
 !-- CustomCommand suicide
 -- availableFor player
+-- requireSender
 -- description "Kills your current character"
 -- cooldown 10s
 -- onCooldownMessage "Please wait %time% seconds before using .suicide again."

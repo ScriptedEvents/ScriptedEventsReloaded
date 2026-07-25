@@ -5,31 +5,30 @@
 !-- OnEvent ProcessingPlayer
 -- require @evPlayer $evKnobSetting
 
+# downgrade the player's role 
 if $evKnobSetting is "Rough"
     if {@evPlayer -> role} isnt "Scp0492"
-        # change to zombie
         SetRole @evPlayer Scp0492
     else
-        # explode if already a zombie
         Explode @evPlayer
     end
 
+# damage and TP the player 
 elif $evKnobSetting is "Coarse"
-    # take 50 hp
-    Damage @evPlayer 50 "SCP-914"
-    # teleport to a random room in HCZ
-    TPRoom @evPlayer HeavyContainment 
-    # make the player not teleport to the out section of scp 914
+    Damage @evPlayer 50 "SCP-914 Coarse output"
+    
+    # make the player not teleport to the out section of scp 914, but a random room in HCZ
     IsAllowed false
+    TPRoom @evPlayer HeavyContainment
 
+# no effect (can add your own)
 elif $evKnobSetting is "OneToOne"
-    # no effect
-
+    
+# no effect (can add your own)
 elif $evKnobSetting is "Fine"
-    # no effect
 
+# grant good effects
 elif $evKnobSetting is "VeryFine"
-    # add good effects
     GiveEffect @evPlayer MovementBoost 20s 10
     GiveEffect @evPlayer AntiScp207 10s
 end

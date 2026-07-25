@@ -14,5 +14,7 @@
 -- globalMaxUses 10
 # the text to send
 -- arguments message
+# makes sure that @sender variable is available
+-- requireSender
 
 Broadcast @all 10s "<size=10><color=yellow>[VIP Broadcast by {@sender -> name}]</color></size><br>{$message}"

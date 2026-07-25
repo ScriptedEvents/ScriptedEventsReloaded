@@ -19,6 +19,7 @@ end
 
 !-- CustomCommand coinstats
 -- availableFor player
+-- requireSender
 -- description "Shows your coin-flip totals"
 -- cooldown 2s
 

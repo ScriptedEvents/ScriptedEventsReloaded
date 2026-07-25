@@ -1,6 +1,5 @@
 # Disabled by default: remove # from the filename to enable this script.
 !-- CustomCommand surfacesmite
--- availableFor RemoteAdmin
 -- description "Kills a random player currently in the Surface Zone."
 
 Countdown @all 10s "A random person on surface is going to be killed in %seconds% seconds!"

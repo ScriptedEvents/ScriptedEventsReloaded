@@ -15,10 +15,10 @@ SER simplifies the most essential plugin features into a friendly package.
 All you need to get started is a text editor and a server!
 
 # Nice-to-Haves of SER
-- **Simplification** of the most essential features like commands, events and player management.
+- **Simplification** of the most essential features like commands, events, and player management.
 - **No compilation required**, while C# plugins require a full development environment, compilation, and DLL management.
-- **Lots of built-in features** like AudioPlayer, Databases, Discord webhooks, HTTP and more!
-- **Extendable** with frameworks like UCR, EXILED or Callvote, but __without__ any dependencies! 
+- **Lots of built-in features** like AudioPlayer, Databases, Discord webhooks, HTTP, and more!
+- **Extendable** with frameworks like UCR, EXILED, or Callvote, but __without__ any dependencies! 
 - **Plugin docs** are available directly on the server using the `serhelp` command.
 - **Helpful community** available to help you with any questions you may have.
 
@@ -30,18 +30,8 @@ All you need to get started is a text editor and a server!
 SER ships one synchronized editing system in two forms:
 
 - **SER Blocks**, a standalone beginner editor generated as `SER Visual Editor.html`;
-- a VS Code extension with completions, hovers, shared diagnostics and the same
+- a VS Code extension with completions, hovers, shared diagnostics, and the same
   visual editor available through **SER: Open Blocks Editor**.
-
-Both clients are built from SER's reflection-generated language manifest and
-the shared JavaScript language core in `Tooling`. This keeps methods, keywords,
-flags, events and event-variable documentation synchronized with the plugin.
-
-SER Blocks is intentionally not a visual copy of every SER feature. It teaches
-the core model—when something happens, choose players, perform actions and make
-simple decisions—using guided recipes and a small set of safe blocks. The real
-generated SER code stays visible so a learner can move naturally to the VS Code
-extension when they want more control.
 
 # Examples
 (these scripts may be outdated, check the `Example Scripts` folder for the latest example scripts)
@@ -70,11 +60,7 @@ Broadcast @evPlayer 10s "Welcome to the server {@evPlayer -> name}!"
 ### Coin on kill
 ```
 !-- OnEvent Death
-
-# check if player died without an attacker
-if {VarExists @evAttacker} is false
-    stop
-end
+-- require @evAttacker
 
 # give the attacker a coin
 GiveItem @evAttacker Coin
@@ -86,7 +72,7 @@ GiveItem @evAttacker Coin
 -- description "broadcasts a message to all players - VIP only"
 -- neededRank vip svip mvip
 -- arguments message
--- availableFor Player
+-- availableFor player
 -- cooldown 2m
 
 # send the broadcast to all players

@@ -123,7 +123,7 @@ public static class Tokenizer
         return outList;
     }
 
-    public static Result TokenizeLine(Line line, Script scr)
+    public static Result TokenizeLine(Line line, Script? scr)
     {
         if (TokenizeLine(line.Slices, scr, line.LineNumber).HasErrored(out var err, out var tokens))
         {
@@ -134,7 +134,7 @@ public static class Tokenizer
         return true;
     }
 
-    public static TryGet<BaseToken[]> TokenizeLine(string line, Script scr, uint? lineNum)
+    public static TryGet<BaseToken[]> TokenizeLine(string line, Script? scr, uint? lineNum)
     {
         if (SliceLine(line).HasErrored(out var sliceError, out var slices))
         {
@@ -144,7 +144,7 @@ public static class Tokenizer
         return TokenizeLine(slices, scr, lineNum);
     }
 
-    public static TryGet<BaseToken[]> TokenizeLine(IEnumerable<Slice> slices, Script scr, uint? lineNum)
+    public static TryGet<BaseToken[]> TokenizeLine(IEnumerable<Slice> slices, Script? scr, uint? lineNum)
     {
         var sliceArray = slices.ToArray();
         List<BaseToken> outList = [];

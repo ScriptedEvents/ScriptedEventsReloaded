@@ -5,6 +5,7 @@
 
 !-- CustomCommand medic
 -- availableFor player
+-- requireSender
 -- description "Restores 35 health once per round"
 -- cooldown 30s
 -- onCooldownMessage "You must wait %time% seconds before healing again."

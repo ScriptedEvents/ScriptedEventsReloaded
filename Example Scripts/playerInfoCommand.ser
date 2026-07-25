@@ -3,7 +3,6 @@
 # Targets can be names, player IDs, user IDs, roles, teams, rooms or zones.
 
 !-- CustomCommand whois
--- availableFor remoteAdmin server
 -- description "Shows basic information about one online player"
 -- arguments target
 

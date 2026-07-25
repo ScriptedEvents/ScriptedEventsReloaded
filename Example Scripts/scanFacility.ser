@@ -1,7 +1,6 @@
 # Disabled by default: remove # from the filename to enable this script.
-!-- CustomCommand scan
+!-- CustomCommand scanfacility
 -- description "Scans the facility"
--- availableFor server remoteAdmin
 -- cooldown 1m
 
 # scan beginning announcement

@@ -1,7 +1,8 @@
 # Disabled by default: remove # from the filename to enable this script.
 !-- CustomCommand healscp
 -- description "heals a random SCP"
--- availableFor Player
+-- availableFor player
+-- requireSender
 -- cooldown 10s
 
 # dont allow SCPs to use this command

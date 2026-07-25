@@ -67,10 +67,12 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
         new(
             "availableFor",
             "Specifies from which console the command can be executed from. Accepts: " +
-            Enum.GetNames(typeof(ConsoleType)).Without(nameof(ConsoleType.None)).JoinStrings(" or "),
+            Enum.GetNames(typeof(ConsoleType)).Without(nameof(ConsoleType.None)).JoinStrings(" or ") +
+            ". Defaults to 'server' and 'remoteAdmin'.",
             AddConsoleType,
             false,
-            "-- availableFor Player RemoteAdmin"
+            "-- availableFor player remoteAdmin"
+        ),
         ),
         new(
             "description",
@@ -217,6 +219,11 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
             return $"A custom command named '{Command.Command}' is already registered by another script.";
         }
         
+        if (Command.RequireSender && Command.ConsoleTypes.HasFlag(ConsoleType.Server))
+        {
+            return "'requireSender' flag argument: 'server' console cannot provide @sender variable.";
+        }
+        
         ScriptCommands[Command] = this;
         
         foreach (var console in Command.ConsoleTypes.GetFlags())
@@ -291,6 +298,13 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
     public override Result OnScriptRunning(Script scr, out bool mustReport)
     {
         mustReport = true;
+        if (Command.RequireSender 
+            && !scr.LocalVariables.Any(var => var is PlayerVariable { Name: "sender" }))
+        {
+             return "Command was sent in a way that did not grant a @sender player variable. " +
+                    "Did you run a command meant for players using a server console?";
+        }
+        
         if (base.OnScriptRunning(scr, out _).HasErrored(out var error)) return error;
         
         if (scr.HasFlag<OnEventFlag>())
@@ -325,7 +339,9 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
         public string[] Aliases => [];
         public string Description { get; set; } = "";
         public string[] Usage { get; set; } = [];
-        public ConsoleType ConsoleTypes = ConsoleType.Server;
+        public ConsoleType ConsoleTypes = ConsoleType.Server | ConsoleType.RemoteAdmin;
+
+        public bool RequireSender = false;
         
         public string[] NeededRanks = [];
         public string? InvalidRankMessage;
@@ -604,6 +620,13 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
         }
         
         Command.ConsoleTypes = types;
+        return true;
+    }
+
+    private Result AddRequiredSender(string[] args)
+    {
+        if (args.Length != 0) return "Required sender cannot be specified.";
+        Command.RequireSender = true;
         return true;
     }
 

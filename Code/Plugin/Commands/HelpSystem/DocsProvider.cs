@@ -4,7 +4,6 @@ using CommandSystem;
 using LabApi.Events.Arguments.Interfaces;
 using LabApi.Features.Permissions;
 using SER.Code.ContextSystem.BaseContexts;
-using SER.Code.ContextSystem.Contexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;

@@ -73,6 +73,12 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
             false,
             "-- availableFor player remoteAdmin"
         ),
+        new(
+            "requireSender",
+            "Makes sure that the @sender variable exists when the command is executed.",
+            AddRequiredSender,
+            false,
+            "-- requireSender"
         ),
         new(
             "description",

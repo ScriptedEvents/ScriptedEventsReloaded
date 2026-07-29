@@ -1,0 +1,21 @@
+# Table of contents
+
+- [Documentation home](README.md)
+- Getting started
+  - [Installation](getting-started/installation.md)
+  - [First script](getting-started/first-script.md)
+  - [Files and reloads](getting-started/files-and-reloads.md)
+- Language
+  - [Methods and values](language/methods-and-values.md)
+  - [Variables and properties](language/variables-and-properties.md)
+  - [Conditions and loops](language/conditions-and-loops.md)
+  - [Collections](language/collections.md)
+  - [Timing and yielding](language/timing-and-yielding.md)
+  - [Functions, scopes, and errors](language/functions-scopes-and-errors.md)
+- Guides
+  - [Flags, events, and commands](guides/flags-events-and-commands.md)
+  - [Optional integrations](guides/integrations.md)
+  - [Debugging](guides/debugging.md)
+  - [Validated examples](guides/examples.md)
+- [Translation policy](translations.md)
+- [Language specification](../language_specification.md)

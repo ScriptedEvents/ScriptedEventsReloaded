@@ -23,7 +23,13 @@ All you need to get started is a text editor and a server!
 - **Helpful community** available to help you with any questions you may have.
 
 # SER Tutorials
-> https://scriptedeventsreloaded.gitbook.io/docs/tutorial
+
+The in-development 1.0 tutorials are versioned with the plugin:
+
+> [SER 1.0 documentation](./docs/README.md)
+
+The previous GitBook documents older releases and is not the source of truth
+for the current 1.0 branch.
 
 # SER editing tools
 
@@ -33,22 +39,66 @@ SER ships one synchronized editing system in two forms:
 - a VS Code extension with completions, hovers, shared diagnostics, and the same
   visual editor available through **SER: Open Blocks Editor**.
 
+# Quick start
+
+1. Install `SER.dll` as a LabAPI plugin and start the server once.
+2. Open the script directory shown by `serhelp start` or `serstatus`.
+3. Create `hello.ser` containing:
+
+   ```ser
+   Print "Hello from SER!"
+   ```
+
+4. Run `serrun hello`. When `hello` is not registered yet, `serrun` searches the
+   complete SER script directory and registers the matching file automatically.
+5. After editing an already registered script, run `serreload`. Use `serstatus`
+   to see accepted, failed, disabled, and conflicting files.
+
+`.ser` is the preferred extension. `.txt` is an identical compatibility format
+for server hosts whose file managers do not allow users to open unknown file
+types. A script name is global: two files with the same base name cannot coexist,
+even in different folders.
+
+Run `serexamples` to generate validated examples. Their names begin with `#`, so
+they remain disabled until you copy one or remove the leading `#` and run
+`serreload`.
+
 # Examples
-(these scripts may be outdated, check the `Example Scripts` folder for the latest example scripts)
 
-One `.ser` file may contain multiple independent handlers. Each `!--` flag starts a new section that ends immediately before the next flag. Multi-section files can be addressed as `filename:1`, `filename:2`, and so on.
+The build validates every script in the
+[`Example Scripts`](./Example%20Scripts) directory. The short examples below use
+the same current syntax.
 
-SER reads script files when the plugin initializes. File edits are not detected automatically; use the permission-protected `serreload` command to refresh scripts from disk. Reloads are transactional: a changed file is compiled in full before its flags are replaced, and if validation fails the last known-good version stays active. Map changes rebind that accepted in-memory version without rereading edited files.
+One `.ser` or `.txt` file may contain multiple independent handlers. Each `!--`
+flag starts a new section that ends immediately before the next flag.
+Multi-section files can be addressed as `filename:1`, `filename:2`, and so on.
+
+SER reads script files when the plugin initializes. `serrun name` also discovers
+a new, not-yet-registered file. Edits to registered files are not watched; use
+the permission-protected `serreload` command. Reloads are transactional: a
+changed file is compiled in full before its flags are replaced, and if validation
+fails the last known-good version stays active.
 
 ```ser
 !-- OnEvent RoundStarted
 Print "Round started"
 
-!-- OnEvent Died
+!-- OnEvent Death
 Print "A player died"
 
 !-- CustomCommand status
+-- requireSender
 Reply "Online"
+```
+
+ProjectMER integrations can use the dedicated optional event entry point:
+
+```ser
+!-- OnPMER SchematicSpawned
+-- require *evSchematic
+
+Print "Spawned {$evName}"
+MER.PlayAnimation *evSchematic "Open"
 ```
 
 ### Welcome message
@@ -73,6 +123,7 @@ GiveItem @evAttacker Coin
 -- neededRank vip svip mvip
 -- arguments message
 -- availableFor player
+-- requireSender
 -- cooldown 2m
 
 # send the broadcast to all players
@@ -83,6 +134,7 @@ Broadcast @all 10s "{@sender -> name} used VIP broadcast<br>{$message}"
 !-- CustomCommand healscp
 -- description "heals a random SCP"
 -- availableFor Player
+-- requireSender
 -- cooldown 10s
 
 # dont allow SCPs to use this command
@@ -99,67 +151,9 @@ $healAmount = Round ({@randomScp -> maxHealth} * 0.05)
 Heal @randomScp $healAmount
 Broadcast @randomScp 4s "{@sender -> name} healed you with {$healAmount} HP!"
 ```
-### Hot Potato event
-```
-!-- OnEvent RoundStarted
-
-# there is a 50% chance that the event will not happen
-if {Chance 50%}
-    Print "Hot Potato event will not be loaded"
-    stop
-end
-
-Print "Hot Potato event was loaded"
-Broadcast @all 5s "Be ready for a Hot Potato!"
-
-# this is the main loop of the event
-forever
-    wait 1m
-
-    # Get a random player from the alive players that are not SCPs
-    @potatoCarrier = LimitPlayers {RemovePlayers @alivePlayers @scpPlayers} 1
-
-    # if no player is alive, continue to next attempt
-    if {AmountOf @potatoCarrier} is 0
-        continue
-    end
-    
-    # if the inventory is full, continue to next attempt
-    if {@potatoCarrier -> inventory -> length} is 8
-        continue
-    end
-    
-    Hint @potatoCarrier 3s "YOU HAVE THE HOT POTATO! DROP IT OR DIE!"
-    GiveItem @potatoCarrier GunA7
-
-    wait 6s
-
-    # Check if they still have the item (GunA7) in their inventory
-    over {@potatoCarrier -> inventory} with *item
-        if {*item -> type} isnt "GunA7"
-            continue
-        end
-
-        # when GunA7 is found, explode the player
-        AdvDestroyItem *item
-        Explode @potatoCarrier
-        Broadcast @all 5s "Player {@potatoCarrier -> name} has failed the Hot Potato!"
-        
-        # 70% chance that the event to continue, else stop the event
-        if {Chance 70%}
-            Broadcast @all 5s "The Hot Potato will return soon!"
-            continue
-        else
-            Broadcast @all 5s "The Hot Potato got tired and will not return..."
-            stop
-        end
-    end
-        
-    # if the loop finishes without finding GunA7, it means the player has dropped it
-    AdvDestroyItem *item
-    Broadcast @all 5s "The Hot Potato has been neutralized... but it will return!"
-end
-```
+For a complete event script, see
+[`hotPotato.ser`](./Example%20Scripts/hotPotato.ser), which is validated during
+every build.
 
 ## Are you an LLM?
 Check the [syntax definition](https://raw.githubusercontent.com/ScriptedEvents/ScriptedEventsReloaded/refs/heads/main/language_specification.md) for guidance about SER script-making.

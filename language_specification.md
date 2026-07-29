@@ -1,6 +1,11 @@
 # SCRIPTED EVENTS RELOADED (SER) - Language Spec v1.0.0
 
-SER scripts are written in .ser files (for compatibility, .txt is also allowed) 
+SER scripts use `.ser` by default. `.txt` has identical semantics and exists for
+server hosts whose file managers do not let users open unknown file types.
+
+Files are discovered recursively, but the base filename is a global script
+identifier. Only one `example.ser` or `example.txt` may exist across the entire
+SER script directory, regardless of subfolder.
 
 ## 1. Data Types & Variables
 
@@ -170,13 +175,20 @@ end
 
 A file can contain multiple flagged script sections. Every `!--` declaration starts a new independent script, and its section continues up to (but not including) the next `!--` declaration. Named `--` arguments belong to the nearest flag above them.
 
-SER reads script files when the plugin initializes and does not watch for later edits. Use the permission-protected `serreload` command to refresh scripts from disk. The complete physical file must compile and register successfully before any active section is replaced; otherwise SER reports the error and keeps the last known-good version active. Map changes rebind that accepted in-memory version without rereading edited files.
+SER reads script files when the plugin initializes and does not watch later edits.
+When `serrun name` cannot find a registered script, it searches recursively for
+a new `name.ser` or `name.txt`, registers that one file, and retries the command.
+Use the permission-protected `serreload` command after editing a registered file
+or when you want to refresh the entire directory. The complete physical file
+must compile and register successfully before any active section is replaced;
+otherwise SER reports the exact file error and keeps the last known-good version
+active. Use `serstatus` to inspect accepted, failed, disabled, and conflicting files.
 
 ```ser
 !-- OnEvent RoundStarted
 Print "The round started"
 
-!-- OnEvent Died
+!-- OnEvent Death
 Print "A player died"
 
 !-- CustomCommand status
@@ -185,14 +197,16 @@ Reply "The server is online"
 
 The sections of a multi-section file named `roundHandlers.ser` can be addressed manually as `roundHandlers:1`, `roundHandlers:2`, and `roundHandlers:3`. A bare name is accepted only for flagless and single-section files. Only blank lines and comments may appear before the first flag in a multi-section file.
 
-| Flag Type          | Syntax Example                                            | Description                               |
-|--------------------|-----------------------------------------------------------|-------------------------------------------|
-| **Utility**        | *(No flags in the file)*                                  | Run manually via `serrun` or `RunScript`. |
-| **Custom Command** | `!-- CustomCommand heal`<br>`-- availableFor RemoteAdmin` | Binds the script to a custom command.     |
-| **Event**          | `!-- OnEvent Dying`<br>`-- require @evPlayer`             | Triggers on a LabAPI game event.          |
+| Flag Type          | Syntax Example                                             | Description                               |
+|--------------------|------------------------------------------------------------|-------------------------------------------|
+| **Utility**        | *(No flags in the file)*                                   | Run manually via `serrun` or `RunScript`. |
+| **Custom Command** | `!-- CustomCommand heal`<br>`-- availableFor RemoteAdmin`  | Binds the script to a custom command.     |
+| **Event**          | `!-- OnEvent Dying`<br>`-- require @evPlayer`              | Triggers on a LabAPI game event.          |
+| **ProjectMER**     | `!-- OnPMER SchematicSpawned`<br>`-- require *evSchematic` | Triggers on an optional ProjectMER event. |
 
 * *Event Cancellation:* Use `IsAllowed false` followed by `stop` to cancel the base game event.
-* *Event Variables:* Provided via C# reflection, but may not always exist. Use `--require` to validate.
+* *Event Variables:* Provided via C# reflection, but may not always exist. Use `-- require` to validate.
+* *ProjectMER Events:* Use `serhelp pmerevents` to list the events exposed by the installed ProjectMER version. Schematic event values use SER's `MERSchematic` reference type and can be passed directly to `MER.*` methods.
 
 ---
 
@@ -246,7 +260,7 @@ $kills = GetPlayerData @plr "kills"
 **Event Cancellation:**
 
 ```ser
-!-- ChangingRole
+!-- OnEvent ChangingRole
 -- require @evPlayer $evNewRole
 
 if $evNewRole is "ClassD"

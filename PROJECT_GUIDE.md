@@ -1,6 +1,6 @@
 # SER Developer Guide
 
-This guide describes the current architecture and development workflow of Scripted Events Reloaded (SER). It is intended for contributors and release maintainers. The implementation remains the source of truth; user-facing script syntax is documented separately in `language_specification.md` and through the in-game `serhelp` command.
+This guide describes the current architecture and development workflow of Scripted Events Reloaded (SER). It is intended for contributors and release maintainers. The implementation remains the source of truth; the beginner tutorial lives in `docs/`, compact syntax is documented in `language_specification.md`, and generated runtime reference is exposed through `serhelp`.
 
 Last verified against the repository: 2026-07-13.
 
@@ -117,7 +117,9 @@ Lifecycle rule: every event subscription, command registration, custom handler a
 - A file whose base filename starts with `#` is ignored.
 - Physical-file identity is the filename without its extension, not its relative path. Runtime sections add a numbered selector when needed.
 - If two files anywhere in the tree share the same base filename, all scripts with that duplicate name are excluded and an error is logged.
-- Files are read when the catalog initializes and when an authorized operator explicitly runs `serreload`. Script lookups never reread files.
+- Files are read when the catalog initializes and when an authorized operator runs `serreload`.
+- If `serrun name` cannot find a registered script, it performs a targeted rescan and registers only a newly found `name.ser` or `name.txt`. It does not reload unrelated files or pick up edits to already registered scripts.
+- `serstatus` reports accepted snapshots, failed candidates, disabled files, and every path involved in a global-name conflict.
 
 `ScriptCatalog` owns the accepted source snapshot and registered flags for each physical file. During initial loading or an explicit reload, SER splits the file at every `!--` declaration and compiles every section before changing live bindings. Each declaration is inclusive in its section, and the section ends immediately before the next declaration. Multi-section files receive selectors such as `file:1` and `file:2`; flagless and single-section files retain their bare filename. Only blank lines and comments may precede the first declaration in a flagged file.
 
@@ -269,6 +271,8 @@ Avoid broad `catch` blocks that discard the original exception. If recovery is p
 ## 12. Events and optional frameworks
 
 `EventHandler.Initialize()` discovers static LabAPI handler events by reflection. A script using `!-- OnEvent EventName` causes SER to bind that event lazily. Event properties are converted into local variables named `ev<PropertyName>` with a prefix inferred from the value type. Cancellable events can propagate a script's allow/deny result.
+
+ProjectMER events are discovered into a separate optional catalog. `!-- OnPMER EventName` binds only against that catalog, while sharing the reflected variable and cancellation pipeline. ProjectMER schematic objects are converted to SER `MERSchematic` references before script execution. Keep this path late-bound so SER still loads when ProjectMER is absent.
 
 `DisableEvent` and `EnableEvent` only accept events whose argument type implements LabAPI's `ICancellableEvent`. Both are returning methods: they return `true` when the disabled state changed and `false` when it was already in the requested state. A missing or non-cancellable event is a script runtime error.
 

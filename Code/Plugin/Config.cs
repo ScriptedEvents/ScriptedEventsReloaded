@@ -1,5 +1,5 @@
-﻿using System.ComponentModel;
-#if EXILED 
+using System.ComponentModel;
+#if EXILED
 using Exiled.API.Interfaces;
 #endif
 
@@ -13,14 +13,23 @@ public class Config
 {
     public bool IsEnabled { get; set; } = true;
 
-    [Description("This setting does not do anything lol")]
+#if EXILED
+    [Description("Enables debug logging provided by EXILED.")]
     public bool Debug { get; set; } = false;
+#endif
 
-    [Description("If true, SER will send a message to the server console when the plugin is enabled.")]
+    [Description("If true, SER sends a concise status message when the plugin is ready.")]
     public bool SendInitMessage { get; set; } = true;
 
-    [Description("If true, SER will slow down scripts in order to prevent them from crashing the server.")]
-    public bool SafeScripts { get; set; } = false;
-    [Description("If you wish to remove ranks from players mentioned in the credits, message the developer.")]
-    public int RankRemovalKey { get; set; } = 0;
+    [Description(
+        "Inserts frame yields while scripts execute, reducing the risk that a tight script stalls the server. " +
+        "Disable this only after reviewing every active script."
+    )]
+    public bool SafeScripts { get; set; } = true;
+
+    [Description("Prints the large SER logo and contributor list when the plugin is enabled.")]
+    public bool SendLogo { get; set; } = false;
+
+    [Description("Shows a temporary SER contributor badge to recognized contributors without a server rank.")]
+    public bool ShowContributorBadges { get; set; } = false;
 }

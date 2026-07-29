@@ -22,7 +22,7 @@ public class Audio_PlayMethod : SynchronousMethod, ICanError
     [
         new TextArgument("speaker name"),
         new TextArgument("audio clip name"),
-        new BoolArgument("loop?")
+        new BoolArgument("loop")
         {
             DefaultValue = new(false, null)
         }
@@ -39,6 +39,6 @@ public class Audio_PlayMethod : SynchronousMethod, ICanError
         if (!AudioClipStorage.AudioClips.ContainsKey(clipName))
             throw new ScriptRuntimeError(this, $"Audio clip with name '{clipName}' does not exist.");
         
-        audioPlayer.AddClip(clipName, loop: Args.GetBool("loop?"));
+        audioPlayer.AddClip(clipName, loop: Args.GetBool("loop"));
     }
 }

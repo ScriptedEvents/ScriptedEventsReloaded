@@ -20,7 +20,6 @@ using SER.Code.ValueSystem.PropertySystem;
 using SER.Code.VariableSystem;
 using EventHandler = SER.Code.EventSystem.EventHandler;
 using Events = LabApi.Events.Handlers;
-using Server = LabApi.Features.Wrappers.Server;
 
 namespace SER.Code.Plugin;
 
@@ -39,7 +38,7 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
     public override Version Version => new(1, 0, 0, 7);
 
     public static string GitHubLink => "https://github.com/ScriptedEvents/ScriptedEventsReloaded";
-    public static string DocsLink => "https://scriptedeventsreloaded.gitbook.io/docs/tutorial";
+    public static string DocsLink => GitHubLink + "/blob/main/docs/README.md";
     public static string DiscordLink => "https://discord.gg/3j54zBnbbD";
 
     public static string HelpCommandName => "serhelp";
@@ -128,12 +127,18 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
         
         Instance = this;
         
-        SendLogo();
+        if (Config.SendLogo)
+        {
+            SendLogo();
+        }
 
         Events.ServerEvents.MapGenerating += OnMapGenerating;
         
         Events.ServerEvents.WaitingForPlayers += OnServerFullyInit;
-        Events.PlayerEvents.Joined += OnJoined;
+        if (Config.ShowContributorBadges)
+        {
+            Events.PlayerEvents.Joined += OnJoined;
+        }
 
         _teslaRuleHandler = new TeslaRuleHandler();
         _damageRuleHandler = new DamageRuleHandler();
@@ -197,12 +202,13 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
 
         Logger.Raw(
             $"""
-             Thank you for using ### Scripted Events Reloaded ### by {Author}!
-             
-             Help command: {HelpCommandName}
-             GitHub repository: {GitHubLink}
+             SER {Version} is ready.
+             Active script files: {FileSystem.ScriptCatalog.GetAcceptedScripts().Length}
+             Files requiring attention: {FileSystem.ScriptCatalog.GetFailedScripts().Length}
+             Disabled files (name starts with #): {FileSystem.FileSystem.DisabledScriptPaths.Length}
+             Script directory: {FileSystem.FileSystem.MainDirPath}
+             First steps: {HelpCommandName} start
              Documentation: {DocsLink}
-             Discord: {DiscordLink}
              """,
             ConsoleColor.Cyan
         );
@@ -254,7 +260,7 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
 
     private void OnJoined(PlayerJoinedEventArgs ev)
     {
-        if (Config.RankRemovalKey == Server.IpAddress.GetHashCode()) return;
+        if (!Config.ShowContributorBadges) return;
         if (ev.Player is not { } plr) return;
         
         Timing.CallDelayed(3f, () =>

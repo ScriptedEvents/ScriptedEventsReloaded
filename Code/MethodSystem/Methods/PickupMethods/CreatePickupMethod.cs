@@ -23,9 +23,10 @@ public class CreatePickupMethod : ReferenceReturningMethod<Pickup>
         var itemType = Args.GetEnum<ItemType>("item type");
         
         if (!InventoryItemLoader.AvailableItems.TryGetValue(itemType, out var prefab))
-            throw new TosoksFuckedUpException("Either Northwood fucked up or you're a wizard. Congratulations!");
+            throw new TosoksFuckedUpException($"The pickup prefab for '{itemType}' was unavailable.");
         
-        var item = Object.Instantiate(prefab.PickupDropModel) ?? throw new TosoksFuckedUpException("Somehow the prefab failed to copy??? I don't even know who to blame tbh");
+        var item = Object.Instantiate(prefab.PickupDropModel)
+                   ?? throw new TosoksFuckedUpException("The pickup prefab could not be instantiated.");
         item.Info = new(itemType, prefab.Weight);
         item.PreviousOwner = new(Server.Host?.ReferenceHub);
         

@@ -3,6 +3,7 @@ using System.Text;
 using CommandSystem;
 using LabApi.Events.Arguments.Interfaces;
 using LabApi.Features.Permissions;
+using SER.Code.ContextSystem;
 using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.Exceptions;
@@ -32,10 +33,12 @@ public static class DocsProvider
 {
     public static readonly Dictionary<HelpOption, Func<string>> GeneralOptions = new()
     {
-        [HelpOption.Methods] = GetMethodList,
+        [HelpOption.Start] = GetStartHelpPage,
+        [HelpOption.Methods] = GetMethodIndex,
         [HelpOption.Variables] = GetVariableList,
         [HelpOption.Enums] = GetEnumHelpPage,
         [HelpOption.Events] = GetEventsHelpPage,
+        [HelpOption.PmerEvents] = GetPmerEventsHelpPage,
         [HelpOption.Properties] = GetPropertiesHelpPage,
         [HelpOption.Flags] = GetFlagHelpPage,
         [HelpOption.Keywords] = GetKeywordHelpPage
@@ -53,10 +56,9 @@ public static class DocsProvider
                 return GetPropertiesAdvanced(args, sender, out response);
             }
 
-            if (option == HelpOption.Methods && args.Count > 1 && args.Array?[args.Offset + 1] == "essential")
+            if (option == HelpOption.Methods && args.Count > 1)
             {
-                response = GetMethodList(true);
-                return true;
+                return GetMethodsOutput(args.Array![args.Offset + 1], out response);
             }
             
             if (!GeneralOptions.TryGetValue(option, out var func))
@@ -91,6 +93,7 @@ public static class DocsProvider
         }
         
         var ev = EventSystem.EventHandler.AvailableEvents
+            .Concat(EventSystem.EventHandler.AvailablePmerEvents)
             .FirstOrDefault(e => e.Name.ToLowerInvariant() == arg);
         if (ev is not null)
         {
@@ -113,6 +116,7 @@ public static class DocsProvider
         if (outsideMethodKvp is { m: {} outsideMethod, Key: var framework})
         {
             response = GetMethodHelp(outsideMethod, framework);
+            return true;
         }
 
         var correctFlagName = Flag.FlagInfos.Keys
@@ -123,19 +127,20 @@ public static class DocsProvider
             return true;
         }
 
-        response = $"There is no '{arg}' option!";
+        var suggestion = GetClosestHelpName(arg);
+        response = $"There is no '{arg}' help topic." +
+                   (suggestion is null ? string.Empty : $" Did you mean 'serhelp {suggestion}'?");
         return false;
     }
 
     public static string GetOptionsList()
     {
         return $"""
-                === Welcome to the help command of SER! ===
+                === SER help ===
 
-                To get specific information for your script creation adventure:
-                (1) find the desired option (like '{nameof(HelpOption.Methods).ToLowerInvariant()}')
-                (2) use this command, attaching the option after it (like 'serhelp methods')
-                (3) enjoy!
+                New here? Run 'serhelp start'.
+                For a compact method list, run 'serhelp methods essential'.
+                For details about one item, run 'serhelp <name>', for example 'serhelp Print'.
 
                 Here are all the available options:
                 > {"\n> ".Join(Enum.GetValues(typeof(HelpOption)).Cast<HelpOption>()
@@ -152,6 +157,114 @@ public static class DocsProvider
                         => $"{c.Command} (permission: {(c as IUsePermissions)?.Permission ?? "not required"})" + 
                            $"\n{(string.IsNullOrEmpty(c.Description) ? string.Empty : c.Description + "\n")}"))}
                 """;
+    }
+
+    public static string GetStartHelpPage()
+    {
+        return $"""
+                === First SER script ===
+
+                1. Script directory:
+                   {FileSystem.FileSystem.MainDirPath}
+
+                2. Create 'hello.ser' there with:
+                   Print "Hello from SER!"
+
+                   Use .ser when your host allows unknown file types. Use 'hello.txt' as
+                   a compatibility format when its file manager blocks .ser. Both behave identically.
+
+                3. Run:
+                   serrun hello
+
+                   If the file is new, serrun discovers and registers it automatically.
+                   After editing an already registered script, run 'serreload'.
+
+                4. Diagnose files with:
+                   serstatus
+
+                Need examples? Run 'serexamples'. Generated files start with '#', so they
+                are disabled. Copy one or remove the leading '#', then run 'serreload'.
+
+                Script names are global: only one file with a given base name may exist,
+                even when the files are in different folders.
+                """;
+    }
+
+    private static string GetMethodIndex()
+    {
+        var methods = MethodIndex.GetMethods();
+        var categories = MethodsByCategory(methods)
+            .OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase)
+            .Select(pair => $"> {pair.Key}: {pair.Value.Count}");
+
+        return $"""
+                SER currently exposes {methods.Length} methods.
+
+                Start with:
+                > serhelp methods essential
+
+                Browse a category with:
+                > serhelp methods <category>
+
+                Show the complete list with:
+                > serhelp methods all
+
+                Categories:
+                {string.Join("\n", categories)}
+                """;
+    }
+
+    private static bool GetMethodsOutput(string selector, out string response)
+    {
+        if (selector.Equals("essential", StringComparison.OrdinalIgnoreCase))
+        {
+            response = GetMethodList(true);
+            return true;
+        }
+
+        if (selector.Equals("all", StringComparison.OrdinalIgnoreCase))
+        {
+            response = GetMethodList(false);
+            return true;
+        }
+
+        var category = MethodsByCategory()
+            .FirstOrDefault(pair => pair.Key.Equals(selector, StringComparison.OrdinalIgnoreCase));
+        if (category.Value is null)
+        {
+            response = $"Unknown method category '{selector}'. Run 'serhelp methods' to list categories.";
+            return false;
+        }
+
+        response = $"--- {category.Key} methods ---\n" +
+                   string.Join("\n", category.Value
+                       .OrderBy(method => method.Name, StringComparer.OrdinalIgnoreCase)
+                       .Select(method => $"> {method.Name} - {method.Description}")) +
+                   "\n\nUse 'serhelp <method name>' for arguments and return values.";
+        return true;
+    }
+
+    private static string? GetClosestHelpName(string input)
+    {
+        var candidates = Enum.GetNames(typeof(HelpOption))
+            .Select(name => name.ToLowerInvariant())
+            .Concat(ContextableKeywordToken.KeywordContextTypes
+                .Select(type => type.CreateInstance<IKeywordContext>().KeywordName))
+            .Concat(EnumIndex.GetAllEnums().Select(type => type.Name))
+            .Concat(EventSystem.EventHandler.AvailableEvents
+                .Concat(EventSystem.EventHandler.AvailablePmerEvents)
+                .Select(info => info.Name))
+            .Concat(MethodIndex.GetMethods().Select(method => method.Name))
+            .Concat(MethodIndex.FrameworkDependentMethods.Values
+                .SelectMany(methods => methods)
+                .Select(method => method.Name))
+            .Concat(Flag.FlagInfos.Keys)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Select(name => new { Name = name, Score = Contexter.GetDiceCoefficient(input, name) })
+            .OrderByDescending(candidate => candidate.Score)
+            .FirstOrDefault();
+
+        return candidates is { Score: >= 0.35 } ? candidates.Name : null;
     }
 
     public static string GetKeywordInfo(IKeywordContext keyword)
@@ -360,6 +473,44 @@ public static class DocsProvider
             Here are all events that SER can use:
             {sb}
             """;
+    }
+
+    public static string GetPmerEventsHelpPage()
+    {
+        if (EventSystem.EventHandler.AvailablePmerEvents.Count == 0)
+        {
+            return
+                """
+                ProjectMER is not installed or did not expose any supported events.
+                The OnPMER flag becomes available for binding when ProjectMER is loaded.
+                """;
+        }
+
+        var sb = new StringBuilder();
+        foreach (var category in EventSystem.EventHandler.AvailablePmerEvents
+                     .Select(ev => ev.DeclaringType)
+                     .ToHashSet()
+                     .OfType<Type>())
+        {
+            sb.AppendLine($"--- {category.Name} ---");
+            if (XmlDocReader.GetDocumentation(category) is { Length: > 0 } categoryDocumentation)
+                sb.AppendLine(categoryDocumentation);
+            sb.AppendLine(string.Join(", ", EventSystem.EventHandler.AvailablePmerEvents
+                .Where(ev => ev.DeclaringType == category)
+                .Select(ev => ev.Name)));
+        }
+
+        return
+            $"""
+             ProjectMER events are signals exposed by the optional ProjectMER plugin.
+             Use `!-- OnPMER EventName` to run a script when one occurs.
+
+             Event properties are exposed as ev variables. Use `serhelp <eventName>`
+             to inspect them and `-- require` to skip execution when selected variables are absent.
+
+             Here are all ProjectMER events available to SER:
+             {sb}
+             """;
     }
     
     public static string GetEnum(Type enumType)

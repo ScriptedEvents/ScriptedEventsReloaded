@@ -10,7 +10,7 @@ namespace SER.Code.MethodSystem.Methods.TextMethods;
 // ReSharper disable once InconsistentNaming
 public class Text_TrimMethod : ReturningMethod<TextValue>
 {
-    public override string Description => "Trims the text value from whitspaces at the beginning and end.";
+    public override string Description => "Trims whitespace from the beginning and end of a text value.";
 
     public override Argument[] ExpectedArguments { get; } =
     [

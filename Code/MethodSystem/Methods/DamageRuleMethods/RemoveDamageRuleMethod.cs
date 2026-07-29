@@ -7,7 +7,7 @@ namespace SER.Code.MethodSystem.Methods.DamageRuleMethods;
 [UsedImplicitly]
 public class RemoveDamageRuleMethod : SynchronousMethod
 {
-    public override string Description => "Removes a given damage rule fro applying.";
+    public override string Description => "Prevents a given damage rule from applying.";
 
     public override Argument[] ExpectedArguments { get; } =
     [

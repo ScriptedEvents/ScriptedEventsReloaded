@@ -18,7 +18,7 @@ public class Speaker_CreateOnPositionMethod : SynchronousMethod
         new FloatArgument("x"),
         new FloatArgument("y"),
         new FloatArgument("z"),
-        new FloatArgument("volume", 0f)
+        new FloatArgument("volume", 0f, preferPercent: true)
         {
             DefaultValue = new(1f, "100%"),
             Description = "The volume of the audio."

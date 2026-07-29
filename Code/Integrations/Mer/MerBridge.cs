@@ -18,6 +18,20 @@ namespace SER.Code.Integrations.Mer;
 /// </summary>
 internal static class MerBridge
 {
+    internal static object WrapEventValue(object value)
+    {
+        return value is SchematicObject schematic
+            ? new MERSchematic(schematic.Name, schematic)
+            : value;
+    }
+
+    internal static Type GetEventValueType(Type type)
+    {
+        return typeof(SchematicObject).IsAssignableFrom(type)
+            ? typeof(MERSchematic)
+            : type;
+    }
+
     internal static void LoadMap(string mapName)
     {
         MapUtils.LoadMap(mapName);

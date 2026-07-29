@@ -30,7 +30,7 @@ public static class ObjectExtensions
         public NetworkIdentity NetworkIdentity =>
             obj.TryGetComponent(out NetworkIdentity networkIdentity)
                 ? networkIdentity
-                : throw new NotOurFaultException("Either you hacked the game or " +
-                                                     "northwood fucked up real hard.");
+                : throw new NotOurFaultException(
+                    "The GameObject does not contain the NetworkIdentity expected by SER.");
     }
 }

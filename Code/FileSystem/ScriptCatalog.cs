@@ -13,6 +13,18 @@ public static class ScriptCatalog
     private readonly record struct ScriptFile(string Content, DateTime LastWriteTimeUtc, long Length);
     private readonly record struct FileStamp(DateTime LastWriteTimeUtc, long Length);
 
+    public readonly record struct RequestedRefreshResult(bool FileFound, RefreshSummary Summary);
+    public readonly record struct AcceptedScriptInfo(
+        string FileName,
+        string Path,
+        int Sections,
+        int FlagBindings);
+    public readonly record struct FailedScriptInfo(
+        string FileName,
+        string Path,
+        string Error,
+        bool PreviousVersionActive);
+
     public readonly record struct RefreshSummary(int Reloaded, int Unloaded, int Failed)
     {
         public static RefreshSummary operator +(RefreshSummary first, RefreshSummary second) => new(
@@ -35,6 +47,8 @@ public static class ScriptCatalog
     private static readonly Dictionary<string, Snapshot> SnapshotsByFileName =
         new(StringComparer.OrdinalIgnoreCase);
     private static readonly Dictionary<string, FileStamp> FailedFileStamps =
+        new(StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<string, FailedScriptInfo> FailedScriptsByPath =
         new(StringComparer.OrdinalIgnoreCase);
 
     private static bool _initialized;
@@ -73,7 +87,7 @@ public static class ScriptCatalog
 
             try
             {
-            FileSystem.UpdateScriptPathCollection();
+                FileSystem.UpdateScriptPathCollection();
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
@@ -87,6 +101,12 @@ public static class ScriptCatalog
             foreach (var removedFailure in FailedFileStamps.Keys.Where(path => !paths.Contains(path)).ToArray())
             {
                 FailedFileStamps.Remove(removedFailure);
+                FailedScriptsByPath.Remove(removedFailure);
+            }
+
+            foreach (var removedFailure in FailedScriptsByPath.Keys.Where(path => !paths.Contains(path)).ToArray())
+            {
+                FailedScriptsByPath.Remove(removedFailure);
             }
 
             foreach (var removedPath in SnapshotsByPath.Keys.Where(path => !paths.Contains(path)).ToArray())
@@ -111,12 +131,84 @@ public static class ScriptCatalog
         }
     }
 
+    public static RequestedRefreshResult RefreshRequested(ScriptName requestedName)
+    {
+        if (_isRefreshing)
+        {
+            return default;
+        }
+
+        if (!Directory.Exists(FileSystem.MainDirPath))
+        {
+            Directory.CreateDirectory(FileSystem.MainDirPath);
+        }
+
+        try
+        {
+            FileSystem.UpdateScriptPathCollection();
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            Log.Error($"Failed to scan the SER script directory: {exception.Message}");
+            return new RequestedRefreshResult(false, new RefreshSummary(0, 0, 1));
+        }
+
+        FileSystem.ParseSectionSelector(requestedName, out var fileName, out _);
+        var path = FileSystem.RegisteredScriptPaths.FirstOrDefault(candidate =>
+            string.Equals(
+                Path.GetFileNameWithoutExtension(candidate),
+                fileName,
+                StringComparison.OrdinalIgnoreCase));
+
+        if (path is null)
+        {
+            return default;
+        }
+
+        _isRefreshing = true;
+        try
+        {
+            return new RequestedRefreshResult(true, RefreshPath(path, false));
+        }
+        finally
+        {
+            _isRefreshing = false;
+        }
+    }
+
+    public static AcceptedScriptInfo[] GetAcceptedScripts() => SnapshotsByPath.Values
+        .OrderBy(snapshot => snapshot.FileName, StringComparer.OrdinalIgnoreCase)
+        .Select(snapshot => new AcceptedScriptInfo(
+            snapshot.FileName,
+            snapshot.Path,
+            snapshot.Sections.Length,
+            snapshot.Flags.Sum(pair => pair.Value.Count)))
+        .ToArray();
+
+    public static FailedScriptInfo[] GetFailedScripts() => FailedScriptsByPath.Values
+        .OrderBy(failure => failure.FileName, StringComparer.OrdinalIgnoreCase)
+        .ToArray();
+
+    public static FailedScriptInfo? GetFailure(ScriptName requestedName)
+    {
+        FileSystem.ParseSectionSelector(requestedName, out var fileName, out _);
+        foreach (var failure in FailedScriptsByPath.Values)
+        {
+            if (string.Equals(failure.FileName, fileName, StringComparison.OrdinalIgnoreCase))
+            {
+                return failure;
+            }
+        }
+
+        return null;
+    }
+
     public static TryGet<ScriptSection> GetSection(ScriptName requestedName)
     {
         FileSystem.ParseSectionSelector(requestedName, out var fileName, out var requestedSection);
         if (!SnapshotsByFileName.TryGetValue(fileName, out var snapshot))
         {
-            return $"Script '{requestedName}' does not exist anymore";
+            return $"Script '{requestedName}' is not registered.";
         }
 
         if (requestedSection is { } sectionNumber)
@@ -146,7 +238,7 @@ public static class ScriptCatalog
         FileSystem.ParseSectionSelector(requestedName, out var fileName, out _);
         return SnapshotsByFileName.TryGetValue(fileName, out var snapshot)
             ? TryGet<string>.Success(snapshot.Path)
-            : TryGet<string>.Error($"Script '{requestedName}' does not exist anymore");
+            : TryGet<string>.Error($"Script '{requestedName}' is not registered.");
     }
 
     public static void Shutdown()
@@ -159,6 +251,7 @@ public static class ScriptCatalog
         SnapshotsByPath.Clear();
         SnapshotsByFileName.Clear();
         FailedFileStamps.Clear();
+        FailedScriptsByPath.Clear();
         _initialized = false;
     }
 
@@ -183,7 +276,13 @@ public static class ScriptCatalog
 
         if (ReadStableScriptFile(path).HasErrored(out var readError, out var scriptFile))
         {
-            Log.CompileError(Path.GetFileNameWithoutExtension(path), readError);
+            var fileName = Path.GetFileNameWithoutExtension(path);
+            Log.CompileError(fileName, readError);
+            FailedScriptsByPath[path] = new FailedScriptInfo(
+                fileName,
+                path,
+                readError,
+                SnapshotsByPath.ContainsKey(path));
             RestoreSnapshotBinding(path);
             return new RefreshSummary(0, 0, 1);
         }
@@ -204,6 +303,7 @@ public static class ScriptCatalog
             SnapshotsByPath[path] = refreshedSnapshot;
             SnapshotsByFileName[refreshedSnapshot.FileName] = refreshedSnapshot;
             FailedFileStamps.Remove(path);
+            FailedScriptsByPath.Remove(path);
             return default;
         }
 
@@ -212,6 +312,11 @@ public static class ScriptCatalog
         {
             var fileName = Path.GetFileNameWithoutExtension(path);
             FailedFileStamps[path] = new FileStamp(lastWriteTimeUtc, length);
+            FailedScriptsByPath[path] = new FailedScriptInfo(
+                fileName,
+                path,
+                error,
+                SnapshotsByPath.ContainsKey(path));
             Log.CompileError(fileName, error);
             if (SnapshotsByPath.ContainsKey(path))
             {
@@ -225,12 +330,18 @@ public static class ScriptCatalog
         if (CommitSnapshot(candidate).HasErrored(out error))
         {
             FailedFileStamps[path] = new FileStamp(lastWriteTimeUtc, length);
+            FailedScriptsByPath[path] = new FailedScriptInfo(
+                candidate.FileName,
+                path,
+                error,
+                SnapshotsByPath.ContainsKey(path));
             Log.CompileError(candidate.FileName, error);
             Logger.Warn($"SER kept the last known-good version of script '{candidate.FileName}' active.");
             return new RefreshSummary(0, 0, 1);
         }
 
         FailedFileStamps.Remove(path);
+        FailedScriptsByPath.Remove(path);
         Logger.Debug(
             $"reloaded script '{candidate.FileName}'" +
             (
@@ -365,6 +476,7 @@ public static class ScriptCatalog
     private static string? RemoveSnapshot(string path)
     {
         FailedFileStamps.Remove(path);
+        FailedScriptsByPath.Remove(path);
         if (!SnapshotsByPath.TryGetValue(path, out var snapshot))
         {
             return null;

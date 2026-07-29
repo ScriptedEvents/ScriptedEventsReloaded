@@ -1,5 +1,6 @@
-﻿using CommandSystem;
+using CommandSystem;
 using LabApi.Features.Permissions;
+using SER.Code.FileSystem;
 using SER.Code.Plugin.Commands.Interfaces;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
@@ -17,28 +18,72 @@ public class RunCommand : ICommand, IUsePermissions
             response = "You do not have permission to run scripts.";
             return false;
         }
-        
+
         var name = arguments.FirstOrDefault();
-        
         if (name is null)
         {
-            response = "No script name provided.";
+            response = "No script name provided. Usage: serrun <script-name>.";
             return false;
         }
 
-        if (Script.CreateByScriptName(name, ScriptExecutor.Get(sender)).HasErrored(out var err, out var script))
+        var requestedName = ScriptName.CreateUnsafe(name);
+        var executor = ScriptExecutor.Get(sender);
+        var creation = Script.CreateByScriptName(name, executor);
+
+        if (creation.HasErrored(out var originalError, out var script))
         {
-            response = err;
-            return false;
+            var refresh = FileSystem.FileSystem.RefreshRequested(requestedName);
+            if (refresh.FileFound)
+            {
+                creation = Script.CreateByScriptName(name, executor);
+            }
+
+            if (creation.HasErrored(out var finalError, out script))
+            {
+                response = BuildFailureResponse(requestedName, refresh.FileFound, originalError, finalError);
+                return false;
+            }
         }
-        
+
         script.Run(RunReason.BaseCommand);
-        response = $"Script '{script.Name}' was requested to run";
+        response = $"Script '{script.Name}' was requested to run.";
         return true;
+    }
+
+    private static string BuildFailureResponse(
+        ScriptName requestedName,
+        bool fileFound,
+        string originalError,
+        string finalError)
+    {
+        if (ScriptCatalog.GetFailure(requestedName) is { } failure)
+        {
+            return $"SER found '{failure.Path}', but could not register it:\n{failure.Error}\n" +
+                   (failure.PreviousVersionActive
+                       ? "The previous accepted version remains active."
+                       : "No version of this script is active.");
+        }
+
+        FileSystem.FileSystem.ParseSectionSelector(requestedName, out var fileName, out _);
+        if (FileSystem.FileSystem.DuplicateScriptPaths.TryGetValue(fileName, out var conflicts))
+        {
+            return $"SER found multiple scripts named '{fileName}'. One name can identify only one script, " +
+                   "so none of them were registered:\n" +
+                   string.Join("\n", conflicts.Select(path => $"> {path}")) +
+                   "\nRename all but one file, run 'serreload', and try again.";
+        }
+
+        if (!fileFound)
+        {
+            return $"{originalError}\nSER also searched recursively for '{fileName}.ser' and " +
+                   $"'{fileName}.txt' in:\n{FileSystem.FileSystem.MainDirPath}";
+        }
+
+        return finalError;
     }
 
     public string Command => "serrun";
     public string[] Aliases => [];
-    public string Description => "Runs a specified script.";
+    public string Description => "Runs a script; newly added .ser or .txt files are discovered automatically.";
     public string Permission => "ser.run";
 }

@@ -24,7 +24,7 @@ public class Speaker_CreatePlayerAttachedMethod : SynchronousMethod, ICanError
     [
         new PlayerArgument("player to attach"),
         new TextArgument("speaker name"),
-        new FloatArgument("volume", 0f)
+        new FloatArgument("volume", 0f, preferPercent: true)
         {
             DefaultValue = new(1f, "100%"),
             Description = "The volume of the audio."

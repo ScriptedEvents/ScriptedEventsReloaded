@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
@@ -61,7 +62,7 @@ public static class ExampleHandler
     }
 
     [UsedImplicitly]
-    public static (string?, string[]) Verify()
+    public static (string?, string[]) Verify(string? projectDirectory = null)
     {
         var examples = GetAllExamples();
 
@@ -85,6 +86,11 @@ public static class ExampleHandler
                         examples.Keys.ToArray());
                 }
             }
+        }
+
+        if (VerifyDocumentationExamples(projectDirectory).HasErrored(out var documentationError))
+        {
+            return (documentationError, examples.Keys.ToArray());
         }
 
         var regressionScripts = new Dictionary<string, string>
@@ -215,5 +221,121 @@ public static class ExampleHandler
         }
 
         return (null, examples.Keys.ToArray());
+    }
+
+    private static Result VerifyDocumentationExamples(string? projectDirectory)
+    {
+        var documentationDirectory = !string.IsNullOrWhiteSpace(projectDirectory)
+            ? Path.Combine(projectDirectory, "docs")
+            : FindDocumentationDirectory();
+        if (documentationDirectory is null)
+        {
+            return new(false, "Documentation directory was not found from the build or assembly path.");
+        }
+
+        foreach (var filename in Directory.GetFiles(documentationDirectory, "*.md", SearchOption.AllDirectories))
+        {
+            var relativeFilename = filename[(documentationDirectory.Length + 1)..]
+                .Replace(Path.DirectorySeparatorChar, '/');
+            var blockNumber = 0;
+            var blockStartLine = 0;
+            var insideSerBlock = false;
+            var content = new StringBuilder();
+            var lineNumber = 0;
+
+            foreach (var line in File.ReadLines(filename))
+            {
+                lineNumber++;
+                var trimmedLine = line.Trim();
+
+                if (!insideSerBlock)
+                {
+                    if (!trimmedLine.Equals("```ser", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    insideSerBlock = true;
+                    blockNumber++;
+                    blockStartLine = lineNumber + 1;
+                    content.Clear();
+                    continue;
+                }
+
+                if (!trimmedLine.Equals("```", StringComparison.Ordinal))
+                {
+                    content.AppendLine(line);
+                    continue;
+                }
+
+                // Optional integrations are not loaded by every build configuration.
+                // Their snippets remain executable on matching servers, while the
+                // generated method manifest verifies that their API still exists.
+                if (content.ToString().TrimStart()
+                    .StartsWith("# requires ", StringComparison.OrdinalIgnoreCase))
+                {
+                    insideSerBlock = false;
+                    continue;
+                }
+
+                var snippetName = $"docs_{Path.GetFileNameWithoutExtension(filename)}_{blockNumber}";
+                if (ScriptSection.Split(snippetName, content.ToString(), filename)
+                    .HasErrored(out var splitError, out var sections))
+                {
+                    return new Result(false,
+                               $"while splitting SER block {blockNumber} in '{relativeFilename}' (line {blockStartLine})")
+                           + splitError.AsError();
+                }
+
+                foreach (var section in sections)
+                {
+                    if (Script.CreateByVerifiedSection(section, ScriptExecutor.Get())
+                        .Compile()
+                        .HasErrored(out var compileError))
+                    {
+                        return new Result(false,
+                                   $"in SER block {blockNumber} in '{relativeFilename}' (line {blockStartLine})")
+                               + compileError.AsError();
+                    }
+                }
+
+                insideSerBlock = false;
+            }
+
+            if (insideSerBlock)
+            {
+                return new(false,
+                    $"Unterminated SER block {blockNumber} in '{relativeFilename}' (line {blockStartLine - 1}).");
+            }
+        }
+
+        return new(true, string.Empty);
+    }
+
+    private static string? FindDocumentationDirectory()
+    {
+        var startingDirectories = new List<DirectoryInfo>
+        {
+            new(Directory.GetCurrentDirectory())
+        };
+        var assemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        if (!string.IsNullOrWhiteSpace(assemblyDirectory))
+        {
+            startingDirectories.Add(new(assemblyDirectory));
+        }
+
+        foreach (var startingDirectory in startingDirectories)
+        {
+            for (var directory = startingDirectory; directory is not null; directory = directory.Parent)
+            {
+                var candidate = Path.Combine(directory.FullName, "docs");
+                if (Directory.Exists(candidate) && File.Exists(Path.Combine(candidate, "SUMMARY.md")))
+                {
+                    return candidate;
+                }
+            }
+        }
+
+        return null;
     }
 }

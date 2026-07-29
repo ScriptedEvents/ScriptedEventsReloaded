@@ -1,6 +1,6 @@
-﻿using MEC;
+using LabApi.Features.Console;
+using MEC;
 using SER.Code.Exceptions;
-using SER.Code.Extensions;
 using SER.Code.Plugin;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
@@ -10,8 +10,8 @@ namespace SER.Code.Helpers;
 public static class BetterCoros
 {
     public static CoroutineHandle Run(
-        this IEnumerator<float> coro, 
-        Script? scr, 
+        this IEnumerator<float> coro,
+        Script? scr,
         Action<Exception>? onException = null,
         Action? onFinish = null
     )
@@ -25,8 +25,8 @@ public static class BetterCoros
     }
 
     private static IEnumerator<float> Wrapper(
-        IEnumerator<float> routine, 
-        Script? scr, 
+        IEnumerator<float> routine,
+        Script? scr,
         Action<Exception>? onException = null,
         Action? onFinish = null
     )
@@ -37,7 +37,7 @@ public static class BetterCoros
             {
                 yield return Timing.WaitForOneFrame;
             }
-            
+
             try
             {
                 if (!routine.MoveNext()) goto End;
@@ -60,14 +60,12 @@ public static class BetterCoros
             }
             catch (DeveloperFuckedUpException devErr)
             {
-                onException?.Invoke(devErr);
-                scr?.Error(devErr.Message + "\n" + devErr.StackTrace);
+                ReportInternalError(devErr, scr, onException);
                 goto End;
             }
             catch (Exception ex)
             {
-                onException?.Invoke(ex);
-                scr?.Error($"Coroutine failed with {ex.GetType().AccurateName}: {ex.Message}\n{ex.StackTrace}");
+                ReportInternalError(ex, scr, onException);
                 goto End;
             }
 
@@ -75,11 +73,25 @@ public static class BetterCoros
             {
                 goto End;
             }
-            
+
             yield return routine.Current;
         }
 
         End:
         onFinish?.Invoke();
+    }
+
+    private static void ReportInternalError(
+        Exception exception,
+        Script? script,
+        Action<Exception>? onException)
+    {
+        var errorId = Guid.NewGuid().ToString("N")[..8];
+        Log.Error($"SER internal error [{errorId}]\n{exception}");
+
+        var publicError = new CustomScriptRuntimeError(
+            $"Internal SER error [{errorId}]. Check the server console and report this identifier.");
+        onException?.Invoke(publicError);
+        script?.Error(publicError.Message);
     }
 }

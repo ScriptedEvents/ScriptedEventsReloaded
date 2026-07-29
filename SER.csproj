@@ -179,6 +179,7 @@
         <ParameterGroup>
             <AssemblyPath ParameterType="System.String" Required="true" />
             <ReferencePath ParameterType="System.String" Required="true" />
+            <ProjectDirectory ParameterType="System.String" Required="true" />
         </ParameterGroup>
         <Task>
             <Using Namespace="System" />
@@ -226,8 +227,12 @@ ResolveEventHandler resolver = (sender, args) =>
     try 
     {
         string fileName = new AssemblyName(args.Name).Name + ".dll";
-        string fullPath = Path.Combine(ReferencePath, fileName);
-        return File.Exists(fullPath) ? Assembly.LoadFrom(fullPath) : null;
+        string referencePath = Path.Combine(ReferencePath, fileName);
+        if (File.Exists(referencePath))
+            return Assembly.LoadFrom(referencePath);
+
+        string outputPath = Path.Combine(Path.GetDirectoryName(AssemblyPath), fileName);
+        return File.Exists(outputPath) ? Assembly.LoadFrom(outputPath) : null;
     }
     catch (Exception e) { Log.LogError("Resolver Error: " + e.Message); return null; }
 };
@@ -269,7 +274,7 @@ try
         }
 
         Log.LogMessage(MessageImportance.High, ">>> Validating Scripts...");
-        var (error, scripts) = ((string?, string[]))verifyMethod.Invoke(null, null);
+        var (error, scripts) = ((string?, string[]))verifyMethod.Invoke(null, [ProjectDirectory]);
 
         if (!string.IsNullOrEmpty(error))
         {
@@ -308,7 +313,11 @@ finally
     </UsingTask>
 
     <Target Name="RunValidation" AfterTargets="Build">
-        <RunDllValidation AssemblyPath="$(TargetPath)" ReferencePath="$(SL_DEV_REFERENCES)" />
+        <RunDllValidation
+            AssemblyPath="$(TargetPath)"
+            ReferencePath="$(SL_DEV_REFERENCES)"
+            ProjectDirectory="$(MSBuildProjectDirectory)"
+        />
     </Target>
 
     <!-- Keep the VS Code extension and its generated SER truth table in sync with the plugin build. -->

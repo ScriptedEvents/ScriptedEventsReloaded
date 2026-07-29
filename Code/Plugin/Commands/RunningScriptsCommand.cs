@@ -27,6 +27,7 @@ public class RunningScriptsCommand : ICommand, IUsePermissions
 
     public string Command => "serrunning";
     public string[] Aliases => [];
-    public string Description => "Returns a list of names of all running scripts.";
+    public string Description =>
+        "Lists scripts executing right now. Use 'serstatus' to inspect registered script files.";
     public string Permission => "ser.run";
 }

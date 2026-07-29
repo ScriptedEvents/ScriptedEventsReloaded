@@ -10,10 +10,15 @@ namespace SER.Code.FileSystem;
 
 public static class FileSystem
 {
+    public readonly record struct ExampleGenerationSummary(int Created, int AlreadyExisted, string DirectoryPath);
+
     public static readonly string MainDirPath = Path.Combine(PathManager.Configs.FullName, "Scripted Events Reloaded");
     public static readonly string DbDirPath = Path.Combine(MainDirPath, "Databases");
     public static readonly string ConfigsDirPath = Path.Combine(MainDirPath, "Custom Configs");
     public static string[] RegisteredScriptPaths = [];
+    public static string[] DisabledScriptPaths = [];
+    public static IReadOnlyDictionary<string, string[]> DuplicateScriptPaths { get; private set; } =
+        new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
 
     public static TryGet<string> GetContainedPath(string rootDirectory, string name, string extension)
     {
@@ -45,35 +50,44 @@ public static class FileSystem
         }
     }
 
-    public static void UpdateScriptPathCollection()
+    public static void UpdateScriptPathCollection(bool logDuplicateErrors = true)
     {
         List<string> paths = [];
         paths.AddRange(Directory.GetFiles(MainDirPath, "*.txt", SearchOption.AllDirectories));
         paths.AddRange(Directory.GetFiles(MainDirPath, "*.ser", SearchOption.AllDirectories));
-        
+
+        DisabledScriptPaths = paths
+            .Where(path => Path.GetFileName(path).StartsWith("#", StringComparison.Ordinal))
+            .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
         RegisteredScriptPaths = paths
             // ignore files with a pound sign at the start
-            .Where(path => Path.GetFileName(path).FirstOrDefault() != '#')
+            .Where(path => !Path.GetFileName(path).StartsWith("#", StringComparison.Ordinal))
             .ToArray();
-        
-        
-        var duplicates = RegisteredScriptPaths
-            .Select(Path.GetFileNameWithoutExtension)
-            .GroupBy(x => x, StringComparer.OrdinalIgnoreCase)
+
+        DuplicateScriptPaths = RegisteredScriptPaths
+            .GroupBy(Path.GetFileNameWithoutExtension, StringComparer.OrdinalIgnoreCase)
             .Where(g => g.Count() > 1)
-            .Select(g => (g.Key, g.Count()))
-            .ToList();
-        
-        if (!duplicates.Any()) return;
-        Logger.Error(
-            $"There are {string.Join(", ", duplicates.Select(d => $"{d.Item2} scripts named '{d.Key}'"))}\n" +
-            $"Please rename them to avoid conflicts."
-        );
-        
+            .ToDictionary(
+                group => group.Key,
+                group => group.OrderBy(path => path, StringComparer.OrdinalIgnoreCase).ToArray(),
+                StringComparer.OrdinalIgnoreCase);
+
+        foreach (var duplicate in DuplicateScriptPaths.Where(_ => logDuplicateErrors))
+        {
+            Logger.Error(
+                $"SER found {duplicate.Value.Length} scripts named '{duplicate.Key}'. " +
+                "Script names must be globally unique, so none of these files were loaded:\n" +
+                string.Join("\n", duplicate.Value.Select(path => $"> {path}")) +
+                "\nRename all but one of these files, then run 'serreload'."
+            );
+        }
+
+        if (DuplicateScriptPaths.Count == 0) return;
+
         RegisteredScriptPaths = RegisteredScriptPaths
-            .Where(path => !duplicates.Select(d => d.Key).Contains(
-                Path.GetFileNameWithoutExtension(path),
-                StringComparer.OrdinalIgnoreCase))
+            .Where(path => !DuplicateScriptPaths.ContainsKey(Path.GetFileNameWithoutExtension(path)))
             .ToArray();
     }
     
@@ -88,6 +102,9 @@ public static class FileSystem
     }
 
     public static ScriptCatalog.RefreshSummary RefreshAll(bool force = false) => ScriptCatalog.RefreshAll(force);
+
+    public static ScriptCatalog.RequestedRefreshResult RefreshRequested(ScriptName name) =>
+        ScriptCatalog.RefreshRequested(name);
 
     public static void Shutdown() => ScriptCatalog.Shutdown();
 
@@ -162,15 +179,21 @@ public static class FileSystem
             : name;
     }
 
-    public static void GenerateExamples()
+    public static ExampleGenerationSummary GenerateExamples()
     {
         var examples = ExampleHandler.GetAllExamples();
 
         var exampleDir = Directory.CreateDirectory(Path.Combine(MainDirPath, "Example Scripts"));
+        var created = 0;
+        var alreadyExisted = 0;
         foreach (var kvp in examples)
         {
             var path = Path.Combine(exampleDir.FullName, $"#{kvp.Key}.ser");
-            if (File.Exists(path)) continue;
+            if (File.Exists(path))
+            {
+                alreadyExisted++;
+                continue;
+            }
             
             string? directory = Path.GetDirectoryName(path);
             if (!string.IsNullOrEmpty(directory))
@@ -180,6 +203,9 @@ public static class FileSystem
             
             using var sw = File.CreateText(path);
             sw.Write(kvp.Value);
+            created++;
         }
+
+        return new ExampleGenerationSummary(created, alreadyExisted, exampleDir.FullName);
     }
 }

@@ -9,6 +9,7 @@ using SER.Code.Extensions;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.Helpers;
 using SER.Code.MethodSystem;
+using SER.Code.MethodSystem.BaseMethods;
 using SER.Code.MethodSystem.BaseMethods.Interfaces;
 using SER.Code.MethodSystem.Structures;
 using SER.Code.Plugin.Commands.HelpSystem;
@@ -30,6 +31,7 @@ public static class Builder
         try
         {
             SER.Code.EventSystem.EventHandler.Initialize();
+            SER.Code.EventSystem.EventHandler.LoadOptionalProjectMerEventsForTooling();
         }
         catch (Exception ex)
         {
@@ -39,8 +41,10 @@ public static class Builder
         var metadata = new
         {
             Events = SER.Code.EventSystem.EventHandler.AvailableEvents.Select(e => e.Name).Distinct().OrderBy(n => n).ToArray(),
-            EventDetails = GetEventDetails(),
-            Methods = MethodIndex.GetMethods().Select(m =>
+            EventDetails = GetEventDetails(SER.Code.EventSystem.EventHandler.AvailableEvents),
+            PMEREvents = SER.Code.EventSystem.EventHandler.AvailablePmerEvents.Select(e => e.Name).Distinct().OrderBy(n => n).ToArray(),
+            PMEREventDetails = GetEventDetails(SER.Code.EventSystem.EventHandler.AvailablePmerEvents),
+            Methods = GetToolingMethods().Select(m =>
             {
                 return new
                 {
@@ -966,8 +970,13 @@ public static class Builder
                                 if (flag.InlineArgument) {
                                     let input = block.appendDummyInput()
                                         .appendField(flag.InlineArgument.Name + ":");
-                                    if (flag.Name === "OnEvent" && metadata.Events) {
-                                        const eventOptions = metadata.Events.map(e => [e, e]);
+                                    const availableEvents = flag.Name === "OnEvent"
+                                        ? metadata.Events
+                                        : flag.Name === "OnPMER"
+                                            ? metadata.PMEREvents
+                                            : null;
+                                    if (availableEvents?.length) {
+                                        const eventOptions = availableEvents.map(e => [e, e]);
                                         input.appendField(new Blockly.FieldDropdown(eventOptions), "INLINE");
                                     } else {
                                         input.appendField(new Blockly.FieldTextInput(""), "INLINE");
@@ -985,9 +994,11 @@ public static class Builder
                                 this.setColour(290);
                                 this.setTooltip(() => {
                                     let tooltip = flag.Description.replace(/\n(?!\n)/g, '\n\n');
-                                    if (flag.Name === "OnEvent") {
+                                    if (flag.Name === "OnEvent" || flag.Name === "OnPMER") {
                                         const selectedEvent = block.getFieldValue("INLINE");
-                                        const eventDetails = metadata.EventDetails?.[selectedEvent];
+                                        const eventDetails = (flag.Name === "OnPMER"
+                                            ? metadata.PMEREventDetails
+                                            : metadata.EventDetails)?.[selectedEvent];
                                         if (eventDetails?.description) {
                                             tooltip += `\n\n${eventDetails.description}`;
                                         }
@@ -1582,9 +1593,9 @@ public static class Builder
         return descriptions.Count == 0 ? null : descriptions;
     }
 
-    private static Dictionary<string, object> GetEventDetails()
+    private static Dictionary<string, object> GetEventDetails(IEnumerable<EventInfo> availableEvents)
     {
-        return SER.Code.EventSystem.EventHandler.AvailableEvents
+        return availableEvents
             .GroupBy(eventInfo => eventInfo.Name)
             .OrderBy(group => group.Key)
             .ToDictionary(group => group.Key, object (group) =>
@@ -1613,9 +1624,16 @@ public static class Builder
             });
     }
 
+    private static IEnumerable<Method> GetToolingMethods()
+    {
+        return MethodIndex.GetMethods()
+            .Concat(MethodIndex.FrameworkDependentMethods.Values.SelectMany(methods => methods))
+            .Distinct();
+    }
+
     private static void CreateSerMethodInfo()
     {
-        var methods = MethodIndex.GetMethods().ToDictionary(m => m.Name, object (m) => new
+        var methods = GetToolingMethods().ToDictionary(m => m.Name, object (m) => new
         {
             syntax = $"{m.Name} " + string.Join(" ", m.ExpectedArguments.Select(GetArgumentSyntax)),
             description = m.Description,
@@ -1726,7 +1744,12 @@ public static class Builder
             .Select(eventInfo => eventInfo.Name)
             .Distinct()
             .OrderBy(name => name);
-        var eventDetails = GetEventDetails();
+        var eventDetails = GetEventDetails(SER.Code.EventSystem.EventHandler.AvailableEvents);
+        var pmerEvents = SER.Code.EventSystem.EventHandler.AvailablePmerEvents
+            .Select(eventInfo => eventInfo.Name)
+            .Distinct()
+            .OrderBy(name => name);
+        var pmerEventDetails = GetEventDetails(SER.Code.EventSystem.EventHandler.AvailablePmerEvents);
 
         var truthTable = new
         {
@@ -1736,7 +1759,9 @@ public static class Builder
             flags,
             variables,
             events,
-            eventDetails
+            eventDetails,
+            pmerEvents,
+            pmerEventDetails
         };
         var json = JsonConvert.SerializeObject(truthTable, Formatting.Indented);
         var content = $"const SER_TRUTH_TABLE = {json};{Environment.NewLine}{Environment.NewLine}" +

@@ -98,8 +98,8 @@ public class OnErrorStatement : StatementContext, IStatementExtender, IKeywordCo
             # In 90% of situations $type will be ScriptRuntimeError
             Print "Type of error: {$type}"
             
-            # This just shows where in the internal code (not the script) the error was made
-            # (basically to allow devs to know where in the code they may have fucked up)
+            # This shows where the error originated. Internal SER failures are
+            # replaced with a short identifier; full details stay in the server console.
             Print "Stack trace: {$stackTrace}"
         end
         """;

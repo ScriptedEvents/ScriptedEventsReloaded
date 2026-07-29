@@ -2,10 +2,12 @@
 
 public enum HelpOption
 {
+    Start,
     Methods,
     Variables,
     Enums,
     Events,
+    PmerEvents,
     Properties,
     Flags,
     Keywords

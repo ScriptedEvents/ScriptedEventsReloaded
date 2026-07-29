@@ -47,6 +47,12 @@ public class DocsCommand : ICommand, IUsePermissions
             eventSb.AppendLine(DocsProvider.GetEventInfo(@event));
             eventSb.AppendLine();
         }
+
+        foreach (var @event in EventSystem.EventHandler.AvailablePmerEvents)
+        {
+            eventSb.AppendLine(DocsProvider.GetEventInfo(@event));
+            eventSb.AppendLine();
+        }
         
         MakeDocFile("events", eventSb);
         
@@ -112,7 +118,7 @@ public class DocsCommand : ICommand, IUsePermissions
 
     private static StringBuilder GetBuilder()
     {
-        return new StringBuilder($"Genrated on [{DateTime.Today.ToLongDateString()}] with SER version [{MainPlugin.Instance.Version}]\n\n");
+        return new StringBuilder($"Generated on [{DateTime.Today.ToLongDateString()}] with SER version [{MainPlugin.Instance.Version}]\n\n");
     }
 
     private static void MakeDocFile(string type, StringBuilder content)

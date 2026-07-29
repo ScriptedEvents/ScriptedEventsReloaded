@@ -523,10 +523,10 @@ function flagCompletions(position, typedName) {
     return Object.entries(SER_TRUTH_TABLE.flags || {}).map(([name, flag]) => {
         const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Event);
         item.insertText = flag.inlineArgument ? `${name} ` : name;
-        if (name === 'OnEvent') {
+        if (name === 'OnEvent' || name === 'OnPMER') {
             item.command = {
                 command: 'editor.action.triggerSuggest',
-                title: 'Show SER events'
+                title: name === 'OnPMER' ? 'Show ProjectMER events' : 'Show SER events'
             };
         }
         item.filterText = name;
@@ -554,15 +554,18 @@ function flagArgumentCompletions(document, position, typedName) {
     });
 }
 
-function eventCompletions(position, typedName) {
+function eventCompletions(position, typedName, pmer = false) {
     const range = completionRange(position, typedName);
-    return (SER_TRUTH_TABLE.events || []).map(eventName => {
-        const details = SER_TRUTH_TABLE.eventDetails?.[eventName];
+    const events = pmer ? SER_TRUTH_TABLE.pmerEvents : SER_TRUTH_TABLE.events;
+    const eventDetails = pmer ? SER_TRUTH_TABLE.pmerEventDetails : SER_TRUTH_TABLE.eventDetails;
+    return (events || []).map(eventName => {
+        const details = eventDetails?.[eventName];
         const item = new vscode.CompletionItem(eventName, vscode.CompletionItemKind.Event);
         item.insertText = eventName;
         item.filterText = eventName;
         item.range = range;
-        item.detail = details?.group ? `SER event · ${details.group}` : 'SER event';
+        const source = pmer ? 'ProjectMER event' : 'SER event';
+        item.detail = details?.group ? `${source} · ${details.group}` : source;
         if (details) {
             let documentation = details.description ? `${escapeMarkdown(details.description)}\n\n` : '';
             if (details.eventDataType) {
@@ -764,9 +767,9 @@ async function provideCompletions(document, position) {
         }
     }
 
-    const eventMatch = linePrefix.match(/^\s*!--\s+OnEvent\s+([A-Za-z0-9_]*)$/);
+    const eventMatch = linePrefix.match(/^\s*!--\s+(OnEvent|OnPMER)\s+([A-Za-z0-9_]*)$/);
     if (eventMatch) {
-        return eventCompletions(position, eventMatch[1]);
+        return eventCompletions(position, eventMatch[2], eventMatch[1] === 'OnPMER');
     }
 
     const flagMatch = linePrefix.match(/^\s*!--\s*([A-Za-z0-9]*)$/);

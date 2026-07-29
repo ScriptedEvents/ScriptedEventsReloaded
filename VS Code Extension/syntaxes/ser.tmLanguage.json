@@ -24,7 +24,7 @@
     "flags": {
       "patterns": [
         {
-          "match": "^\\s*(!--)\\s+(OnEvent|OnCRole|InteractableToyEvent|OnCustomTrigger|CustomCommand|Function)(\\s*)",
+          "match": "^\\s*(!--)\\s+(OnEvent|OnPMER|OnCRole|InteractableToyEvent|OnCustomTrigger|CustomCommand|Function)(\\s*)",
           "captures": {
             "1": {"name": "keyword.control.ser"},
             "2": {"name": "keyword.control.ser"},

@@ -724,7 +724,7 @@
     },
     "Text.Trim": {
       "syntax": "Text.Trim \"text\"",
-      "description": "Trims the text value from whitspaces at the beginning and end.",
+      "description": "Trims whitespace from the beginning and end of a text value.",
       "subgroup": "Text",
       "essential": false,
       "additionalDescription": null,
@@ -4194,7 +4194,7 @@
       "description": "Creates a new grenade projectile to later spawn.",
       "subgroup": "Pickup",
       "essential": false,
-      "additionalDescription": "To spawn SCP-018, SCP-2176 or the grenades' unactivated versions, use the Pickup method. IMPORTANT: Northwood had a very bright idea of making the grenades not damage people when not provided with an attacker. In order to have the grenades kill anyone, you HAVE to provide an attacker. We know this is stupid, but for now we can't do anything about it.",
+      "additionalDescription": "To spawn SCP-018, SCP-2176 or the grenades' unactivated versions, use the Pickup method. Grenades require an attacker to deal damage, so this argument must identify a player.",
       "requiredFramework": null,
       "returns": "reference to Projectile object",
       "arguments": [
@@ -9495,7 +9495,7 @@
     },
     "RemoveDamageRule": {
       "syntax": "RemoveDamageRule \"id_to_remove\"?",
-      "description": "Removes a given damage rule fro applying.",
+      "description": "Prevents a given damage rule from applying.",
       "subgroup": "DamageRule",
       "essential": false,
       "additionalDescription": null,
@@ -11181,7 +11181,7 @@
       ]
     },
     "Audio.Play": {
-      "syntax": "Audio.Play \"speaker_name\" \"audio_clip_name\" loop??",
+      "syntax": "Audio.Play \"speaker_name\" \"audio_clip_name\" loop?",
       "description": "Plays a loaded audio clip from a created speaker.",
       "subgroup": "Audio",
       "essential": false,
@@ -11220,14 +11220,14 @@
           "options": null
         },
         {
-          "name": "loop?",
+          "name": "loop",
           "argumentKind": "BoolArgument",
           "mustBeProvided": false,
           "type": "bool (true or false) value",
           "description": null,
           "defaultValue": "False",
           "consumesRemainingValues": false,
-          "syntax": "loop??",
+          "syntax": "loop?",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,
@@ -11297,7 +11297,7 @@
           "name": "volume",
           "argumentKind": "FloatArgument",
           "mustBeProvided": false,
-          "type": "A number bigger or equal 0",
+          "type": "A number bigger or equal 0%",
           "description": "The volume of the audio.",
           "defaultValue": "100%",
           "consumesRemainingValues": false,
@@ -11414,7 +11414,7 @@
           "name": "volume",
           "argumentKind": "FloatArgument",
           "mustBeProvided": false,
-          "type": "A number bigger or equal 0",
+          "type": "A number bigger or equal 0%",
           "description": "The volume of the audio.",
           "defaultValue": "100%",
           "consumesRemainingValues": false,
@@ -11546,7 +11546,7 @@
           "name": "volume",
           "argumentKind": "FloatArgument",
           "mustBeProvided": false,
-          "type": "A number bigger or equal 0",
+          "type": "A number bigger or equal 0%",
           "description": "The volume of the audio.",
           "defaultValue": "100%",
           "consumesRemainingValues": false,
@@ -13022,6 +13022,2043 @@
         }
       ],
       "errors": []
+    },
+    "UCR.GetPlayersWithRole": {
+      "syntax": "UCR.GetPlayersWithRole role_id",
+      "description": "Gets all players who have a provided UCR role.",
+      "subgroup": "UCR",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": "UncomplicatedCustomRoles",
+      "returns": "player value",
+      "arguments": [
+        {
+          "name": "role id",
+          "argumentKind": "IntArgument",
+          "mustBeProvided": true,
+          "type": "Any whole number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "role_id",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "UCR.GetRole": {
+      "syntax": "UCR.GetRole @player",
+      "description": "Returns a reference to the UCR role a player has.",
+      "subgroup": "UCR",
+      "essential": false,
+      "additionalDescription": "Be sure to verify if the player has a role. The reference will be INVALID when the player doesn't have a role.",
+      "requiredFramework": "UncomplicatedCustomRoles",
+      "returns": "reference value",
+      "arguments": [
+        {
+          "name": "player",
+          "argumentKind": "PlayerArgument",
+          "mustBeProvided": true,
+          "type": "Player value e.g. @player, with EXACTLY 1 player.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "@player",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "UCR.SetRole": {
+      "syntax": "UCR.SetRole @player role_id",
+      "description": "Sets the UCR role of a player.",
+      "subgroup": "UCR",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": "UncomplicatedCustomRoles",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "player",
+          "argumentKind": "PlayerArgument",
+          "mustBeProvided": true,
+          "type": "Player value e.g. @player, with EXACTLY 1 player.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "@player",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "role id",
+          "argumentKind": "IntArgument",
+          "mustBeProvided": true,
+          "type": "Any whole number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "role_id",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "GetAmmoLimit": {
+      "syntax": "GetAmmoLimit @player_to_get_the_limit_from ammo_type",
+      "description": "Gets the player's limit on a certain ammunition type",
+      "subgroup": "Player",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": "Exiled",
+      "returns": "number value",
+      "arguments": [
+        {
+          "name": "player to get the limit from",
+          "argumentKind": "PlayerArgument",
+          "mustBeProvided": true,
+          "type": "Player value e.g. @player, with EXACTLY 1 player.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "@player_to_get_the_limit_from",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "ammo type",
+          "argumentKind": "EnumArgument`1",
+          "mustBeProvided": true,
+          "type": "AmmoType enum value - found using 'serhelp AmmoType' command",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "ammo_type",
+          "enumValues": [
+            "None",
+            "Nato556",
+            "Nato762",
+            "Nato9",
+            "Ammo12Gauge",
+            "Ammo44Cal"
+          ],
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "SetAmmoLimit": {
+      "syntax": "SetAmmoLimit @players_to_set_the_limit_to ammo_type limit",
+      "description": "Sets the players' limit on a certain ammunition type",
+      "subgroup": "Player",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": "Exiled",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "players to set the limit to",
+          "argumentKind": "PlayersArgument",
+          "mustBeProvided": true,
+          "type": "Player variable (e.g. @all, @classDPlayers)",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "@players_to_set_the_limit_to",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "ammo type",
+          "argumentKind": "EnumArgument`1",
+          "mustBeProvided": true,
+          "type": "AmmoType enum value - found using 'serhelp AmmoType' command",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "ammo_type",
+          "enumValues": [
+            "None",
+            "Nato556",
+            "Nato762",
+            "Nato9",
+            "Ammo12Gauge",
+            "Ammo44Cal"
+          ],
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "limit",
+          "argumentKind": "IntArgument",
+          "mustBeProvided": true,
+          "type": "A whole number between 0 and 65535 (inclusive)",
+          "description": "The min and max are there so the whole thing doesn't crash from int -> ushort conversion :trollface:",
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "limit",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "SetAppearance": {
+      "syntax": "SetAppearance @players_whose_appearance_will_be_changed role_to_change_appearance_to @players_who_will_see_the_change?",
+      "description": "Changes the appearance of a player (or reskins)",
+      "subgroup": "Player",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": "Exiled",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "players whose appearance will be changed",
+          "argumentKind": "PlayersArgument",
+          "mustBeProvided": true,
+          "type": "Player variable (e.g. @all, @classDPlayers)",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "@players_whose_appearance_will_be_changed",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "role to change appearance to",
+          "argumentKind": "EnumArgument`1",
+          "mustBeProvided": true,
+          "type": "RoleTypeId enum value - found using 'serhelp RoleTypeId' command",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "role_to_change_appearance_to",
+          "enumValues": [
+            "Scp173",
+            "ClassD",
+            "Spectator",
+            "Scp106",
+            "NtfSpecialist",
+            "Scp049",
+            "Scientist",
+            "Scp079",
+            "ChaosConscript",
+            "Scp096",
+            "Scp0492",
+            "NtfSergeant",
+            "NtfCaptain",
+            "NtfPrivate",
+            "Tutorial",
+            "FacilityGuard",
+            "Scp939",
+            "CustomRole",
+            "ChaosRifleman",
+            "ChaosMarauder",
+            "ChaosRepressor",
+            "Overwatch",
+            "Filmmaker",
+            "Scp3114",
+            "Destroyed",
+            "Flamingo",
+            "AlphaFlamingo",
+            "ZombieFlamingo",
+            "NtfFlamingo",
+            "ChaosFlamingo",
+            "None"
+          ],
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "players who will see the change",
+          "argumentKind": "PlayersArgument",
+          "mustBeProvided": false,
+          "type": "Player variable (e.g. @all, @classDPlayers)",
+          "description": null,
+          "defaultValue": "everyone",
+          "consumesRemainingValues": false,
+          "syntax": "@players_who_will_see_the_change?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "MER.LoadMap": {
+      "syntax": "MER.LoadMap \"map_name\"",
+      "description": "Loads a MER map.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "map name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"map_name\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The map does not exist, is invalid, or ProjectMER failed to spawn it."
+      ]
+    },
+    "MER.UnloadMap": {
+      "syntax": "MER.UnloadMap \"map_name\"",
+      "description": "Unloads a MER map.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Returns true when the map was loaded.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": "bool value",
+      "arguments": [
+        {
+          "name": "map name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"map_name\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "MER.SaveMap": {
+      "syntax": "MER.SaveMap \"map_name\"",
+      "description": "Saves a MER map.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "MER merges Untitled into the target, reloads it, and clears Untitled.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "map name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"map_name\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The map could not be serialized or written.",
+        "The reserved Untitled name was provided."
+      ]
+    },
+    "MER.MergeMaps": {
+      "syntax": "MER.MergeMaps \"output_map_name\" \"input_map_names\"...",
+      "description": "Merges MER maps.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Provide an output name followed by at least two input map names.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "output map name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"output_map_name\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "input map names",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": true,
+          "syntax": "\"input_map_names\"...",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "Fewer than two input maps were provided.",
+        "An input map does not exist or is invalid.",
+        "The output map could not be written."
+      ]
+    },
+    "MER.GetAvailableMaps": {
+      "syntax": "MER.GetAvailableMaps ",
+      "description": "Lists available MER maps.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": "collection of text value",
+      "arguments": [],
+      "errors": []
+    },
+    "MER.GetAvailableSchematics": {
+      "syntax": "MER.GetAvailableSchematics ",
+      "description": "Lists available MER schematics.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": "collection of text value",
+      "arguments": [],
+      "errors": []
+    },
+    "MER.GetLoadedMaps": {
+      "syntax": "MER.GetLoadedMaps ",
+      "description": "Lists loaded MER maps.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Each reference exposes name and object; object is the actual MER map.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": "collection of reference to MERMap object",
+      "arguments": [],
+      "errors": []
+    },
+    "MER.GetLoadedMap": {
+      "syntax": "MER.GetLoadedMap \"map_name\"",
+      "description": "Gets a loaded MER map.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "The returned reference exposes name and object; object is the actual MER map.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": "reference to MERMap object",
+      "arguments": [
+        {
+          "name": "map name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"map_name\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The requested map is not loaded."
+      ]
+    },
+    "MER.ReadMapData": {
+      "syntax": "MER.ReadMapData \"map_name\"",
+      "description": "Reads a MER map file.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Returns a detached map reference; it is not spawned or added to loaded maps.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": "reference to MERMap object",
+      "arguments": [
+        {
+          "name": "map name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"map_name\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The requested map file does not exist or is invalid."
+      ]
+    },
+    "MER.GetObjects": {
+      "syntax": "MER.GetObjects object_type? \"map_name\" \"object_ID\"?",
+      "description": "Gets MER map objects.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "An empty ID and the any type match every object. Each reference exposes mapName, id, type, object, and definition.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": "collection of reference to MERObject object",
+      "arguments": [
+        {
+          "name": "object type",
+          "argumentKind": "OptionsArgument",
+          "mustBeProvided": false,
+          "type": "One of the following options:\n > any (Matches every object type)\n > schematic\n > primitive\n > light\n > door\n > workstation\n > itemSpawnpoint\n > playerSpawnpoint\n > capybara\n > text\n > scp079Camera\n > shootingTarget\n > locker\n > teleport\n > interactable\n > waypoint",
+          "description": null,
+          "defaultValue": "any",
+          "consumesRemainingValues": false,
+          "syntax": "object_type?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": [
+            {
+              "value": "any",
+              "description": "Matches every object type"
+            },
+            {
+              "value": "schematic",
+              "description": ""
+            },
+            {
+              "value": "primitive",
+              "description": ""
+            },
+            {
+              "value": "light",
+              "description": ""
+            },
+            {
+              "value": "door",
+              "description": ""
+            },
+            {
+              "value": "workstation",
+              "description": ""
+            },
+            {
+              "value": "itemSpawnpoint",
+              "description": ""
+            },
+            {
+              "value": "playerSpawnpoint",
+              "description": ""
+            },
+            {
+              "value": "capybara",
+              "description": ""
+            },
+            {
+              "value": "text",
+              "description": ""
+            },
+            {
+              "value": "scp079Camera",
+              "description": ""
+            },
+            {
+              "value": "shootingTarget",
+              "description": ""
+            },
+            {
+              "value": "locker",
+              "description": ""
+            },
+            {
+              "value": "teleport",
+              "description": ""
+            },
+            {
+              "value": "interactable",
+              "description": ""
+            },
+            {
+              "value": "waypoint",
+              "description": ""
+            }
+          ]
+        },
+        {
+          "name": "map name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"map_name\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "object ID",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": false,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": "all IDs",
+          "consumesRemainingValues": false,
+          "syntax": "\"object_ID\"?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "MER.GetObjectDefinition": {
+      "syntax": "MER.GetObjectDefinition \"object_ID\" \"map_name\"",
+      "description": "Gets a MER object definition.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "The reference exposes mapName, id, type, and object. Definition properties are forwarded and refreshed after writes.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": "reference to MERObjectDefinition object",
+      "arguments": [
+        {
+          "name": "object ID",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"object_ID\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "map name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"map_name\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The map is not loaded.",
+        "The object ID does not exist in the map."
+      ]
+    },
+    "MER.CreateObject": {
+      "syntax": "MER.CreateObject object_type x_position y_position z_position \"map_name\"? \"object_ID\"? \"schematic_name\"?",
+      "description": "Creates a MER map object.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "The position is absolute. Definition properties are forwarded and refreshed after writes.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": "reference to MERObjectDefinition object",
+      "arguments": [
+        {
+          "name": "object type",
+          "argumentKind": "OptionsArgument",
+          "mustBeProvided": true,
+          "type": "One of the following options:\n > schematic\n > primitive\n > light\n > door\n > workstation\n > itemSpawnpoint\n > playerSpawnpoint\n > capybara\n > text\n > scp079Camera\n > shootingTarget\n > locker\n > teleport\n > interactable\n > waypoint",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "object_type",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": [
+            {
+              "value": "schematic",
+              "description": ""
+            },
+            {
+              "value": "primitive",
+              "description": ""
+            },
+            {
+              "value": "light",
+              "description": ""
+            },
+            {
+              "value": "door",
+              "description": ""
+            },
+            {
+              "value": "workstation",
+              "description": ""
+            },
+            {
+              "value": "itemSpawnpoint",
+              "description": ""
+            },
+            {
+              "value": "playerSpawnpoint",
+              "description": ""
+            },
+            {
+              "value": "capybara",
+              "description": ""
+            },
+            {
+              "value": "text",
+              "description": ""
+            },
+            {
+              "value": "scp079Camera",
+              "description": ""
+            },
+            {
+              "value": "shootingTarget",
+              "description": ""
+            },
+            {
+              "value": "locker",
+              "description": ""
+            },
+            {
+              "value": "teleport",
+              "description": ""
+            },
+            {
+              "value": "interactable",
+              "description": ""
+            },
+            {
+              "value": "waypoint",
+              "description": ""
+            }
+          ]
+        },
+        {
+          "name": "x position",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "x_position",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "y position",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "y_position",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "z position",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "z_position",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "map name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": false,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": "Untitled",
+          "consumesRemainingValues": false,
+          "syntax": "\"map_name\"?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "object ID",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": false,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": "automatically generated",
+          "consumesRemainingValues": false,
+          "syntax": "\"object_ID\"?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "schematic name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": false,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": "Used only when object type is schematic.",
+          "defaultValue": "none",
+          "consumesRemainingValues": false,
+          "syntax": "\"schematic_name\"?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The object type or schematic name is invalid.",
+        "The object ID already exists.",
+        "ProjectMER failed to spawn the object."
+      ]
+    },
+    "MER.DeleteObject": {
+      "syntax": "MER.DeleteObject *MER_object_reference",
+      "description": "Deletes a MER map object.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Deletes the definition and every spawned copy.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "MER object reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to IMerObjectReference object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*MER_object_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The referenced map or object no longer exists."
+      ]
+    },
+    "MER.RenameObject": {
+      "syntax": "MER.RenameObject *MER_object_reference \"new_object_ID\"",
+      "description": "Renames a MER map object.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Reloads the map and returns a replacement definition reference.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": "reference to MERObjectDefinition object",
+      "arguments": [
+        {
+          "name": "MER object reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to IMerObjectReference object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*MER_object_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "new object ID",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"new_object_ID\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The old object no longer exists.",
+        "The new object ID is already used."
+      ]
+    },
+    "MER.MoveObjectToMap": {
+      "syntax": "MER.MoveObjectToMap *MER_object_reference \"new_map_name\" \"new_object_ID\"?",
+      "description": "Moves a MER map object.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Reloads affected maps and returns a replacement definition reference.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": "reference to MERObjectDefinition object",
+      "arguments": [
+        {
+          "name": "MER object reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to IMerObjectReference object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*MER_object_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "new map name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"new_map_name\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "new object ID",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": false,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": "keep current ID",
+          "consumesRemainingValues": false,
+          "syntax": "\"new_object_ID\"?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The source object no longer exists.",
+        "The destination already contains the requested ID."
+      ]
+    },
+    "MER.RefreshObject": {
+      "syntax": "MER.RefreshObject *MER_object_reference",
+      "description": "Refreshes a MER map object.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Properties that require reloading destroy and recreate the runtime object after a short MER delay. Fetch a new object reference afterward.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "MER object reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to IMerObjectReference object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*MER_object_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The referenced map or object no longer exists."
+      ]
+    },
+    "MER.SetPosition": {
+      "syntax": "MER.SetPosition *MER_reference mode x_position y_position z_position",
+      "description": "Sets a MER object position.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Map object changes are refreshed automatically. Some changes can invalidate the old runtime reference.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "MER reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to IMerReference object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*MER_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "mode",
+          "argumentKind": "OptionsArgument",
+          "mustBeProvided": true,
+          "type": "One of the following options:\n > set\n > add",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "mode",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": [
+            {
+              "value": "set",
+              "description": ""
+            },
+            {
+              "value": "add",
+              "description": ""
+            }
+          ]
+        },
+        {
+          "name": "x position",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "x_position",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "y position",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "y_position",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "z position",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "z_position",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The reference does not represent a map object, definition, or standalone schematic."
+      ]
+    },
+    "MER.SetRotation": {
+      "syntax": "MER.SetRotation *MER_reference mode x_rotation y_rotation z_rotation",
+      "description": "Sets a MER object rotation.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Map object changes are refreshed automatically. Some changes can invalidate the old runtime reference.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "MER reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to IMerReference object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*MER_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "mode",
+          "argumentKind": "OptionsArgument",
+          "mustBeProvided": true,
+          "type": "One of the following options:\n > set\n > add",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "mode",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": [
+            {
+              "value": "set",
+              "description": ""
+            },
+            {
+              "value": "add",
+              "description": ""
+            }
+          ]
+        },
+        {
+          "name": "x rotation",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "x_rotation",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "y rotation",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "y_rotation",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "z rotation",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "z_rotation",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The reference does not represent a map object, definition, or standalone schematic."
+      ]
+    },
+    "MER.SetScale": {
+      "syntax": "MER.SetScale *MER_reference mode x_scale y_scale z_scale",
+      "description": "Sets a MER object scale.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Map object changes are refreshed automatically. Some changes can invalidate the old runtime reference.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "MER reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to IMerReference object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*MER_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "mode",
+          "argumentKind": "OptionsArgument",
+          "mustBeProvided": true,
+          "type": "One of the following options:\n > set\n > add",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "mode",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": [
+            {
+              "value": "set",
+              "description": ""
+            },
+            {
+              "value": "add",
+              "description": ""
+            }
+          ]
+        },
+        {
+          "name": "x scale",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "x_scale",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "y scale",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "y_scale",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "z scale",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "z_scale",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The reference does not represent a map object, definition, or standalone schematic."
+      ]
+    },
+    "MER.SpawnSchematic": {
+      "syntax": "MER.SpawnSchematic \"schematic_name\" x_position y_position z_position x_rotation? y_rotation? z_rotation? x_scale? y_scale? z_scale?",
+      "description": "Spawns a MER schematic.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "The returned reference exposes name and object; object is the actual schematic.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": "reference to MERSchematic object",
+      "arguments": [
+        {
+          "name": "schematic name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"schematic_name\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "x position",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "x_position",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "y position",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "y_position",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "z position",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": true,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "z_position",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "x rotation",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": false,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": "0",
+          "consumesRemainingValues": false,
+          "syntax": "x_rotation?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "y rotation",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": false,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": "0",
+          "consumesRemainingValues": false,
+          "syntax": "y_rotation?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "z rotation",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": false,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": "0",
+          "consumesRemainingValues": false,
+          "syntax": "z_rotation?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "x scale",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": false,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": "1",
+          "consumesRemainingValues": false,
+          "syntax": "x_scale?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "y scale",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": false,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": "1",
+          "consumesRemainingValues": false,
+          "syntax": "y_scale?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "z scale",
+          "argumentKind": "FloatArgument",
+          "mustBeProvided": false,
+          "type": "Any number",
+          "description": null,
+          "defaultValue": "1",
+          "consumesRemainingValues": false,
+          "syntax": "z_scale?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The schematic does not exist, is invalid, or ProjectMER cancelled its spawning event."
+      ]
+    },
+    "MER.DestroySchematic": {
+      "syntax": "MER.DestroySchematic *schematic_reference",
+      "description": "Destroys a MER schematic.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Only standalone schematic references are accepted.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "schematic reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to MERSchematic object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*schematic_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The schematic was already destroyed or the reference is invalid."
+      ]
+    },
+    "MER.GetSchematicBlocks": {
+      "syntax": "MER.GetSchematicBlocks *schematic_reference",
+      "description": "Gets MER schematic blocks.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Each reference exposes schematicName, index, name, and object; object is the block GameObject.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": "collection of reference to MERSchematicBlock object",
+      "arguments": [
+        {
+          "name": "schematic reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to MERSchematic object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*schematic_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The schematic reference is no longer valid."
+      ]
+    },
+    "MER.GetAnimators": {
+      "syntax": "MER.GetAnimators *schematic_reference",
+      "description": "Gets MER schematic animators.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Each reference exposes schematicName, index, name, and object; object is the Unity animator.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": "collection of reference to MERAnimator object",
+      "arguments": [
+        {
+          "name": "schematic reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to MERSchematic object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*schematic_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The schematic reference is no longer valid."
+      ]
+    },
+    "MER.PlayAnimation": {
+      "syntax": "MER.PlayAnimation *schematic_reference \"state_name\" animator_index? \"animator_name\"?",
+      "description": "Plays a MER animation.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Select the animator by name or one-based index.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "schematic reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to MERSchematic object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*schematic_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "state name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"state_name\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "animator index",
+          "argumentKind": "IntArgument",
+          "mustBeProvided": false,
+          "type": "A whole number bigger or equal 1",
+          "description": null,
+          "defaultValue": "1",
+          "consumesRemainingValues": false,
+          "syntax": "animator_index?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "animator name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": false,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": "use animator index",
+          "consumesRemainingValues": false,
+          "syntax": "\"animator_name\"?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The schematic is invalid.",
+        "The animator index is out of range or its name was not found.",
+        "The requested state or parameter does not exist."
+      ]
+    },
+    "MER.SetAnimationState": {
+      "syntax": "MER.SetAnimationState *schematic_reference \"parameter_name\" state animator_index?",
+      "description": "Sets a MER animation bool.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "The animator index is one-based.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "schematic reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to MERSchematic object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*schematic_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "parameter name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"parameter_name\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "state",
+          "argumentKind": "BoolArgument",
+          "mustBeProvided": true,
+          "type": "bool (true or false) value",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "state",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "animator index",
+          "argumentKind": "IntArgument",
+          "mustBeProvided": false,
+          "type": "A whole number bigger or equal 1",
+          "description": null,
+          "defaultValue": "1",
+          "consumesRemainingValues": false,
+          "syntax": "animator_index?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The schematic is invalid.",
+        "The animator index is out of range or its name was not found.",
+        "The requested state or parameter does not exist."
+      ]
+    },
+    "MER.StopAnimation": {
+      "syntax": "MER.StopAnimation *schematic_reference animator_index? \"animator_name\"?",
+      "description": "Stops a MER animation.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Select the animator by name or one-based index.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "schematic reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to MERSchematic object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*schematic_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "animator index",
+          "argumentKind": "IntArgument",
+          "mustBeProvided": false,
+          "type": "A whole number bigger or equal 1",
+          "description": null,
+          "defaultValue": "1",
+          "consumesRemainingValues": false,
+          "syntax": "animator_index?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "animator name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": false,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": "use animator index",
+          "consumesRemainingValues": false,
+          "syntax": "\"animator_name\"?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The schematic is invalid.",
+        "The animator index is out of range or its name was not found.",
+        "The requested state or parameter does not exist."
+      ]
+    },
+    "MER.ShowSchematic": {
+      "syntax": "MER.ShowSchematic @players *schematic_reference",
+      "description": "Shows a MER schematic.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Sends spawn messages only to the specified players; visibility is transient.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "players",
+          "argumentKind": "PlayersArgument",
+          "mustBeProvided": true,
+          "type": "Player variable (e.g. @all, @classDPlayers)",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "@players",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "schematic reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to MERSchematic object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*schematic_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The schematic reference is no longer valid.",
+        "A player's connection is not available."
+      ]
+    },
+    "MER.HideSchematic": {
+      "syntax": "MER.HideSchematic @players *schematic_reference",
+      "description": "Hides a MER schematic.",
+      "subgroup": "MER",
+      "essential": false,
+      "additionalDescription": "Sends destroy messages only to the specified players; visibility is transient.",
+      "requiredFramework": "ProjectMapEditorReborn",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "players",
+          "argumentKind": "PlayersArgument",
+          "mustBeProvided": true,
+          "type": "Player variable (e.g. @all, @classDPlayers)",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "@players",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "schematic reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to MERSchematic object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*schematic_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The schematic reference is no longer valid.",
+        "A player's connection is not available."
+      ]
+    },
+    "Vote.CreateOption": {
+      "syntax": "Vote.CreateOption option \"display_text\"",
+      "description": "Creates a vote option, which can be used in a vote.",
+      "subgroup": "Callvote",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": "Callvote",
+      "returns": "reference to VoteOption object",
+      "arguments": [
+        {
+          "name": "option",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Text with no spaces e.g. someValue (quotes are not required)",
+          "description": "This will be the command for voting AND the result of the vote, if it wins.",
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "option",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "display text",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": "The description of the option.",
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"display_text\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "Vote.StartAndWait": {
+      "syntax": "Vote.StartAndWait \"question\" @player_asking? *options...",
+      "description": "Starts a vote and waits until it is completed.",
+      "subgroup": "Callvote",
+      "essential": false,
+      "additionalDescription": "It also returns the option key that won. If it was a tie, \"tie\" will be returned.",
+      "requiredFramework": "Callvote",
+      "returns": "text value",
+      "arguments": [
+        {
+          "name": "question",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"question\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "player asking",
+          "argumentKind": "PlayerArgument",
+          "mustBeProvided": false,
+          "type": "Player value e.g. @player, with EXACTLY 1 player.",
+          "description": "Use _ if there isnt a specific player asking the question.",
+          "defaultValue": "general question",
+          "consumesRemainingValues": false,
+          "syntax": "@player_asking?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "options",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to VoteOption object.",
+          "description": "The options for the vote.",
+          "defaultValue": null,
+          "consumesRemainingValues": true,
+          "syntax": "*options...",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "Vote.Start": {
+      "syntax": "Vote.Start \"question\" @player_asking? *options...",
+      "description": "Starts a vote.",
+      "subgroup": "Callvote",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": "Callvote",
+      "returns": null,
+      "arguments": [
+        {
+          "name": "question",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"question\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "player asking",
+          "argumentKind": "PlayerArgument",
+          "mustBeProvided": false,
+          "type": "Player value e.g. @player, with EXACTLY 1 player.",
+          "description": "Use _ if there isnt a specific player asking the question.",
+          "defaultValue": "general question",
+          "consumesRemainingValues": false,
+          "syntax": "@player_asking?",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "options",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to VoteOption object.",
+          "description": "The options for the vote.",
+          "defaultValue": null,
+          "consumesRemainingValues": true,
+          "syntax": "*options...",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
     }
   },
   "keywords": {
@@ -13164,7 +15201,7 @@
       "syntax": "on_error",
       "description": "Catches an exception thrown inside of an 'attempt' statement.",
       "arguments": [],
-      "example": "&collection = Coll.Empty\r\nattempt\r\n    Print {Coll.Fetch &collection 2}\r\n    # ERROR: there's nothing at index 2\r\n    \r\n    Print \"Hello, world!\"\r\n    # ^ won't get executed because 'attempt' skips the remaining code\r\n    # inside of it if an error was made\r\n    \r\non_error with $message $type $stackTrace\r\n    # this will print the error message\r\n    Print \"Error: {$message}\"\r\n    \r\n    # In 90% of situations $type will be ScriptRuntimeError\r\n    Print \"Type of error: {$type}\"\r\n    \r\n    # This just shows where in the internal code (not the script) the error was made\r\n    # (basically to allow devs to know where in the code they may have fucked up)\r\n    Print \"Stack trace: {$stackTrace}\"\r\nend",
+      "example": "&collection = Coll.Empty\r\nattempt\r\n    Print {Coll.Fetch &collection 2}\r\n    # ERROR: there's nothing at index 2\r\n    \r\n    Print \"Hello, world!\"\r\n    # ^ won't get executed because 'attempt' skips the remaining code\r\n    # inside of it if an error was made\r\n    \r\non_error with $message $type $stackTrace\r\n    # this will print the error message\r\n    Print \"Error: {$message}\"\r\n    \r\n    # In 90% of situations $type will be ScriptRuntimeError\r\n    Print \"Type of error: {$type}\"\r\n    \r\n    # This shows where the error originated. Internal SER failures are\n    # replaced with a short identifier; full details stay in the server console.\n    Print \"Stack trace: {$stackTrace}\"\r\nend",
       "isStatement": true,
       "extendsSignal": "ThrewException",
       "allowedSignals": null
@@ -13440,6 +15477,24 @@
           "description": "A list of variables that have to be present in order for this script to execute.",
           "required": false,
           "example": "-- require @evPlayer *evItem"
+        }
+      ]
+    },
+    "OnPMER": {
+      "syntax": "!-- OnPMER eventName",
+      "description": "Binds a script to a ProjectMER event when ProjectMER is installed.\nEvent properties are provided as ev variables, and ProjectMER schematics\nare exposed as SER schematic references.\nFind supported events using the 'serhelp pmerevents' command.",
+      "inlineArgument": {
+        "name": "eventName",
+        "description": "The name of the ProjectMER event to bind to.",
+        "required": true,
+        "example": "!-- OnPMER SchematicSpawned"
+      },
+      "arguments": [
+        {
+          "name": "require",
+          "description": "A list of variables that have to be present in order for this script to execute.",
+          "required": false,
+          "example": "-- require *evSchematic"
         }
       ]
     }
@@ -23513,6 +25568,105 @@
           "name": "$evNewZone",
           "type": "FacilityZone enum value",
           "description": "Gets the new zone. May be None if the player went into void, died and such."
+        }
+      ]
+    }
+  },
+  "pmerEvents": [
+    "ButtonInteracted",
+    "SchematicDestroyed",
+    "SchematicSpawned",
+    "SchematicSpawning"
+  ],
+  "pmerEventDetails": {
+    "ButtonInteracted": {
+      "description": null,
+      "group": "Schematic",
+      "eventDataType": "ButtonInteractedEventArgs",
+      "eventDataDescription": null,
+      "isCancellable": false,
+      "variables": [
+        {
+          "name": "*evButton",
+          "type": "reference to Pickup object",
+          "description": null
+        },
+        {
+          "name": "*evPickup",
+          "type": "reference to Pickup object",
+          "description": null
+        },
+        {
+          "name": "@evPlayer",
+          "type": "player value",
+          "description": null
+        },
+        {
+          "name": "*evSchematic",
+          "type": "reference to MERSchematic object",
+          "description": null
+        }
+      ]
+    },
+    "SchematicDestroyed": {
+      "description": null,
+      "group": "Schematic",
+      "eventDataType": "SchematicDestroyedEventArgs",
+      "eventDataDescription": null,
+      "isCancellable": false,
+      "variables": [
+        {
+          "name": "*evSchematic",
+          "type": "reference to MERSchematic object",
+          "description": null
+        },
+        {
+          "name": "$evName",
+          "type": "text value",
+          "description": null
+        }
+      ]
+    },
+    "SchematicSpawned": {
+      "description": null,
+      "group": "Schematic",
+      "eventDataType": "SchematicSpawnedEventArgs",
+      "eventDataDescription": null,
+      "isCancellable": false,
+      "variables": [
+        {
+          "name": "*evSchematic",
+          "type": "reference to MERSchematic object",
+          "description": null
+        },
+        {
+          "name": "$evName",
+          "type": "text value",
+          "description": null
+        }
+      ]
+    },
+    "SchematicSpawning": {
+      "description": null,
+      "group": "Schematic",
+      "eventDataType": "SchematicSpawningEventArgs",
+      "eventDataDescription": null,
+      "isCancellable": true,
+      "variables": [
+        {
+          "name": "*evData",
+          "type": "reference to SchematicObjectDataList object",
+          "description": null
+        },
+        {
+          "name": "$evName",
+          "type": "text value",
+          "description": null
+        },
+        {
+          "name": "$evIsAllowed",
+          "type": "bool value",
+          "description": null
         }
       ]
     }

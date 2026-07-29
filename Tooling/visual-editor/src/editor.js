@@ -1535,7 +1535,7 @@
       elements.codeOutput.value,
       "text/plain;charset=utf-8"
     );
-    showToast("Downloaded a real .ser script.");
+    showToast("Downloaded. Put it in the SER script directory, then run serrun or serreload.");
   });
 
   elements.scriptName.addEventListener("input", scheduleAutosave);

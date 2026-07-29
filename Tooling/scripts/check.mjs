@@ -43,6 +43,10 @@ const manifest = readGeneratedManifest(files.manifest);
 const extensionManifest = readGeneratedManifest(files.extensionManifest);
 assert.deepEqual(extensionManifest, manifest, "The extension manifest is out of sync with SER.");
 assert.ok(Object.keys(manifest.methods).length > 0, "The manifest contains no methods.");
+assert.ok(
+  Object.values(manifest.methods).some(method => method.requiredFramework),
+  "The manifest contains no optional-framework methods."
+);
 assert.ok(Object.keys(manifest.keywords).length > 0, "The manifest contains no keywords.");
 assert.ok(Object.keys(manifest.flags).length > 0, "The manifest contains no flags.");
 

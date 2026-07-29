@@ -240,7 +240,7 @@
           message: "A required block input is still empty."
         });
       }
-      if (/^\s*!--\s+(CustomCommand|OnCustomTrigger|OnCRole)\s*$/.test(line)) {
+      if (/^\s*!--\s+(CustomCommand|OnCustomTrigger|OnCRole|OnPMER)\s*$/.test(line)) {
         diagnostics.push({
           severity: "error",
           code: "missing-flag-argument",

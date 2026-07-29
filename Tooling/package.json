@@ -5,7 +5,8 @@
   "description": "Shared language tooling for the SER visual editor and VS Code extension",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "node scripts/check.mjs",
+    "check": "node scripts/check.mjs && node scripts/check-docs.mjs",
+    "check:docs": "node scripts/check-docs.mjs",
     "test": "node --test tests/*.test.mjs",
     "verify": "npm run build && npm run check && npm test"
   },

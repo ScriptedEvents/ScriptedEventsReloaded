@@ -245,14 +245,15 @@ button:disabled {
   min-width: 0;
   min-height: 0;
   display: grid;
-  grid-template-rows: auto minmax(190px, 1fr) auto;
+  grid-template-rows: auto minmax(170px, 1fr) auto auto;
   overflow: hidden;
   background: var(--panel);
 }
 
 .lesson-panel,
 .output-panel,
-.diagnostics-panel {
+.diagnostics-panel,
+.deployment-panel {
   padding: 16px;
 }
 
@@ -337,6 +338,35 @@ button:disabled {
   overflow: auto;
   border-top: 1px solid var(--border);
   background: #171a21;
+}
+
+.deployment-panel {
+  border-top: 1px solid var(--border);
+  background: var(--panel-soft);
+}
+
+.deployment-panel h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.deployment-panel ol {
+  margin: 9px 0;
+  padding-left: 20px;
+  color: #d5d9e3;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.deployment-panel p:last-child {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.deployment-panel code {
+  color: #c8c0ff;
 }
 
 #statusBadge {

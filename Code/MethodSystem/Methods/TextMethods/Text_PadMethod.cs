@@ -30,6 +30,9 @@ public class Text_PadMethod : ReturningMethod<TextValue>, ICanError, IAdditional
             "right"),
         new IntArgument("length"),
         new TextArgument("character")
+        {
+            Description = "Has to be exactly 1 character long."
+        }
     ];
     
     public override void Execute()

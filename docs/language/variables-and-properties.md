@@ -1,5 +1,10 @@
 # Variables and properties
 
+This page documents variable value families and property access. Variable
+visibility is not conventional lexical scope; see
+[functions, variable lifetimes, and errors](functions-scopes-and-errors.md) for
+the exact local, global, function-argument, and `ephm` behavior.
+
 SER prefixes variable names with their value family:
 
 | Prefix | Family | Typical contents |

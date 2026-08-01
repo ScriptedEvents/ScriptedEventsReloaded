@@ -39,7 +39,7 @@ Command arguments become local literal variables:
 -- requireSender
 -- arguments message
 
-Broadcast @all 8s "{$message}<br>— {@sender -> name}"
+Broadcast @all 8s "{$message}<br> - {@sender -> name}"
 ```
 
 An argument ending with `?` is optional. Required arguments must come first.
@@ -117,4 +117,4 @@ Existing bindings reload their script before the next execution. After adding or
 removing bindings which cannot trigger yet, run `serreload` (or restart the round)
 and inspect `serstatus`.
 
-Next: [functions, scopes, and errors](../language/functions-scopes-and-errors.md).
+Next reference: [functions, variable lifetimes, and errors](../language/functions-scopes-and-errors.md).

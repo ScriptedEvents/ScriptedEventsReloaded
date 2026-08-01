@@ -22,7 +22,8 @@ const files = {
   thirdPartyLicenses: path.join(repositoryDirectory, "THIRD_PARTY_LICENSES.txt"),
   extensionThirdPartyLicenses: path.join(extensionDirectory, "THIRD_PARTY_LICENSES.txt"),
   manifest: path.join(repositoryDirectory, "ser_method_info.js"),
-  extensionManifest: path.join(extensionDirectory, "out", "ser_method_info.js")
+  extensionManifest: path.join(extensionDirectory, "out", "ser_method_info.js"),
+  websiteManifest: path.join(repositoryDirectory, "website", "data", "ser-truth-table.json")
 };
 
 for (const [name, filename] of Object.entries(files)) {
@@ -44,6 +45,11 @@ for (const filename of [
 const manifest = readGeneratedManifest(files.manifest);
 const extensionManifest = readGeneratedManifest(files.extensionManifest);
 assert.deepEqual(extensionManifest, manifest, "The extension manifest is out of sync with SER.");
+assert.deepEqual(
+  JSON.parse(fs.readFileSync(files.websiteManifest, "utf8")),
+  manifest,
+  "The documentation website manifest is out of sync with SER."
+);
 assert.ok(Object.keys(manifest.methods).length > 0, "The manifest contains no methods.");
 assert.ok(
   Object.values(manifest.methods).some(method => method.requiredFramework),

@@ -21,18 +21,28 @@ From most to least used:
 | **Reference**  | `*`    | C# objects (e.g., rooms, items)              | `*spawnRoom`, `*evRoom`                          |
 | **Collection** | `&`    | A list of multiple items                     | `&inventory`, `&rooms`                           |
 
-### Memory Scopes
+### Variable Visibility and Lifetimes
 
-* **Local (Default):** Deleted when the script finishes. (`$var = 10`)
+SER does not have conventional lexical variable scopes. Each running script has
+one local-variable table. Blocks and inline functions control value lifetime,
+but do not create separate access namespaces.
 
-
-* **Global:** Persists for the entire round. Accessible by other scripts. You **must** use the `global` keyword when assigning/changing it to avoid local name collisions. Read without the keyword.
-* *Set:* `global $score = 100`
-* *Read:* `Print {$score}`
-* *Verify:* `if {VarExists $myGlobal} is false`
-
-
-* **Ephemeral:** Exists only inside a specific loop or function. (`ephm $x = 1`)
+* **Local (default):** Stored in the current script's local table and removed
+  when that script execution finishes. (`$var = 10`)
+* **Global:** Stored in the round-wide table and accessible to other scripts.
+  Use `global` whenever creating or changing it; read it without the keyword.
+  SER does not allow an active local and global with the same prefix and name.
+  * Set: `global $score = 100`
+  * Read: `Print {$score}`
+  * Verify: `if {VarExists $myGlobal} is false`
+* **Ephemeral (`ephm`):** Added to the same script-local table, so it has normal
+  local visibility while alive. Its containing statement owns its lifetime and
+  removes it when that statement finishes. Loops remove their ephemeral values
+  after each iteration. `ephm` is therefore lifetime-limited, not lexically
+  private. (`ephm $x = 1`)
+* **Function arguments:** Temporarily added to the calling script's local table
+  and removed when the function call finishes. They are not stored in a separate
+  lexical environment.
 
 ---
 

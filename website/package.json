@@ -1,0 +1,31 @@
+{
+  "name": "ser-documentation-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Public documentation and generated language reference for Scripted Events Reloaded",
+  "scripts": {
+    "sync:data": "node scripts/sync-data.mjs",
+    "prepare:site": "node scripts/prepare-site.mjs",
+    "prestart": "npm run prepare:site",
+    "start": "docusaurus start",
+    "prebuild": "npm run prepare:site",
+    "build": "docusaurus build",
+    "serve": "docusaurus serve",
+    "clear": "docusaurus clear"
+  },
+  "devDependencies": {
+    "@docusaurus/core": "3.10.2",
+    "@docusaurus/preset-classic": "3.10.2",
+    "@mdx-js/react": "3.1.1",
+    "clsx": "2.1.1",
+    "prism-react-renderer": "2.4.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "overrides": {
+    "serialize-javascript": "7.0.5"
+  },
+  "engines": {
+    "node": ">=20.0"
+  }
+}

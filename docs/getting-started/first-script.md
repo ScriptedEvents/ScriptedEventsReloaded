@@ -1,53 +1,73 @@
-# Your first script
+# Make the server say something
 
-Run `serhelp start` and open the script directory it prints.
+You are about to write a complete SER script. No variables, loops, or language
+theory yet—just a result you can see immediately.
 
-Create `hello.ser`:
+## 1. Create the file
+
+Run `serhelp start` and open the script directory it prints. Create a file named
+`hello.ser` and put this inside:
 
 ```ser
-Print "Hello from SER!"
+Reply "Hello from my first SER script!"
 ```
 
-Then use the server console or Remote Admin:
+`Reply` is a **method**: an instruction that asks SER to do something.
+
+## 2. Run it
+
+Use the server console or Remote Admin:
 
 ```text
 serrun hello
 ```
 
-You should see `Hello from SER!` followed by confirmation that the script was
-requested to run.
+Use the script name, not `hello.ser` and not its full path. You should see your
+message followed by confirmation that `hello` was requested to run.
 
-If `hello` was not registered, `serrun` searches the entire script directory
-for a new `hello.ser` or `hello.txt`, registers that file, and retries
-automatically. You do not need to run `serreload` before the first execution of
-a newly added utility script.
+Remote Admin senders need the `ser.run` permission.
 
-Remote Admin senders require the `ser.run` permission.
+## 3. Make players see it
 
-## Make the script do more
+Add another method:
 
 ```ser
-Print "Starting the greeting"
-wait 1s
-Print "Hello after one second"
+Reply "Sending a message to everyone..."
+Broadcast @all 5s "This server can be scripted!"
 ```
 
-Instructions normally execute from top to bottom. `wait` pauses only this
-script's execution.
+Run `serrun hello` again. SER refreshes the file before executing it, so the new
+broadcast should appear for every connected player.
 
-## If it does not run
+Read the second line from left to right:
 
-Use:
+- `Broadcast` is what SER should do;
+- `@all` means every player;
+- `5s` is how long the message stays visible;
+- the quoted text is what they see.
+
+That pattern—**method, then arguments**—already covers a surprising amount of
+SER.
+
+## Try one change
+
+Change `5s` to `10s`, edit the message, and run the script again. If you want a
+smaller on-screen message, ask SER how `Hint` works:
+
+```text
+serhelp Hint
+```
+
+## If nothing happens
+
+Run:
 
 ```text
 serstatus
 ```
 
-It distinguishes:
+It tells you whether the file was accepted, failed to compile, is disabled by a
+leading `#`, lives inside a disabled folder, or conflicts with another file
+using the same script name.
 
-- an accepted script;
-- a file that failed to compile or register;
-- a disabled filename or an excluded folder name beginning with `#`;
-- multiple files competing for the same script name.
-
-Next: [files, names, and reloads](files-and-reloads.md).
+Next: [discover methods that change the game](../tutorial/methods.md).

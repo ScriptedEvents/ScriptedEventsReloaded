@@ -1,19 +1,24 @@
 # Table of contents
 
-- [Documentation home](README.md)
-- Getting started
-  - [Installation](getting-started/installation.md)
-  - [First script](getting-started/first-script.md)
-  - [Files and reloads](getting-started/files-and-reloads.md)
-- Language
+- [Start here](README.md)
+- Tutorial: make something
+  - [Install and verify SER](getting-started/installation.md)
+  - [Make the server say something](getting-started/first-script.md)
+  - [Methods change the game](tutorial/methods.md)
+  - [Commands and events with flags](tutorial/flags.md)
+  - [Choose your players](tutorial/player-targets.md)
+  - [Remember and inspect values](tutorial/variables-and-properties.md)
+  - [Decisions, chance, and timing](tutorial/decisions-and-time.md)
+  - [Build Hot Potato](tutorial/hot-potato.md)
+- Reference: exact behavior
+  - [Files, names, and reloads](getting-started/files-and-reloads.md)
   - [Methods and values](language/methods-and-values.md)
   - [Variables and properties](language/variables-and-properties.md)
   - [Conditions and loops](language/conditions-and-loops.md)
   - [Collections](language/collections.md)
   - [Timing and yielding](language/timing-and-yielding.md)
-  - [Functions, scopes, and errors](language/functions-scopes-and-errors.md)
-- Guides
   - [Flags, events, and commands](guides/flags-events-and-commands.md)
+  - [Functions, lifetimes, and errors](language/functions-scopes-and-errors.md)
   - [Optional integrations](guides/integrations.md)
   - [Debugging](guides/debugging.md)
   - [Validated examples](guides/examples.md)

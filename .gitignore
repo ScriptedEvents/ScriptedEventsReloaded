@@ -12,3 +12,11 @@ SER.sln.DotSettings.user
 /Tooling/node_modules
 /Tooling/visual-editor/dist
 /artifacts
+/website/node_modules
+/website/.docusaurus
+/website/build
+/website/.site-docs
+/website/src/data/constructs.json
+/website/static/assets
+/website/static/ser-blocks
+/website/static/img

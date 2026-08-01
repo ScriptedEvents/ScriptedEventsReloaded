@@ -26,7 +26,7 @@ The build:
 4. copies the shared language core and extension source into `out`;
 5. copies the repository license and third-party notices into the extension.
 
-`npm run verify` also checks generated-file synchronization, all 16 local
+`npm run verify` also checks generated-file synchronization, all local
 documentation files, JavaScript behavior, third-party notice coverage, and
 whether C# method implementations read every argument they declare (without
 reading undeclared names).

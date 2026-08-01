@@ -22,6 +22,7 @@ const paths = {
   core: path.join(toolingDirectory, "shared", "ser-language-core.js"),
   blockly: path.join(toolingDirectory, "node_modules", "blockly", "blockly.min.js"),
   blocklyMedia: path.join(toolingDirectory, "node_modules", "blockly", "media"),
+  websiteManifest: path.join(repositoryDirectory, "website", "data", "ser-truth-table.json"),
   extensionSource: path.join(extensionSourceDirectory, "extension.js"),
   extensionEditorLogic: path.join(extensionSourceDirectory, "ser-editor-logic.js")
 };
@@ -70,6 +71,7 @@ fs.writeFileSync(path.join(extensionOutputDirectory, "ser-language-core.js"), co
 fs.writeFileSync(path.join(extensionOutputDirectory, "ser_method_info.js"), manifestModuleSource(manifest));
 fs.writeFileSync(path.join(extensionOutputDirectory, "visual-editor.html"), extensionHtml);
 fs.writeFileSync(path.join(extensionOutputDirectory, "ser-language.json"), manifestJson);
+fs.writeFileSync(paths.websiteManifest, manifestJson);
 fs.copyFileSync(paths.license, path.join(extensionDirectory, "LICENSE"));
 fs.copyFileSync(
   paths.thirdPartyLicenses,

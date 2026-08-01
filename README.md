@@ -17,16 +17,17 @@ All you need to get started is a text editor and a server!
 # Nice-to-Haves of SER
 - **Simplification** of the most essential features like commands, events, and player management.
 - **No compilation required**, while C# plugins require a full development environment, compilation, and DLL management.
-- **Lots of built-in features** like AudioPlayer, Databases, Discord webhooks, HTTP, and more!
-- **Extendable** with integrations such as UCR, EXILED, Callvote, and ProjectMER.
-  The LabAPI build discovers each integration only when it is installed, so
-  optional frameworks do not become base dependencies or interfere with one another.
+- **Lots of built-in features** like custom roles, audio, map editor, databases, Discord webhooks, HTTP, and more!
+- **Extendable** with integrations such as UCR, EXILED, Callvote, and ProjectMER,
+  but only when you need it - no unnecessary dependencies!
 - **Plugin docs** are available directly on the server using the `serhelp` command.
 - **Helpful community** available to help you with any questions you may have.
 
 # SER Tutorials
 
-The 1.0 tutorials are versioned with the plugin:
+Want to make something useful before studying the language? Follow the
+outcome-first tutorial. Need an exact rule or edge case? Jump to the technical
+reference. Both are versioned with the plugin:
 
 > [SER 1.0 documentation](./docs/README.md)
 
@@ -93,7 +94,7 @@ before execution, whether requested by `serrun`, an event, a callback, or anothe
 script. Use the permission-protected `serreload` command to refresh everything on
 demand, especially when adding or removing bindings that cannot trigger yet. Reloads
 are transactional: a changed file is compiled in full before its flags are replaced,
-and if validation fails the last known-good version stays active.
+and if validation fails, the last known-good version stays active.
 
 ```ser
 !-- OnEvent RoundStarted
@@ -104,7 +105,7 @@ Print "A player died"
 
 !-- CustomCommand status
 -- requireSender
-Reply "Online"
+Reply "Hello {@sender -> name}! The server is online"
 ```
 
 ProjectMER integrations can use the dedicated optional event entry point:
@@ -120,6 +121,7 @@ MER.PlayAnimation *evSchematic "Open"
 ### Welcome message
 ```
 !-- OnEvent Joined
+-- require @evPlayer
 
 Broadcast @evPlayer 10s "Welcome to the server {@evPlayer -> name}!"
 ```

@@ -1,0 +1,46 @@
+.page {
+  display: flex;
+  height: calc(100vh - var(--ifm-navbar-height));
+  flex-direction: column;
+  background: #090b12;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-background-surface-color);
+}
+
+.bar div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.bar span {
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.82rem;
+}
+
+.bar a {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.frame {
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+  border: 0;
+  background: white;
+}
+
+@media (max-width: 600px) {
+  .bar span {
+    display: none;
+  }
+}

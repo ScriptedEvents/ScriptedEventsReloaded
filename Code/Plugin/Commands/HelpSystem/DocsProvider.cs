@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 using CommandSystem;
 using LabApi.Events.Arguments.Interfaces;
@@ -287,7 +287,7 @@ public static class DocsProvider
         var usageInfo = keyword is IStatementExtender extender
             ? $"""
                {Heading("Usage")}
-               This statement can only be used after a statement supporting the {Code(extender.Extends)} signal.
+               This statement can only be used after a statement supporting the {Code(extender.Extends.ToString())} signal.
 
                ```ser
                somekeyword
@@ -433,7 +433,7 @@ public static class DocsProvider
     public static string GetEventInfo(EventInfo ev)
     {
         var variables = EventSystem.EventHandler.GetMimicVariableInfo(ev);
-        var eventArgsType = ev.EventHandlerType?.GetGenericArguments().FirstOrDefault();
+        var eventArgsType = ev.EventHandlerType.GetGenericArguments().FirstOrDefault();
         var cancellable = eventArgsType is not null &&
                           typeof(ICancellableEvent).IsAssignableFrom(eventArgsType);
         var msg = variables.Count > 0 

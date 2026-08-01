@@ -31,6 +31,14 @@ namespace SER.Code.Plugin.Commands.HelpSystem;
 
 public static class DocsProvider
 {
+    private static string Code(string value) => $"`{value.Replace("`", "\\`")}`";
+
+    private static string BulletList(IEnumerable<string> items) =>
+        string.Join("\n", items.Select(item => $"- {item}"));
+
+    private static string Heading(string title, int level = 2) =>
+        $"{new string('#', level)} {title}";
+
     public static readonly Dictionary<HelpOption, Func<string>> GeneralOptions = new()
     {
         [HelpOption.Start] = GetStartHelpPage,
@@ -136,51 +144,57 @@ public static class DocsProvider
     public static string GetOptionsList()
     {
         return $"""
-                === SER help ===
+                # SER help
 
-                New here? Run 'serhelp start'.
-                For a compact method list, run 'serhelp methods essential'.
-                For details about one item, run 'serhelp <name>', for example 'serhelp Print'.
+                New here? Run {Code("serhelp start")}.
+                For a compact method list, run {Code("serhelp methods essential")}.
+                For details about one item, run {Code("serhelp <name>")}, for example {Code("serhelp Print")}.
 
-                Here are all the available options:
-                > {"\n> ".Join(Enum.GetValues(typeof(HelpOption)).Cast<HelpOption>()
-                    .Select(o => o.ToString().LowerFirst()))}
+                ## Help topics
+
+                {BulletList(Enum.GetValues(typeof(HelpOption)).Cast<HelpOption>()
+                    .Select(o => Code(o.ToString().LowerFirst())))}
                     
                     
-                === Other commands! ===
-                > {"\n> ".Join(Assembly.GetExecutingAssembly().GetTypes()
+                ## Other commands
+
+                {BulletList(Assembly.GetExecutingAssembly().GetTypes()
                     .Where(t => typeof(ICommand).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract && t != typeof(HelpCommand))
                     .Select(Activator.CreateInstance)
                     .Cast<ICommand>()
                     .Where(c => !string.IsNullOrEmpty(c.Command))
                     .Select(c 
-                        => $"{c.Command} (permission: {(c as IUsePermissions)?.Permission ?? "not required"})" + 
-                           $"\n{(string.IsNullOrEmpty(c.Description) ? string.Empty : c.Description + "\n")}"))}
+                        => $"{Code(c.Command)} (permission: {(c as IUsePermissions)?.Permission ?? "not required"})" +
+                           $"{(string.IsNullOrEmpty(c.Description) ? string.Empty : $" — {c.Description}")}"))}
                 """;
     }
 
     public static string GetStartHelpPage()
     {
         return $"""
-                === First SER script ===
+                # Your first SER script
 
                 1. Script directory:
-                   {FileSystem.FileSystem.MainDirPath}
+                   {Code(FileSystem.FileSystem.MainDirPath)}
 
                 2. Create 'hello.ser' there with:
-                   Print "Hello from SER!"
+                ```ser
+                Print "Hello from SER!"
+                ```
 
                    Use .ser when your host allows unknown file types. Use 'hello.txt' as
                    a compatibility format when its file manager blocks .ser. Both behave identically.
 
                 3. Run:
-                   serrun hello
+                ```text
+                serrun hello
+                ```
 
                    serrun discovers or reloads the requested file before running it.
                    Round restart reloads all scripts; 'serreload' does the same on demand.
 
                 4. Diagnose files with:
-                   serstatus
+                   {Code("serstatus")}
 
                 Need examples? Run 'serexamples'. Generated files start with '#', so they
                 are disabled. Copy one or remove the leading '#', then run 'serreload'.
@@ -195,22 +209,23 @@ public static class DocsProvider
         var methods = MethodIndex.GetMethods();
         var categories = MethodsByCategory(methods)
             .OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase)
-            .Select(pair => $"> {pair.Key}: {pair.Value.Count}");
+            .Select(pair => $"- {Code(pair.Key)} — {pair.Value.Count} methods");
 
         return $"""
                 SER currently exposes {methods.Length} methods.
 
                 Start with:
-                > serhelp methods essential
+                {Code("serhelp methods essential")}
 
                 Browse a category with:
-                > serhelp methods <category>
+                {Code("serhelp methods <category>")}
 
                 Show the complete list with:
-                > serhelp methods all
+                {Code("serhelp methods all")}
 
-                Categories:
-                {string.Join("\n", categories)}
+                ## Categories
+
+                {string.Join("\n", categories.Select(category => $"- {category}"))}
                 """;
     }
 
@@ -236,11 +251,11 @@ public static class DocsProvider
             return false;
         }
 
-        response = $"--- {category.Key} methods ---\n" +
+        response = $"{Heading($"{category.Key} methods")}\n\n" +
                    string.Join("\n", category.Value
                        .OrderBy(method => method.Name, StringComparer.OrdinalIgnoreCase)
-                       .Select(method => $"> {method.Name} - {method.Description}")) +
-                   "\n\nUse 'serhelp <method name>' for arguments and return values.";
+                       .Select(method => $"- {Code(method.Name)} — {method.Description}")) +
+                   $"\n\nUse {Code("serhelp <method name>")} for arguments and return values.";
         return true;
     }
 
@@ -271,30 +286,30 @@ public static class DocsProvider
     {
         var usageInfo = keyword is IStatementExtender extender
             ? $"""
-               --- Usage ---
-               This statement can ONLY be used after a statement supporting the "{extender.Extends}" signal!
+               {Heading("Usage")}
+               This statement can only be used after a statement supporting the {Code(extender.Extends)} signal.
 
-               # example usage (assuming "somekeyword" supports "{extender.Extends}" signal)
-               
+               ```ser
                somekeyword
                    # some code
                {keyword.KeywordName} {keyword.Arguments.JoinStrings(" ")}
                    # some other code
                end
-               
+               ```
                """
             : $"""
-               --- Usage ---
+               {Heading("Usage")}
+               ```ser
                {keyword.KeywordName} {keyword.Arguments.JoinStrings(" ")}
-               {(keyword is StatementContext ? "\t# some code\nend" : string.Empty)}
-               
+               {(keyword is StatementContext ? "    # some code\nend" : string.Empty)}
+               ```
                """;
         
         var extendableInfo = keyword is IExtendableStatement extendable
             ? $"""
-               --- This statement is extendable! ---
-               Other statements can be added after this one, provided they support one of the following signal(s):
-               {extendable.AllowedSignals.GetFlags().Select(f => $"> {f}").JoinStrings("\n")}
+               {Heading("Signals")}
+               **This statement is extendable.** Other statements can be added after this one when they support one of these signals:
+               {BulletList(extendable.AllowedSignals.GetFlags().Select(f => Code(f.ToString())))}
                
                """
             : string.Empty;
@@ -302,16 +317,17 @@ public static class DocsProvider
         // exampel
         var exampel = keyword is { Example: {} e}
             ? $"""
-               --- Example Usage ---
+               {Heading("Example")}
+               ```ser
                {e}
-               
+               ```
                """
             : string.Empty;
         
         return 
             $"""
-            ===== {keyword.KeywordName} keyword =====
-            > {keyword.Description}
+            {Heading($"{Code(keyword.KeywordName)} keyword", 1)}
+            {keyword.Description}
             
             {usageInfo}
             {extendableInfo}
@@ -326,38 +342,40 @@ public static class DocsProvider
             Keywords alter how the script behaves, not by changing someones role, but the internal script execution.
             They can range from simple things from stopping the script to handling advanced logic.
 
-            Keywords are written as all lowercase words, like 'stop', 'if' etc.
+            Keywords are written as lowercase words, like {Code("stop")} and {Code("if")}.
 
             Some keywords also have an ability to have instructions inside their "body", making them statements!
             These statements control how the methods inside their body are executed.
 
-            Here is a list of all keywords available in SER:
-            (each of them is of course searchable using 'serhelp keywordName')
+            ## Available keywords
+            Each keyword can be searched with {Code("serhelp keywordName")}.
             
             """ + ContextableKeywordToken.KeywordContextTypes
                 .Select(t => t.CreateInstance<IKeywordContext>())
-                .Select(k => $"> {k.KeywordName}")
+                .Select(k => $"- {Code(k.KeywordName)}")
                 .JoinStrings("\n");
     }
 
     public static string GetFlagHelpPage()
     {
         var flags = Flag.FlagInfos.Keys
-            .Select(f => $"> {f}")
+            .Select(f => $"- {Code(f)}")
             .JoinStrings("\n");
         
         return
             $"""
             Flags are a way to change script behavior depending on your needs.
             
-            This how they are used:
+            ## Usage
+            ```ser
             !-- SomeFlag argValue1 argValue2
             -- customFlagArgument "some value"
+            ```
             
             Flags should be used at the top of the script.
             
-            Below is a list of all flags available in SER:
-            (for more info about their usage, use 'serhelp flagName')
+            ## Available flags
+            For more information, use {Code("serhelp flagName")}.
             {flags}
             """;
     }
@@ -398,14 +416,16 @@ public static class DocsProvider
         
         return
             $"""
-             ===== {flagName} =====
+             {Heading(Code(flagName), 1)}
              {flag.Description}
              
-             Usage:
+             ## Usage
+             ```ser
              !-- {flagName} {inlineArgumentUsage}
              {argumentsUsage}
+             ```
              
-             {(argDesc.Length > 0 ? "+++ Arguments +++" : "")}
+             {(argDesc.Length > 0 ? Heading("Arguments") : "")}
              {argDesc}
              """;
     }
@@ -419,7 +439,7 @@ public static class DocsProvider
         var msg = variables.Count > 0 
             ? variables.Aggregate(
                 "This event has the following variables attached to it:\n", 
-                (current, variable) => current + $"> {variable.Display}" +
+                (current, variable) => current + $"- {Code(variable.Display)}" +
                                        (string.IsNullOrWhiteSpace(variable.Description)
                                            ? "\n"
                                            : $" - {variable.Description}\n")
@@ -433,12 +453,13 @@ public static class DocsProvider
         
         return 
              $"""
-              Event {ev.Name} is a part of {ev.DeclaringType?.Name ?? "unknown event group"}.
+              {Heading($"{Code(ev.Name)} event", 1)}
+              **Group:** {Code(ev.DeclaringType?.Name ?? "unknown event group")}
               {(string.IsNullOrWhiteSpace(eventDocumentation) ? "" : $"\n{eventDocumentation}\n")}
-              {(eventArgsType is null ? "" : $"Event data type: {eventArgsType.AccurateName}" +
+              {(eventArgsType is null ? "" : $"**Event data type:** {Code(eventArgsType.AccurateName)}" +
                   (string.IsNullOrWhiteSpace(eventArgsDocumentation) ? "" : $" - {eventArgsDocumentation}") + "\n")}
               
-              Is cancellable? {cancellable}
+              **Cancellable:** {cancellable}
               
               {msg}
               """;
@@ -450,12 +471,12 @@ public static class DocsProvider
         
         foreach (var category in EventSystem.EventHandler.AvailableEvents.Select(ev => ev.DeclaringType).ToHashSet().OfType<Type>())
         {
-            sb.AppendLine($"--- {category.Name} ---");
+            sb.AppendLine(Heading(category.Name));
             if (XmlDocReader.GetDocumentation(category) is { Length: > 0 } categoryDocumentation)
                 sb.AppendLine(categoryDocumentation);
-            sb.AppendLine(string.Join(", ",  EventSystem.EventHandler.AvailableEvents
+            sb.AppendLine(BulletList(EventSystem.EventHandler.AvailableEvents
                 .Where(ev => ev.DeclaringType == category)
-                .Select(ev => ev.Name)));
+                .Select(ev => Code(ev.Name))));
         }
         
         return
@@ -470,7 +491,7 @@ public static class DocsProvider
             Some events have additional information attached to them in a form of variables.
             If you wish to know what variables are available for a given event, just use 'serhelp <eventName>'!
             
-            Here are all events that SER can use:
+            ## Available events
             {sb}
             """;
     }
@@ -492,12 +513,12 @@ public static class DocsProvider
                      .ToHashSet()
                      .OfType<Type>())
         {
-            sb.AppendLine($"--- {category.Name} ---");
+            sb.AppendLine(Heading(category.Name));
             if (XmlDocReader.GetDocumentation(category) is { Length: > 0 } categoryDocumentation)
                 sb.AppendLine(categoryDocumentation);
-            sb.AppendLine(string.Join(", ", EventSystem.EventHandler.AvailablePmerEvents
+            sb.AppendLine(BulletList(EventSystem.EventHandler.AvailablePmerEvents
                 .Where(ev => ev.DeclaringType == category)
-                .Select(ev => ev.Name)));
+                .Select(ev => Code(ev.Name))));
         }
 
         return
@@ -508,7 +529,7 @@ public static class DocsProvider
              Event properties are exposed as ev variables. Use `serhelp <eventName>`
              to inspect them and `-- require` to skip execution when selected variables are absent.
 
-             Here are all ProjectMER events available to SER:
+             ## Available ProjectMER events
              {sb}
              """;
     }
@@ -522,12 +543,13 @@ public static class DocsProvider
             .Select(field =>
             {
                 var documentation = XmlDocReader.GetDocumentation(field);
-                return $"> {field.Name}" +
+                return $"- {Code(field.Name)}" +
                        (string.IsNullOrWhiteSpace(documentation) ? "" : $" - {documentation}");
             });
 
         return $"""
-                Enum {enumType.Name} has the following values:
+                {Heading($"{Code(enumType.Name)} enum", 1)}
+                This enum has the following values:
                 {(string.IsNullOrWhiteSpace(enumDocumentation) ? "" : $"\n{enumDocumentation}")}
                 {string.Join("\n", values)}
                 """;
@@ -544,7 +566,7 @@ public static class DocsProvider
             For example: 'serhelp RoomName' will get you a list of all available room names to use in methods.
             
             Here are some of the enums used in SER:
-            {string.Join("\n", EnumIndex.GetNonReflectedEnums().Select(e => $"> {e.Name}"))}
+            {string.Join("\n", EnumIndex.GetNonReflectedEnums().Select(e => $"- {Code(e.Name)}"))}
             """;
     }
 
@@ -592,13 +614,11 @@ public static class DocsProvider
 
         foreach (var kvp in MethodsByCategory(allMethods).OrderBy(kvp => kvp.Key[0]))
         {
-            var descDistance = DescDistance(kvp.Value);
-            
             sb.AppendLine();
-            sb.AppendLine($"--- {kvp.Key} methods ---");
+            sb.AppendLine(Heading($"{kvp.Key} methods"));
             foreach (var method in kvp.Value)
             {
-                sb.AppendLine(GetFormatted(method, descDistance));
+                sb.AppendLine(GetFormatted(method));
             }
         }
         
@@ -606,12 +626,12 @@ public static class DocsProvider
                      .Where(kvp => FrameworkBridge.Found.All(fb => fb.Type != kvp.Key)))
         {
             sb.AppendLine();
-            sb.AppendLine($"> {framework} framework (not installed) can add {methods.Count} more methods");
+            sb.AppendLine($"- **{framework} framework** (not installed) can add {methods.Count} more methods");
         }
         
         return sb.ToString();
 
-        string GetFormatted(Method method, int descDistance)
+        string GetFormatted(Method method)
         {
             var name = method.Name;
             if (method is ReturningMethod)
@@ -619,15 +639,7 @@ public static class DocsProvider
                 name += retsSuffix;
             }
 
-            var descPadding = new string(' ', descDistance - name.Length);
-            return $"> {name}{descPadding}~ {method.Description}";
-        }
-        
-        int DescDistance(IEnumerable<Method> methods)
-        {
-            return methods
-                .Select(m => m.Name.Length + (m is ReturningMethod ? retsSuffix.Length : 0))
-                .Max() + 1;
+            return $"- {Code(name)} — {method.Description}";
         }
     }
     
@@ -643,10 +655,10 @@ public static class DocsProvider
         foreach (var category in categories)
         {
             sb.AppendLine();
-            sb.AppendLine($"--- {category ?? "Other"} variables ---");
+            sb.AppendLine(Heading($"{category ?? "Other"} variables"));
             foreach (var var in allVars.Where(var => var.Category == category))
             {
-                sb.AppendLine($"> @{var.Name}");
+            sb.AppendLine($"- {Code($"@{var.Name}")}");
             }
         }
         
@@ -655,12 +667,12 @@ public static class DocsProvider
 
     public static string GetMethodHelp(Method method, FrameworkBridge.Type? notLoadedFramework = null)
     {
-        var sb = new StringBuilder($"=== {method.Name} ===\n");
+        var sb = new StringBuilder($"{Heading(Code(method.Name), 1)}\n\n");
 
-        sb.AppendLine($"> {method.Description}");
+        sb.AppendLine(method.Description);
         if (method is IAdditionalDescription addDesc)
         {
-            sb.AppendLine($"> {addDesc.AdditionalDescription}");
+            sb.AppendLine(addDesc.AdditionalDescription);
         }
         
         if (notLoadedFramework is {} framework)
@@ -687,7 +699,7 @@ public static class DocsProvider
                 {
                     sb.AppendLine($"You can save it to a variable with a '{possiblePrefixes[0]}' prefix.");
                     var addDots = method.ExpectedArguments.Any(arg => arg.MustBeProvided);
-                    sb.AppendLine($"{possiblePrefixes[0]}myVariable = {method.Name} {(addDots ? "..." : string.Empty)}");
+                    sb.AppendLine($"```ser\n{possiblePrefixes[0]}myVariable = {method.Name} {(addDots ? "..." : string.Empty)}\n```");
                 }
             }
         }
@@ -707,25 +719,25 @@ public static class DocsProvider
             
             var argument = method.ExpectedArguments[index];
             var optionalArgPrefix = argument.MustBeProvided ? "" : " optional";
-            sb.AppendLine($"({index + 1}){optionalArgPrefix} '{argument.Name}' argument");
+            sb.AppendLine($"- **{argument.Name}**{optionalArgPrefix} argument");
 
             if (argument.Description is not null)
             {
-                sb.AppendLine($" - Description: {argument.Description}");
+                sb.AppendLine($"  - **Description:** {argument.Description}");
             }
             
-            sb.AppendLine($" - Expected value: {argument.InputDescription.Replace("\n", "\n\t")}");
+            sb.AppendLine($"  - **Expected value:** {argument.InputDescription.Replace("\n", "\n    ")}");
 
             if (argument.DefaultValue is { } defVal)
             {
-                sb.AppendLine($" - Default value/behavior: {defVal.StringRep ?? defVal.Value?.ToString() ?? "<unknown>"}");
-                sb.AppendLine("   (use '_' character to keep the default)");
+                sb.AppendLine($"  - **Default value/behavior:** {defVal.StringRep ?? defVal.Value?.ToString() ?? "<unknown>"}");
+                sb.AppendLine("    (use `_` to keep the default)");
             }
 
             if (argument.ConsumesRemainingValues)
             {
                 sb.AppendLine(
-                    " - This argument consumes all remaining values; this means that every value provided AFTER " +
+                    "  - This argument consumes all remaining values; every value provided AFTER " +
                     "this one will also count towards THIS argument's values.");
             }
         }
@@ -734,7 +746,7 @@ public static class DocsProvider
         {
             sb.AppendLine();
             sb.AppendLine("This method defines custom errors:");
-            sb.AppendLine(errorMethod.ErrorReasons.Select(e => $"> {e}").JoinStrings("\n"));
+            sb.AppendLine(errorMethod.ErrorReasons.Select(e => $"- {e}").JoinStrings("\n"));
         }
         
         return sb.ToString();
@@ -771,15 +783,15 @@ public static class DocsProvider
             if (elementProps != null)
             {
                 var sb = new StringBuilder();
-                sb.AppendLine($"> Properties for {val.FriendlyName} (showing both collection and element properties)");
+                sb.AppendLine($"**Properties for {val.FriendlyName}** (showing both collection and element properties)");
                 sb.AppendLine();
-                sb.AppendLine("--- Collection Properties ---");
+                sb.AppendLine(Heading("Collection properties"));
                 foreach (var (name, info) in properties.OrderBy(p => p.Key))
                 {
                     sb.AppendLine(RenderPropertyLine(name, info));
                 }
                 sb.AppendLine();
-                sb.AppendLine($"--- Element Properties ({Value.GetFriendlyName(collection.StoredTypes)}) ---");
+                sb.AppendLine(Heading($"Element properties ({Value.GetFriendlyName(collection.StoredTypes)})"));
                 foreach (var (name, info) in elementProps.OrderBy(p => p.Key))
                 {
                     sb.AppendLine(RenderPropertyLine(name, info));
@@ -796,7 +808,7 @@ public static class DocsProvider
     private static string RenderProperties(string typeName, IReadOnlyDictionary<string, IValueWithProperties.PropInfo> props, Type? type = null)
     {
         var sb = new StringBuilder(
-            $"> Properties for {typeName} value" 
+            $"**Properties for {typeName} value**"
             + (type is not null ? $" in '{type.Assembly.GetName().Name}' assembly" : "") 
             + "\n");
 
@@ -811,7 +823,7 @@ public static class DocsProvider
 
         if (reflected.Count > 0)
         {
-            sb.AppendLine("\n--- Base properties ---");
+            sb.AppendLine($"\n{Heading("Base properties")}");
             foreach (var (name, info) in reflected)
             {
                 sb.AppendLine(RenderPropertyLine(name, info));
@@ -820,7 +832,7 @@ public static class DocsProvider
 
         if (custom.Count > 0)
         {
-            sb.AppendLine("\n--- Custom SER properties ---");
+            sb.AppendLine($"\n{Heading("Custom SER properties")}");
             foreach (var (name, info) in custom)
             {
                 sb.AppendLine(RenderPropertyLine(name, info));
@@ -833,8 +845,8 @@ public static class DocsProvider
     private static string RenderPropertyLine(string name, IValueWithProperties.PropInfo info)
     {
         var returnTypeFriendlyName = info.ReturnType.ToString();
-        return $"> {name} " +
-               $"({returnTypeFriendlyName}) " +
+        return $"- {Code(name)} " +
+               $"({Code(returnTypeFriendlyName)}) " +
                $"{(info.IsSettable ? "[settable] " : "")}" +
                $"{(string.IsNullOrEmpty(info.Description) ? "" : $"- {info.Description}")}";
     }
@@ -842,7 +854,7 @@ public static class DocsProvider
     public static string GetPropertiesHelpPage()
     {
         var registeredTypes = ReferencePropertyRegistry.GetRegisteredTypes()
-            .Select(t => $"> {t.Name}")
+            .Select(t => $"- {Code(t.Name)}")
             .JoinStrings("\n");
 
         var playerPropsList = GetTopProperties(new PlayerValue().Properties, "player");
@@ -867,7 +879,7 @@ public static class DocsProvider
             if {@sender -> role} is "ClassD"  - Or use {} when in a condition.
 
             
-            --- Enhanced serhelp properties ---
+            ## Enhanced property lookup
             You can now inspect properties without knowing the exact type name:
             
             From a global variable:
@@ -883,7 +895,7 @@ public static class DocsProvider
             > serhelp properties Door@LabAPI 
 
             
-            --- Basic SER value properties ---
+            ## Basic SER value properties
 
             Player:
             - {{playerPropsList}}
@@ -907,7 +919,7 @@ public static class DocsProvider
             - {{durationPropsList}}
 
             
-            --- Registered SCP:SL objects ---
+            ## Registered SCP:SL objects
             Use 'serhelp properties <objectName>' to see available properties for these types:
             {{registeredTypes}}
             and many more not listed here!

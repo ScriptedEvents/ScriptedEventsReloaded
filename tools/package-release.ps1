@@ -58,15 +58,18 @@ if (-not $SkipDependencyInstall) {
     Invoke-CheckedCommand -FilePath 'npm' -Arguments @('ci') -WorkingDirectory $extensionDirectory
 }
 
-$releaseBuildArguments = @('build', 'SER.csproj', '--configuration', 'Release')
-$exiledBuildArguments = @('build', 'SER.csproj', '--configuration', 'EXILED', '--no-restore')
+$exiledBuildArguments = @('build', 'SER.csproj', '--configuration', 'EXILED')
+$releaseBuildArguments = @('build', 'SER.csproj', '--configuration', 'Release', '--no-restore')
 if (-not [string]::IsNullOrWhiteSpace($UcrReferencePath)) {
     $resolvedUcrReferencePath = (Resolve-Path -LiteralPath $UcrReferencePath -ErrorAction Stop).Path
     $releaseBuildArguments += "-p:UcrReferencePath=$resolvedUcrReferencePath"
     $exiledBuildArguments += "-p:UcrReferencePath=$resolvedUcrReferencePath"
 }
-Invoke-CheckedCommand -FilePath 'dotnet' -Arguments $releaseBuildArguments -WorkingDirectory $repositoryDirectory
+# LabAPI is SER's backbone and the canonical source for shared editor/help
+# metadata. Build EXILED first, then leave the LabAPI manifest in place for the
+# tooling build below.
 Invoke-CheckedCommand -FilePath 'dotnet' -Arguments $exiledBuildArguments -WorkingDirectory $repositoryDirectory
+Invoke-CheckedCommand -FilePath 'dotnet' -Arguments $releaseBuildArguments -WorkingDirectory $repositoryDirectory
 Invoke-CheckedCommand -FilePath 'npm' -Arguments @('run', 'verify') -WorkingDirectory $toolingDirectory
 Invoke-CheckedCommand -FilePath 'npm' -Arguments @('run', 'verify') -WorkingDirectory $extensionDirectory
 

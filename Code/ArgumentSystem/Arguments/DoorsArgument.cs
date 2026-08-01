@@ -54,13 +54,17 @@ public class DoorsArgument(string name) : EnumHandlingArgument(name)
             new EnumHandler<DoorName, Door[]>(name => new(() =>
             {
                 return Door.List
-                .Where(door => door.DoorName == name)
+                .Where(door => door.DoorName == name
+                    && door is not ElevatorDoor)
+                .Distinct()
                 .ToArray();
             })),
             new EnumHandler<FacilityZone, Door[]>(zone => new(() =>
             {
                 return Door.List
-                    .Where(door => door.Zone == zone)
+                    .Where(door => door.Zone == zone
+                        && door is not ElevatorDoor)
+                    .Distinct()
                     .ToArray();
             })),
             new EnumHandler<RoomName, Door[]>(name => new(() =>

@@ -24,6 +24,7 @@ public class Text_SliceMethod : ReturningMethod<TextValue>
         new IntArgument("end amount", 0)
         {
             Description = "The amount of characters to remove from the end of the text.",
+            DefaultValue = new(0, null)
         }
     ];
 

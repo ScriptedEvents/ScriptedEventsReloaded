@@ -5,6 +5,7 @@ using SER.Code.Helpers.ResultSystem;
 using SER.Code.Plugin.Commands.HelpSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.Interfaces;
+using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.Arguments;
 
@@ -54,25 +55,22 @@ public class EnumArgument<TEnum> : EnumArgument where TEnum : struct, Enum
     [UsedImplicitly]
     public DynamicTryGet<TEnum> GetConvertSolution(BaseToken token)
     {
+        if (token is IValueToken { IsConstant: false } valueToken)
+        {
+            if (!valueToken.CapableOf<LiteralValue>(out _))
+            {
+                return $"Not a {InputDescription}.";
+            }
+
+            return new(() => InternalConvert(token));
+        }
+
         if (InternalConvert(token).WasSuccessful(out var value))
         {
             return value;
         }
 
-        if (token is not IValueToken valToken || valToken.IsConstant)
-        {
-            return $"Not a {InputDescription}.";
-        }
-
-        return new(() =>
-        {
-            if (InternalConvert(token).HasErrored(out var error, out value))
-            {
-                return error;
-            }
-
-            return value;
-        });
+        return $"Not a {InputDescription}.";
     }
 
     public static TryGet<TEnum> Convert(BaseToken token, bool isFlag)

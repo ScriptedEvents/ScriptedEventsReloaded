@@ -12,11 +12,11 @@ public class SetFriendlyFireMethod : SynchronousMethod
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new BoolArgument("enabled?")
+        new BoolArgument("enabled")
     ];
     
     public override void Execute()
     {
-        Server.FriendlyFire = Args.GetBool("enabled?");
+        Server.FriendlyFire = Args.GetBool("enabled");
     }
 }

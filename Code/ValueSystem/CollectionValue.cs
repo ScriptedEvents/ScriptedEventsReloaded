@@ -7,7 +7,7 @@ using ValueType = SER.Code.ValueSystem.Other.ValueType;
 
 namespace SER.Code.ValueSystem;
 
-public class CollectionValue(IEnumerable value) : Value, IValueWithProperties
+public class CollectionValue(IEnumerable value) : Value, IValueWithProperties, IEnumerable<Value>
 {
     private static readonly Random Random = new();
 
@@ -215,9 +215,19 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties
     [UsedImplicitly]
     public new static string FriendlyName => "collection value";
 
+    public IEnumerator<Value> GetEnumerator()
+    {
+        return CastedValues.AsEnumerable().GetEnumerator();
+    }
+
     public override string ToString()
     {
         return $"[{string.Join(", ", CastedValues.Select(v => v.ToString()))}] ({FriendlyName})";
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 
     public override TryGet<object> ToCSharpObject(Type? targetType)

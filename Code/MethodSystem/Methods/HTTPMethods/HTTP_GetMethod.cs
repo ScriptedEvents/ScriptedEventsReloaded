@@ -33,7 +33,8 @@ public class HTTP_GetMethod : YieldingReferenceReturningMethod<JObject>, ICanErr
         
         using UnityWebRequest webRequest = UnityWebRequest.Get(address);
 
-        yield return Timing.WaitUntilDone(webRequest.SendWebRequest());
+        using var wait = HTTP_PostMethod.SendWithPolicy(this, webRequest);
+        while (wait.MoveNext()) yield return wait.Current;
         
         if (webRequest.error is { } error)
         {
@@ -48,7 +49,7 @@ public class HTTP_GetMethod : YieldingReferenceReturningMethod<JObject>, ICanErr
         }
         catch (JsonReaderException)
         {
-            throw new ScriptRuntimeError(this, ErrorReasons[0]);
+            throw new ScriptRuntimeError(this, ErrorReasons[^1]);
         }
     }
 }

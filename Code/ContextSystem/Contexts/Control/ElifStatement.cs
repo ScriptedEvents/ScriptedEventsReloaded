@@ -1,4 +1,4 @@
-﻿using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
@@ -14,7 +14,7 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
 {
     private readonly List<BaseToken> _condition = [];
 
-    private NumericExpressionReslover.CompiledExpression _expression = null!;
+    private NumericExpressionResolver.CompiledExpression _expression = null!;
 
     public override string FriendlyName => "'elif' statement";
 
@@ -30,7 +30,7 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
-        if (NumericExpressionReslover.IsValidForExpression(token).HasErrored(out var error))
+        if (NumericExpressionResolver.IsValidForExpression(token).HasErrored(out var error))
         {
             return TryAddTokenRes.Error(error);
         }
@@ -41,7 +41,7 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
 
     public override Result VerifyCurrentState()
     {
-        if (NumericExpressionReslover.CompileExpression(_condition.ToArray())
+        if (NumericExpressionResolver.CompileExpression(_condition.ToArray())
             .HasErrored(out var error, out var cond))
         {
             return error;
@@ -74,7 +74,7 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
                 yield break;
             }
 
-            var coro = statement.Run();
+            using var coro = statement.Run();
             while (coro.MoveNext())
             {
                 yield return coro.Current;
@@ -92,12 +92,14 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
                     break;
 
                 case YieldingContext yieldingContext:
-                    var coro = yieldingContext.Run();
+                {
+                    using var coro = yieldingContext.Run();
                     while (coro.MoveNext()) yield return coro.Current;
                     break;
+                }
 
                 default:
-                    throw new AndrzejFuckedUpException("context is not standard nor yielding");
+                    throw new CoreInvariantException("context is not standard nor yielding");
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
@@ -73,7 +73,7 @@ public class WarheadMethod : SynchronousMethod, IEssential
                 break;
 
             default: 
-                throw new KrzysiuFuckedUpException("out of range");
+                throw new GameStateInvariantException("out of range");
         }
     }
 }

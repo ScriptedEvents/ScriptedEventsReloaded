@@ -16,7 +16,7 @@ public class CRole_SetMethod : SynchronousMethod
         new PlayersArgument("players"),
         new CustomRoleArgument("custom role")
         {
-            DefaultValue = new(null, "Removes the currect custom role from the player", true)
+            DefaultValue = new(null, "removes the current custom role from the player", true)
         }
     ];
     

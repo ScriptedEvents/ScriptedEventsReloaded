@@ -1,4 +1,4 @@
-﻿using CommandSystem;
+using CommandSystem;
 using LabApi.Features.Enums;
 using RemoteAdmin;
 using SER.Code.Exceptions;
@@ -42,7 +42,7 @@ public abstract class ScriptExecutor
         {
             CommandType.Client => new PlayerConsoleExecutor { Sender = playerSender.ReferenceHub },
             CommandType.RemoteAdmin => new RemoteAdminExecutor { Sender = playerSender },
-            _ => throw new AndrzejFuckedUpException()
+            _ => throw new CoreInvariantException()
         };
     }
 }

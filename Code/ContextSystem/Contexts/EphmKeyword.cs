@@ -30,7 +30,7 @@ public class EphmKeyword : YieldingContext, IKeywordContext
             return TryAddTokenRes.Error($"{KeywordName} expects a variable definition afterwards.");
 
         _variableToken = variableToken;
-        _variableContext = variableToken.GetContext(Script) as VariableDefinitionContext ?? throw new TosoksFuckedUpException();
+        _variableContext = variableToken.GetContext(Script) as VariableDefinitionContext ?? throw new ExecutionInvariantException();
         return TryAddTokenRes.Continue();
     }
 
@@ -51,7 +51,7 @@ public class EphmKeyword : YieldingContext, IKeywordContext
 
         if (_variableContext.DefinedVariable is null)
         {
-            throw new TosoksFuckedUpException();
+            throw new ExecutionInvariantException();
         }
 
         ParentContext?.MarkVariableAsEphemeral(_variableContext.DefinedVariable);

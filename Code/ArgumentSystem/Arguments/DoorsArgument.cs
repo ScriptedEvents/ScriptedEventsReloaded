@@ -27,30 +27,25 @@ public class DoorsArgument(string name) : EnumHandlingArgument(name)
             return new(() => Door.List.Where(d => d is not ElevatorDoor).ToArray());
         }
         
-        if (token.CanReturn<ReferenceValue>(out var get))
+        return ValueOrEnumResolver<Door[]>(token, value =>
         {
-            return new(() =>
+            if (value is not ReferenceValue reference)
             {
-                if (get().HasErrored(out var error, out var refToken))
-                {
-                    return error;
-                }
-
-                if (refToken.ValueIs<Door>(out var door))
-                {
-                    return new[] { door };
-                }
-
-                if (refToken.ValueIs<Room>(out var room))
-                {
-                    return room.Doors.ToArray();
-                }
-
                 return GenericError(token);
-            });
-        }
+            }
 
-        return EnumResolver<Door[]>(token, [
+            if (reference.ValueIs<Door>(out var door))
+            {
+                return new[] { door };
+            }
+
+            if (reference.ValueIs<Room>(out var room))
+            {
+                return room.Doors.ToArray();
+            }
+
+            return GenericError(token);
+        }, [
             new EnumHandler<DoorName, Door[]>(name => new(() =>
             {
                 return Door.List

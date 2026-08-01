@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
@@ -44,7 +44,7 @@ public class ServerInfoMethod : ReturningMethod
             "tps" => new NumberValue((decimal)Server.Tps),
             "maxtps" => new NumberValue(Server.MaxTps),
             "isverified" => new BoolValue(CustomNetworkManager.IsVerified),
-            _ => throw new TosoksFuckedUpException("out of order")
+            _ => throw new ExecutionInvariantException("out of order")
         };
     }
 }

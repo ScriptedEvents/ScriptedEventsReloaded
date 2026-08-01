@@ -1,4 +1,4 @@
-﻿using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
@@ -62,9 +62,9 @@ public abstract class VariableDefinitionContext<TVarToken, TValue, TVariable>(TV
 
     protected override IEnumerator<float> Execute()
     {
-        if (Expression is null) throw new AndrzejFuckedUpException();
+        if (Expression is null) throw new CoreInvariantException();
 
-        var coro = Expression.Run();
+        using var coro = Expression.Run();
         while (coro.MoveNext())
         {
             yield return coro.Current;

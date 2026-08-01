@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using LabApi.Features.Wrappers;
 using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
@@ -27,7 +27,7 @@ public static class SerExtensions
         switch (value)
         {
             case null:
-                throw new AndrzejFuckedUpException();
+                throw new CoreInvariantException();
             case TOut outValue:
                 return outValue;
         }
@@ -38,7 +38,7 @@ public static class SerExtensions
             valueRep = $"A value '{rawRep}' of type ";
         }
         
-        return $"{valueRep}{value.FriendlyTypeName()} is not a {typeof(TOut).FriendlyTypeName()}";
+        return $"{valueRep}{value.GetType().AccurateName} is not a {typeof(TOut).AccurateName}";
     }
 
     extension(BaseToken token)
@@ -84,6 +84,14 @@ public static class SerExtensions
 
     extension(IValueToken valToken)
     {
+        /// <summary>
+        /// Returns whether the token's static signature may overlap with <typeparamref name="T"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is only a possibility check. In particular, an unknown or union-typed token may
+        /// return a different value at runtime. Do not use this method to choose between competing
+        /// type-specific paths; resolve <see cref="IValueToken.Value"/> first and inspect that value.
+        /// </remarks>
         public bool CapableOf<T>([NotNullWhen(true)] out Func<TryGet<T>>? get) where T : Value
         {
             get = valToken.TryGet<T>;
@@ -93,6 +101,23 @@ public static class SerExtensions
         
             // if any of known types is assignable to T, or T to type, then it may return T
             return knownReturnTypes.Any(type => typeof(T).IsAssignableFrom(type) || type.IsAssignableFrom(typeof(T)));
+        }
+
+        public bool NotCapableOf<T>() where T : Value
+        {
+            return !valToken.CapableOf<T>(out _);
+        }
+
+        public bool NotCapableOf<T1, T2>() where T1 : Value where T2 : Value
+        {
+            return valToken.NotCapableOf<T1>() && valToken.NotCapableOf<T2>();
+        }
+
+        public bool NotCapableOf<T1, T2, T3>() where T1 : Value where T2 : Value where T3 : Value
+        {
+            return valToken.NotCapableOf<T1>()
+                   && valToken.NotCapableOf<T2>()
+                   && valToken.NotCapableOf<T3>();
         }
         
         public TryGet<T> TryGet<T>() where T : Value

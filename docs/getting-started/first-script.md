@@ -47,7 +47,7 @@ It distinguishes:
 
 - an accepted script;
 - a file that failed to compile or register;
-- a disabled filename beginning with `#`;
+- a disabled filename or an excluded folder name beginning with `#`;
 - multiple files competing for the same script name.
 
 Next: [files, names, and reloads](files-and-reloads.md).

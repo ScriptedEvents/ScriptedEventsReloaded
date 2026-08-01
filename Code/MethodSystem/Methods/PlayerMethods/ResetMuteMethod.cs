@@ -12,7 +12,7 @@ public class ResetMuteMethod : SynchronousMethod
     public override Argument[] ExpectedArguments { get; } =
     [
         new PlayersArgument("players"),
-        new BoolArgument("revoke permament")
+        new BoolArgument("revoke permanent")
         {
             DefaultValue = new(true, null)
         }
@@ -21,8 +21,8 @@ public class ResetMuteMethod : SynchronousMethod
     public override void Execute()
     {
         var players = Args.GetPlayers("players");
-        var revokePermament = Args.GetBool("revoke permament");
+        var revokePermanent = Args.GetBool("revoke permanent");
         
-        foreach (var plr in players) plr.Unmute(revokePermament);
+        foreach (var plr in players) plr.Unmute(revokePermanent);
     }
 }

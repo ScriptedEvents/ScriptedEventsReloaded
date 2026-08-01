@@ -1,4 +1,4 @@
-﻿using SER.Code.Exceptions;
+using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
@@ -175,7 +175,7 @@ public static class Tokenizer
                 case BaseToken.Success: return token;
                 case BaseToken.Ignore: continue;
                 case BaseToken.Error err: return err.Message;
-                default: throw new AndrzejFuckedUpException();
+                default: throw new CoreInvariantException();
             }
         }
 

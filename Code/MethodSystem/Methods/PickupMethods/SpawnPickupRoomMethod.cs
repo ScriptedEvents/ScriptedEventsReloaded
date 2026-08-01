@@ -15,7 +15,7 @@ public class SpawnPickupRoomMethod : SynchronousMethod, ICanError
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new ReferenceArgument<Pickup>("pickup/projectile reference"),
+        new ReferenceArgument<Pickup>("pickup or projectile reference"),
         new RoomArgument("room to spawn pickup in"),
         new FloatArgument("relative x")
         {
@@ -33,7 +33,7 @@ public class SpawnPickupRoomMethod : SynchronousMethod, ICanError
 
     public override void Execute()
     {
-        var obj = Args.GetReference<Pickup>("pickup/projectile reference");
+        var obj = Args.GetReference<Pickup>("pickup or projectile reference");
         var room = Args.GetRoom("room to spawn pickup in");
         var pos = room.Transform.TransformPoint(new(
             Args.GetFloat("relative x"),

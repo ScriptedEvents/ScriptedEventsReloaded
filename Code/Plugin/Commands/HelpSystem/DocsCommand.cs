@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using CommandSystem;
 using LabApi.Features.Permissions;
 using SER.Code.ContextSystem.Interfaces;
@@ -96,7 +96,7 @@ public class DocsCommand : ICommand, IUsePermissions
         {
             if (!DocsProvider.GeneralOptions.TryGetValue(helpOption, out var generalOption))
             {
-                throw new AndrzejFuckedUpException(
+                throw new CoreInvariantException(
                     $"Option {helpOption} is not registered in the help command.");
             }
             

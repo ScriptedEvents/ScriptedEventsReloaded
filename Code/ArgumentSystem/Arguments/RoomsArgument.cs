@@ -4,6 +4,7 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
+using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.Arguments;
 
@@ -23,12 +24,12 @@ public class RoomsArgument(string name) : EnumHandlingArgument(name)
             return new(() => Room.List.ToArray());
         }
 
-        if (token.CanReturnReference<Room>(out var func))
+        return ValueOrEnumResolver<Room[]>(token, value =>
         {
-            return new(() => func().OnSuccess<Room[]>(room => [room]));
-        }
-
-        return EnumResolver<Room[]>(token, [
+            return value is ReferenceValue reference
+                ? reference.GetAs<Room>().OnSuccess<Room[]>(room => [room])
+                : GenericError(token);
+        }, [
             new EnumHandler<RoomName, Room[]>(roomName => new(() =>
             {
                 return Room.List

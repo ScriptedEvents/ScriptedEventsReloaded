@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ArgumentSystem.Structures;
@@ -304,7 +304,7 @@ public class ProvidedArguments(Method method)
         {
             DynamicTryGet<TValue> strict => strict.Invoke().Value,
             DynamicTryGet<TValue?> nullable => nullable.Invoke().Value,
-            _ => throw new AndrzejFuckedUpException(
+            _ => throw new CoreInvariantException(
                 $"Argument '{argName}' evaluator type mismatch. " +
                 $"Got {evaluator.GetType().AccurateName}, expected {typeof(TValue).AccurateName} or {typeof(TValue?).AccurateName}.")
         };
@@ -322,7 +322,7 @@ public class ProvidedArguments(Method method)
         {
             if (evaluator is not DynamicTryGet<TValue> argEvalRes)
             {
-                throw new AndrzejFuckedUpException(
+                throw new CoreInvariantException(
                     mainErr +
                     $"Argument value is not of type {typeof(TValue).Name}, evaluator: {evaluator.GetType().AccurateName}."
                 );
@@ -350,7 +350,7 @@ public class ProvidedArguments(Method method)
         var foundArg = method.ExpectedArguments.FirstOrDefault(arg => arg.Name == argName);
         if (foundArg is null)
         {
-            throw new AndrzejFuckedUpException($"There is no argument registered of type '{nameof(TArg)}' and name '{argName}'.");
+            throw new CoreInvariantException($"There is no argument registered of type '{nameof(TArg)}' and name '{argName}'.");
         }
 
         if (foundArg.DefaultValue is null)
@@ -372,7 +372,7 @@ public class ProvidedArguments(Method method)
                 new DynamicTryGet<TValue>((TValue)(object)null!)
             ], // magik
             
-            _ => throw new AndrzejFuckedUpException(
+            _ => throw new CoreInvariantException(
                 $"Argument {argName} for method {method.Name} has its default value set to type " +
                 $"{foundArg.DefaultValue?.Value.GetType().AccurateName ?? "null"}, expected of type {typeof(TValue).Name} or a list of " +
                 $"{typeof(TValue).Name}s."

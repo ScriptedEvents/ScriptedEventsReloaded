@@ -59,7 +59,10 @@ public class ValueExpressionContext : AdditionalContext
 
     public override string FriendlyName => _handler?.FriendlyName ?? "value expression";
 
-    public TypeOfValue PossibleValues => _handler?.PossibleValues ?? new UnknownTypeOfValue();
+    public TypeOfValue PossibleValues =>
+        _handler?.PossibleValues
+        ?? _initialValueToken?.PossibleValues
+        ?? new UnknownTypeOfValue();
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
@@ -102,7 +105,7 @@ public class ValueExpressionContext : AdditionalContext
     {
         _ran = true;
         if (_handler is null) yield break;
-        var coro = _handler.Run();
+        using var coro = _handler.Run();
         while (coro.MoveNext()) yield return coro.Current;
     }
 
@@ -114,12 +117,13 @@ public class ValueExpressionContext : AdditionalContext
         if (!_ran)
         {
             Log.Warn("value expression was not ran yet");
-            Run().MoveNext();
+            using var run = Run();
+            run.MoveNext();
         }
         
         return _handler?.GetReturnValue()
                ?? _initialValueToken?.Value()
-               ?? throw new AndrzejFuckedUpException();
+               ?? throw new CoreInvariantException();
     }
 
     public abstract class Handler
@@ -147,10 +151,10 @@ public class MethodHandler : ValueExpressionContext.Handler
         var method = token.Method;
 
         if (method is not IReturningMethod)
-            throw new Exception($"Method '{method.Name}' does not return a value.'");
+            throw new ScriptCompileError($"Method '{method.Name}' does not return a value.");
 
         if (method is YieldingMethod && !allowsYielding)
-            throw new Exception(
+            throw new ScriptCompileError(
                 $"Method '{method.Name}' is yielding, but you cannot use yielding methods in this context. " +
                 $"Consider making a variable and using that variable instead.");
     }
@@ -159,7 +163,7 @@ public class MethodHandler : ValueExpressionContext.Handler
 
     public override TypeOfValue PossibleValues =>
         _context.Returns
-        ?? throw new AndrzejFuckedUpException("Method has no return type.");
+        ?? throw new CoreInvariantException("Method has no return type.");
 
     public override TryGet<Value> GetReturnValue()
     {
@@ -179,7 +183,7 @@ public class MethodHandler : ValueExpressionContext.Handler
 
     public override IEnumerator<float> Run()
     {
-        var coro = _context.Run();
+        using var coro = _context.Run();
         while (coro.MoveNext()) yield return coro.Current;
     }
 }
@@ -227,7 +231,7 @@ public class NumericExpressionValueHandler(BaseToken initial)
     : ValueExpressionContext.Handler
 {
     private readonly List<BaseToken> _tokens = [initial];
-    private Safe<NumericExpressionReslover.CompiledExpression> _expression;
+    private Safe<NumericExpressionResolver.CompiledExpression> _expression;
 
     public override string FriendlyName => "numeric expression";
 
@@ -246,7 +250,7 @@ public class NumericExpressionValueHandler(BaseToken initial)
 
     public override Result VerifyCurrentState()
     {
-        if (NumericExpressionReslover.CompileExpression(_tokens.ToArray()).HasErrored(out var error, out var compiledExpression))
+        if (NumericExpressionResolver.CompileExpression(_tokens.ToArray()).HasErrored(out var error, out var compiledExpression))
         {
             return error;
         }
@@ -270,7 +274,7 @@ public class FunctionCallHandler(Script scr) : ValueExpressionContext.Handler
 
     public override TypeOfValue PossibleValues =>
         _func?.Returns
-        ?? throw new AndrzejFuckedUpException("Function has no return type.");
+        ?? throw new CoreInvariantException("Function has no return type.");
 
     public override TryGet<Value> GetReturnValue()
     {
@@ -323,7 +327,7 @@ public class FunctionCallHandler(Script scr) : ValueExpressionContext.Handler
             varsToProvide.Add(variable);
         }
 
-        var coro = _func!.RunProperly(varsToProvide.ToArray());
+        using var coro = _func!.RunProperly(varsToProvide.ToArray());
         while (coro.MoveNext()) yield return coro.Current;
     }
 }

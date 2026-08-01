@@ -61,7 +61,6 @@ function getMethodCallContext(lineText, cursorCharacter) {
 function createMarkdownHover(content, range) {
     const markdown = new vscode.MarkdownString(content);
     markdown.supportHtml = true;
-    markdown.isTrusted = true;
     return new vscode.Hover(markdown, range);
 }
 
@@ -117,7 +116,6 @@ function methodArgumentMarkdown(argument) {
 function methodArgumentDocumentation(argument) {
     const markdown = new vscode.MarkdownString(methodArgumentMarkdown(argument));
     markdown.supportHtml = true;
-    markdown.isTrusted = true;
     return markdown;
 }
 
@@ -145,14 +143,13 @@ function createSignaturePresentation(label, parameterRanges, activeParameter, de
     const activeRange = parameterRanges[activeParameter];
     if (!activeRange) return null;
 
-    const width = Math.max(activeRange[1] - activeRange[0], 1);
-    const guide = `${' '.repeat(activeRange[0])}${'─'.repeat(width)}`;
-    let content = `\`\`\`ser\n${escapeCodeBlock(label)}\n${guide}\n\`\`\``;
+    // Keep the signature preview to one line. A separate underline guide makes
+    // long signatures wrap and can corrupt the preview in VS Code.
+    let content = `\`\`\`ser\n${escapeCodeBlock(label)}\n\`\`\``;
     if (description) content += `\n\n${escapeMarkdown(description)}`;
 
     const documentation = new vscode.MarkdownString(content);
     documentation.supportHtml = true;
-    documentation.isTrusted = true;
 
     return {
         // VS Code renders newlines in SignatureInformation.label inline. Keep the
@@ -1157,7 +1154,6 @@ function activate(context) {
 
             const markdown = new vscode.MarkdownString(md);
             markdown.supportHtml = true; // Essential flag to authorize color translations
-            markdown.isTrusted = true;
             return new vscode.Hover(markdown, range);
         }
     });

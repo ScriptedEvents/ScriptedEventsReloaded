@@ -1211,7 +1211,7 @@
       "errors": []
     },
     "SetFriendlyFire": {
-      "syntax": "SetFriendlyFire enabled?",
+      "syntax": "SetFriendlyFire enabled",
       "description": "Changes friendly fire mode.",
       "subgroup": "Server",
       "essential": false,
@@ -1220,14 +1220,14 @@
       "returns": null,
       "arguments": [
         {
-          "name": "enabled?",
+          "name": "enabled",
           "argumentKind": "BoolArgument",
           "mustBeProvided": true,
           "type": "bool (true or false) value",
           "description": null,
           "defaultValue": null,
           "consumesRemainingValues": false,
-          "syntax": "enabled?",
+          "syntax": "enabled",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,
@@ -2976,7 +2976,7 @@
       "errors": []
     },
     "ResetMute": {
-      "syntax": "ResetMute @players revoke_permament?",
+      "syntax": "ResetMute @players revoke_permanent?",
       "description": "Resets mute status for specified players.",
       "subgroup": "Player",
       "essential": false,
@@ -3000,14 +3000,14 @@
           "options": null
         },
         {
-          "name": "revoke permament",
+          "name": "revoke permanent",
           "argumentKind": "BoolArgument",
           "mustBeProvided": false,
           "type": "bool (true or false) value",
           "description": null,
           "defaultValue": "True",
           "consumesRemainingValues": false,
-          "syntax": "revoke_permament?",
+          "syntax": "revoke_permanent?",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,
@@ -4034,7 +4034,7 @@
           "mustBeProvided": false,
           "type": "Any value",
           "description": "If the key doesn't exist, this value will be returned.",
-          "defaultValue": "no default value - will error when key doesnt exist",
+          "defaultValue": "no default value; errors when the key doesn't exist",
           "consumesRemainingValues": false,
           "syntax": "default_value?",
           "enumValues": null,
@@ -4340,7 +4340,7 @@
       "errors": []
     },
     "DestroyPickup": {
-      "syntax": "DestroyPickup *pickup/projectile_reference",
+      "syntax": "DestroyPickup *pickup_or_projectile_reference",
       "description": "Destroys a pickup / grenade from the map.",
       "subgroup": "Pickup",
       "essential": false,
@@ -4349,14 +4349,14 @@
       "returns": null,
       "arguments": [
         {
-          "name": "pickup/projectile reference",
+          "name": "pickup or projectile reference",
           "argumentKind": "ReferenceArgument`1",
           "mustBeProvided": true,
           "type": "a reference to Pickup object.",
           "description": null,
           "defaultValue": null,
           "consumesRemainingValues": false,
-          "syntax": "*pickup/projectile_reference",
+          "syntax": "*pickup_or_projectile_reference",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,
@@ -4396,7 +4396,7 @@
       "errors": []
     },
     "SpawnPickupPlayer": {
-      "syntax": "SpawnPickupPlayer *pickup/projectile_reference @player_to_spawn_pickup_on",
+      "syntax": "SpawnPickupPlayer *pickup_or_projectile_reference @player_to_spawn_pickup_on",
       "description": "Spawns an item pickup / grenade on a player.",
       "subgroup": "Pickup",
       "essential": false,
@@ -4405,14 +4405,14 @@
       "returns": null,
       "arguments": [
         {
-          "name": "pickup/projectile reference",
+          "name": "pickup or projectile reference",
           "argumentKind": "ReferenceArgument`1",
           "mustBeProvided": true,
           "type": "a reference to Pickup object.",
           "description": null,
           "defaultValue": null,
           "consumesRemainingValues": false,
-          "syntax": "*pickup/projectile_reference",
+          "syntax": "*pickup_or_projectile_reference",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,
@@ -4440,7 +4440,7 @@
       ]
     },
     "SpawnPickupPos": {
-      "syntax": "SpawnPickupPos *pickup/projectile_reference x_position y_position z_position",
+      "syntax": "SpawnPickupPos *pickup_or_projectile_reference x_position y_position z_position",
       "description": "Spawns an item pickup / grenade at the coordinates.",
       "subgroup": "Pickup",
       "essential": false,
@@ -4449,14 +4449,14 @@
       "returns": null,
       "arguments": [
         {
-          "name": "pickup/projectile reference",
+          "name": "pickup or projectile reference",
           "argumentKind": "ReferenceArgument`1",
           "mustBeProvided": true,
           "type": "a reference to Pickup object.",
           "description": null,
           "defaultValue": null,
           "consumesRemainingValues": false,
-          "syntax": "*pickup/projectile_reference",
+          "syntax": "*pickup_or_projectile_reference",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,
@@ -4514,7 +4514,7 @@
       ]
     },
     "SpawnPickupRoom": {
-      "syntax": "SpawnPickupRoom *pickup/projectile_reference room_to_spawn_pickup_in relative_x? relative_y? relative_z?",
+      "syntax": "SpawnPickupRoom *pickup_or_projectile_reference room_to_spawn_pickup_in relative_x? relative_y? relative_z?",
       "description": "Spawns an item pickup / grenade in a room.",
       "subgroup": "Pickup",
       "essential": false,
@@ -4523,14 +4523,14 @@
       "returns": null,
       "arguments": [
         {
-          "name": "pickup/projectile reference",
+          "name": "pickup or projectile reference",
           "argumentKind": "ReferenceArgument`1",
           "mustBeProvided": true,
           "type": "a reference to Pickup object.",
           "description": null,
           "defaultValue": null,
           "consumesRemainingValues": false,
-          "syntax": "*pickup/projectile_reference",
+          "syntax": "*pickup_or_projectile_reference",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,
@@ -6671,6 +6671,7 @@
         "ConnectionError",
         "DataProcessingError",
         "ProtocolError",
+        "Response exceeded the configured maximum size.",
         "Provided response was not a valid JSON object."
       ]
     },
@@ -6763,7 +6764,8 @@
       "errors": [
         "ConnectionError",
         "DataProcessingError",
-        "ProtocolError"
+        "ProtocolError",
+        "Response exceeded the configured maximum size."
       ]
     },
     "JSON.Add": {
@@ -8446,6 +8448,7 @@
         "ConnectionError",
         "DataProcessingError",
         "ProtocolError",
+        "Response exceeded the configured maximum size.",
         "Message ID must not be empty.",
         "Provided URL is not a valid webhook URL."
       ]
@@ -8524,6 +8527,7 @@
         "ConnectionError",
         "DataProcessingError",
         "ProtocolError",
+        "Response exceeded the configured maximum size.",
         "Message ID must not be empty.",
         "Provided URL is not a valid webhook URL."
       ]
@@ -8587,6 +8591,7 @@
         "ConnectionError",
         "DataProcessingError",
         "ProtocolError",
+        "Response exceeded the configured maximum size.",
         "Provided URL is not a valid webhook URL."
       ]
     },
@@ -8649,6 +8654,7 @@
         "ConnectionError",
         "DataProcessingError",
         "ProtocolError",
+        "Response exceeded the configured maximum size.",
         "Provided URL is not a valid webhook URL."
       ]
     },
@@ -9672,7 +9678,7 @@
       "errors": []
     },
     "CRole.CreateProceduralSpawnSystem": {
-      "syntax": "CRole.CreateProceduralSpawnSystem role_to_replace per-player_spawn_chance conversion_limit? minimum_required_players?",
+      "syntax": "CRole.CreateProceduralSpawnSystem role_to_replace per_player_spawn_chance conversion_limit? minimum_required_players?",
       "description": "Creates a procedural spawn system for a custom role.",
       "subgroup": "CustomRole",
       "essential": false,
@@ -9728,14 +9734,14 @@
           "options": null
         },
         {
-          "name": "per-player spawn chance",
+          "name": "per player spawn chance",
           "argumentKind": "FloatArgument",
           "mustBeProvided": true,
           "type": "A number between 0% and 100% (inclusive)",
           "description": "Example: setting conversion chance to 30% means that EACH player has a 30% chance to convert.",
           "defaultValue": null,
           "consumesRemainingValues": false,
-          "syntax": "per-player_spawn_chance",
+          "syntax": "per_player_spawn_chance",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,
@@ -10070,7 +10076,7 @@
           "mustBeProvided": true,
           "type": "Custom role id e.g. myCustomRole",
           "description": null,
-          "defaultValue": "Removes the currect custom role from the player",
+          "defaultValue": "removes the current custom role from the player",
           "consumesRemainingValues": false,
           "syntax": "custom_role",
           "enumValues": null,
@@ -10110,11 +10116,11 @@
       "errors": []
     },
     "Config.GetOption": {
-      "syntax": "Config.GetOption *config \"keys\"...",
+      "syntax": "Config.GetOption *config \"key\" default_value?",
       "description": "Tries to get a value from a config.",
       "subgroup": "Config",
       "essential": false,
-      "additionalDescription": "It's advised that you use 'attempt' statement when trying to get an option from the config, as many things can go wrong during the process.",
+      "additionalDescription": "It's advised that you set the 'default value' argument if you don't want an error to occur if no key is found.",
       "requiredFramework": null,
       "returns": "unknown value",
       "arguments": [
@@ -10134,14 +10140,29 @@
           "options": null
         },
         {
-          "name": "keys",
+          "name": "key",
           "argumentKind": "TextArgument",
           "mustBeProvided": true,
           "type": "Any text e.g. \"Hello, World!\"",
-          "description": "If the config is nested, you can provide multiple keys to traverse the option tree.",
+          "description": null,
           "defaultValue": null,
-          "consumesRemainingValues": true,
-          "syntax": "\"keys\"...",
+          "consumesRemainingValues": false,
+          "syntax": "\"key\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "default value",
+          "argumentKind": "AnyValueArgument",
+          "mustBeProvided": false,
+          "type": "Any value",
+          "description": "The value to return if the key is not found.",
+          "defaultValue": "no default value",
+          "consumesRemainingValues": false,
+          "syntax": "default_value?",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,
@@ -10150,7 +10171,7 @@
         }
       ],
       "errors": [
-        "No key was found in the config."
+        "The requested key was not found in the config."
       ]
     },
     "Config.Read": {
@@ -10158,7 +10179,7 @@
       "description": "Reads and returns a config.",
       "subgroup": "Config",
       "essential": false,
-      "additionalDescription": "This method will attempt to read basic '.yaml' files from 'C:\\Users\\Olgie\\AppData\\Roaming\\SCP Secret Laboratory\\LabAPI\\configs\\Scripted Events Reloaded\\Custom Configs' folder. If the folder doesnt exist, you can safely make one and create '.yaml' files there. The '.yml' extension is also supported. If a file with the config name is not found, an invalid reference will be returned. Learn more about YAML files: https://www.cloudbees.com/blog/yaml-tutorial-everything-you-need-get-started ",
+      "additionalDescription": "This method will attempt to read basic '.yaml' files from 'C:\\Users\\Olgie\\AppData\\Roaming\\SCP Secret Laboratory\\LabAPI\\configs\\Scripted Events Reloaded\\Custom Configs' folder. If the folder doesn't exist, you can safely make one and create '.yaml' files there. The '.yml' extension is also supported. If a file with the config name is not found, an invalid reference will be returned. Learn more about YAML files: https://www.cloudbees.com/blog/yaml-tutorial-everything-you-need-get-started ",
       "requiredFramework": null,
       "returns": "reference to CustomConfig object",
       "arguments": [
@@ -11177,7 +11198,8 @@
       ],
       "errors": [
         "File doesn't exist",
-        "File is not of type 'ogg'"
+        "File is not of type 'ogg'",
+        "The file path resolves outside the main SER folder"
       ]
     },
     "Audio.Play": {
@@ -11778,7 +11800,7 @@
     },
     "Toy.Info": {
       "syntax": "Toy.Info *toy_reference property",
-      "description": "Returns information about an Admin Toy",
+      "description": "Returns numeric network or transform information about an Admin Toy.",
       "subgroup": "AdminToys",
       "essential": false,
       "additionalDescription": null,
@@ -12214,7 +12236,7 @@
       "errors": []
     },
     "Toy.TPPlayer": {
-      "syntax": "Toy.TPPlayer *toy_reference @player_to_teleport_toy_to align_toy_rotation_to_player??",
+      "syntax": "Toy.TPPlayer *toy_reference @player_to_teleport_toy_to align_toy_rotation_to_player?",
       "description": "Teleports an Admin Toy to a given player",
       "subgroup": "AdminToys",
       "essential": false,
@@ -12253,14 +12275,14 @@
           "options": null
         },
         {
-          "name": "align toy rotation to player?",
+          "name": "align toy rotation to player",
           "argumentKind": "BoolArgument",
           "mustBeProvided": false,
           "type": "bool (true or false) value",
           "description": null,
           "defaultValue": "False",
           "consumesRemainingValues": false,
-          "syntax": "align_toy_rotation_to_player??",
+          "syntax": "align_toy_rotation_to_player?",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,
@@ -12880,7 +12902,7 @@
       "errors": []
     },
     "SetShootingTargetProperties": {
-      "syntax": "SetShootingTargetProperties *target_reference max_hp? auto_reset_time? synchronize_damage??",
+      "syntax": "SetShootingTargetProperties *target_reference max_hp? auto_reset_time? synchronize_damage?",
       "description": "Sets the properties of a ShootingTargetToy.",
       "subgroup": "AdminToyProperty",
       "essential": false,
@@ -12934,14 +12956,14 @@
           "options": null
         },
         {
-          "name": "synchronize damage?",
+          "name": "synchronize damage",
           "argumentKind": "BoolArgument",
           "mustBeProvided": false,
           "type": "bool (true or false) value",
           "description": null,
           "defaultValue": "not changing",
           "consumesRemainingValues": false,
-          "syntax": "synchronize_damage??",
+          "syntax": "synchronize_damage?",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,
@@ -13219,7 +13241,7 @@
           "argumentKind": "IntArgument",
           "mustBeProvided": true,
           "type": "A whole number between 0 and 65535 (inclusive)",
-          "description": "The min and max are there so the whole thing doesn't crash from int -> ushort conversion :trollface:",
+          "description": "The accepted range matches the unsigned 16-bit limit used by EXILED.",
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "limit",
@@ -14975,7 +14997,7 @@
           "argumentKind": "PlayerArgument",
           "mustBeProvided": false,
           "type": "Player value e.g. @player, with EXACTLY 1 player.",
-          "description": "Use _ if there isnt a specific player asking the question.",
+          "description": "Use _ if there isn't a specific player asking the question.",
           "defaultValue": "general question",
           "consumesRemainingValues": false,
           "syntax": "@player_asking?",
@@ -15032,7 +15054,7 @@
           "argumentKind": "PlayerArgument",
           "mustBeProvided": false,
           "type": "Player value e.g. @player, with EXACTLY 1 player.",
-          "description": "Use _ if there isnt a specific player asking the question.",
+          "description": "Use _ if there isn't a specific player asking the question.",
           "defaultValue": "general question",
           "consumesRemainingValues": false,
           "syntax": "@player_asking?",
@@ -21674,7 +21696,7 @@
       ]
     },
     "PluginsEnabled": {
-      "description": null,
+      "description": "Gets called when all the plugins are enabled.",
       "group": "ServerEvents",
       "eventDataType": null,
       "eventDataDescription": null,

@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
@@ -33,7 +33,7 @@ public class RoundInfoMethod : LiteralValueReturningMethod
             "isinprogress" => new BoolValue(Round.IsRoundInProgress),
             "hasended" => new BoolValue(Round.IsRoundEnded),
             "duration" => new DurationValue(Round.Duration),
-            _ => throw new AndrzejFuckedUpException()
+            _ => throw new CoreInvariantException()
         };
     }
 }

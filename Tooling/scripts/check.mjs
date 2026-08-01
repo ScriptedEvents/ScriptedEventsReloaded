@@ -19,6 +19,8 @@ const files = {
   extensionEditorLogicOutput: path.join(extensionDirectory, "out", "ser-editor-logic.js"),
   extensionCore: path.join(extensionDirectory, "out", "ser-language-core.js"),
   extensionEditor: path.join(extensionDirectory, "out", "visual-editor.html"),
+  thirdPartyLicenses: path.join(repositoryDirectory, "THIRD_PARTY_LICENSES.txt"),
+  extensionThirdPartyLicenses: path.join(extensionDirectory, "THIRD_PARTY_LICENSES.txt"),
   manifest: path.join(repositoryDirectory, "ser_method_info.js"),
   extensionManifest: path.join(extensionDirectory, "out", "ser_method_info.js")
 };
@@ -66,6 +68,28 @@ assert.equal(
   "The extension's shared language core is stale."
 );
 
+const thirdPartyLicenses = fs.readFileSync(files.thirdPartyLicenses, "utf8");
+assert.equal(
+  fs.readFileSync(files.extensionThirdPartyLicenses, "utf8"),
+  thirdPartyLicenses,
+  "The extension's third-party notices are stale. Run the tooling build."
+);
+for (const requiredNotice of [
+  "Blockly 13.2.0",
+  "Apache License",
+  "AudioPlayerApi 1.1.3",
+  "EXILED 9.14.2",
+  "NCalc 1.3.8",
+  "Newtonsoft.Json 13.0.4",
+  "NVorbis 0.10.5",
+  "SharpCompress 0.48.1"
+]) {
+  assert.ok(
+    thirdPartyLicenses.includes(requiredNotice),
+    `THIRD_PARTY_LICENSES.txt is missing ${requiredNotice}.`
+  );
+}
+
 for (const filename of [files.standalone, files.extensionEditor]) {
   const html = fs.readFileSync(filename, "utf8");
   assert.ok(html.includes("SER Blocks"), `${filename} is not the beginner SER editor.`);
@@ -74,6 +98,10 @@ for (const filename of [files.standalone, files.extensionEditor]) {
   assert.ok(html.includes("ser_player_exists"), `${filename} is missing the safe player check.`);
   assert.ok(html.includes("SERLanguageCore"), `${filename} does not include the shared core.`);
   assert.ok(html.includes("Blockly"), `${filename} does not include Blockly.`);
+  assert.ok(
+    html.includes("THIRD_PARTY_LICENSES.txt"),
+    `${filename} does not direct redistributors to the third-party notices.`
+  );
   assert.ok(!html.includes("https://unpkg.com/blockly/blockly.min.js"), `${filename} still uses the unpinned CDN.`);
   assert.ok(!html.includes("SER_TOOLING_"), `${filename} contains unexpanded build placeholders.`);
 }
@@ -82,6 +110,12 @@ const editorSource = fs.readFileSync(files.editor, "utf8");
 assert.ok(
   !editorSource.includes("metadata.Methods") && !editorSource.includes("All SER features"),
   "The beginner editor must not dynamically expose the complete SER API."
+);
+
+const extensionSource = fs.readFileSync(files.extensionSource, "utf8");
+assert.ok(
+  !extensionSource.includes("isTrusted = true"),
+  "Generated SER documentation must not enable trusted Markdown commands."
 );
 
 const standaloneHtml = fs.readFileSync(files.standalone, "utf8");

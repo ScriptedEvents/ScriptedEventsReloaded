@@ -100,7 +100,7 @@ for (const requiredText of [
   "serreload",
   ".txt",
   "globally unique",
-  "targeted discovery"
+  "targeted refresh"
 ]) {
   assert.ok(
     combinedDocumentation.toLowerCase().includes(requiredText.toLowerCase()),

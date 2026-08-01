@@ -21,7 +21,7 @@ public abstract class YieldingContext : RunnableContext
             Script.CurrentLine = LineNum.Value;
         }
 
-        var enumerator = Execute();
+        using var enumerator = Execute();
         while (enumerator.MoveNext())
         {
             yield return enumerator.Current;

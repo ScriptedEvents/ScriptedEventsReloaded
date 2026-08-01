@@ -16,12 +16,11 @@ public class Config_GetOptionMethod : ReturningMethod, ICanError, IAdditionalDes
     public override TypeOfValue Returns => new UnknownTypeOfValue();
 
     public string AdditionalDescription =>
-        "It's advised that you use 'attempt' statement when trying to get an option from the config, as many things " +
-        "can go wrong during the process.";
+        "It's advised that you set the 'default value' argument if you don't want an error to occur if no key is found.";
 
     public string[] ErrorReasons { get; } =
     [
-        "No key was found in the config."
+        "The requested key was not found in the config."
     ];
 
     public override string Description => "Tries to get a value from a config.";
@@ -29,20 +28,32 @@ public class Config_GetOptionMethod : ReturningMethod, ICanError, IAdditionalDes
     public override Argument[] ExpectedArguments { get; } =
     [
         new ReferenceArgument<CustomConfig>("config"),
-        new TextArgument("keys")
+        new TextArgument("key"),
+        new AnyValueArgument("default value")
         {
-            ConsumesRemainingValues = true,
-            Description = "If the config is nested, you can provide multiple keys to traverse the option tree."
+            Description = "The value to return if the key is not found.",
+            DefaultValue = new(null, "no default value")
         }
     ];
 
     public override void Execute()
     {
         var config = Args.GetReference<CustomConfig>("config");
-        var keys = Args.GetRemainingArguments<string, TextArgument>("keys");
+        var key = Args.GetText("key");
+        var defaultValue = Args.GetAnyValue("default value");
 
-        ReturnValue = Value.Parse(
-            config.GetValue(keys) ?? throw new ScriptRuntimeError(this, ErrorReasons[0])
-        );
+        if (config.GetValue(key) is { } value)
+        {
+            ReturnValue = Value.Parse(value);
+            return;
+        }
+
+        if (defaultValue is not null)
+        {
+            ReturnValue = defaultValue;
+            return;
+        }
+
+        throw new ScriptRuntimeError(this, $"Key '{key}' was not found in the config.");
     }
 }

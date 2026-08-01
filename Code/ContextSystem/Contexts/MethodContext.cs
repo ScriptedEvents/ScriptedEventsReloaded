@@ -80,12 +80,14 @@ public class MethodContext(MethodToken methodToken) : YieldingContext, IMayRetur
                 break;
 
             case YieldingMethod yieldAct:
-                var enumerator = yieldAct.Execute();
+            {
+                using var enumerator = yieldAct.Execute();
                 while (enumerator.MoveNext())
                 {
                     yield return enumerator.Current;
                 }
                 break;
+            }
         }
 
         ReturnedValue = Method is IReturningMethod returningMethod

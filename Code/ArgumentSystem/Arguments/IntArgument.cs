@@ -1,4 +1,4 @@
-﻿using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
@@ -17,7 +17,7 @@ public class IntArgument : Argument
     {
         if (minValue.HasValue && maxValue.HasValue && minValue.Value > maxValue.Value)
         {
-            throw new AndrzejFuckedUpException(
+            throw new CoreInvariantException(
                 $"{nameof(IntArgument)} has minValue at {minValue.Value} and maxValue at {maxValue.Value}.");
         }
 

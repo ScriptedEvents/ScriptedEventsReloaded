@@ -70,13 +70,15 @@ public abstract class StatementContext : YieldingContext
                     continue;
 
                 case YieldingContext yc:
-                    var coro = yc.Run();
+                {
+                    using var coro = yc.Run();
                     while (coro.MoveNext())
                     {
                         if (endCond?.Invoke() is true) goto leave;
                         yield return coro.Current;
                     }
                     break;
+                }
             }
         }
 

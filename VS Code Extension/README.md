@@ -1,7 +1,8 @@
 # Scripted Events Reloaded
-Allow your SER scripts to get colorful!
 
-Adds custom theme support for SER scripts. Works regardless of selected theme.
+Language support and a guided blocks editor for Scripted Events Reloaded 1.0.
+The extension is generated from the same method, flag, event, variable, and
+property manifest used by the plugin's built-in `serhelp` reference.
 
 Language features include:
 
@@ -19,6 +20,15 @@ Language features include:
   available through **SER: Open Blocks Editor**. It uses guided recipes and a
   deliberately small block set; the text editor remains the path to the full
   SER language.
+
+SER associates `.ser` files automatically. The plugin also accepts `.txt`
+scripts for hosting-panel compatibility; in VS Code, choose the SER language
+mode manually when editing one of those files.
+
+Start with the
+[SER 1.0 documentation](https://github.com/ScriptedEvents/ScriptedEventsReloaded/tree/main/docs),
+or run `serhelp start` on a server to locate the active script directory and
+see the first-run workflow.
 
 This extension is maintained together with the main SER repository. SER's build
 regenerates the reflection-backed language manifest. The shared tooling build

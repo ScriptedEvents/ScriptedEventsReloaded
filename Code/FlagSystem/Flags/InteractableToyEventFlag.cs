@@ -45,7 +45,7 @@ public class InteractableToyEventFlag : Flag, IMajorBehaviorFlag
             new ReferenceVariable("evToy", new ReferenceValue<InteractableToy>(interactableToy))
         ];
         
-        foreach (var scriptName in ScriptsBoundToEvent)
+        foreach (var scriptName in ScriptsBoundToEvent.ToArray())
         {
             if (scriptName.GetScript(null).HasErrored(out var err, out var script))
             {

@@ -2,7 +2,7 @@
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
-using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.BaseMethods.Yielding;
 using SER.Code.MethodSystem.Methods.HTTPMethods;
 using SER.Code.MethodSystem.Structures;
 
@@ -10,7 +10,7 @@ namespace SER.Code.MethodSystem.Methods.DiscordMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class Discord_DeleteMessageMethod : SynchronousMethod, ICanError
+public class Discord_DeleteMessageMethod : YieldingMethod, ICanError
 {
     public override string Description => "Deletes a message sent by a discord webhook (with that same webhook).";
 
@@ -35,7 +35,7 @@ public class Discord_DeleteMessageMethod : SynchronousMethod, ICanError
         }
     ];
 
-    public override void Execute()
+    public override IEnumerator<float> Execute()
     {
         var webhookUrl = Args.GetText("webhook url");
         var messageId = Args.GetText("message id");
@@ -50,6 +50,6 @@ public class Discord_DeleteMessageMethod : SynchronousMethod, ICanError
         var messageURL = webhookUrl + "/messages/" + messageId +
                          (!threadId.IsEmpty() ? $"?thread_id={threadId}" : "");
 
-        Timing.RunCoroutine(HTTP_PostMethod.RequestSend(this, messageURL, null, "DELETE"));
+        return HTTP_PostMethod.RequestSend(this, messageURL, null, "DELETE");
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ValueSystem.PropertySystem;
@@ -39,7 +39,7 @@ public abstract class LiteralValue : Value
     [field: AllowNull, MaybeNull]
     public object Value => field
                            ?? _valueGetter?.Invoke()
-                           ?? throw new AndrzejFuckedUpException("literal value is null");
+                           ?? throw new CoreInvariantException("literal value is null");
 
     public override bool Equals(Value? other) => other is LiteralValue otherP && Value.Equals(otherP.Value);
 

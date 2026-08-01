@@ -32,4 +32,14 @@ public class Config
 
     [Description("Shows a temporary SER contributor badge to recognized contributors without a server rank.")]
     public bool ShowContributorBadges { get; set; } = false;
+
+    [Description(
+        "Maximum time in seconds that an HTTP, Discord, or IP-information request may run before it is cancelled."
+    )]
+    public int NetworkRequestTimeoutSeconds { get; set; } = 15;
+
+    [Description(
+        "Maximum response body size in bytes accepted by HTTP, Discord, and IP-information requests."
+    )]
+    public int MaxNetworkResponseBytes { get; set; } = 1_048_576;
 }

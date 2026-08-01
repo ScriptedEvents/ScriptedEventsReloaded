@@ -1,4 +1,4 @@
-﻿using SER.Code.ContextSystem.Structures;
+using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
@@ -54,14 +54,14 @@ public class ReferenceVariableDefinitionContext(VariableToken<ReferenceVariable,
     {
         if (_propertyAccess is null)
         {
-            var coro = base.Execute();
+            using var coro = base.Execute();
             while (coro.MoveNext()) yield return coro.Current;
             yield break;
         }
 
-        if (Expression is null) throw new AndrzejFuckedUpException();
+        if (Expression is null) throw new CoreInvariantException();
 
-        var coroExpr = Expression.Run();
+        using var coroExpr = Expression.Run();
         while (coroExpr.MoveNext())
         {
             yield return coroExpr.Current;

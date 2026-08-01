@@ -4,6 +4,8 @@ namespace SER.Code.Extensions;
 
 public static class CollectionExtensions
 {
+    private static readonly Random Random = new();
+
     extension<T>(IEnumerable<T> enumerable)
     {
         public void ForEachItem(Action<T> obj)
@@ -19,7 +21,10 @@ public static class CollectionExtensions
         public T GetRandomValue()
         {
             var array = enumerable as T[] ?? enumerable.ToArray();
-            return array[new Random().Next(0, array.Length)];
+            lock (Random)
+            {
+                return array[Random.Next(0, array.Length)];
+            }
         }
 
         public TryGet<T> TryGetRandomValue(string error)

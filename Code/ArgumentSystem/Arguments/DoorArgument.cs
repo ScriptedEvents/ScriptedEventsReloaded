@@ -5,6 +5,7 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
+using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.Arguments;
 
@@ -19,12 +20,12 @@ public class DoorArgument(string name) : EnumHandlingArgument(name)
     [UsedImplicitly]
     public DynamicTryGet<Door> GetConvertSolution(BaseToken token)
     {
-        if (token.CanReturnReference<Door>(out var func))
+        return ValueOrEnumResolver<Door>(token, value =>
         {
-            return func;
-        }
-        
-        return EnumResolver<Door>(token, [
+            return value is ReferenceValue reference
+                ? reference.GetAs<Door>()
+                : GenericError(token);
+        }, [
             new EnumHandler<DoorName, Door>(name => new(() =>
             {
                 return Door.List

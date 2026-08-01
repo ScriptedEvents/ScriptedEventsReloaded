@@ -1,4 +1,4 @@
-﻿using SER.Code.Exceptions;
+using SER.Code.Exceptions;
 
 namespace SER.Code.Helpers.ResultSystem;
 
@@ -39,7 +39,7 @@ public class DynamicTryGet<T> : DynamicTryGet
             }
             else
             {
-                throw new AndrzejFuckedUpException();
+                throw new CoreInvariantException();
             }
             
             if (string.IsNullOrEmpty(error)) return true;

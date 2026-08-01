@@ -7,7 +7,6 @@ namespace SER.Code.ArgumentSystem.Arguments;
 
 public class TokenArgument<T>(string name) : Argument(name) where T : BaseToken
 {
-    // todo: add better descriptions for tokens
     public override string InputDescription => $"A {typeof(T).FriendlyTypeName(true)}";
 
     [UsedImplicitly]

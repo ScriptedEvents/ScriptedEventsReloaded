@@ -15,13 +15,13 @@ public class SpawnPickupPlayerMethod : SynchronousMethod, ICanError
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new ReferenceArgument<Pickup>("pickup/projectile reference"),
+        new ReferenceArgument<Pickup>("pickup or projectile reference"),
         new PlayerArgument("player to spawn pickup on"),
     ];
 
     public override void Execute()
     {
-        var obj = Args.GetReference<Pickup>("pickup/projectile reference");
+        var obj = Args.GetReference<Pickup>("pickup or projectile reference");
         var plr = Args.GetPlayer("player to spawn pickup on");
 
         SpawnPickupPosMethod.SpawnPickup(obj, plr.Position, this);

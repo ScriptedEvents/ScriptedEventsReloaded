@@ -1,4 +1,4 @@
-﻿using InventorySystem;
+using InventorySystem;
 using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
@@ -32,11 +32,11 @@ public class CreateGrenadeMethod : ReferenceReturningMethod<Projectile>, IAdditi
     {
         if (!Enum.TryParse(Args.GetOption("grenade type"), true, out ItemType itemType) ||
             !InventoryItemLoader.TryGetItem<ThrowableItem>(itemType, out var throwable))
-            throw new TosoksFuckedUpException(
+            throw new ExecutionInvariantException(
                 $"The projectile prefab for '{Args.GetOption("grenade type")}' was unavailable.");
         
         var item = Object.Instantiate(throwable.Projectile) 
-                   ?? throw new TosoksFuckedUpException("The projectile prefab could not be instantiated.");
+                   ?? throw new ExecutionInvariantException("The projectile prefab could not be instantiated.");
         item.Info = new(itemType, throwable.Weight);
         item.PreviousOwner = new(Args.GetPlayer("attacker").ReferenceHub);
         

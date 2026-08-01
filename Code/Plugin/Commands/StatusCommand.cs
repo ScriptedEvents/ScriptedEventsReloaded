@@ -35,6 +35,8 @@ public class StatusCommand : ICommand, IUsePermissions
         var accepted = ScriptCatalog.GetAcceptedScripts();
         var failed = ScriptCatalog.GetFailedScripts();
         var disabled = FileSystem.FileSystem.DisabledScriptPaths;
+        var disabledDirectories = FileSystem.FileSystem.DisabledScriptDirectoryPaths;
+        var skippedLinks = FileSystem.FileSystem.SkippedLinkDirectoryPaths;
         var duplicates = FileSystem.FileSystem.DuplicateScriptPaths;
 
         var output = new StringBuilder();
@@ -42,7 +44,8 @@ public class StatusCommand : ICommand, IUsePermissions
         output.AppendLine($"Directory: {FileSystem.FileSystem.MainDirPath}");
         output.AppendLine(
             $"Accepted: {accepted.Length} | Failed: {failed.Length} | " +
-            $"Disabled by #: {disabled.Length} | Name conflicts: {duplicates.Count}");
+            $"Disabled by #: {disabled.Length} file(s), {disabledDirectories.Length} folder(s) | " +
+            $"Skipped links: {skippedLinks.Length} | Name conflicts: {duplicates.Count}");
 
         AppendLimited(
             output,
@@ -60,6 +63,8 @@ public class StatusCommand : ICommand, IUsePermissions
                     : "No active version.")),
             limit);
         AppendLimited(output, "Disabled files", disabled.Select(path => $"> {path}"), limit);
+        AppendLimited(output, "Excluded folders", disabledDirectories.Select(path => $"> {path}"), limit);
+        AppendLimited(output, "Skipped linked folders", skippedLinks.Select(path => $"> {path}"), limit);
         AppendLimited(
             output,
             "Conflicting names",
@@ -67,7 +72,11 @@ public class StatusCommand : ICommand, IUsePermissions
                 $"> {pair.Key}\n" + string.Join("\n", pair.Value.Select(path => $"  {path}"))),
             limit);
 
-        if (!showAll && new[] { accepted.Length, failed.Length, disabled.Length, duplicates.Count }
+        if (!showAll && new[]
+                {
+                    accepted.Length, failed.Length, disabled.Length, disabledDirectories.Length,
+                    skippedLinks.Length, duplicates.Count
+                }
                 .Any(count => count > DefaultLimit))
         {
             output.AppendLine();
@@ -105,6 +114,6 @@ public class StatusCommand : ICommand, IUsePermissions
 
     public string Command => "serstatus";
     public string[] Aliases => ["serlist"];
-    public string Description => "Shows accepted, failed, disabled, and conflicting script files.";
+    public string Description => "Shows accepted, failed, disabled, excluded, linked, and conflicting scripts.";
     public string Permission => "ser.run";
 }

@@ -2,6 +2,8 @@
 using System.Text;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
+using SER.Code.MethodSystem;
+using SER.Code.MethodSystem.Structures;
 using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
@@ -91,6 +93,11 @@ public static class ExampleHandler
         if (VerifyDocumentationExamples(projectDirectory).HasErrored(out var documentationError))
         {
             return (documentationError, examples.Keys.ToArray());
+        }
+
+        if (VerifyMethodContracts() is { } methodContractError)
+        {
+            return (methodContractError, examples.Keys.ToArray());
         }
 
         var regressionScripts = new Dictionary<string, string>
@@ -193,6 +200,29 @@ public static class ExampleHandler
                 examples.Keys.ToArray());
         }
 
+        var pathValidationRoot = Path.Combine(Path.GetTempPath(), "ser-path-validation");
+        var unsafePathNames = new List<string>
+        {
+            Path.Combine("..", "outside"),
+            Path.Combine("trailing. ", "outside"),
+            "file:stream"
+        };
+        if (Path.DirectorySeparatorChar == '\\')
+        {
+            unsafePathNames.Add("CON");
+        }
+
+        if (FileSystem.FileSystem.GetContainedPath(
+                pathValidationRoot,
+                Path.Combine("audio", "clip"),
+                ".ogg").HasErrored()
+            || unsafePathNames.Any(name => !FileSystem.FileSystem.GetContainedPath(
+                pathValidationRoot, name, ".ogg").HasErrored()))
+        {
+            return ("SER data-path containment accepted an escape or rejected a nested path.",
+                examples.Keys.ToArray());
+        }
+
         if (!CRole.PassesSpawnChance(1f, 0.999999999)
             || CRole.PassesSpawnChance(0f, 0d)
             || !CRole.PassesSpawnChance(0.5f, 0.49d)
@@ -221,6 +251,99 @@ public static class ExampleHandler
         }
 
         return (null, examples.Keys.ToArray());
+    }
+
+    private static string? VerifyMethodContracts()
+    {
+        var methods = MethodIndex.NameToMethodIndex.Values
+            .Concat(MethodIndex.FrameworkDependentMethods.Values.SelectMany(group => group))
+            .Distinct()
+            .ToArray();
+        var claimedNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var method in methods)
+        {
+            if (string.IsNullOrWhiteSpace(method.Name))
+            {
+                return $"Method type '{method.GetType().FullName}' has no public name.";
+            }
+
+            if (string.IsNullOrWhiteSpace(method.Description))
+            {
+                return $"Method '{method.Name}' has no description.";
+            }
+
+            foreach (var publicName in new[] { method.Name }
+                         .Concat(method is IHasAliases aliases ? aliases.Aliases : []))
+            {
+                if (string.IsNullOrWhiteSpace(publicName))
+                {
+                    return $"Method '{method.Name}' declares an empty alias.";
+                }
+
+                if (claimedNames.TryGetValue(publicName, out var owner) && owner != method.Name)
+                {
+                    return $"Method name or alias '{publicName}' is shared by '{owner}' and '{method.Name}'.";
+                }
+
+                claimedNames[publicName] = method.Name;
+            }
+
+            var arguments = method.ExpectedArguments;
+            if (arguments.Any(argument => string.IsNullOrWhiteSpace(argument.Name)))
+            {
+                return $"Method '{method.Name}' contains an unnamed argument.";
+            }
+
+            var invalidArgumentName = arguments.FirstOrDefault(argument =>
+                argument.Name.Any(character =>
+                    !char.IsLetterOrDigit(character) && character != ' '));
+            if (invalidArgumentName is not null)
+            {
+                return $"Method '{method.Name}' argument '{invalidArgumentName.Name}' contains punctuation.";
+            }
+
+            var duplicateArgument = arguments
+                .GroupBy(argument => argument.Name, StringComparer.OrdinalIgnoreCase)
+                .FirstOrDefault(group => group.Count() > 1);
+            if (duplicateArgument is not null)
+            {
+                return $"Method '{method.Name}' declares argument '{duplicateArgument.Key}' more than once.";
+            }
+
+            if (arguments.Select((argument, index) => (argument, index))
+                .Any(pair => pair.argument.ConsumesRemainingValues && pair.index != arguments.Length - 1))
+            {
+                return $"Method '{method.Name}' has a consume-remaining argument that is not last.";
+            }
+
+            if (arguments.Any(argument => string.IsNullOrWhiteSpace(argument.InputDescription)))
+            {
+                return $"Method '{method.Name}' contains an argument without an input description.";
+            }
+
+            if (method is ICanError canError
+                && (canError.ErrorReasons.Length == 0
+                    || canError.ErrorReasons.Any(string.IsNullOrWhiteSpace)))
+            {
+                return $"Method '{method.Name}' declares an empty runtime-error contract.";
+            }
+
+            if (method is IAdditionalDescription additional
+                && string.IsNullOrWhiteSpace(additional.AdditionalDescription))
+            {
+                return $"Method '{method.Name}' declares an empty additional description.";
+            }
+
+            if (method is IDependOnFramework dependency
+                && (!MethodIndex.FrameworkDependentMethods.TryGetValue(dependency.DependsOn, out var registered)
+                    || !registered.Contains(method)))
+            {
+                return $"Method '{method.Name}' is not indexed under its required framework.";
+            }
+        }
+
+        return null;
     }
 
     private static Result VerifyDocumentationExamples(string? projectDirectory)

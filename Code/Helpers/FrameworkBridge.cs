@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Console;
+using LabApi.Features.Console;
 using LabApi.Loader;
 using SER.Code.Extensions;
 using SER.Code.MethodSystem;
@@ -31,6 +31,10 @@ public static class FrameworkBridge
     public static void Initialize()
     {
         Clear();
+#if EXILED
+        MethodIndex.LoadMethodsOfFramework(Type.Exiled);
+        Found.Add(new Framework("Exiled", Type.Exiled));
+#endif
         FindAndLoadFrameworkMethods();
     }
 
@@ -43,7 +47,7 @@ public static class FrameworkBridge
     {
         foreach (var framework in Frameworks.Except(Found))
         {
-            if (IsLabAPIComatibleFrameworkLoaded(framework) 
+            if (IsLabAPICompatibleFrameworkLoaded(framework)
                 || (IsExiledLoaded() && IsExiledCompatibleFrameworkLoaded(framework)))
             {
                 MethodIndex.LoadMethodsOfFramework(framework.Type);
@@ -62,7 +66,7 @@ public static class FrameworkBridge
         );
     }
 
-    private static bool IsLabAPIComatibleFrameworkLoaded(Framework framework)
+    private static bool IsLabAPICompatibleFrameworkLoaded(Framework framework)
     {
         return PluginLoader.EnabledPlugins.Any(plg => plg.Name == framework.Name);
     }

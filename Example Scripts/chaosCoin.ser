@@ -26,7 +26,7 @@ end
 # select a random effect of the coin, from 9 available
 $effect = Random 1 9 int
 
-# russian roulette with a full gun :trollface:
+# give the player a revolver for a round of russian roulette
 if $effect is 1
     GiveItem @evPlayer GunRevolver
     Broadcast @evPlayer 5s "{$baseText}Let's play russian roulette!"

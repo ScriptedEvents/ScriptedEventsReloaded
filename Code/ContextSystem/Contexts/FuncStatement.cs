@@ -119,11 +119,11 @@ public class FuncStatement :
 
         foreach (var (value, variableToken) in values.Zip(ExpectedVariables, (v, t) => (v, t)))
         {
-            if (value.Type.IsSameOrHigherThan(variableToken.ValueType))
+            if (!value.Type.IsSameOrHigherThan(variableToken.ValueType))
             {
                 throw new ScriptRuntimeError(this,
-                    $"Provided variable '{variableToken.Name}' of type '{value.FriendlyTypeName()}' " +
-                    $"does not match expected type '{variableToken.ValueType.FriendlyTypeName()}'"
+                    $"Provided variable '{variableToken.Name}' of type '{value.Type}' " +
+                    $"does not match expected type '{variableToken.ValueType}'"
                 );
             }
 

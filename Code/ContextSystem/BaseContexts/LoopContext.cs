@@ -1,4 +1,4 @@
-﻿using SER.Code.ContextSystem.Interfaces;
+using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Helpers;
@@ -57,12 +57,14 @@ public abstract class LoopContext : StatementContext, IKeywordContext
                     break;
 
                 case YieldingContext yieldingContext:
-                    var coro = yieldingContext.Run();
+                {
+                    using var coro = yieldingContext.Run();
                     while (coro.MoveNext()) yield return coro.Current;
                     break;
+                }
 
                 default:
-                    throw new AndrzejFuckedUpException("context is not standard nor yielding");
+                    throw new CoreInvariantException("context is not standard nor yielding");
             }
 
             if (!ReceivedContinue) continue;

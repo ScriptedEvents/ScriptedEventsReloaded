@@ -20,7 +20,7 @@ public class CRole_CreateProceduralSpawnSystemMethod : ReferenceReturningMethod<
         {
             Description = "This decides which base-game role will be replaced by a custom role."
         },
-        new FloatArgument("per-player spawn chance", 0, 1, true)
+        new FloatArgument("per player spawn chance", 0, 1, true)
         {
             Description = "Example: setting conversion chance to 30% means that EACH player has a 30% chance to convert."
         },
@@ -42,7 +42,7 @@ public class CRole_CreateProceduralSpawnSystemMethod : ReferenceReturningMethod<
         ReturnValue = new ProceduralSpawn
         {
             RoleToReplace = Args.GetEnum<RoleTypeId>("role to replace"),
-            SpawnChance = Args.GetFloat("per-player spawn chance"),
+            SpawnChance = Args.GetFloat("per player spawn chance"),
             MaxAmountToSpawn = Args.GetNullableInt("conversion limit"),
             StartSpawningWhen = Args.GetNullableInt("minimum required players")
         };

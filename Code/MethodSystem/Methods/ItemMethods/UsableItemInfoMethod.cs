@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
@@ -34,7 +34,7 @@ internal class UsableItemInfoMethod : ReturningMethod
             "usetime" => new NumberValue((decimal)u.UseDuration),
             "canuse" => new BoolValue(u.CanClientStartUsing),
             "isusing" => new BoolValue(u.IsUsing),
-            _ => throw new KrzysiuFuckedUpException("out of range")
+            _ => throw new GameStateInvariantException("out of range")
         };
     }
 }

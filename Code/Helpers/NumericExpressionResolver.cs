@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using NCalc;
 using SER.Code.Extensions;
@@ -10,7 +10,7 @@ using SER.Code.TokenSystem.Tokens.Interfaces;
 
 namespace SER.Code.Helpers;
 
-public static class NumericExpressionReslover
+public static class NumericExpressionResolver
 {
     public static Result IsValidForExpression(BaseToken token)
     {
@@ -100,19 +100,24 @@ public static class NumericExpressionReslover
             
             try
             {
-                return _expression.Evaluate() ?? throw new Exception();
+                if (_expression.Evaluate() is { } result)
+                {
+                    return result;
+                }
             }
             catch (Exception)
             {
-                if (_values.Count <= 0)
-                {
-                    return $"Expression '{_rawRepresentation}' is invalid.";
-                }
-                
-                return $"Expression '{_rawRepresentation}' is invalid. Values used:\n" +
-                       _values.Select((kvp, _) => $"- {_parameters[kvp.Key].repr} = {kvp.Value}")
-                           .JoinStrings("\n");
+                // Convert NCalc failures into SER's value-aware diagnostic below.
             }
+
+            if (_values.Count <= 0)
+            {
+                return $"Expression '{_rawRepresentation}' is invalid.";
+            }
+
+            return $"Expression '{_rawRepresentation}' is invalid. Values used:\n" +
+                   _values.Select((kvp, _) => $"- {_parameters[kvp.Key].repr} = {kvp.Value}")
+                       .JoinStrings("\n");
         }
     }
 

@@ -30,6 +30,6 @@ public class DynamicGet<T>
         func = _valueFunc;
         if (value is not null) return true;
         if (func is not null) return false;
-        throw new AndrzejFuckedUpException("DynamicGet has both null");
+        throw new CoreInvariantException("DynamicGet has both null");
     }
 }

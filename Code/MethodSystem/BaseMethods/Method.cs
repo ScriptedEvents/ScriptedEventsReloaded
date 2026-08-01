@@ -1,4 +1,4 @@
-﻿using MEC;
+using MEC;
 using SER.Code.ArgumentSystem;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
@@ -46,7 +46,7 @@ public abstract class Method
             var name = type.Name.Replace("_", ".");
             if (!name.EndsWith("Method"))
             {
-                throw new AndrzejFuckedUpException($"Method class name '{name}' must end with 'Method'.");
+                throw new CoreInvariantException($"Method class name '{name}' must end with 'Method'.");
             }
 
             Name = name[..^"Method".Length];
@@ -70,13 +70,9 @@ public abstract class Method
 
     public uint? LineNum { get; set; }
     
-    private readonly List<CoroutineHandle> _coroutines = [];
-    
     protected CoroutineHandle RunCoroutine(IEnumerator<float> coro)
     {
-        var handle = coro.Run(Script);
-        _coroutines.Add(handle);
-        return handle;
+        return coro.Run(Script);
     }
 
     public override string ToString()

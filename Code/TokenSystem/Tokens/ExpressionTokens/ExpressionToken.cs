@@ -77,7 +77,8 @@ public class ExpressionToken : BaseToken, IValueToken
 
     public TryGet<Value> Value()
     {
-        _context!.Run().MoveNext();
+        using var run = _context!.Run();
+        run.MoveNext();
         return _context.GetValue();
     }
     public TypeOfValue PossibleValues => _context!.PossibleValues;

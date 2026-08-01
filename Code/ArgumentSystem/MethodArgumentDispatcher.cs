@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Reflection;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ArgumentSystem.Structures;
@@ -63,7 +63,7 @@ public class MethodArgumentDispatcher(Method method)
             return ConverterCache[argType] = new ConverterInfo(instanceMethod);
         }
         
-        throw new AndrzejFuckedUpException($"No suitable GetConvertSolution method found for {argType.AccurateName}.");
+        throw new CoreInvariantException($"No suitable GetConvertSolution method found for {argType.AccurateName}.");
     }
 
     public TryGet<ArgumentValueInfo?> TryGetValueInfo(BaseToken token, int index)

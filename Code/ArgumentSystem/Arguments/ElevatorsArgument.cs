@@ -4,6 +4,7 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
+using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.Arguments;
 
@@ -22,18 +23,17 @@ public class ElevatorsArgument(string name) : EnumHandlingArgument(name)
             return new(() => Elevator.List.ToArray());
         }
 
-        if (token.CanReturnReference<Elevator>(out var func))
+        return ValueOrEnumResolver<Elevator[]>(token, value =>
         {
-            return new(() => func().OnSuccess<Elevator[]>(e => [e]));
-        }
-        
-        return EnumResolver<Elevator[]>(token, [
+            return value is ReferenceValue reference
+                ? reference.GetAs<Elevator>().OnSuccess<Elevator[]>(elevator => [elevator])
+                : GenericError(token);
+        }, [
             new EnumHandler<ElevatorGroup, Elevator[]>(group => new(() =>
             {
                 return Elevator.List
                     .Where(elevator => elevator.Group == group)
                     .ToArray();
-            }))]
-        );
+            }))]);
     }
 }

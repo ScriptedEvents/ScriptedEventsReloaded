@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using PlayerRoles.Voice;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
@@ -42,7 +42,7 @@ public class IntercomInfoMethod : ReturningMethod
             "cooldown" => new DurationValue(TimeSpan.FromSeconds(Intercom.State == IntercomState.Cooldown ? Intercom._singleton.RemainingTime : 0)),
             "speechtimeleft" => new DurationValue(TimeSpan.FromSeconds(Intercom.State == IntercomState.InUse ? Intercom._singleton.RemainingTime : 0)),
             "textoverride" => new StaticTextValue(IntercomDisplay._singleton._overrideText),
-            _ => throw new TosoksFuckedUpException("out of range")
+            _ => throw new ExecutionInvariantException("out of range")
         };
     }
 }

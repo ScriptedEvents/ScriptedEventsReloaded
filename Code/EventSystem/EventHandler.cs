@@ -436,7 +436,7 @@ public static class EventHandler
             if (type is null) continue;
             var typeOfValue = new SingleTypeOfValue(Value.GuessValueType(type));
             
-            // because of stupid NW design decision, only StandardDamageHandler inherits from DamageHandlerBase
+            // Only StandardDamageHandler inherits from DamageHandlerBase in the game API.
             if (typeOfValue.Is<ReferenceValue<DamageHandlerBase>>())
             {
                 typeOfValue = new TypeOfValue<ReferenceValue<StandardDamageHandler>>();

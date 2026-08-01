@@ -2,7 +2,7 @@
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
-using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.BaseMethods.Yielding;
 using SER.Code.MethodSystem.Methods.HTTPMethods;
 using SER.Code.MethodSystem.Structures;
 
@@ -10,7 +10,7 @@ namespace SER.Code.MethodSystem.Methods.DiscordMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class Discord_SendMessageMethod : SynchronousMethod, ICanError
+public class Discord_SendMessageMethod : YieldingMethod, ICanError
 {
     public override string Description => "Sends a message using a discord webhook.";
 
@@ -30,7 +30,7 @@ public class Discord_SendMessageMethod : SynchronousMethod, ICanError
         }
     ];
 
-    public override void Execute()
+    public override IEnumerator<float> Execute()
     {
         var webhookUrl = Args.GetText("webhook url");
         var messageObject = Args.GetReference<Discord_CreateMessageMethod.DMessage>("message object");
@@ -39,9 +39,9 @@ public class Discord_SendMessageMethod : SynchronousMethod, ICanError
         if (!webhookUrl.StartsWith("https://discord.com/api/webhooks/"))
             throw new ScriptRuntimeError(this, ErrorReasons.Last());
 
-        Timing.RunCoroutine(HTTP_PostMethod.RequestSend(
+        return HTTP_PostMethod.RequestSend(
             this, 
             webhookUrl + (!threadId.IsEmpty() ? $"?thread_id={threadId}" : ""), 
-            messageObject));
+            messageObject);
     }
 }

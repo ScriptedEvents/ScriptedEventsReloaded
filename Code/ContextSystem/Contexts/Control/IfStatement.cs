@@ -1,4 +1,4 @@
-﻿using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
@@ -14,7 +14,7 @@ public class IfStatement : StatementContext, IExtendableStatement, IKeywordConte
 {
     private readonly List<BaseToken> _condition = [];
 
-    private NumericExpressionReslover.CompiledExpression _expression = null!;
+    private NumericExpressionResolver.CompiledExpression _expression = null!;
 
     public override string FriendlyName => "'if' statement";
 
@@ -27,7 +27,7 @@ public class IfStatement : StatementContext, IExtendableStatement, IKeywordConte
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
-        if (NumericExpressionReslover.IsValidForExpression(token).HasErrored(out var error))
+        if (NumericExpressionResolver.IsValidForExpression(token).HasErrored(out var error))
         {
             return TryAddTokenRes.Error(error);
         }
@@ -38,7 +38,7 @@ public class IfStatement : StatementContext, IExtendableStatement, IKeywordConte
 
     public override Result VerifyCurrentState()
     {
-        if (NumericExpressionReslover.CompileExpression(_condition.ToArray())
+        if (NumericExpressionResolver.CompileExpression(_condition.ToArray())
             .HasErrored(out var error, out var cond))
         {
             return error;
@@ -70,7 +70,7 @@ public class IfStatement : StatementContext, IExtendableStatement, IKeywordConte
                 yield break;
             }
 
-            var didntExecuteCoro = statement.Run();
+            using var didntExecuteCoro = statement.Run();
             while (didntExecuteCoro.MoveNext())
             {
                 yield return didntExecuteCoro.Current;

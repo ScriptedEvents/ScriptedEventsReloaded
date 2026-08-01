@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ArgumentSystem.Structures;
@@ -39,7 +39,7 @@ public class WarheadInfoMethod : ReturningMethod
             "hasstarted" => new BoolValue(Warhead.IsDetonationInProgress),
             "isdetonated" => new BoolValue(Warhead.IsDetonated),
             "duration" or "timetodenotation" => new DurationValue(TimeSpan.FromSeconds(AlphaWarheadController.TimeUntilDetonation)),
-            _ => throw new KrzysiuFuckedUpException()
+            _ => throw new GameStateInvariantException()
         };
     }
 }

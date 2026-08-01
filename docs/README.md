@@ -1,7 +1,7 @@
 # SER 1.0 documentation
 
-This directory is the canonical user documentation for the in-development
-Scripted Events Reloaded 1.0 release. It lives beside the implementation so a
+This directory is the canonical user documentation for Scripted Events
+Reloaded 1.0. It lives beside the implementation so a
 change to syntax, commands, examples, or tooling can update the matching
 tutorial in the same pull request.
 

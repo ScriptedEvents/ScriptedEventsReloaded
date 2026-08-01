@@ -1,4 +1,5 @@
 using MEC;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
@@ -69,7 +70,8 @@ public class GetIPInfoMethod : YieldingReferenceReturningMethod<IPInfo>, ICanErr
 
         using UnityWebRequest webRequest = UnityWebRequest.Get(url);
 
-        yield return Timing.WaitUntilDone(webRequest.SendWebRequest());
+        using var wait = HTTPMethods.HTTP_PostMethod.SendWithPolicy(this, webRequest);
+        while (wait.MoveNext()) yield return wait.Current;
 
         if (webRequest.result != UnityWebRequest.Result.Success)
         {
@@ -79,7 +81,15 @@ public class GetIPInfoMethod : YieldingReferenceReturningMethod<IPInfo>, ICanErr
             );
         }
 
-        JObject json = JObject.Parse(webRequest.downloadHandler.text);
+        JObject json;
+        try
+        {
+            json = JObject.Parse(webRequest.downloadHandler.text);
+        }
+        catch (JsonReaderException exception)
+        {
+            throw new ScriptRuntimeError(this, $"Failed to parse IP info response: {exception.Message}");
+        }
 
         if (json["status"]?.ToString() == "error")
         {

@@ -75,7 +75,7 @@ public class Vote_StartAndWaitMethod : YieldingReturningMethod<TextValue>, IAddi
         new TextArgument("question"),
         new PlayerArgument("player asking")
         {
-            Description = "Use _ if there isnt a specific player asking the question.",
+            Description = "Use _ if there isn't a specific player asking the question.",
             DefaultValue = new(null, "general question")
         },
         new ReferenceArgument<Vote_CreateOptionMethod.VoteOption>("options")
@@ -88,6 +88,7 @@ public class Vote_StartAndWaitMethod : YieldingReturningMethod<TextValue>, IAddi
     public override IEnumerator<float> Execute()
     {
         var question = Args.GetText("question");
+        var askingPlayer = Args.GetPlayer("player asking").MaybeNull() ?? Server.Host!;
         var rawOptions = Args.GetRemainingArguments<
             Vote_CreateOptionMethod.VoteOption, 
             ReferenceArgument<Vote_CreateOptionMethod.VoteOption>>("options");
@@ -97,7 +98,7 @@ public class Vote_StartAndWaitMethod : YieldingReturningMethod<TextValue>, IAddi
 
         // Run the logic in a SEPARATE method that is NOT an iterator.
         // This prevents 'CustomVote' from becoming a field in the <Execute> state machine.
-        RunSafeVote(question, rawOptions, (res) => {
+        RunSafeVote(askingPlayer, question, rawOptions, (res) => {
             result = res;
             completed = true;
         });
@@ -108,6 +109,7 @@ public class Vote_StartAndWaitMethod : YieldingReturningMethod<TextValue>, IAddi
     }
 
     private static void RunSafeVote(
+        Player askingPlayer,
         string question, 
         IEnumerable<Vote_CreateOptionMethod.VoteOption> rawOptions, 
         System.Action<string> onComplete)
@@ -119,7 +121,7 @@ public class Vote_StartAndWaitMethod : YieldingReturningMethod<TextValue>, IAddi
         }
 
         var voting = new CustomVote(
-            Server.Host!,
+            askingPlayer,
             question,
             $"SER.{question}",
             VoteCallback,

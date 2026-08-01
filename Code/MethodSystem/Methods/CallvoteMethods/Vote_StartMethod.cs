@@ -4,6 +4,7 @@ using Callvote.Features;
 using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.Extensions;
 using SER.Code.Helpers;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
@@ -23,7 +24,7 @@ public class Vote_StartMethod : SynchronousMethod, IDependOnFramework
         new TextArgument("question"),
         new PlayerArgument("player asking")
         {
-            Description = "Use _ if there isnt a specific player asking the question.",
+            Description = "Use _ if there isn't a specific player asking the question.",
             DefaultValue = new(null, "general question")
         },
         new ReferenceArgument<Vote_CreateOptionMethod.VoteOption>("options")
@@ -36,6 +37,7 @@ public class Vote_StartMethod : SynchronousMethod, IDependOnFramework
     public override void Execute()
     {
         var question = Args.GetText("question");
+        var askingPlayer = Args.GetPlayer("player asking").MaybeNull() ?? Server.Host!;
         var rawOptions = Args.GetRemainingArguments<
             Vote_CreateOptionMethod.VoteOption, 
             ReferenceArgument<Vote_CreateOptionMethod.VoteOption>>("options");
@@ -47,7 +49,7 @@ public class Vote_StartMethod : SynchronousMethod, IDependOnFramework
         }
 
         var voting = new CustomVote(
-            Server.Host!,
+            askingPlayer,
             question,
             $"SER.{question}",
             null,

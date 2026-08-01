@@ -11,6 +11,7 @@ It shows the active script directory and separates:
 - accepted snapshots;
 - failed candidates and their full paths;
 - files disabled by a leading `#`;
+- folders and their contents excluded by a leading `#`;
 - globally conflicting base names.
 
 Use `serstatus all` when a category was shortened.

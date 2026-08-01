@@ -1,4 +1,4 @@
-﻿using InventorySystem;
+using InventorySystem;
 using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
@@ -23,10 +23,10 @@ public class CreatePickupMethod : ReferenceReturningMethod<Pickup>
         var itemType = Args.GetEnum<ItemType>("item type");
         
         if (!InventoryItemLoader.AvailableItems.TryGetValue(itemType, out var prefab))
-            throw new TosoksFuckedUpException($"The pickup prefab for '{itemType}' was unavailable.");
+            throw new ExecutionInvariantException($"The pickup prefab for '{itemType}' was unavailable.");
         
         var item = Object.Instantiate(prefab.PickupDropModel)
-                   ?? throw new TosoksFuckedUpException("The pickup prefab could not be instantiated.");
+                   ?? throw new ExecutionInvariantException("The pickup prefab could not be instantiated.");
         item.Info = new(itemType, prefab.Weight);
         item.PreviousOwner = new(Server.Host?.ReferenceHub);
         

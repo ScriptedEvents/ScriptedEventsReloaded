@@ -68,7 +68,7 @@ public class AttemptStatement : StatementContext, IExtendableStatement, IKeyword
         {
             catchStatement.Exception = _exception;
         }
-        var catchCoro = statement.Run();
+        using var catchCoro = statement.Run();
         while (catchCoro.MoveNext())
             yield return catchCoro.Current;
     }

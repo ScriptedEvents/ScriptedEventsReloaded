@@ -53,7 +53,7 @@ public abstract class Flag
         return true;
     }
 
-    // when this fucker is set to null, it still compiles but the plugin will just fucking explode
+    // Keep the singleton initialized: a null value compiles but fails during runtime registration.
     // even better, the errors will be pointing to a random line in some child class
     // https://tenor.com/view/alucore-gif-21193899
     protected ScriptName ScriptName { get; set; } = default;

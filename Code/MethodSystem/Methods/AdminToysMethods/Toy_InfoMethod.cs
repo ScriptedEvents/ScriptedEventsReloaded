@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
@@ -11,7 +11,7 @@ namespace SER.Code.MethodSystem.Methods.AdminToysMethods;
 // ReSharper disable once InconsistentNaming
 public class Toy_InfoMethod : ReturningMethod<NumberValue>
 {
-    public override string Description => "Returns information about an Admin Toy";
+    public override string Description => "Returns numeric network or transform information about an Admin Toy.";
 
     public override Argument[] ExpectedArguments { get; } =
     [
@@ -27,7 +27,7 @@ public class Toy_InfoMethod : ReturningMethod<NumberValue>
             "scaleX",
             "scaleY",
             "scaleZ")
-    ]; // TODO: add every property from every toy type
+    ];
 
     public override void Execute()
     {
@@ -45,7 +45,7 @@ public class Toy_InfoMethod : ReturningMethod<NumberValue>
             "scalex" => (decimal)toy.Scale.x,
             "scaley" => (decimal)toy.Scale.y,
             "scalez" => (decimal)toy.Scale.z,
-            _ => throw new TosoksFuckedUpException("out of order")
+            _ => throw new ExecutionInvariantException("out of order")
         };
     }
 }

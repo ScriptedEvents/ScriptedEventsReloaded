@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ArgumentSystem.Structures;
@@ -45,7 +45,7 @@ public class Toy_CreateMethod : ReferenceReturningMethod<AdminToy>, IAdditionalD
             "camera"          => CameraToy.Create(networkSpawn: false),
             "capybara"        => CapybaraToy.Create(networkSpawn: false),
             "text"            => TextToy.Create(networkSpawn: false),
-            _                 => throw new TosoksFuckedUpException("out of order")
+            _                 => throw new ExecutionInvariantException("out of order")
         };
     }
 

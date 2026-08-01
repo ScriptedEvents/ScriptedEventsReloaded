@@ -1,4 +1,4 @@
-﻿using SER.Code.ArgumentSystem.Arguments;
+using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.ArgumentSystem.Structures;
 using SER.Code.Exceptions;
@@ -47,7 +47,7 @@ public class ThisInfoMethod : ReturningMethod
             "name" => new StaticTextValue(Script.Name),
             "path" => new StaticTextValue(FileSystem.FileSystem.GetScriptPath(Script).Value ?? "lost"),
             "variables" => new CollectionValue(Script.LocalVariables.Select(v => v.Prefix + v.Name)),
-            _ => throw new TosoksFuckedUpException("out of order")
+            _ => throw new ExecutionInvariantException("out of order")
         };
     }
 }

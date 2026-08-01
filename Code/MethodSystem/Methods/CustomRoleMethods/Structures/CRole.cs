@@ -191,7 +191,7 @@ public class CRole
     {
         if (!EventHandlers.TryGetValue(@event, out var handlers)) return;
         
-        foreach (var handler in handlers)
+        foreach (var handler in handlers.ToArray())
         {
             if (handler.ForRoles is not { } roles || roles.Contains(Id))
             {

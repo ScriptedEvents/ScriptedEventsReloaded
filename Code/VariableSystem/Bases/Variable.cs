@@ -1,4 +1,4 @@
-﻿using SER.Code.Exceptions;
+using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.ValueSystem;
 using SER.Code.VariableSystem.Structures;
@@ -17,7 +17,6 @@ public abstract class Variable : IVariableRepr
     
     public abstract string FriendlyName { get; }
 
-    // todo: replace with reflected field fetch
     public static string GetFriendlyName(Type t)
     {
         return ((Variable)t.CreateInstance()).FriendlyName;
@@ -27,12 +26,12 @@ public abstract class Variable : IVariableRepr
     {
         return value switch
         {
-            // this shit is fuckass
+            // Preserve the runtime value category when cloning variables.
             LiteralValue lit     => new LiteralVariable(name, lit is DynamicTextValue t ? new StaticTextValue(t.StringRep) : lit),
             CollectionValue coll => new CollectionVariable(name, coll),
             PlayerValue plr      => new PlayerVariable(name, plr),
             ReferenceValue @ref  => new ReferenceVariable(name, @ref),
-            _ => throw new AndrzejFuckedUpException(
+            _ => throw new CoreInvariantException(
                 $"CreateVariable called on invalid value type {value.GetType().AccurateName}")
         };
     }

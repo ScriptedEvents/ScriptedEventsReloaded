@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using LightContainmentZoneDecontamination;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
@@ -28,7 +28,7 @@ public class DecontaminationMethod : SynchronousMethod
             "enable" => DecontaminationController.DecontaminationStatus.None,
             "disable" => DecontaminationController.DecontaminationStatus.Disabled,
             "force" => DecontaminationController.DecontaminationStatus.Forced,
-            _ => throw new AndrzejFuckedUpException()
+            _ => throw new CoreInvariantException()
         };
     }
 }

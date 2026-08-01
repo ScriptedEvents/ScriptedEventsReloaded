@@ -602,15 +602,25 @@ dialog::backdrop {
 }
 
 @media (max-width: 700px) {
-  html,
-  body {
+  html {
     overflow: auto;
+  }
+
+  body {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
   }
 
   .toolbar {
     position: sticky;
     top: 0;
     z-index: 20;
+    flex-shrink: 0;
+  }
+
+  .learning-path {
+    flex-shrink: 0;
   }
 
   .filename-field {

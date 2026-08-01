@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using SER.Code.Exceptions;
 
 namespace SER.Code.Helpers.ResultSystem;
@@ -55,7 +55,7 @@ public sealed class TryGet<TValue>(TValue? value, string? errorMsg)
     {
         if (res.HasErrored(out var msg)) return new TryGet<TValue>(default, msg);
 
-        throw new AndrzejFuckedUpException("implicit operator TryGet<TValue>(Result res) called when not errored");
+        throw new CoreInvariantException("implicit operator TryGet<TValue>(Result res) called when not errored");
     }
 
     [Pure]

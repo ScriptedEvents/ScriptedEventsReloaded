@@ -1,4 +1,4 @@
-﻿using SER.Code.ArgumentSystem.Arguments;
+using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
 using SER.Code.FlagSystem;
@@ -60,7 +60,7 @@ public class RunFuncMethod : SynchronousMethod, ICanError
         {
             if (zippedTuples[i] is not { varToken: { } varToken, value: { } value })
             {
-                throw new AndrzejFuckedUpException();
+                throw new CoreInvariantException();
             }
             
             if (!varToken.ValueType.CanHold(value.Type))
@@ -74,7 +74,7 @@ public class RunFuncMethod : SynchronousMethod, ICanError
             var variable = Variable.Create(varToken.Name, value);
             if (variable.GetType() != varToken.VariableType)
             {
-                throw new AndrzejFuckedUpException();
+                throw new CoreInvariantException();
             }
             
             scriptToRun.AddLocalVariable(variable);

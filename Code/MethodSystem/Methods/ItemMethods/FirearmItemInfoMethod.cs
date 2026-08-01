@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
@@ -38,7 +38,7 @@ internal class FirearmItemInfoMethod : ReturningMethod
             "maxammo" => new NumberValue(f.MaxAmmo),
             "iscocked" => new BoolValue(f.Cocked),
             "ismagazineinserted" => new BoolValue(f.MagazineInserted),
-            _ => throw new KrzysiuFuckedUpException("out of range")
+            _ => throw new GameStateInvariantException("out of range")
         };
     }
 }

@@ -15,7 +15,7 @@ public class Config_ReadMethod : ReferenceReturningMethod<CustomConfig?>, IAddit
 
     public string AdditionalDescription => 
         $"This method will attempt to read basic '.yaml' files from '{FileSystem.FileSystem.ConfigsDirPath}' folder. " +
-        $"If the folder doesnt exist, you can safely make one and create '.yaml' files there. " +
+        $"If the folder doesn't exist, you can safely make one and create '.yaml' files there. " +
         $"The '.yml' extension is also supported. " +
         $"If a file with the config name is not found, an invalid reference will be returned. " +
         $"Learn more about YAML files: https://www.cloudbees.com/blog/yaml-tutorial-everything-you-need-get-started ";

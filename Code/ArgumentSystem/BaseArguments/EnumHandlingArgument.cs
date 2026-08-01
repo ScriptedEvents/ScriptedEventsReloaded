@@ -2,6 +2,7 @@
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
+using SER.Code.TokenSystem.Tokens.Interfaces;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.BaseArguments;
@@ -35,7 +36,7 @@ public abstract class EnumHandlingArgument(string name) : Argument(name)
         BaseToken token,
         IEnumHandler<T>[] enumHandlers)
     {
-        if (InternalEnumResolve() is { } value1)
+        if (ResolveEnum(token.BestStaticTextRepr(), enumHandlers) is { } value1)
         {
             return value1;
         }
@@ -47,29 +48,89 @@ public abstract class EnumHandlingArgument(string name) : Argument(name)
 
         return new(() =>
         {
-            if (InternalEnumResolve() is { } value2)
+            if (ResolveEnum(token.BestStaticTextRepr(), enumHandlers) is { } value2)
             {
                 return value2.Invoke();
             }
 
             return GenericError(token);
         });
+    }
 
-        DynamicTryGet<T>? InternalEnumResolve()
+    /// <summary>
+    /// Resolves arguments which accept either an SER value (usually a reference)
+    /// or one of several enum representations.
+    /// </summary>
+    /// <remarks>
+    /// The actual value is deliberately inspected at runtime. A capability check
+    /// only says that a token may return a type, so it cannot safely select one of
+    /// several mutually exclusive conversion paths.
+    /// </remarks>
+    protected DynamicTryGet<T> ValueOrEnumResolver<T>(
+        BaseToken token,
+        Func<Value, TryGet<T>> valueHandler,
+        IEnumHandler<T>[] enumHandlers)
+    {
+        if (token is not IValueToken valueToken)
         {
-            var stringRep = token.BestStaticTextRepr();
-            foreach (var enumHandler in enumHandlers)
+            return EnumResolver(token, enumHandlers);
+        }
+
+        if (valueToken.NotCapableOf<ReferenceValue, LiteralValue>())
+        {
+            return GenericError(token);
+        }
+
+        if (!valueToken.IsConstant)
+        {
+            return new(ResolveDynamicValue);
+        }
+
+        if (valueToken.Value().HasErrored(out var error, out var constantValue))
+        {
+            return error;
+        }
+
+        if (constantValue is LiteralValue constantLiteral)
+        {
+            return ResolveEnum(constantLiteral.StringRep, enumHandlers)
+                   ?? GenericError(token);
+        }
+
+        return valueHandler(constantValue);
+
+        TryGet<T> ResolveDynamicValue()
+        {
+            if (valueToken.Value().HasErrored(out var error, out var value))
             {
-                if (EnumArgument.ConvertOne(stringRep, enumHandler.EnumType)
-                    .HasErrored(out _, out var enumValue))
-                {
-                    continue;
-                }
-                
-                return enumHandler.Handler(enumValue);
+                return error;
             }
 
-            return null;
+            if (value is not LiteralValue literal)
+            {
+                return valueHandler(value);
+            }
+
+            return ResolveEnum(literal.StringRep, enumHandlers)?.Invoke()
+                   ?? GenericError(token);
         }
+    }
+
+    private static DynamicTryGet<T>? ResolveEnum<T>(
+        string stringRep,
+        IEnumerable<IEnumHandler<T>> enumHandlers)
+    {
+        foreach (var enumHandler in enumHandlers)
+        {
+            if (EnumArgument.ConvertOne(stringRep, enumHandler.EnumType)
+                .HasErrored(out _, out var enumValue))
+            {
+                continue;
+            }
+
+            return enumHandler.Handler(enumValue);
+        }
+
+        return null;
     }
 }

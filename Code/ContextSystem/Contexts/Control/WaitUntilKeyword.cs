@@ -15,7 +15,7 @@ public class WaitUntilKeyword : YieldingContext, IKeywordContext
 {
     protected readonly List<BaseToken> Tokens = [];
 
-    private NumericExpressionReslover.CompiledExpression _expression = null!;
+    private NumericExpressionResolver.CompiledExpression _expression = null!;
 
     public override string FriendlyName => $"'{KeywordName}' keyword";
     public virtual string KeywordName => "wait_until";
@@ -43,7 +43,7 @@ public class WaitUntilKeyword : YieldingContext, IKeywordContext
             return $"The condition was not provided for the '{KeywordName}' keyword.";
         }
 
-        if (NumericExpressionReslover.CompileExpression(Tokens.ToArray())
+        if (NumericExpressionResolver.CompileExpression(Tokens.ToArray())
             .HasErrored(out var error, out var cond))
         {
             return error;

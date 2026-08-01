@@ -1,4 +1,4 @@
-﻿using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
@@ -39,7 +39,7 @@ public class ElseStatement : StatementContext, IStatementExtender, IKeywordConte
             {
                 case YieldingContext yielding:
                 {
-                    var enumerator = yielding.Run();
+                    using var enumerator = yielding.Run();
                     while (enumerator.MoveNext())
                     {
                         yield return enumerator.Current;
@@ -51,7 +51,7 @@ public class ElseStatement : StatementContext, IStatementExtender, IKeywordConte
                     standard.Run();
                     break;
                 default:
-                    throw new AndrzejFuckedUpException();
+                    throw new CoreInvariantException();
             }
         }
     }

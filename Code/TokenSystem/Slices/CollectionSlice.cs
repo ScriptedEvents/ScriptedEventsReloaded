@@ -1,4 +1,4 @@
-﻿using SER.Code.Exceptions;
+using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Structures;
 using StringBuilder = System.Text.StringBuilder;
@@ -31,7 +31,7 @@ public class CollectionSlice : Slice
     public CollectionSlice(char startChar) : base(startChar)
     {
         if (!CollectionStarters.Contains(startChar))
-            throw new AndrzejFuckedUpException();
+            throw new CoreInvariantException();
 
         _rootInfo = CollectionSliceInfos.First(i => i.Start == startChar);
         _contexts.Push(_rootInfo);
@@ -52,7 +52,7 @@ public class CollectionSlice : Slice
         {
             _ignoreNext = true;
             
-            // this is such a fucking hack
+            // Preserve the existing collection token shape for backward-compatible parsing.
             if (Type is not CollectionBrackets.Quotes)
             {
                 _value.Append(c);

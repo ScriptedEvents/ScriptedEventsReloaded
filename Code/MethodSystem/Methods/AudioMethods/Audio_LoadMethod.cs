@@ -25,7 +25,8 @@ public class Audio_LoadMethod : SynchronousMethod, IAdditionalDescription, ICanE
     public string[] ErrorReasons =>
     [
         "File doesn't exist",
-        "File is not of type 'ogg'"
+        "File is not of type 'ogg'",
+        "The file path resolves outside the main SER folder"
     ];
 
     public override Argument[] ExpectedArguments { get; } =
@@ -51,9 +52,16 @@ public class Audio_LoadMethod : SynchronousMethod, IAdditionalDescription, ICanE
             return;
         }
         
-        if (!AudioClipStorage.LoadClip(
-            Path.Combine(FileSystem.FileSystem.MainDirPath, Args.GetText("file path")), 
-            name
-        )) throw new ScriptRuntimeError(this, "Audio has failed to load. Check the console for more info.");
+        if (FileSystem.FileSystem.GetContainedPath(
+                FileSystem.FileSystem.MainDirPath,
+                Args.GetText("file path"),
+                string.Empty)
+            .HasErrored(out var pathError, out var path))
+        {
+            throw new ScriptRuntimeError(this, pathError);
+        }
+
+        if (!AudioClipStorage.LoadClip(path, name))
+            throw new ScriptRuntimeError(this, "Audio has failed to load. Check the console for more info.");
     }
 }

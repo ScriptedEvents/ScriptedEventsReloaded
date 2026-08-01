@@ -23,7 +23,13 @@ The build:
 1. reads the generated SER manifest;
 2. builds the standalone `SER Visual Editor.html`;
 3. copies the same editor into the VS Code extension;
-4. copies the shared language core and extension source into `out`.
+4. copies the shared language core and extension source into `out`;
+5. copies the repository license and third-party notices into the extension.
+
+`npm run verify` also checks generated-file synchronization, all 16 local
+documentation files, JavaScript behavior, third-party notice coverage, and
+whether C# method implementations read every argument they declare (without
+reading undeclared names).
 
 The tooling has no runtime dependency on the game server or SER internals.
 

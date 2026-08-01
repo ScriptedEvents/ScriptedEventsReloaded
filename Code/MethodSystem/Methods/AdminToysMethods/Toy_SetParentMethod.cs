@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
@@ -52,7 +52,7 @@ public class Toy_SetParentMethod : SynchronousMethod, ICanError
                               ?? throw new ScriptRuntimeError(this, ErrorReasons[0]),
             "toy" => toyParent?.Transform
                      ?? throw new ScriptRuntimeError(this, ErrorReasons[1]),
-            _ => throw new TosoksFuckedUpException("out of order")
+            _ => throw new ExecutionInvariantException("out of order")
         }, false);
     }
 

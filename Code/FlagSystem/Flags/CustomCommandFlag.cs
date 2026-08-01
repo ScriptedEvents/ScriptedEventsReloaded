@@ -1,4 +1,4 @@
-﻿using CommandSystem;
+using CommandSystem;
 using LabApi.Features.Permissions;
 using LabApi.Features.Wrappers;
 using RemoteAdmin;
@@ -249,7 +249,7 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
                         break;
                     case ConsoleType.None:
                     default:
-                        throw new AndrzejFuckedUpException();
+                        throw new CoreInvariantException();
                 }
 
                 _boundConsoles.Add(console);
@@ -286,7 +286,7 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
                         break;
                     case ConsoleType.None:
                     default:
-                        throw new AndrzejFuckedUpException();
+                        throw new CoreInvariantException();
                 }
             }
             catch (Exception exception)

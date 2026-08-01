@@ -1,4 +1,4 @@
-﻿using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
@@ -20,7 +20,7 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
     private VariableToken? _indexIterationVariableToken;
     private Variable? _itemIterationVariable;
     private VariableToken? _itemIterationVariableToken;
-    private Func<Value[]>? _values = null;
+    private IValueToken? _itemIterationValueToken;
     
     public override string KeywordName => "over";
     public override string Description =>
@@ -83,66 +83,49 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
         }
 
         _indexIterationVariableToken = indexToken;
-
         return true;
     }
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {
-        if (token is not IValueToken valToken)
+        if (token is not IValueToken valToken || valToken.NotCapableOf<PlayerValue, CollectionValue>())
         {
-            goto Error;
+            return TryAddTokenRes.Error(
+                "'over' loop expected to have either a player value or collection value as its argument, " +
+                $"but received '{token.RawRep}'."
+            );
         }
 
-        if (valToken.CapableOf<PlayerValue>(out var getPlayer))
-        {
-            _values = () =>
-            {
-                if (getPlayer().HasErrored(out var error, out var value))
-                {
-                    throw new ScriptRuntimeError(this, error);
-                }
-
-                return value.Players.Select(p => new PlayerValue(p)).ToArray();
-            };
-
-            return TryAddTokenRes.End();
-        }
-
-        if (valToken.CapableOf<CollectionValue>(out var getCollection))
-        {
-            _values = () =>
-            {
-                if (getCollection().HasErrored(out var error, out var value))
-                {
-                    throw new ScriptRuntimeError(this, error);
-                }
-
-                return value.CastedValues;
-            };
-
-            return TryAddTokenRes.End();
-        }
-
-        Error:
-        return TryAddTokenRes.Error(
-            "'over' loop expected to have either a player value or collection value as its third argument, " +
-            $"but received '{token.RawRep}'."
-        );
+        _itemIterationValueToken = valToken;
+        return TryAddTokenRes.End();
     }
 
     public override Result VerifyCurrentState()
     {
         return Result.Assert(
-            _values is not null,
+            _itemIterationValueToken is not null,
             _mainErr + "Missing required arguments.");
     }
 
     protected override IEnumerator<float> Execute()
     {
-        if (_values is null) throw new AndrzejFuckedUpException();
+        if (_itemIterationValueToken is null) throw new CoreInvariantException();
 
-        var values = _values();
+        if (_itemIterationValueToken.Value().HasErrored(out var error, out var dirtyValue))
+        {
+            throw new ScriptRuntimeError(this, error);
+        }
+
+        var values = dirtyValue switch
+        {
+            PlayerValue players => players.Players.Select(player => new PlayerValue(player)).ToArray<Value>(),
+            CollectionValue collection => collection.CastedValues,
+            _ => throw new ScriptRuntimeError(
+                this,
+                $"Value '{dirtyValue}' cannot be iterated over by an 'over' loop."
+            )
+        };
+
         for (var index = 0; index < values.Length; index++)
         {
             var value = values[index];
@@ -159,7 +142,7 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
                 Script.AddLocalVariable(_indexIterationVariable);
             }
 
-            var coro = RunChildren();
+            using var coro = RunChildren();
             while (coro.MoveNext())
             {
                 yield return coro.Current;

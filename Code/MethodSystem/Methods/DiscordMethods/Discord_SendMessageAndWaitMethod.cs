@@ -51,7 +51,8 @@ public class Discord_SendMessageAndWaitMethod : YieldingReturningMethod<TextValu
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        yield return Timing.WaitUntilDone(request.SendWebRequest());
+        using var wait = HTTP_PostMethod.SendWithPolicy(this, request);
+        while (wait.MoveNext()) yield return wait.Current;
 
         if (request.error is { } error)
         {

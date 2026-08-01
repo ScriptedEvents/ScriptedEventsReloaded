@@ -22,7 +22,7 @@ public class SpawnPickupPosMethod : SynchronousMethod, ICanError
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new ReferenceArgument<Pickup>("pickup/projectile reference"),
+        new ReferenceArgument<Pickup>("pickup or projectile reference"),
         new FloatArgument("x position"),
         new FloatArgument("y position"),
         new FloatArgument("z position"),
@@ -30,7 +30,7 @@ public class SpawnPickupPosMethod : SynchronousMethod, ICanError
 
     public override void Execute()
     {
-        var obj = Args.GetReference<Pickup>("pickup/projectile reference");
+        var obj = Args.GetReference<Pickup>("pickup or projectile reference");
         
         Vector3 pos = new(
             Args.GetFloat("x position"),

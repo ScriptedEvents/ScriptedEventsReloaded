@@ -18,13 +18,15 @@ All you need to get started is a text editor and a server!
 - **Simplification** of the most essential features like commands, events, and player management.
 - **No compilation required**, while C# plugins require a full development environment, compilation, and DLL management.
 - **Lots of built-in features** like AudioPlayer, Databases, Discord webhooks, HTTP, and more!
-- **Extendable** with frameworks like UCR, EXILED, or Callvote, but __without__ any dependencies! 
+- **Extendable** with integrations such as UCR, EXILED, Callvote, and ProjectMER.
+  The LabAPI build discovers each integration only when it is installed, so
+  optional frameworks do not become base dependencies or interfere with one another.
 - **Plugin docs** are available directly on the server using the `serhelp` command.
 - **Helpful community** available to help you with any questions you may have.
 
 # SER Tutorials
 
-The in-development 1.0 tutorials are versioned with the plugin:
+The 1.0 tutorials are versioned with the plugin:
 
 > [SER 1.0 documentation](./docs/README.md)
 
@@ -49,10 +51,10 @@ SER ships one synchronized editing system in two forms:
    Print "Hello from SER!"
    ```
 
-4. Run `serrun hello`. When `hello` is not registered yet, `serrun` searches the
-   complete SER script directory and registers the matching file automatically.
-5. After editing an already registered script, run `serreload`. Use `serstatus`
-   to see accepted, failed, disabled, and conflicting files.
+4. Run `serrun hello`. SER discovers or reloads the requested file immediately
+   before creating the runnable script.
+5. Use `serreload` when you want to refresh the complete directory at once, and
+   `serstatus` to see accepted, failed, disabled, excluded, linked, and conflicting paths.
 
 `.ser` is the preferred extension. `.txt` is an identical compatibility format
 for server hosts whose file managers do not allow users to open unknown file
@@ -61,7 +63,19 @@ even in different folders.
 
 Run `serexamples` to generate validated examples. Their names begin with `#`, so
 they remain disabled until you copy one or remove the leading `#` and run
-`serreload`.
+`serreload`. A folder whose name begins with `#` is also disabled: SER skips the
+folder and its entire contents during script discovery.
+Linked folders (symbolic links and directory junctions) are also skipped so
+discovery cannot leave the SER directory or loop indefinitely.
+
+# Building release artifacts
+
+Run `tools/package-release.ps1` from PowerShell. It rebuilds and verifies both
+plugin hosts and the editor tooling, then creates minimal LabAPI and EXILED
+plugin bundles, the examples/documentation bundle, the standalone editor, the
+VS Code extension, a complete bundle, and `SHA256SUMS.txt` under `artifacts/`.
+Release maintainers can pass `-UcrReferencePath <path>` to compile against the
+exact official UCR DLL selected for that compatibility baseline.
 
 # Examples
 
@@ -73,11 +87,13 @@ One `.ser` or `.txt` file may contain multiple independent handlers. Each `!--`
 flag starts a new section that ends immediately before the next flag.
 Multi-section files can be addressed as `filename:1`, `filename:2`, and so on.
 
-SER reads script files when the plugin initializes. `serrun name` also discovers
-a new, not-yet-registered file. Edits to registered files are not watched; use
-the permission-protected `serreload` command. Reloads are transactional: a
-changed file is compiled in full before its flags are replaced, and if validation
-fails the last known-good version stays active.
+SER reloads the complete script directory when the plugin initializes and whenever
+the round restarts. Every file-backed script is also checked and reloaded immediately
+before execution, whether requested by `serrun`, an event, a callback, or another
+script. Use the permission-protected `serreload` command to refresh everything on
+demand, especially when adding or removing bindings that cannot trigger yet. Reloads
+are transactional: a changed file is compiled in full before its flags are replaced,
+and if validation fails the last known-good version stays active.
 
 ```ser
 !-- OnEvent RoundStarted

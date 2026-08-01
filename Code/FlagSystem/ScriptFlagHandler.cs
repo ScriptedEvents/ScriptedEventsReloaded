@@ -1,4 +1,4 @@
-﻿using SER.Code.Exceptions;
+using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.Helpers;
@@ -56,7 +56,7 @@ public static class ScriptFlagHandler
             {
                 FlagToken => HandleFlag(name, args, scriptName, parsedFlags, ref currentFlag).Result,
                 FlagArgumentToken => HandleFlagArgument(name, args, currentFlag),
-                _ => throw new AndrzejFuckedUpException($"{prefix} not flag or flag arg")
+                _ => throw new CoreInvariantException($"{prefix} not flag or flag arg")
             };
             
             if (result.HasErrored(out var error))

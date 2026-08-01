@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
@@ -26,7 +26,7 @@ public class GetWaveTimerMethod : ReturningMethod<DurationValue>, IAdditionalDes
             MiniMtfWave => RespawnWaves.MiniMtfWave?.TimeLeft is {} wave and > 0 ? wave : 0,
             ChaosWave => RespawnWaves.PrimaryChaosWave?.TimeLeft is {} wave and > 0 ? wave : 0,
             MiniChaosWave => RespawnWaves.MiniChaosWave?.TimeLeft is {} wave and > 0 ? wave : 0,
-            _ => throw new AndrzejFuckedUpException()
+            _ => throw new CoreInvariantException()
         });
     }
 

@@ -3,6 +3,7 @@ using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
+using SER.Code.Exceptions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 
 namespace SER.Code.MethodSystem.Methods.EffectMethods;
@@ -12,7 +13,7 @@ public class ClearEffectMethod : SynchronousMethod
 {
     private static readonly MethodInfo DisableEffectMethod = 
         typeof(Player).GetMethod("DisableEffect", [])
-        ?? throw new Exception("Could not find EnableEffect method for Player");
+        ?? throw new CoreInvariantException("Could not find the expected Player.DisableEffect overload.");
     
     public override string Description => "Removes the provided status effect from players.";
 

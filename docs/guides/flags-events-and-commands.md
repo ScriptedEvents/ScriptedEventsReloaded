@@ -113,6 +113,8 @@ version.
 
 Prefer inline functions for new logic contained in one file.
 
-After editing flagged sections, run `serreload` and inspect `serstatus`.
+Existing bindings reload their script before the next execution. After adding or
+removing bindings which cannot trigger yet, run `serreload` (or restart the round)
+and inspect `serstatus`.
 
 Next: [functions, scopes, and errors](../language/functions-scopes-and-errors.md).

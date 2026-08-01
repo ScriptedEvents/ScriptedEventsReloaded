@@ -2,6 +2,7 @@ using System.Reflection;
 using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
+using SER.Code.Exceptions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 
 namespace SER.Code.MethodSystem.Methods.EffectMethods;
@@ -11,7 +12,7 @@ public class GiveEffectMethod : SynchronousMethod
 {
     private static readonly MethodInfo EnableEffectMethod = 
         typeof(Player).GetMethod("EnableEffect", [typeof(byte), typeof(float), typeof(bool)])
-        ?? throw new Exception("Could not find EnableEffect method for Player");
+        ?? throw new CoreInvariantException("Could not find the expected Player.EnableEffect overload.");
 
     public override string Description => "Adds a provided effect for specified players.";
 

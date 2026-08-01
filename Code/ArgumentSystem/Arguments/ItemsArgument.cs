@@ -3,6 +3,7 @@ using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
+using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.Arguments;
 
@@ -21,12 +22,12 @@ public class ItemsArgument(string name) : EnumHandlingArgument(name)
             return new(() => Item.List.ToArray());
         }
 
-        if (token.CanReturnReference<Item>(out var get))
+        return ValueOrEnumResolver<Item[]>(token, value =>
         {
-            return new(() => get().OnSuccess<Item[]>(item => [item]));
-        }
-        
-        return EnumResolver<Item[]>(token, [
+            return value is ReferenceValue reference
+                ? reference.GetAs<Item>().OnSuccess<Item[]>(item => [item])
+                : GenericError(token);
+        }, [
             new EnumHandler<ItemType, Item[]>(itemType => new(() => Item.GetAll(itemType).ToArray()))
         ]);
     }

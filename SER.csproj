@@ -84,7 +84,7 @@
             <HintPath>$(SL_DEV_REFERENCES)\UnityEngine.UnityWebRequestModule.dll</HintPath>
         </Reference>
         <Reference Include="UncomplicatedCustomRoles-LabAPI">
-            <HintPath>$(SL_DEV_REFERENCES)\UncomplicatedCustomRoles-LabAPI.dll</HintPath>
+            <HintPath>$(UcrReferencePath)</HintPath>
         </Reference>
         <Reference Include="ProjectMER">
             <HintPath>$(SL_DEV_REFERENCES)\ProjectMER.dll</HintPath>
@@ -106,7 +106,10 @@
     </Target>
 
     <PropertyGroup>
-        <LabApiXmlPath>$(UserProfile)\.nuget\packages\northwood.labapi\1.1.6.1\lib\net48\LabApi.xml</LabApiXmlPath>
+        <LabApiXmlPath>$(UserProfile)\.nuget\packages\northwood.labapi\1.1.7\lib\net48\LabApi.xml</LabApiXmlPath>
+        <ExiledApiXmlPath>$(UserProfile)\.nuget\packages\exmod.exiled\9.14.2\lib\net48\Exiled.API.xml</ExiledApiXmlPath>
+        <ExiledEventsXmlPath>$(UserProfile)\.nuget\packages\exmod.exiled\9.14.2\lib\net48\Exiled.Events.xml</ExiledEventsXmlPath>
+        <UcrReferencePath Condition="'$(UcrReferencePath)' == ''">$(SL_DEV_REFERENCES)\UncomplicatedCustomRoles-LabAPI.dll</UcrReferencePath>
         <!-- The extension is versioned with SER; the installed copy is updated after a successful build. -->
         <SerExtensionDirectory Condition="'$(SerExtensionDirectory)' == ''">$(MSBuildProjectDirectory)\VS Code Extension</SerExtensionDirectory>
         <SerExtensionInstallDirectory Condition="'$(SerExtensionInstallDirectory)' == ''">$(UserProfile)\.vscode\extensions\ser</SerExtensionInstallDirectory>
@@ -119,10 +122,10 @@
         <EmbeddedResource Include="$(LabApiXmlPath)" Condition="Exists('$(LabApiXmlPath)')">
             <LogicalName>LabApi.xml</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="$(OutputPath)Exiled.API.xml" Condition="Exists('$(OutputPath)Exiled.API.xml')">
+        <EmbeddedResource Include="$(ExiledApiXmlPath)" Condition="'$(Configuration)' == 'EXILED' and Exists('$(ExiledApiXmlPath)')">
             <LogicalName>Exiled.API.xml</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="$(OutputPath)Exiled.Events.xml" Condition="Exists('$(OutputPath)Exiled.Events.xml')">
+        <EmbeddedResource Include="$(ExiledEventsXmlPath)" Condition="'$(Configuration)' == 'EXILED' and Exists('$(ExiledEventsXmlPath)')">
             <LogicalName>Exiled.Events.xml</LogicalName>
         </EmbeddedResource>
         <None Include="App.config" />
@@ -137,8 +140,7 @@
         <Using Include="JetBrains.Annotations" />
     </ItemGroup>
 
-    <!-- ignore warnings about mismatch between versions of core libs
-        and unreachable code because compiler is stupid -->
+    <!-- Ignore warnings about mismatched core-library versions and unreachable code. -->
     <PropertyGroup>
         <NoWarn>$(NoWarn);MSB3277;CS0162</NoWarn>
     </PropertyGroup>
@@ -146,12 +148,12 @@
     <!-- nuget refs -->
     <ItemGroup>
         <PackageReference Include="AudioPlayerApi" Version="1.1.3" />
-        <PackageReference Include="Callvote.LabAPI" Version="6.8.0" />
-        <PackageReference Include="ExMod.Exiled" Version="9.13.3" />
+        <PackageReference Include="Callvote.LabAPI" Version="6.9.0" />
+        <PackageReference Include="ExMod.Exiled" Version="9.14.2" />
         <PackageReference Include="NCalc" Version="1.3.8" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-        <PackageReference Include="Northwood.LabAPI" Version="1.1.6.1" />
-        <PackageReference Include="PolySharp" Version="1.15.0">
+        <PackageReference Include="Northwood.LabAPI" Version="1.1.7" />
+        <PackageReference Include="PolySharp" Version="1.16.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

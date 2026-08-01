@@ -1,4 +1,4 @@
-﻿using SER.Code.Extensions;
+using SER.Code.Extensions;
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
@@ -40,7 +40,7 @@ public class ParenthesesToken : BaseToken, IValueToken
 
     public TryGet<object> ParseExpression()
     {
-        if (NumericExpressionReslover.CompileExpression(Tokens).HasErrored(out var error2, out var expression))
+        if (NumericExpressionResolver.CompileExpression(Tokens).HasErrored(out var error2, out var expression))
         {
             return error2;
         }

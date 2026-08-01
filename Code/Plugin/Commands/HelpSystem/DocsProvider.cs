@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text;
 using CommandSystem;
 using LabApi.Events.Arguments.Interfaces;
@@ -47,7 +47,7 @@ public static class DocsProvider
     public static bool GetGeneralOutput(ArraySegment<string> args, ICommandSender sender, out string response)
     {
         var arg = args.Array?[args.Offset].ToLowerInvariant() 
-                  ?? throw new Exception("argument provided in invalid format");
+                  ?? throw new CoreInvariantException("Help arguments were provided in an invalid format.");
         
         if (Enum.TryParse(arg, true, out HelpOption option))
         {
@@ -63,7 +63,7 @@ public static class DocsProvider
             
             if (!GeneralOptions.TryGetValue(option, out var func))
             {
-                throw new AndrzejFuckedUpException($"Option {option} was not added to the help system.");
+                throw new CoreInvariantException($"Option {option} was not added to the help system.");
             }
             
             response = func();
@@ -176,8 +176,8 @@ public static class DocsProvider
                 3. Run:
                    serrun hello
 
-                   If the file is new, serrun discovers and registers it automatically.
-                   After editing an already registered script, run 'serreload'.
+                   serrun discovers or reloads the requested file before running it.
+                   Round restart reloads all scripts; 'serreload' does the same on demand.
 
                 4. Diagnose files with:
                    serstatus
@@ -675,7 +675,7 @@ public static class DocsProvider
             sb.AppendLine();
             sb.AppendLine($"This method returns {retMethod.Returns}.");
             
-            // this is stupid, will have to wait for value system rewrite
+            // This fallback can be removed when the value system is redesigned.
             if (retMethod.Returns.AreKnown(out var known))
             {
                 var possiblePrefixes = known

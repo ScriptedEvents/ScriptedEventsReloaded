@@ -34,9 +34,21 @@ public class Script
 
     public ScriptName FileName { get; init; }
 
-    public uint SourceLineOffset { get; init; }
+    private uint _sourceLineOffset;
+    public uint SourceLineOffset
+    {
+        get => _sourceLineOffset;
+        init => _sourceLineOffset = value;
+    }
+
+    private bool RefreshFromCatalogBeforeExecution { get; init; }
     
-    public required string Content { get; init; }
+    private string _content = null!;
+    public required string Content
+    {
+        get => _content;
+        init => _content = value;
+    }
     
     public required ScriptExecutor Executor
     {
@@ -104,30 +116,39 @@ public class Script
 
     public static TryGet<Script> CreateByScriptName(ScriptName name, ScriptExecutor? executor)
     {
+        FileSystem.FileSystem.RefreshRequested(name);
+
         if (FileSystem.FileSystem.GetScriptSection(name).HasErrored(out var error, out var section))
         {
             return error;
         }
 
-        return CreateByVerifiedSection(section, executor);
+        return CreateByVerifiedSection(section, executor, true);
     }
     
     public static TryGet<Script> CreateByScriptName(string dirtyName, ScriptExecutor? executor)
     {
-        if (ScriptName.Create(dirtyName).HasErrored(out var initError, out var scriptName))
+        if (string.IsNullOrWhiteSpace(dirtyName))
         {
-            return initError;       
+            return "A script name cannot be empty.";
         }
 
-        return CreateByScriptName(scriptName, executor);
+        return CreateByScriptName(ScriptName.CreateUnsafe(dirtyName), executor);
     }
 
-    public static Script CreateByVerifiedSection(ScriptSection section, ScriptExecutor? executor) => new()
+    public static Script CreateByVerifiedSection(ScriptSection section, ScriptExecutor? executor) =>
+        CreateByVerifiedSection(section, executor, false);
+
+    private static Script CreateByVerifiedSection(
+        ScriptSection section,
+        ScriptExecutor? executor,
+        bool refreshFromCatalogBeforeExecution) => new()
     {
         Name = section.Name,
         FileName = section.FileName,
         Content = section.Content,
         SourceLineOffset = section.StartLine - 1,
+        RefreshFromCatalogBeforeExecution = refreshFromCatalogBeforeExecution,
         Executor = executor ?? ScriptExecutor.Get()
     };
 
@@ -258,6 +279,12 @@ public class Script
     /// <returns>Returns a boolean indicating whether the event is allowed.</returns>
     public bool? RunForEvent(RunReason reason, Script? caller = null)
     {
+        if (RefreshSourceBeforeExecution().HasErrored(out var refreshError))
+        {
+            Executor.Error(refreshError, this);
+            return null;
+        }
+
         StartTime = DateTime.Now;
         RunReason = reason;
         Caller = caller;
@@ -380,6 +407,16 @@ public class Script
 
     internal TryGet<Value> RunSingleSynchronousReturningMethod(RunReason reason)
     {
+        if (RefreshSourceBeforeExecution().HasErrored(out var refreshError))
+        {
+            return refreshError;
+        }
+
+        if (_contexts.Length == 0 && Compile().HasErrored(out var compileError))
+        {
+            return compileError;
+        }
+
         if (_contexts is not [MethodContext { Method: ReturningMethod } methodContext])
         {
             return "The command is not a single synchronous returning method.";
@@ -391,7 +428,7 @@ public class Script
 
         try
         {
-            var execution = methodContext.Run();
+            using var execution = methodContext.Run();
             while (execution.MoveNext())
             {
                 // A synchronous method can only yield the optional SafeScripts frame.
@@ -427,6 +464,33 @@ public class Script
         }
     }
 
+    private Result RefreshSourceBeforeExecution()
+    {
+        if (!RefreshFromCatalogBeforeExecution)
+        {
+            return true;
+        }
+
+        FileSystem.FileSystem.RefreshRequested(Name);
+        if (FileSystem.FileSystem.GetScriptSection(Name).HasErrored(out var error, out var section))
+        {
+            return $"Failed to reload script '{Name}' before execution: {error}";
+        }
+
+        var sourceLineOffset = section.StartLine - 1;
+        if (_content == section.Content && _sourceLineOffset == sourceLineOffset)
+        {
+            return true;
+        }
+
+        _content = section.Content;
+        _sourceLineOffset = sourceLineOffset;
+        _lines = [];
+        _contexts = [];
+        _definedFunctions.Clear();
+        return true;
+    }
+
     private IEnumerator<float> InternalExecute()
     {
         if (_contexts.Length is 0)
@@ -446,7 +510,7 @@ public class Script
                     continue;
                 case YieldingContext yc:
                 {
-                    var handle = yc.Run();
+                    using var handle = yc.Run();
                     while (handle.MoveNext())
                     {
                         yield return handle.Current;

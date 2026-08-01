@@ -1,4 +1,4 @@
-﻿using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
@@ -77,7 +77,7 @@ public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
     protected override IEnumerator<float> Execute()
     {
         if (_repeatCountExpression == null)
-            throw new AndrzejFuckedUpException("Repeat context has no amount specified");
+            throw new CoreInvariantException("Repeat context has no amount specified");
 
         if (_repeatCountExpression().HasErrored(out var error, out var val))
         {
@@ -87,7 +87,7 @@ public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
         for (ulong i = 0; i < val; i++)
         {
             SetVariable(i + 1);
-            var coro = RunChildren();
+            using var coro = RunChildren();
             while (coro.MoveNext())
             {
                 yield return coro.Current;

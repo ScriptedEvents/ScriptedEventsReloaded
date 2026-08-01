@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Reflection;
 using LabApi.Features.Wrappers;
 using SER.Code.Exceptions;
@@ -102,7 +102,7 @@ public abstract class Value : IEquatable<Value>
     public static Value Parse(object obj)
     {
         // ReSharper disable once ConvertIfStatementToSwitchStatement
-        if (obj is null) throw new AndrzejFuckedUpException();
+        if (obj is null) throw new CoreInvariantException();
         if (obj is Value v) return v;
 
         try

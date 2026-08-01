@@ -2,18 +2,43 @@
   "name": "ser",
   "displayName": "Scripted Events Reloaded",
   "description": "Language support, hover documentation and contextual completions for SER scripts",
-  "version": "1.5.7",
+  "version": "1.6.0",
   "publisher": "ElektrykAndrzej",
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ScriptedEvents/ScriptedEventsReloaded.git"
+  },
+  "homepage": "https://github.com/ScriptedEvents/ScriptedEventsReloaded/tree/main/docs",
+  "bugs": {
+    "url": "https://github.com/ScriptedEvents/ScriptedEventsReloaded/issues"
+  },
+  "keywords": [
+    "scp-sl",
+    "ser",
+    "scripted-events"
+  ],
+  "files": [
+    "LICENSE",
+    "THIRD_PARTY_LICENSES.txt",
+    "README.md",
+    "images/**",
+    "language-configuration.json",
+    "out/**",
+    "syntaxes/**"
+  ],
   "main": "./out/extension.js",
   "scripts": {
     "build": "node ../Tooling/scripts/build.mjs",
     "check": "node ../Tooling/scripts/check.mjs",
     "test": "node --test ../Tooling/tests/*.test.mjs",
-    "verify": "npm run build && npm run check && npm test"
+    "verify": "npm run build && npm run check && npm test",
+    "package": "vsce package"
   },
   "devDependencies": {
-    "@types/vscode": "^1.105.0",
-    "typescript": "^5.0.0"
+    "@types/vscode": "1.105.0",
+    "@vscode/vsce": "3.9.2",
+    "typescript": "5.9.3"
   },
   "engines": {
     "vscode": "^1.105.0"

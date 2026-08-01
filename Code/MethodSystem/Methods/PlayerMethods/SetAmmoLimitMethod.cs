@@ -21,7 +21,7 @@ public class SetAmmoLimitMethod : SynchronousMethod, IDependOnFramework
         new EnumArgument<AmmoType>("ammo type"),
         new IntArgument("limit", 0, 65535)
         {
-            Description = "The min and max are there so the whole thing doesn't crash from int -> ushort conversion :trollface:"
+            Description = "The accepted range matches the unsigned 16-bit limit used by EXILED."
         }
     ];
 

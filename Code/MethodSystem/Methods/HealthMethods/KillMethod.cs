@@ -21,10 +21,14 @@ public class KillMethod : SynchronousMethod, IEssential
     public override void Execute()
     {
         var players = Args.GetPlayers("players");
+        var reason = Args.GetText("reason");
         
         foreach (var player in players)
         {
-            player.Kill();
+            if (string.IsNullOrEmpty(reason))
+                player.Kill();
+            else
+                player.Kill(reason, string.Empty);
         }
     }
 }

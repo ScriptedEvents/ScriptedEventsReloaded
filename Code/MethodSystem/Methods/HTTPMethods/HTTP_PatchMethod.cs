@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
-using SER.Code.MethodSystem.BaseMethods.Synchronous;
+using SER.Code.MethodSystem.BaseMethods.Yielding;
 using SER.Code.MethodSystem.Structures;
 using UnityEngine.Networking;
 
@@ -10,7 +10,7 @@ namespace SER.Code.MethodSystem.Methods.HTTPMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class HTTP_PatchMethod : SynchronousMethod, ICanError
+public class HTTP_PatchMethod : YieldingMethod, ICanError
 {
     public override string Description => "Sends a PATCH request to a provided URL.";
 
@@ -27,10 +27,10 @@ public class HTTP_PatchMethod : SynchronousMethod, ICanError
         nameof(UnityWebRequest.Result.ProtocolError)
     ];
     
-    public override void Execute()
+    public override IEnumerator<float> Execute()
     {
         var address = Args.GetText("address");
         var jsonData = Args.GetReference<JObject>("json data to patch");
-        Timing.RunCoroutine(HTTP_PostMethod.RequestSend(this, address, jsonData, "PATCH"));
+        return HTTP_PostMethod.RequestSend(this, address, jsonData, "PATCH");
     }
 }

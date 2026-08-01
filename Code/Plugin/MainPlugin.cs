@@ -14,6 +14,7 @@ using SER.Code.MethodSystem;
 using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
 using SER.Code.MethodSystem.Methods.DamageRuleMethods;
 using SER.Code.MethodSystem.Methods.PlayerDataMethods;
+using SER.Code.MethodSystem.Methods.RoomMethods;
 using SER.Code.MethodSystem.Methods.TeslaRuleMethods;
 using SER.Code.ScriptSystem;
 using SER.Code.ValueSystem.PropertySystem;
@@ -35,7 +36,7 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
 #endif
     public override string Name => "SER";
     public override string Author => "Elektryk_Andrzej";
-    public override Version Version => new(1, 0, 0, 7);
+    public override Version Version => new(1, 0, 0);
 
     public static string GitHubLink => "https://github.com/ScriptedEvents/ScriptedEventsReloaded";
     public static string DocsLink => GitHubLink + "/blob/main/docs/README.md";
@@ -46,6 +47,7 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
 
     private TeslaRuleHandler? _teslaRuleHandler;
     private DamageRuleHandler? _damageRuleHandler;
+    private readonly HashSet<CoroutineHandle> _pendingContributorBadges = [];
     private bool _scriptsLoadedDuringMapGeneration;
 
     public record Contributor(string Name, Contribution Contribution, string? Id = null);
@@ -153,11 +155,19 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
 #endif
     {
         Script.StopAll();
+        BetterCoros.KillAll();
+        BlackoutMethod.Clear();
         FileSystem.FileSystem.Shutdown();
         ScriptFlagHandler.Clear();
         EventHandler.Clear();
         CommandEvents.Clear();
         FrameworkBridge.Clear();
+
+        foreach (var coroutine in _pendingContributorBadges.ToArray())
+        {
+            coroutine.Kill();
+        }
+        _pendingContributorBadges.Clear();
 
         Events.ServerEvents.MapGenerating -= OnMapGenerating;
         Events.ServerEvents.WaitingForPlayers -= OnServerFullyInit;
@@ -175,6 +185,8 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
     private void OnMapGenerating(MapGeneratingEventArgs _)
     {
         Script.StopAll();
+        BetterCoros.KillAll();
+        BlackoutMethod.Clear();
         ScriptFlagHandler.Clear();
         SetPlayerDataMethod.PlayerData.Clear();
         TeslaRuleHandler.ResetAll();
@@ -205,7 +217,9 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
              SER {Version} is ready.
              Active script files: {FileSystem.ScriptCatalog.GetAcceptedScripts().Length}
              Files requiring attention: {FileSystem.ScriptCatalog.GetFailedScripts().Length}
-             Disabled files (name starts with #): {FileSystem.FileSystem.DisabledScriptPaths.Length}
+             Disabled files (filename starts with #): {FileSystem.FileSystem.DisabledScriptPaths.Length}
+             Excluded folders (name starts with #): {FileSystem.FileSystem.DisabledScriptDirectoryPaths.Length}
+             Skipped linked folders: {FileSystem.FileSystem.SkippedLinkDirectoryPaths.Length}
              Script directory: {FileSystem.FileSystem.MainDirPath}
              First steps: {HelpCommandName} start
              Documentation: {DocsLink}
@@ -263,19 +277,28 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
         if (!Config.ShowContributorBadges) return;
         if (ev.Player is not { } plr) return;
         
-        Timing.CallDelayed(3f, () =>
+        CoroutineHandle coroutine = default;
+        coroutine = Timing.CallDelayed(3f, () =>
         {
-            if (plr.UserGroup is not null) return;
-            if (Contributors.FirstOrDefault(c => c.Id == plr.UserId && c.Id is not null) is not { } info) return;
-            
-            plr.GroupColor = "aqua";
-            plr.GroupName = $"* SER {info
-                .Contribution
-                .GetFlags()
-                .OrderByDescending(f => f)
-                .First()
-                .ToString()
-                .Spaceify()} *";
+            try
+            {
+                if (plr.UserGroup is not null) return;
+                if (Contributors.FirstOrDefault(c => c.Id == plr.UserId && c.Id is not null) is not { } info) return;
+
+                plr.GroupColor = "aqua";
+                plr.GroupName = $"* SER {info
+                    .Contribution
+                    .GetFlags()
+                    .OrderByDescending(f => f)
+                    .First()
+                    .ToString()
+                    .Spaceify()} *";
+            }
+            finally
+            {
+                _pendingContributorBadges.Remove(coroutine);
+            }
         });
+        _pendingContributorBadges.Add(coroutine);
     }
 }

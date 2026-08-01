@@ -1,4 +1,5 @@
-﻿using CustomPlayerEffects;
+﻿using System.Collections;
+using CustomPlayerEffects;
 using LabApi.Features.Wrappers;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
@@ -14,7 +15,7 @@ using ValueType = SER.Code.ValueSystem.Other.ValueType;
 
 namespace SER.Code.ValueSystem;
 
-public class PlayerValue : Value, IValueWithProperties
+public class PlayerValue : Value, IValueWithProperties, IEnumerable<Player>
 {
     public PlayerValue(Player? plr)
     {
@@ -251,5 +252,15 @@ public class PlayerValue : Value, IValueWithProperties
         if (targetType.IsAssignableFrom(typeof(IEnumerable<Player>))) return TryGet<object>.Success(Players.AsEnumerable());
 
         return $"Cannot convert players to {targetType.Name}";
+    }
+
+    public IEnumerator<Player> GetEnumerator()
+    {
+        return Players.AsEnumerable().GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }

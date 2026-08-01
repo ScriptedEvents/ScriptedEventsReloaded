@@ -26,12 +26,9 @@ public readonly record struct ScriptName
     
     public TryGet<Script> GetScript(ScriptExecutor? executor, bool assertCheck = true)
     {
-        if (assertCheck)
+        if (assertCheck && string.IsNullOrWhiteSpace(_value))
         {
-            if (Assert(_value).HasErrored(out var error))
-            {
-                return error;
-            }
+            return "A script name cannot be empty.";
         }
         
         executor ??= ScriptExecutor.Get();

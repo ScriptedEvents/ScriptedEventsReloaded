@@ -13,6 +13,7 @@ namespace SER.Code.ContextSystem.Contexts.Control;
 [UsedImplicitly]
 public class ChanceStatement : StatementContext, IExtendableStatement, IKeywordContext
 {
+    private static readonly Random Random = new();
     private decimal? _chance;
     private Func<TryGet<NumberValue>>? _chanceGetter;
     
@@ -65,7 +66,13 @@ public class ChanceStatement : StatementContext, IExtendableStatement, IKeywordC
             throw new ScriptRuntimeError(this, $"Chance must be between 0% and 100%, got {Math.Round(chance, 2)*100}%");
         }
         
-        if ((decimal)new Random().NextDouble() < chance)
+        double randomValue;
+        lock (Random)
+        {
+            randomValue = Random.NextDouble();
+        }
+
+        if ((decimal)randomValue < chance)
         {
             using var coro = RunChildren();
             while (coro.MoveNext())
@@ -81,7 +88,7 @@ public class ChanceStatement : StatementContext, IExtendableStatement, IKeywordC
             yield break;
         }
 
-        var didntExecuteCoro = statement.Run();
+        using var didntExecuteCoro = statement.Run();
         while (didntExecuteCoro.MoveNext())
         {
             yield return didntExecuteCoro.Current;

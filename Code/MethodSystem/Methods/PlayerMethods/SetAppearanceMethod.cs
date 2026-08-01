@@ -30,8 +30,8 @@ public class SetAppearanceMethod : SynchronousMethod, IDependOnFramework
     public override void Execute()
     {
         var labApiPlayers = Args.GetPlayers("players whose appearance will be changed");
-        Player[] players = [];
-        for (uint i = 0; i < labApiPlayers.Length; i++)
+        var players = new Player[labApiPlayers.Length];
+        for (var i = 0; i < labApiPlayers.Length; i++)
             players[i] = Player.Get(labApiPlayers[i]);
         
         var role = Args.GetEnum<RoleTypeId>("role to change appearance to");
@@ -39,8 +39,8 @@ public class SetAppearanceMethod : SynchronousMethod, IDependOnFramework
 
         if (potentialTargets != null)
         {
-            Player[] targets = [];
-            for (uint i = 0; i < potentialTargets.Length; i++)
+            var targets = new Player[potentialTargets.Length];
+            for (var i = 0; i < potentialTargets.Length; i++)
                 targets[i] = Player.Get(potentialTargets[i]);
             
             foreach (var player in players)

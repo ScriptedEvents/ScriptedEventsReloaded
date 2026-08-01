@@ -29,9 +29,9 @@ public class Toy_TPRoomMethod : SynchronousMethod, IAdditionalDescription
         var toy = Args.GetReference<AdminToy>("toy reference");
         var room = Args.GetRoom("room to teleport toy to");
         var pos = room.Transform.TransformPoint(
-            Args.GetFloat("x position"),
-            Args.GetFloat("y position"),
-            Args.GetFloat("z position"));
+            Args.GetFloat("relative x"),
+            Args.GetFloat("relative y"),
+            Args.GetFloat("relative z"));
         
         Toy_TPPositionMethod.TeleportOrSpawn(toy, pos);
     }

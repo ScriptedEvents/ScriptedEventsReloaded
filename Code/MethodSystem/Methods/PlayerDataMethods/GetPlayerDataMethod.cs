@@ -30,7 +30,7 @@ public class GetPlayerDataMethod : ReturningMethod, IAdditionalDescription, ICan
         new AnyValueArgument("default value")
         {
             Description = "If the key doesn't exist, this value will be returned.",
-            DefaultValue = new(null, "no default value - will error when key doesnt exist")
+            DefaultValue = new(null, "no default value; errors when the key doesn't exist")
         }
     ];
 

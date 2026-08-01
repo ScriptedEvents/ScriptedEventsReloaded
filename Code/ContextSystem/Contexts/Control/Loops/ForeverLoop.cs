@@ -53,7 +53,7 @@ public class ForeverLoop : LoopContextWithSingleIterationVariable<NumberValue>, 
         while (true)
         {
             SetVariable(++iteration);
-            var coro = RunChildren();
+            using var coro = RunChildren();
             while (coro.MoveNext())
             {
                 yield return coro.Current;

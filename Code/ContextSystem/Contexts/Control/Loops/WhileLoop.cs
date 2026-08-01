@@ -1,4 +1,4 @@
-﻿using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
@@ -15,7 +15,7 @@ public class WhileLoop : LoopContextWithSingleIterationVariable<NumberValue>
     private readonly List<BaseToken> _condition = [];
 
     private readonly Result _rs = "Cannot create 'while' loop.";
-    private NumericExpressionReslover.CompiledExpression _expression = null!;
+    private NumericExpressionResolver.CompiledExpression _expression = null!;
     public override string KeywordName => "while";
 
     public override string Description =>
@@ -47,7 +47,7 @@ public class WhileLoop : LoopContextWithSingleIterationVariable<NumberValue>
 
     public override Result VerifyCurrentState()
     {
-        if (NumericExpressionReslover.CompileExpression(_condition.ToArray())
+        if (NumericExpressionResolver.CompileExpression(_condition.ToArray())
             .HasErrored(out var error, out var cond))
         {
             return error;
@@ -66,7 +66,7 @@ public class WhileLoop : LoopContextWithSingleIterationVariable<NumberValue>
         while (GetExpressionResult())
         {
             SetVariable(++iteration);
-            var coro = RunChildren();
+            using var coro = RunChildren();
             while (coro.MoveNext())
             {
                 yield return coro.Current;

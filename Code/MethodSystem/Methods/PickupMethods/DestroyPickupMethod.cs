@@ -20,12 +20,12 @@ public class DestroyPickupMethod : SynchronousMethod, ICanError
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new ReferenceArgument<Pickup>("pickup/projectile reference"),
+        new ReferenceArgument<Pickup>("pickup or projectile reference"),
     ];
 
     public override void Execute()
     {
-        var obj = Args.GetReference<Pickup>("pickup/projectile reference");
+        var obj = Args.GetReference<Pickup>("pickup or projectile reference");
         
         if (!NetworkServer.spawned.ContainsValue(obj.NetworkIdentity))
             throw new ScriptRuntimeError(this, ErrorReasons[0]);

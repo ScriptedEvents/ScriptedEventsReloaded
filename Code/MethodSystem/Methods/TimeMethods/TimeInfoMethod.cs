@@ -1,4 +1,4 @@
-﻿using SER.Code.ArgumentSystem.Arguments;
+using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
@@ -51,7 +51,7 @@ public class TimeInfoMethod : LiteralValueReturningMethod
             "dayofyear" => new NumberValue(DateTime.Now.DayOfYear),
             "unixtimeutc" => new NumberValue(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
             "unixtimelocal" => new NumberValue(DateTimeOffset.Now.ToUnixTimeSeconds()),
-            _ => throw new AndrzejFuckedUpException()
+            _ => throw new CoreInvariantException()
         };
     }
 }

@@ -115,15 +115,16 @@ Lifecycle rule: every event subscription, command registration, custom handler a
 `FileSystem.UpdateScriptPathCollection()` recursively scans the SER config directory for `.ser` and `.txt` files.
 
 - A file whose base filename starts with `#` is ignored.
+- A directory whose name starts with `#` is not searched; its entire subtree is ignored.
 - Physical-file identity is the filename without its extension, not its relative path. Runtime sections add a numbered selector when needed.
 - If two files anywhere in the tree share the same base filename, all scripts with that duplicate name are excluded and an error is logged.
-- Files are read when the catalog initializes and when an authorized operator runs `serreload`.
-- If `serrun name` cannot find a registered script, it performs a targeted rescan and registers only a newly found `name.ser` or `name.txt`. It does not reload unrelated files or pick up edits to already registered scripts.
-- `serstatus` reports accepted snapshots, failed candidates, disabled files, and every path involved in a global-name conflict.
+- The complete catalog is force-refreshed during initialization, on every round restart, and when an authorized operator runs `serreload`.
+- Every file-backed execution request performs a targeted refresh before the runnable `Script` is created and again immediately before execution. This applies to `serrun`, events, custom commands, triggers, callbacks, and cross-script calls without reloading unrelated files.
+- `serstatus` reports accepted snapshots, failed candidates, disabled files, excluded directories, and every path involved in a global-name conflict.
 
 `ScriptCatalog` owns the accepted source snapshot and registered flags for each physical file. During initial loading or an explicit reload, SER splits the file at every `!--` declaration and compiles every section before changing live bindings. Each declaration is inclusive in its section, and the section ends immediately before the next declaration. Multi-section files receive selectors such as `file:1` and `file:2`; flagless and single-section files retain their bare filename. Only blank lines and comments may precede the first declaration in a flagged file.
 
-Flag parsing is side-effect-free. After every section compiles and every flag parses, the catalog unbinds the accepted snapshot and binds the candidate. A registration failure rolls the candidate back and restores the last known-good snapshot. Invalid edits therefore do not partially replace handlers. Every successful file reload emits a server info log. `serreload` uses the same pipeline as initial loading. Map initialization rebinds the accepted snapshots without rereading disk. `ScriptFlagHandler.Clear()` calls `Unbind()` on every registered flag before clearing the registry.
+Flag parsing is side-effect-free. After every section compiles and every flag parses, the catalog unbinds the accepted snapshot and binds the candidate. A registration failure rolls the candidate back and restores the last known-good snapshot. Invalid edits therefore do not partially replace handlers. Every successful file reload emits a server info log. Initial loading, round restart, targeted pre-execution refresh, and `serreload` all use the same transactional pipeline. `ScriptFlagHandler.Clear()` calls `Unbind()` on every registered flag before clearing the registry.
 
 Bindings store the section selector rather than only the physical filename, so callbacks reload and execute the correct slice. Section compilation retains original source-file line numbers. A bare multi-section filename is deliberately ambiguous for manual execution; use its numbered selector. File-level stop and running checks match all of that file's sections.
 
@@ -310,7 +311,8 @@ shared tooling build after validation. That build:
   `Tooling/visual-editor/src`;
 - synchronizes `VS Code Extension/src` into `out`;
 - embeds the same editor as a VS Code webview;
-- copies the same language core and manifest to both clients.
+- copies the same language core and manifest to both clients;
+- carries `LICENSE` and `THIRD_PARTY_LICENSES.txt` into the extension package.
 
 The editor deliberately exposes a curated learning vocabulary rather than
 generating one Blockly block for every reflected method. Reflection supplies
@@ -320,7 +322,8 @@ Keep that boundary: adding a runtime method must not automatically add visual
 editor complexity.
 
 Run `npm run verify` from `Tooling` to build both clients and execute their
-manifest synchronization and language-core contract tests.
+manifest synchronization, documentation, method-argument usage, third-party
+notice and language-core contract tests.
 
 The build embeds example scripts and selected dependencies (`NCalc`, `Newtonsoft.Json`, `AudioPlayerApi`, `NVorbis`, `SharpCompress`) into the plugin assembly. It also attempts to embed SER and API XML documentation used by help generation.
 

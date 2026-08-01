@@ -18,7 +18,7 @@ public class Toy_TPPlayerMethod : SynchronousMethod, IAdditionalDescription
     [
         new ReferenceArgument<AdminToy>("toy reference"),
         new PlayerArgument("player to teleport toy to"),
-        new BoolArgument("align toy rotation to player?")
+        new BoolArgument("align toy rotation to player")
         {
             DefaultValue = new(false, null)
         },
@@ -28,7 +28,7 @@ public class Toy_TPPlayerMethod : SynchronousMethod, IAdditionalDescription
     {
         var toy = Args.GetReference<AdminToy>("toy reference");
         var plr = Args.GetPlayer("player to teleport toy to");
-        var alignRotation = Args.GetBool("align toy rotation to player?");
+        var alignRotation = Args.GetBool("align toy rotation to player");
         
         Toy_TPPositionMethod.TeleportOrSpawn(toy, plr.Position, alignRotation ? plr.Rotation : null);
     }

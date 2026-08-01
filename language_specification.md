@@ -175,14 +175,18 @@ end
 
 A file can contain multiple flagged script sections. Every `!--` declaration starts a new independent script, and its section continues up to (but not including) the next `!--` declaration. Named `--` arguments belong to the nearest flag above them.
 
-SER reads script files when the plugin initializes and does not watch later edits.
-When `serrun name` cannot find a registered script, it searches recursively for
-a new `name.ser` or `name.txt`, registers that one file, and retries the command.
-Use the permission-protected `serreload` command after editing a registered file
-or when you want to refresh the entire directory. The complete physical file
+SER reads every script file when the plugin initializes and on each round restart.
+During recursive discovery, SER ignores files whose names start with `#` and
+does not search directories whose names start with `#`.
+Whenever a file-backed script is requested for execution, SER performs a targeted
+refresh of that file before running it. This applies to `serrun`, events, callbacks,
+custom commands, triggers, and calls from other scripts. Use the permission-protected
+`serreload` command when you want to refresh the entire directory immediately,
+including new bindings which have not had an opportunity to trigger. The complete physical file
 must compile and register successfully before any active section is replaced;
 otherwise SER reports the exact file error and keeps the last known-good version
-active. Use `serstatus` to inspect accepted, failed, disabled, and conflicting files.
+active. Use `serstatus` to inspect accepted, failed, disabled, excluded, and
+conflicting paths.
 
 ```ser
 !-- OnEvent RoundStarted

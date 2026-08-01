@@ -38,6 +38,7 @@ public class SetCameraPropertiesMethod : SynchronousMethod, ICanError
         new FloatArgument("maximal zoom", 0, 1)
             { DefaultValue = new(null, "not changing") },
     ];
+
     public override void Execute()
     {
         var camera = Args.GetReference<CameraToy>("camera reference");
@@ -57,16 +58,15 @@ public class SetCameraPropertiesMethod : SynchronousMethod, ICanError
 
         camera.VerticalConstraints = new(
             up ?? camera.VerticalConstraints.x,
-            down ?? camera.VerticalConstraints.y
-            );
+            down ?? camera.VerticalConstraints.y);
+
         camera.HorizontalConstraint = new(
             left ?? camera.HorizontalConstraint.x,
-            right ?? camera.HorizontalConstraint.y
-            );
+            right ?? camera.HorizontalConstraint.y);
+
         camera.ZoomConstraints = new(
             minZoom ?? camera.ZoomConstraints.x,
-            maxZoom ?? camera.ZoomConstraints.y
-            );
+            maxZoom ?? camera.ZoomConstraints.y);
     }
 
 }

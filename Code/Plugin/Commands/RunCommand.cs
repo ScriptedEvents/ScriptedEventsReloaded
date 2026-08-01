@@ -84,6 +84,6 @@ public class RunCommand : ICommand, IUsePermissions
 
     public string Command => "serrun";
     public string[] Aliases => [];
-    public string Description => "Runs a script; newly added .ser or .txt files are discovered automatically.";
+    public string Description => "Reloads and runs the requested .ser or .txt script.";
     public string Permission => "ser.run";
 }

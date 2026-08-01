@@ -10,6 +10,15 @@ namespace SER.Code.FileSystem;
 
 public static class FileSystem
 {
+    private static readonly char[] DirectorySeparators =
+        [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar];
+    private static readonly HashSet<string> ReservedWindowsNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "CON", "PRN", "AUX", "NUL",
+        "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+        "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+    };
+
     public readonly record struct ExampleGenerationSummary(int Created, int AlreadyExisted, string DirectoryPath);
 
     public static readonly string MainDirPath = Path.Combine(PathManager.Configs.FullName, "Scripted Events Reloaded");
@@ -17,6 +26,8 @@ public static class FileSystem
     public static readonly string ConfigsDirPath = Path.Combine(MainDirPath, "Custom Configs");
     public static string[] RegisteredScriptPaths = [];
     public static string[] DisabledScriptPaths = [];
+    public static string[] DisabledScriptDirectoryPaths = [];
+    public static string[] SkippedLinkDirectoryPaths = [];
     public static IReadOnlyDictionary<string, string[]> DuplicateScriptPaths { get; private set; } =
         new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
 
@@ -29,6 +40,19 @@ public static class FileSystem
 
         try
         {
+            var segments = name.Split(DirectorySeparators, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var segment in segments)
+            {
+                if (segment is "." or ".."
+                    || segment != segment.TrimEnd(' ', '.')
+                    || segment.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
+                    || Path.DirectorySeparatorChar == '\\'
+                    && ReservedWindowsNames.Contains(Path.GetFileNameWithoutExtension(segment)))
+                {
+                    return TryGet<string>.Error($"Path '{name}' contains an unsafe file-name segment.");
+                }
+            }
+
             var root = Path.GetFullPath(rootDirectory)
                 .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             var path = Path.GetFullPath(Path.Combine(root, name + extension));
@@ -42,9 +66,23 @@ public static class FileSystem
                 return TryGet<string>.Error($"Path '{name}' resolves outside the SER data directory.");
             }
 
+            var currentPath = root;
+            foreach (var segment in path[rootPrefix.Length..]
+                         .Split(DirectorySeparators, StringSplitOptions.RemoveEmptyEntries))
+            {
+                currentPath = Path.Combine(currentPath, segment);
+                if ((Directory.Exists(currentPath) || File.Exists(currentPath))
+                    && (File.GetAttributes(currentPath) & FileAttributes.ReparsePoint) != 0)
+                {
+                    return TryGet<string>.Error($"Path '{name}' passes through a linked file or directory.");
+                }
+            }
+
             return path.AsSuccess();
         }
-        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException
+                                       or IOException or UnauthorizedAccessException
+                                       or System.Security.SecurityException)
         {
             return TryGet<string>.Error($"Path '{name}' is invalid: {ex.Message}");
         }
@@ -53,8 +91,45 @@ public static class FileSystem
     public static void UpdateScriptPathCollection(bool logDuplicateErrors = true)
     {
         List<string> paths = [];
-        paths.AddRange(Directory.GetFiles(MainDirPath, "*.txt", SearchOption.AllDirectories));
-        paths.AddRange(Directory.GetFiles(MainDirPath, "*.ser", SearchOption.AllDirectories));
+        List<string> disabledDirectories = [];
+        List<string> skippedLinkDirectories = [];
+        Stack<string> directories = new();
+        directories.Push(MainDirPath);
+
+        while (directories.Count > 0)
+        {
+            var directory = directories.Pop();
+            paths.AddRange(Directory.GetFiles(directory, "*.txt", SearchOption.TopDirectoryOnly));
+            paths.AddRange(Directory.GetFiles(directory, "*.ser", SearchOption.TopDirectoryOnly));
+
+            foreach (var childDirectory in Directory.GetDirectories(directory, "*", SearchOption.TopDirectoryOnly))
+            {
+                // Never follow links during recursive discovery. Besides allowing a script tree to
+                // escape MainDirPath, directory junctions can form cycles and make refresh hang.
+                if ((File.GetAttributes(childDirectory) & FileAttributes.ReparsePoint) != 0)
+                {
+                    skippedLinkDirectories.Add(childDirectory);
+                    continue;
+                }
+
+                // A leading pound sign disables an entire directory tree, just as it disables a file.
+                if (Path.GetFileName(childDirectory).StartsWith("#", StringComparison.Ordinal))
+                {
+                    disabledDirectories.Add(childDirectory);
+                    continue;
+                }
+
+                directories.Push(childDirectory);
+            }
+        }
+
+        DisabledScriptDirectoryPaths = disabledDirectories
+            .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        SkippedLinkDirectoryPaths = skippedLinkDirectories
+            .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 
         DisabledScriptPaths = paths
             .Where(path => Path.GetFileName(path).StartsWith("#", StringComparison.Ordinal))
@@ -62,7 +137,7 @@ public static class FileSystem
             .ToArray();
 
         RegisteredScriptPaths = paths
-            // ignore files with a pound sign at the start
+            // Ignore files with a pound sign at the start.
             .Where(path => !Path.GetFileName(path).StartsWith("#", StringComparison.Ordinal))
             .ToArray();
 

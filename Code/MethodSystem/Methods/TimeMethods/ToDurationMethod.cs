@@ -1,4 +1,4 @@
-﻿using SER.Code.ArgumentSystem.Arguments;
+using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
@@ -30,7 +30,7 @@ public class ToDurationMethod : ReturningMethod<DurationValue>, IAdditionalDescr
             DurationUnit.Seconds => TimeSpan.FromSeconds(length),
             DurationUnit.Minutes => TimeSpan.FromMinutes(length),
             DurationUnit.Hours => TimeSpan.FromHours(length),
-            _ => throw new AndrzejFuckedUpException()
+            _ => throw new CoreInvariantException()
         };
     }
 

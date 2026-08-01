@@ -23,24 +23,35 @@ commands/welcome.txt
 SER registers neither candidate and `serstatus` lists both full paths. Rename
 all but one and run `serreload`.
 
-## Disabled files
+## Disabled files and folders
 
-A filename whose first character is `#` is ignored:
+A file or folder name whose first character is `#` is ignored:
 
 ```text
 #welcome.ser
+#old-scripts/
 ```
 
-This is how generated examples remain safe by default. Remove the leading `#`
-or copy the file to a new globally unique name, then reload.
+SER does not search inside a disabled folder, so all of its nested files and
+folders are excluded from discovery. This is how generated examples remain safe
+by default. Remove the leading `#` from a file or folder (or copy the file to a
+new globally unique name), then reload. `serstatus` lists disabled files and
+excluded folders separately; it does not enumerate files inside excluded folders.
 
-## New files versus edits
+SER also does not follow symbolic links or directory junctions while scanning.
+This keeps discovery inside the configured SER directory and prevents link cycles
+from stalling a reload. `serstatus` lists every linked folder it skipped.
 
-`serrun name` performs targeted discovery only when `name` is not already
-registered. This makes a newly uploaded utility script convenient without
-silently reloading unrelated files.
+## Targeted and full reloads
 
-After editing, renaming, enabling, disabling, or deleting registered files, run:
+Every file-backed execution request performs a targeted refresh immediately before
+the script runs. This includes `serrun`, events, custom commands, callbacks, triggers,
+and calls from another script. New files and edits therefore take effect on their
+next direct execution without reloading unrelated files.
+
+Round restart refreshes the complete script directory. To refresh everything immediately,
+including renamed, enabled, disabled, or deleted files and bindings which cannot trigger
+yet, run:
 
 ```text
 serreload

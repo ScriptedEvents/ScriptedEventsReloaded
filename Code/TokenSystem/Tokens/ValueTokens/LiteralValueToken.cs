@@ -1,4 +1,4 @@
-﻿using SER.Code.Exceptions;
+using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens.Interfaces;
@@ -13,7 +13,7 @@ public abstract class LiteralValueToken<T> : BaseToken, IValueToken
     private bool _set = false;
     public T Value
     {
-        get => _set ? field : throw new AndrzejFuckedUpException($"Value of a {GetType().AccurateName} was not set.");
+        get => _set ? field : throw new CoreInvariantException($"Value of a {GetType().AccurateName} was not set.");
         protected set
         {
             _set = true;

@@ -1,4 +1,3 @@
-using LabApi.Features.Console;
 using MEC;
 using SER.Code.Exceptions;
 using SER.Code.Plugin;
@@ -9,6 +8,8 @@ namespace SER.Code.Helpers;
 
 public static class BetterCoros
 {
+    private static readonly HashSet<CoroutineHandle> ActiveCoroutines = [];
+
     public static CoroutineHandle Run(
         this IEnumerator<float> coro,
         Script? scr,
@@ -16,12 +17,29 @@ public static class BetterCoros
         Action? onFinish = null
     )
     {
-        return Timing.RunCoroutine(Wrapper(coro, scr, onException, onFinish));
+        CoroutineHandle handle = default;
+        handle = Timing.RunCoroutine(Wrapper(coro, scr, onException, () =>
+        {
+            ActiveCoroutines.Remove(handle);
+            onFinish?.Invoke();
+        }));
+        ActiveCoroutines.Add(handle);
+        return handle;
     }
 
     public static void Kill(this CoroutineHandle coro)
     {
         Timing.KillCoroutines(coro);
+    }
+
+    public static void KillAll()
+    {
+        foreach (var coroutine in ActiveCoroutines.ToArray())
+        {
+            coroutine.Kill();
+        }
+
+        ActiveCoroutines.Clear();
     }
 
     private static IEnumerator<float> Wrapper(
@@ -31,54 +49,78 @@ public static class BetterCoros
         Action? onFinish = null
     )
     {
-        while (true)
+        try
         {
-            if (MainPlugin.Instance.Config.SafeScripts)
+            while (true)
             {
-                yield return Timing.WaitForOneFrame;
-            }
+                if (scr?.Killed is true)
+                {
+                    yield break;
+                }
 
+                if (MainPlugin.Instance.Config.SafeScripts)
+                {
+                    yield return Timing.WaitForOneFrame;
+                    if (scr?.Killed is true)
+                    {
+                        yield break;
+                    }
+                }
+
+                try
+                {
+                    if (!routine.MoveNext()) yield break;
+                }
+                catch (StopScript)
+                {
+                    yield break;
+                }
+                catch (ScriptCompileError compErr)
+                {
+                    onException?.Invoke(compErr);
+                    scr?.Error(compErr.Message);
+                    yield break;
+                }
+                catch (ScriptRuntimeError runErr)
+                {
+                    onException?.Invoke(runErr);
+                    scr?.Error(runErr.Message);
+                    yield break;
+                }
+                catch (InternalSerException devErr)
+                {
+                    ReportInternalError(devErr, scr, onException);
+                    yield break;
+                }
+                catch (Exception ex)
+                {
+                    ReportInternalError(ex, scr, onException);
+                    yield break;
+                }
+
+                if (scr?.Killed is true)
+                {
+                    yield break;
+                }
+
+                yield return routine.Current;
+            }
+        }
+        finally
+        {
             try
             {
-                if (!routine.MoveNext()) goto End;
+                routine.Dispose();
             }
-            catch (StopScript)
+            catch (Exception exception)
             {
-                goto End;
+                ReportInternalError(exception, scr, onException);
             }
-            catch (ScriptCompileError compErr)
+            finally
             {
-                onException?.Invoke(compErr);
-                scr?.Error(compErr.Message);
-                goto End;
+                onFinish?.Invoke();
             }
-            catch (ScriptRuntimeError runErr)
-            {
-                onException?.Invoke(runErr);
-                scr?.Error(runErr.Message);
-                goto End;
-            }
-            catch (DeveloperFuckedUpException devErr)
-            {
-                ReportInternalError(devErr, scr, onException);
-                goto End;
-            }
-            catch (Exception ex)
-            {
-                ReportInternalError(ex, scr, onException);
-                goto End;
-            }
-
-            if (scr?.Killed is true)
-            {
-                goto End;
-            }
-
-            yield return routine.Current;
         }
-
-        End:
-        onFinish?.Invoke();
     }
 
     private static void ReportInternalError(

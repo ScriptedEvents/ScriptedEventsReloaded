@@ -1,8 +1,10 @@
 ﻿using Interactables.Interobjects.DoorUtils;
 using MEC;
+using LabApi.Features.Wrappers;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
+using SER.Code.Helpers;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 
 namespace SER.Code.MethodSystem.Methods.RoomMethods;
@@ -10,6 +12,11 @@ namespace SER.Code.MethodSystem.Methods.RoomMethods;
 [UsedImplicitly]
 public class BlackoutMethod : SynchronousMethod
 {
+    private static readonly Dictionary<Door, long> ActiveDoorLocks = [];
+    private static readonly HashSet<LightsController> InfiniteBlackouts = [];
+    private static readonly HashSet<CoroutineHandle> ReleaseCoroutines = [];
+    private static long _nextLease;
+
     public override string Description => "Blackouts rooms.";
 
     public override Argument[] ExpectedArguments { get; } =
@@ -26,30 +33,85 @@ public class BlackoutMethod : SynchronousMethod
         var rooms = Args.GetRooms("rooms");
         var duration = Args.GetDuration("duration");
         
-        var actualDuration = duration != TimeSpan.MaxValue
-            ? duration.ToFloatSeconds()
-            : -1;
-        
-        rooms.ForEach(room =>
+        var doors = rooms.SelectMany(room => room.Doors).Distinct().ToArray();
+        var lights = rooms.SelectMany(room => room.AllLightControllers).Distinct().ToArray();
+        var lease = ++_nextLease;
+
+        foreach (var door in doors)
         {
-            foreach (var roomDoor in room.Doors)
+            door.Lock(DoorLockReason.Regular079, true);
+            door.IsOpened = false;
+            ActiveDoorLocks[door] = lease;
+        }
+
+        if (duration == TimeSpan.MaxValue)
+        {
+            foreach (var controller in lights)
             {
-                roomDoor.Lock(DoorLockReason.Regular079, true);
-                roomDoor.IsOpened = false;
+                controller.LightsEnabled = false;
+                InfiniteBlackouts.Add(controller);
             }
 
-            foreach (var roomLightController in room.AllLightControllers)
-            {
-                roomLightController.FlickerLights(actualDuration);
-            }
-        });
+            return;
+        }
 
-        Timing.CallDelayed(actualDuration, () =>
+        var actualDuration = duration.ToFloatSeconds();
+        foreach (var controller in lights)
         {
-            foreach (var roomDoor in rooms.SelectMany(r => r.Doors))
+            InfiniteBlackouts.Remove(controller);
+            controller.FlickerLights(actualDuration);
+        }
+
+        CoroutineHandle releaseCoroutine = default;
+        releaseCoroutine = Timing.CallDelayed(actualDuration, () =>
+        {
+            try
             {
-                roomDoor.IsLocked = false;
+                ReleaseDoors(doors, lease);
+            }
+            finally
+            {
+                ReleaseCoroutines.Remove(releaseCoroutine);
             }
         });
+        ReleaseCoroutines.Add(releaseCoroutine);
+    }
+
+    private static void ReleaseDoors(IEnumerable<Door> doors, long lease)
+    {
+        foreach (var door in doors)
+        {
+            if (!ActiveDoorLocks.TryGetValue(door, out var activeLease) || activeLease != lease)
+            {
+                continue;
+            }
+
+            ActiveDoorLocks.Remove(door);
+            // Remove only the lock reason added by this method. Clearing IsLocked
+            // would also remove locks owned by the game or another plugin.
+            door.Lock(DoorLockReason.Regular079, false);
+        }
+    }
+
+    internal static void Clear()
+    {
+        foreach (var coroutine in ReleaseCoroutines.ToArray())
+        {
+            coroutine.Kill();
+        }
+        ReleaseCoroutines.Clear();
+
+        foreach (var door in ActiveDoorLocks.Keys.ToArray())
+        {
+            door.Lock(DoorLockReason.Regular079, false);
+        }
+        ActiveDoorLocks.Clear();
+
+        foreach (var controller in InfiniteBlackouts.ToArray())
+        {
+            controller.LightsEnabled = true;
+        }
+        InfiniteBlackouts.Clear();
+        _nextLease = 0;
     }
 }

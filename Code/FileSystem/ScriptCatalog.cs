@@ -51,23 +51,11 @@ public static class ScriptCatalog
     private static readonly Dictionary<string, FailedScriptInfo> FailedScriptsByPath =
         new(StringComparer.OrdinalIgnoreCase);
 
-    private static bool _initialized;
     private static bool _isRefreshing;
 
     public static RefreshSummary Initialize()
     {
-        if (!_initialized)
-        {
-            _initialized = true;
-            return RefreshAll(true);
-        }
-
-        foreach (string path in SnapshotsByPath.Keys.ToArray())
-        {
-            RestoreSnapshotBinding(path);
-        }
-
-        return default;
+        return RefreshAll(true);
     }
 
     public static RefreshSummary RefreshAll(bool force)
@@ -92,6 +80,11 @@ public static class ScriptCatalog
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
                 Log.Error($"Failed to scan the SER script directory: {exception.Message}");
+                foreach (var path in SnapshotsByPath.Keys.ToArray())
+                {
+                    RestoreSnapshotBinding(path);
+                }
+
                 return new RefreshSummary(0, 0, 1);
             }
 
@@ -162,7 +155,22 @@ public static class ScriptCatalog
 
         if (path is null)
         {
-            return default;
+            if (!SnapshotsByFileName.TryGetValue(fileName, out var removedSnapshot))
+            {
+                return default;
+            }
+
+            _isRefreshing = true;
+            try
+            {
+                RemoveSnapshot(removedSnapshot.Path);
+                Logger.Debug($"SER script '{removedSnapshot.FileName}' was unloaded before execution.");
+                return new RequestedRefreshResult(false, new RefreshSummary(0, 1, 0));
+            }
+            finally
+            {
+                _isRefreshing = false;
+            }
         }
 
         _isRefreshing = true;
@@ -252,7 +260,6 @@ public static class ScriptCatalog
         SnapshotsByFileName.Clear();
         FailedFileStamps.Clear();
         FailedScriptsByPath.Clear();
-        _initialized = false;
     }
 
     private static RefreshSummary RefreshPath(string path, bool force)

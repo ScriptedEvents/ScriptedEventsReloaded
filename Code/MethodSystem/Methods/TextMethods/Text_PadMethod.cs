@@ -1,4 +1,4 @@
-﻿using SER.Code.ArgumentSystem.Arguments;
+using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
 using SER.Code.Extensions;
@@ -46,7 +46,7 @@ public class Text_PadMethod : ReturningMethod<TextValue>, ICanError, IAdditional
         {
             "left" => text.PadLeft(length, character[0]),
             "right" => text.PadRight(length, character[0]),
-            _ => throw new TosoksFuckedUpException("out of order")
+            _ => throw new ExecutionInvariantException("out of order")
         }).ToDynamicTextValue(Script);
     }
 }

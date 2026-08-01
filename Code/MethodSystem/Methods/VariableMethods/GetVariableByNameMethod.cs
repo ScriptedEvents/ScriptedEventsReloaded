@@ -1,4 +1,4 @@
-﻿using SER.Code.ArgumentSystem.Arguments;
+using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Exceptions;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
@@ -33,7 +33,7 @@ public class GetVariableByNameMethod : ReturningMethod, ICanError
 
         if (Tokenizer.GetTokenFromString(variableName, Script, null)
             .HasErrored(out var error, out var token))
-            throw new TosoksFuckedUpException(error);
+            throw new ExecutionInvariantException(error);
         
         if (token is not VariableToken variableToken)
             throw new ScriptRuntimeError(this, ErrorReasons[0]);

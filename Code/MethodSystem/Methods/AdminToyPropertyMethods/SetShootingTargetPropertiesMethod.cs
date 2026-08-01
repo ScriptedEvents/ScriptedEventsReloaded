@@ -18,7 +18,7 @@ public class SetShootingTargetPropertiesMethod : SynchronousMethod
             { DefaultValue = new(null, "not changing") },
         new IntArgument("auto reset time", -1, 11)
             { DefaultValue = new(null, "not changing") },
-        new BoolArgument("synchronize damage?")
+        new BoolArgument("synchronize damage")
             { DefaultValue = new(null, "not changing") },
     ];
     public override void Execute()
@@ -27,6 +27,6 @@ public class SetShootingTargetPropertiesMethod : SynchronousMethod
 
         if (Args.GetNullableInt("max hp")          is { } hp)        target.Base._maxHp = hp;
         if (Args.GetNullableInt("auto reset time") is { } autoReset) target.Base._autoDestroyTime = autoReset;
-        if (Args.GetNullableBool("sync mode")      is { } sync)    target.Base._syncMode = sync;
+        if (Args.GetNullableBool("synchronize damage") is { } sync) target.Base._syncMode = sync;
     }
 }

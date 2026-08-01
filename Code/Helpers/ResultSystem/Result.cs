@@ -1,4 +1,4 @@
-﻿using SER.Code.Exceptions;
+using SER.Code.Exceptions;
 using SER.Code.Extensions;
 
 namespace SER.Code.Helpers.ResultSystem;
@@ -32,7 +32,7 @@ public readonly struct Result(bool wasSuccess, string errorMsg)
     public static implicit operator Result(bool res)
     {
         if (!res)
-            throw new AndrzejFuckedUpException("Result cannot be returned as false without an error message.");
+            throw new CoreInvariantException("Result cannot be returned as false without an error message.");
 
         return new Result(true, string.Empty);
     }
@@ -40,7 +40,7 @@ public readonly struct Result(bool wasSuccess, string errorMsg)
     public static implicit operator Result(string msg)
     {
         if (string.IsNullOrEmpty(msg))
-            throw new AndrzejFuckedUpException("Result error message cannot be null or empty.");
+            throw new CoreInvariantException("Result error message cannot be null or empty.");
 
         return new Result(false, msg);
     }

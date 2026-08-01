@@ -39,7 +39,7 @@ public class ReturnKeyword : YieldingContext, IKeywordContext
 
     protected override IEnumerator<float> Execute()
     {
-        var coro = _expression!.Run();
+        using var coro = _expression!.Run();
         while (coro.MoveNext()) yield return coro.Current;
         
         if (_expression!.GetValue().HasErrored(out var error, out var value))

@@ -25,7 +25,7 @@ public class TriggerMethod : SynchronousMethod
             return;
         }
 
-        foreach (var scriptName in scripts)
+        foreach (var scriptName in scripts.ToArray())
         {
             if (Script.CreateByScriptName(scriptName, ScriptExecutor.Get()).HasErrored(out var error, out var script))
             {

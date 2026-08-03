@@ -29,8 +29,31 @@ html {
 }
 
 .navbar {
-  backdrop-filter: blur(14px);
   background: color-mix(in srgb, var(--ifm-navbar-background-color) 86%, transparent);
+}
+
+/* Keep Docusaurus's mobile docs sidebar as a real viewport drawer. */
+@media (max-width: 996px) {
+  /* The desktop aside must never fall into the document flow on phones. */
+  .theme-doc-sidebar-container {
+    display: none;
+  }
+
+  .navbar-sidebar {
+    bottom: 0;
+    height: auto;
+    max-height: none;
+    position: fixed;
+    top: 0;
+    z-index: 201;
+  }
+
+  .navbar-sidebar__backdrop {
+    bottom: 0;
+    position: fixed;
+    top: 0;
+    z-index: 200;
+  }
 }
 
 .navbar__logo img {

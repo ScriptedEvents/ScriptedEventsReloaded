@@ -593,7 +593,7 @@
           "argumentKind": "TextArgument",
           "mustBeProvided": true,
           "type": "Any text e.g. \"Hello, World!\"",
-          "description": null,
+          "description": "Has to be exactly 1 character long.",
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "\"character\"",
@@ -666,7 +666,7 @@
       "errors": []
     },
     "Text.Slice": {
-      "syntax": "Text.Slice \"text\" beginning_amount? end_amount",
+      "syntax": "Text.Slice \"text\" beginning_amount? end_amount?",
       "description": "Slices off characters from beginning and end of a text value.",
       "subgroup": "Text",
       "essential": false,
@@ -707,12 +707,12 @@
         {
           "name": "end amount",
           "argumentKind": "IntArgument",
-          "mustBeProvided": true,
+          "mustBeProvided": false,
           "type": "A whole number bigger or equal 0",
           "description": "The amount of characters to remove from the end of the text.",
-          "defaultValue": null,
+          "defaultValue": "0",
           "consumesRemainingValues": false,
-          "syntax": "end_amount",
+          "syntax": "end_amount?",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,

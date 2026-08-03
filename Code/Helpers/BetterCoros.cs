@@ -14,13 +14,13 @@ public static class BetterCoros
         this IEnumerator<float> coro,
         Script? scr,
         Action<Exception>? onException = null,
-        Action? onFinish = null
-    )
+        Action? onFinish = null)
     {
         CoroutineHandle handle = default;
+        var handle1 = handle;
         handle = Timing.RunCoroutine(Wrapper(coro, scr, onException, () =>
         {
-            ActiveCoroutines.Remove(handle);
+            ActiveCoroutines.Remove(handle1);
             onFinish?.Invoke();
         }));
         ActiveCoroutines.Add(handle);
@@ -46,8 +46,7 @@ public static class BetterCoros
         IEnumerator<float> routine,
         Script? scr,
         Action<Exception>? onException = null,
-        Action? onFinish = null
-    )
+        Action? onFinish = null)
     {
         try
         {

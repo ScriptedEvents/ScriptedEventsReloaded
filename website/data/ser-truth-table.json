@@ -11206,7 +11206,7 @@
       ]
     },
     "Audio.Load": {
-      "syntax": "Audio.Load \"file_path\" \"clip_name\"",
+      "syntax": "Audio.Load \"file_name\" \"clip_name\"",
       "description": "Loads an audio file into the audio player.",
       "subgroup": "Audio",
       "essential": false,
@@ -11215,14 +11215,14 @@
       "returns": null,
       "arguments": [
         {
-          "name": "file path",
+          "name": "file name",
           "argumentKind": "TextArgument",
           "mustBeProvided": true,
           "type": "Any text e.g. \"Hello, World!\"",
-          "description": "This path starts at the main SER folder. If your file is in [.. -> Scripted Events Reloaded -> audio.ogg] path, then the path will be 'audio.ogg'. If your file is deeper, like [.. -> Scripted Events Reloaded -> subfolder -> audio.ogg], then the path will be 'subfolder/audio.ogg'.",
+          "description": "The .ogg file name. SER searches all folders under its main data directory automatically.",
           "defaultValue": null,
           "consumesRemainingValues": false,
-          "syntax": "\"file_path\"",
+          "syntax": "\"file_name\"",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,
@@ -11248,7 +11248,7 @@
       "errors": [
         "File doesn't exist",
         "File is not of type 'ogg'",
-        "The file path resolves outside the main SER folder"
+        "More than one file with the same name exists"
       ]
     },
     "Audio.Play": {
@@ -15135,230 +15135,448 @@
   "keywords": {
     "attempt": {
       "syntax": "attempt",
+      "usage": "attempt",
       "description": "Runs everything inside the statement, and if something throws an exception (error), the error will not terminate the script. If there is an 'on_error' statement, it will be executed.",
       "arguments": [],
-      "example": "&collection = Coll.Empty\r\n# swallows the error (doesn't stop the script)\r\nattempt\r\n    Print {Coll.Fetch &collection 2}\r\n    # throws because there's nothing at index 2\r\nend",
+      "argumentDetails": [],
+      "example": "&collection = Coll.Empty\nattempt\n    Print {Coll.Fetch &collection 2}\nend\n\n# The error is handled by on_error when one is present.\non_error with $message\n    Print \"Handled: {$message}\"\nend",
       "isStatement": true,
       "extendsSignal": null,
       "allowedSignals": "ThrewException"
     },
     "break": {
       "syntax": "break",
+      "usage": "break",
       "description": "Makes a given loop or function (that the 'break' keyword is inside) act as it has completely ended its execution (\"breaks\" free from the loop/function)",
       "arguments": [],
-      "example": "# for example:\r\nforever\r\n    wait 1s\r\n    \r\n    Print \"attempting to leave forever loop\"\r\n    if {Chance 20%}\r\n        break\r\n    end\r\nend\r\n\r\nfunc Test\r\n    if {Chance 20%}\r\n        break\r\n    end\r\n    \r\n    Print \"this will not run because the 'break' keyword was used\"\r\nend\r\n\r\nrun Test",
+      "argumentDetails": [],
+      "example": "repeat 10 with $iteration\n    if {$iteration is 3}\n        break\n    end\n    Print \"iteration {$iteration}\"\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "chance": {
       "syntax": "chance $chance",
+      "usage": "chance $chance",
       "description": "This statement will execute with the provided chance.",
       "arguments": [
         "$chance"
       ],
-      "example": null,
+      "argumentDetails": [
+        {
+          "syntax": "$chance",
+          "description": "Probability that the body will execute.",
+          "inputDescription": "A number from 0 to 1, where 1 is 100%.",
+          "optional": false,
+          "consumesRemainingValues": false
+        }
+      ],
+      "example": "chance 25%\n    Print \"This happens about one time in four.\"\nend\n\n# The chance can also come from a value expression.\n$probability = 0.5\nchance $probability\n    Print \"This happens about half the time.\"\nend",
       "isStatement": true,
       "extendsSignal": null,
       "allowedSignals": "DidntExecute"
     },
     "continue": {
       "syntax": "continue",
+      "usage": "continue",
       "description": "Makes a given loop (that the 'continue' keyword is inside) act as it has reached the end of its body.",
       "arguments": [],
-      "example": null,
+      "argumentDetails": [],
+      "example": "repeat 5 with $iteration\n    if {$iteration is 3}\n        continue\n    end\n    Print \"iteration {$iteration}\"\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "delete": {
       "syntax": "delete $varToDelete",
+      "usage": "delete $varToDelete",
       "description": "Deletes a variable.",
       "arguments": [
         "$varToDelete"
       ],
-      "example": "global $someVar = \"value\"\r\n\r\n# some code\r\n# ...\r\n\r\n# delete a global variable after it's no longer needed\r\n# in order to not pollute the global namespace\r\ndelete $someVar",
+      "argumentDetails": [
+        {
+          "syntax": "$varToDelete",
+          "description": "Variable to remove from the local or global scope.",
+          "inputDescription": "An existing variable name such as $value or @players.",
+          "optional": false,
+          "consumesRemainingValues": false
+        }
+      ],
+      "example": "global $temporaryMessage = \"delete me\"\ndelete $temporaryMessage\n\n# Local variables can be deleted the same way.\n$localValue = 42\ndelete $localValue",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "elif": {
       "syntax": "elif $condition",
+      "usage": "elif $condition",
       "description": "If the statement above it didn't execute, 'elif' statement will try to execute if the provided condition is met.",
       "arguments": [
         "$condition"
       ],
-      "example": null,
+      "argumentDetails": [
+        {
+          "syntax": "$condition",
+          "description": "Expression checked when the preceding branch did not execute.",
+          "inputDescription": "A boolean expression; values and method calls may be grouped with braces.",
+          "optional": false,
+          "consumesRemainingValues": false
+        }
+      ],
+      "example": "if {@sender -> role is \"ClassD\"}\n    Print \"You are a Class-D.\"\nelif {@sender -> role is \"Scientist\"}\n    Print \"You are a scientist.\"\nelse\n    Print \"You have another role.\"\nend",
       "isStatement": true,
       "extendsSignal": "DidntExecute",
       "allowedSignals": "DidntExecute"
     },
     "else": {
       "syntax": "else",
+      "usage": "else",
       "description": "If the statement above it didn't execute, 'else' statement will execute instead.",
       "arguments": [],
-      "example": null,
+      "argumentDetails": [],
+      "example": "if {@sender -> is_alive}\n    Print \"You are alive.\"\nelse\n    Print \"You are not alive.\"\nend",
       "isStatement": true,
       "extendsSignal": "DidntExecute",
       "allowedSignals": null
     },
     "end": {
       "syntax": "end",
+      "usage": "end",
       "description": "Ends the current statement's body.",
       "arguments": [],
-      "example": null,
+      "argumentDetails": [],
+      "example": "if {@sender -> is_alive}\n    Print \"This block ends here.\"\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "ephm": {
       "syntax": "ephm [variable prefix and name] = [value]",
+      "usage": "ephm [variable prefix and name] = [value]",
       "description": "Creates/modifies a ephemeral variable.",
       "arguments": [
         "[variable prefix and name]",
         "=",
         "[value]"
       ],
-      "example": null,
+      "argumentDetails": [
+        {
+          "syntax": "[variable prefix and name]",
+          "description": "Value for [variable prefix and name].",
+          "inputDescription": "See the keyword documentation for the accepted value.",
+          "optional": false,
+          "consumesRemainingValues": false
+        },
+        {
+          "syntax": "=",
+          "description": "Value for =.",
+          "inputDescription": "See the keyword documentation for the accepted value.",
+          "optional": false,
+          "consumesRemainingValues": false
+        },
+        {
+          "syntax": "[value]",
+          "description": "Value for [value].",
+          "inputDescription": "See the keyword documentation for the accepted value.",
+          "optional": false,
+          "consumesRemainingValues": false
+        }
+      ],
+      "example": "if {@sender -> is_alive}\n    ephm $message = \"Only needed during this statement\"\n    Print $message\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "forever": {
-      "syntax": "forever",
-      "description": "Makes the code inside the statement run indefinitely. REMEMBER TO YIELD! - otherwise your server may crash.",
-      "arguments": [],
-      "example": "# Makes the code inside the statement run indefinitely. REMEMBER TO YIELD! - otherwise your server may crash.\r\n# it can be interrupted only when the script is stopped, when \"break\" keyword is used, or the server restarts\r\n\r\n# this will send an ad every 2 minutes\r\nforever\r\n    wait 2m\r\n    Broadcast @all 10s \"Join our discord server! https://discord.gg/3j54zBnbbD\"\r\nend\r\n\r\n# ========================================\r\n# you can also use \"with\" keyword to define an iteration variable\r\n#  which will hold the current iteration number, starting from 1\r\nforever with $iter\r\n    wait 1s\r\n    Print \"current iteration: {$iter}\"\r\nend\r\n\r\n# ========================================\r\n# \"break\" and \"continue\" keywords work as usual and you are free to use them inside \"forever\" loops",
+      "syntax": "forever with $iter",
+      "usage": "forever with $iter",
+      "description": "Runs the body indefinitely. The body must yield periodically so the server can continue processing.",
+      "arguments": [
+        "with $iter"
+      ],
+      "argumentDetails": [
+        {
+          "syntax": "with $iter",
+          "description": "Stores the current 1-based iteration number.",
+          "inputDescription": "A number variable compatible with the loop iteration value.",
+          "optional": true,
+          "consumesRemainingValues": false
+        }
+      ],
+      "example": "# A forever loop must yield so the server can continue processing.\nforever\n    wait 1m\n    Print \"One minute has passed.\"\nend\n\n# The optional binding contains the 1-based iteration number.\nforever with $iter\n    wait 1s\n    Print \"current iteration: {$iter}\"\nend\n\n# Use break to leave the loop or continue to skip to its next iteration.",
       "isStatement": true,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "func": {
       "syntax": "func [function name]",
+      "usage": "func [function name]",
       "description": "Defines a function.",
       "arguments": [
         "[function name]"
       ],
-      "example": "func $Add with $a $b\r\n    return $a + $b\r\nend\r\n\r\n$sum = run $Add 5 3\r\nPrint $sum\r\n\r\nfunc @SigmasOnly\r\n    return Except @all @classDPlayers\r\nend\r\n\r\n@sigmas = run @SigmasOnly\r\nExplode @sigmas\r\n\r\nfunc ExplodeAll\r\n    Explode @all\r\nend\r\n\r\nrun ExplodeAll",
+      "argumentDetails": [
+        {
+          "syntax": "[function name]",
+          "description": "Value for [function name].",
+          "inputDescription": "See the keyword documentation for the accepted value.",
+          "optional": false,
+          "consumesRemainingValues": false
+        }
+      ],
+      "example": "func $Add with $left $right\n    return $left + $right\nend\n\n$sum = run $Add 5 3\nPrint \"5 + 3 = {$sum}\"\n\n# Functions without parameters can be called by name.\nfunc Announce\n    Print \"The round has started.\"\nend\nrun Announce",
       "isStatement": true,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "global": {
       "syntax": "global [variable prefix and name] = [value]",
+      "usage": "global [variable prefix and name] = [value]",
       "description": "Creates/modifies a global variable.",
       "arguments": [
         "[variable prefix and name]",
         "=",
         "[value]"
       ],
-      "example": null,
+      "argumentDetails": [
+        {
+          "syntax": "[variable prefix and name]",
+          "description": "Value for [variable prefix and name].",
+          "inputDescription": "See the keyword documentation for the accepted value.",
+          "optional": false,
+          "consumesRemainingValues": false
+        },
+        {
+          "syntax": "=",
+          "description": "Value for =.",
+          "inputDescription": "See the keyword documentation for the accepted value.",
+          "optional": false,
+          "consumesRemainingValues": false
+        },
+        {
+          "syntax": "[value]",
+          "description": "Value for [value].",
+          "inputDescription": "See the keyword documentation for the accepted value.",
+          "optional": false,
+          "consumesRemainingValues": false
+        }
+      ],
+      "example": "global $serverName = \"Example server\"\n\n# Global variables are available to later scripts and events.\nPrint $serverName",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "if": {
       "syntax": "if $condition",
+      "usage": "if $condition",
       "description": "This statement will execute only if the provided condition is met.",
       "arguments": [
         "$condition"
       ],
-      "example": null,
+      "argumentDetails": [
+        {
+          "syntax": "$condition",
+          "description": "Expression that must evaluate to true for the body to run.",
+          "inputDescription": "A boolean expression; values and method calls may be grouped with braces.",
+          "optional": false,
+          "consumesRemainingValues": false
+        }
+      ],
+      "example": "if {@sender -> is_alive}\n    Print \"You are still alive.\"\nend\n\nif {AmountOf @all > 0}\n    Print \"There is at least one player online.\"\nend",
       "isStatement": true,
       "extendsSignal": null,
       "allowedSignals": "DidntExecute"
     },
     "on_error": {
       "syntax": "on_error",
+      "usage": "on_error",
       "description": "Catches an exception thrown inside of an 'attempt' statement.",
       "arguments": [],
-      "example": "&collection = Coll.Empty\r\nattempt\r\n    Print {Coll.Fetch &collection 2}\r\n    # ERROR: there's nothing at index 2\r\n    \r\n    Print \"Hello, world!\"\r\n    # ^ won't get executed because 'attempt' skips the remaining code\r\n    # inside of it if an error was made\r\n    \r\non_error with $message $type $stackTrace\r\n    # this will print the error message\r\n    Print \"Error: {$message}\"\r\n    \r\n    # In 90% of situations $type will be ScriptRuntimeError\r\n    Print \"Type of error: {$type}\"\r\n    \r\n    # This shows where the error originated. Internal SER failures are\n    # replaced with a short identifier; full details stay in the server console.\n    Print \"Stack trace: {$stackTrace}\"\r\nend",
+      "argumentDetails": [],
+      "example": "&collection = Coll.Empty\nattempt\n    Print {Coll.Fetch &collection 2}\n    Print \"This line is skipped after the error.\"\non_error with $message $type\n    Print \"Message: {$message}\"\n    Print \"Type: {$type}\"\nend",
       "isStatement": true,
       "extendsSignal": "ThrewException",
       "allowedSignals": null
     },
     "over": {
-      "syntax": "over @players with @player",
+      "syntax": "over @players with @item [$index]",
+      "usage": "over @players with @item [$index]",
       "description": "Repeats its body for each player in the player variable or a value in a collection variable, assigning it its own custom variable.",
       "arguments": [
-        "@players with @player"
+        "@players",
+        "with @item [$index]"
       ],
-      "example": "# instead of writing something like this:\r\nrepeat {AmountOf @all}\r\n    Print \"found player\"\r\nend\r\n\r\n# you can use 'over' to do the same:\r\nover @all\r\n    Print \"found player\"\r\nend\r\n\r\n# ========================================\r\n# additionally, \"over\" loop can tell you which item is currently being iterated over\r\n# this is usually known as a \"for each\" loop in other languages\r\n# this can be done using \"with\" keyword and naming a temporary variable:\r\nover @all with @plr\r\n    Print \"found player {@plr -> name}\"\r\nend\r\n\r\n# this also works for collections:\r\n&inventory = @sender -> inventory\r\nover &inventory with *item\r\n    Print \"found item {*item -> type}\"\r\nend\r\n# its important to remember that the variable type in \"with\" keyword \r\n#  MUST match the value type inside the collection,\r\n#  if this is not the case, like using $var for a reference value, there will be an error\r\n\r\n# ========================================\r\n# \"with\" can also define a second variable, which will hold the index of the current item\r\n# this is a number value starting at 1, and incrementing by 1 for each iteration\r\nover @all with @plr $index\r\n    Print \"found player #{$index}: {@plr -> name}\"\r\nend\r\n\r\n# ========================================\r\n# \"break\" and \"continue\" keywords work as usual and you are free to use them inside \"over\" loops",
+      "argumentDetails": [
+        {
+          "syntax": "@players",
+          "description": "Players or collection whose values are iterated.",
+          "inputDescription": "A player value or collection value.",
+          "optional": false,
+          "consumesRemainingValues": false
+        },
+        {
+          "syntax": "with @item [$index]",
+          "description": "Names variables receiving the current item and optional 1-based index.",
+          "inputDescription": "One or two variables compatible with the iterated value.",
+          "optional": true,
+          "consumesRemainingValues": false
+        }
+      ],
+      "example": "# Run once for every player.\nover @all\n    Print \"Hello, {@sender -> name}!\"\nend\n\n# Bind the current item to a temporary variable.\nover @all with @plr\n    Print \"found player {@plr -> name}\"\nend\n\n# Collections can be iterated in the same way.\n&inventory = @sender -> inventory\nover &inventory with *item\n    Print \"found item {*item -> type}\"\nend\n\n# Add a 1-based index as a second binding.\nover @all with @plr $index\n    Print \"found player #{$index}: {@plr -> name}\"\nend\n\n# Use break to leave the loop or continue to skip to its next iteration.",
       "isStatement": true,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "repeat": {
-      "syntax": "repeat $number",
+      "syntax": "repeat $number with $iter",
+      "usage": "repeat $number with $iter",
       "description": "Repeats everything inside its body a given amount of times.",
       "arguments": [
-        "$number"
+        "$number",
+        "with $iter"
       ],
-      "example": "# repeat loop repeats its body a given amount of times\r\n# in this case, it will print \"hi\" 10 times\r\nrepeat 10\r\n    Print \"hi\"\r\nend\r\n\r\n# ========================================\r\n# you can also use a variable to define the amount of times to repeat\r\nrepeat {Random 1 10 int}\r\n    Print \"hi\"\r\nend\r\n\r\n# ========================================\r\n# you can also define a variable which will hold the current iteration number, starting from 1\r\nrepeat 10 with $iter\r\n    \r\n    Print \"current iteration: {$iter}\"\r\nend\r\n\r\n# ========================================\r\n# \"break\" and \"continue\" keywords work as usual and you are free to use them inside \"repeat\" loops",
+      "argumentDetails": [
+        {
+          "syntax": "$number",
+          "description": "Number of times the body should run.",
+          "inputDescription": "A non-negative whole-number expression.",
+          "optional": false,
+          "consumesRemainingValues": false
+        },
+        {
+          "syntax": "with $iter",
+          "description": "Stores the current 1-based iteration number.",
+          "inputDescription": "A number variable compatible with the loop iteration value.",
+          "optional": true,
+          "consumesRemainingValues": false
+        }
+      ],
+      "example": "# Repeat a fixed number of times.\nrepeat 10\n    Print \"hi\"\nend\n\n# The count can be an expression or variable.\nrepeat {Random 1 10 int}\n    Print \"hi\"\nend\n\n# Bind the current 1-based iteration number.\nrepeat 10 with $iter\n    Print \"current iteration: {$iter}\"\nend\n\n# Use break to leave the loop or continue to skip to its next iteration.",
       "isStatement": true,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "return": {
       "syntax": "return [return value]",
+      "usage": "return [return value]",
       "description": "Returns value when in a function.",
       "arguments": [
         "[return value]"
       ],
-      "example": null,
+      "argumentDetails": [
+        {
+          "syntax": "[return value]",
+          "description": "Value returned to the caller of the current function.",
+          "inputDescription": "Any SER value expression supported by the function's return type.",
+          "optional": false,
+          "consumesRemainingValues": false
+        }
+      ],
+      "example": "func $IsAdult with $player\n    return {$player -> age >= 18}\nend\n\n$adult = run $IsAdult @sender\nif $adult\n    Print \"You are an adult.\"\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "stop": {
       "syntax": "stop",
+      "usage": "stop",
       "description": "Stops the script from executing.",
       "arguments": [],
-      "example": null,
+      "argumentDetails": [],
+      "example": "if {@sender -> is_alive}\n    Print \"The script is stopping now.\"\n    stop\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "wait": {
       "syntax": "wait <duration>",
+      "usage": "wait <duration>",
       "description": "Halts execution of the script for a specified amount of time.",
       "arguments": [
         "<duration>"
       ],
-      "example": "# wait for 5 seconds\r\nwait 5s\r\n\r\n# Waits using a variable\r\n$duration = 10s\r\nwait $duration",
+      "argumentDetails": [
+        {
+          "syntax": "<duration>",
+          "description": "How long execution should pause.",
+          "inputDescription": "A duration such as 5s, 250ms, or a duration variable.",
+          "optional": false,
+          "consumesRemainingValues": false
+        }
+      ],
+      "example": "  # Wait for a fixed duration.\n  wait 5s\n\n  # A duration can also come from a variable.\n  $duration = 10s\n  wait $duration",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "wait_until": {
       "syntax": "wait_until $condition",
+      "usage": "wait_until $condition",
       "description": "Halts execution of the script until a condition is met.",
       "arguments": [
         "$condition"
       ],
-      "example": "# wait until there are no players on the server\r\nwait_until {AmountOf @all} is 0",
+      "argumentDetails": [
+        {
+          "syntax": "$condition",
+          "description": "Expression polled until it evaluates to true.",
+          "inputDescription": "A boolean expression; it is evaluated once per frame while waiting.",
+          "optional": false,
+          "consumesRemainingValues": false
+        }
+      ],
+      "example": "# Wait until the server is empty.\nwait_until {AmountOf @all} is 0\n\n# Conditions can use variables and properties too.\nwait_until {@sender -> is_alive}",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "while": {
-      "syntax": "while $condition",
+      "syntax": "while $condition with $iter",
+      "usage": "while $condition with $iter",
       "description": "A loop which will execute its body as long as the provided condition is evaluated to true.",
       "arguments": [
-        "$condition"
+        "$condition",
+        "with $iter"
       ],
-      "example": "# while loop repeats its body while the provided condition is met\r\nwhile {AmountOf @all} > 0\r\n    wait 1s\r\n    Print \"there are players on the server!\"\r\nend\r\n\r\n# ========================================\r\n# you may also use a \"with\" keyword to define an iteration variable\r\nwhile {Chance 90%} with $iter\r\n    Print \"current attempt to leave loop: {$iter}\"\r\n    wait 1s\r\nend\r\n\r\n# ========================================\r\n# \"break\" and \"continue\" keywords work as usual and you are free to use them inside \"while\" loops",
+      "argumentDetails": [
+        {
+          "syntax": "$condition",
+          "description": "Condition checked before each iteration.",
+          "inputDescription": "A boolean expression.",
+          "optional": false,
+          "consumesRemainingValues": false
+        },
+        {
+          "syntax": "with $iter",
+          "description": "Stores the current 1-based iteration number.",
+          "inputDescription": "A number variable compatible with the loop iteration value.",
+          "optional": true,
+          "consumesRemainingValues": false
+        }
+      ],
+      "example": "# Check the condition before every iteration.\nwhile {AmountOf @all} > 0\n    wait 1s\n    Print \"there are players on the server!\"\nend\n\n# Bind the current 1-based iteration number when needed.\nwhile {Chance 90%} with $iter\n    Print \"current attempt to leave loop: {$iter}\"\n    wait 1s\nend\n\n# Use break to leave the loop or continue to skip to its next iteration.",
       "isStatement": true,
       "extendsSignal": null,
       "allowedSignals": null
     },
     "with": {
       "syntax": "with [variables...]",
+      "usage": "with [variables...]",
       "description": "This keyword is designed to provide a variable or a collection of variables to a statement.",
       "arguments": [
         "[variables...]"
       ],
-      "example": "# CORRECT\r\nover @all with @plr\r\n    Print {@plr -> name}\r\nend\r\n\r\n# CORRECT - with can be on its own line\r\nover @all \r\n    with @plr\r\n    \r\n    Print {@plr -> name}\r\nend\r\n\r\n# WRONG - \"with\" keyword does not add indentation\r\nover @all\r\n    with @plr\r\n        Print {@plr -> name}\r\nend\r\n\r\n# WRONG - with keyword is not a statement that can be closed\r\n# this causes an error\r\n# over @all\r\n#     with @plr\r\n#         Print {@plr -> name}\r\n#     end\r\n# end",
+      "argumentDetails": [
+        {
+          "syntax": "[variables...]",
+          "description": "Defines temporary variables for the preceding statement.",
+          "inputDescription": "One or more variable names compatible with that statement.",
+          "optional": false,
+          "consumesRemainingValues": true
+        }
+      ],
+      "example": "over @all with @plr\n    Print {@plr -> name}\nend\n\n# The same binding can be written on its own line.\nrepeat 3\n    with $iteration\n    Print \"iteration {$iteration}\"\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null

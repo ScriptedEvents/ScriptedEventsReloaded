@@ -19,8 +19,17 @@ public class EphmKeyword : YieldingContext, IKeywordContext
 
     public string KeywordName => "ephm";
     public string Description => "Creates/modifies a ephemeral variable.";
-    public string[] Arguments => ["[variable prefix and name]", "=", "[value]"];
-    public string? Example => null;
+    public ContextArgument[] Arguments => ["[variable prefix and name]", "=", "[value]"];
+    public string Example =>
+        """
+        if {@sender -> isAlive}
+            ephm $message = "Only needed during this statement"
+            Print $message
+        end
+        
+        # accessing $message outside that if statement will not work!
+        # Print $message <-- will error
+        """;
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

@@ -22,8 +22,19 @@ public class IfStatement : StatementContext, IExtendableStatement, IKeywordConte
     public Dictionary<IExtendableStatement.Signal, StatementContext> RegisteredSignals { get; } = [];
     public string KeywordName => "if";
     public string Description => "This statement will execute only if the provided condition is met.";
-    public string[] Arguments => ["$condition"];
-    public string? Example => null;
+    public ContextArgument[] Arguments => [ContextArgument.Required(
+        "$condition", "Expression that must evaluate to true for the body to run.",
+        "A boolean expression; values and method calls may be grouped with braces.")];
+    public string Example =>
+        """
+        if {@sender -> isAlive}
+            Print "You are still alive."
+        end
+
+        if {AmountOf @all} > 0
+            Print "There is at least one player online."
+        end
+        """;
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

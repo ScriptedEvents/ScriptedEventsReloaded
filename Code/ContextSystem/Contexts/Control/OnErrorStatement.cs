@@ -79,28 +79,16 @@ public class OnErrorStatement : StatementContext, IStatementExtender, IKeywordCo
     public string KeywordName => "on_error";
     public string Description => "Catches an exception thrown inside of an 'attempt' statement.";
 
-    public string[] Arguments => [];
+    public ContextArgument[] Arguments => [];
     public string Example =>
         """
         &collection = Coll.Empty
         attempt
             Print {Coll.Fetch &collection 2}
-            # ERROR: there's nothing at index 2
-            
-            Print "Hello, world!"
-            # ^ won't get executed because 'attempt' skips the remaining code
-            # inside of it if an error was made
-            
-        on_error with $message $type $stackTrace
-            # this will print the error message
-            Print "Error: {$message}"
-            
-            # In 90% of situations $type will be ScriptRuntimeError
-            Print "Type of error: {$type}"
-            
-            # This shows where the error originated. Internal SER failures are
-            # replaced with a short identifier; full details stay in the server console.
-            Print "Stack trace: {$stackTrace}"
+            Print "This line is skipped after the error."
+        on_error with $message $type
+            Print "Message: {$message}"
+            Print "Type: {$type}"
         end
         """;
 

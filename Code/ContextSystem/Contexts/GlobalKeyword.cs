@@ -20,8 +20,14 @@ public class GlobalKeyword : YieldingContext, IKeywordContext
 
     public string KeywordName => "global";
     public string Description => "Creates/modifies a global variable.";
-    public string[] Arguments => ["[variable prefix and name]", "=", "[value]"];
-    public string? Example => null;
+    public ContextArgument[] Arguments => ["[variable prefix and name]", "=", "[value]"];
+    public string Example =>
+        """
+        global $serverName = "Example server"
+
+        # Global variables are available to later scripts and events.
+        Print $serverName
+        """;
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

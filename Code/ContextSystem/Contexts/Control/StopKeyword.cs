@@ -16,9 +16,15 @@ public class StopKeyword : StandardContext, IKeywordContext
 
     public string Description => "Stops the script from executing.";
 
-    public string[] Arguments => [];
+    public ContextArgument[] Arguments => [];
 
-    public string? Example => null;
+    public string Example =>
+        """
+        if {@sender -> isAlive}
+            Print "The script is stopping now."
+            stop
+        end
+        """;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

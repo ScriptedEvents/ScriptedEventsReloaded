@@ -16,8 +16,20 @@ public class ReturnKeyword : YieldingContext, IKeywordContext
 
     public string KeywordName => "return";
     public string Description => "Returns value when in a function.";
-    public string[] Arguments => ["[return value]"];
-    public string? Example => null;
+    public ContextArgument[] Arguments => [ContextArgument.Required(
+        "[return value]", "Value returned to the caller of the current function.",
+        "Any SER value expression supported by the function's return type.")];
+    public string Example =>
+        """
+        func $IsAdult with $age
+            return age >= 18
+        end
+
+        $adult = run $IsAdult 16
+        if $adult
+            Print "You are an adult."
+        end
+        """;
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

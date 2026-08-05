@@ -15,30 +15,18 @@ public class BreakKeyword : StandardContext, IKeywordContext
         "Makes a given loop or function (that the 'break' keyword is inside) act as it has completely ended its execution " +
         "(\"breaks\" free from the loop/function)";
 
-    public string[] Arguments => [];
+    public ContextArgument[] Arguments => [];
 
     public string Example =>
-          """
-          # for example:
-          forever
-              wait 1s
-              
-              Print "attempting to leave forever loop"
-              if {Chance 20%}
-                  break
-              end
-          end
-
-          func Test
-              if {Chance 20%}
-                  break
-              end
-              
-              Print "this will not run because the 'break' keyword was used"
-          end
-
-          run Test
-          """;
+        """
+        # the execution will "break" free after the third iteration
+        repeat 10 with $iteration
+            if {$iteration is 3}
+                break
+            end
+            Print "iteration {$iteration}"
+        end
+        """;
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

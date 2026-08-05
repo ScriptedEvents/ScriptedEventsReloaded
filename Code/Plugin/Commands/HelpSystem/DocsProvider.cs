@@ -311,7 +311,7 @@ public static class DocsProvider
                ```ser
                somekeyword
                    # some code
-               {keyword.KeywordName} {keyword.Arguments.JoinStrings(" ")}
+               {keyword.Usage}
                    # some other code
                end
                ```
@@ -319,7 +319,7 @@ public static class DocsProvider
             : $"""
                {Heading("Usage")}
                ```ser
-               {keyword.KeywordName} {keyword.Arguments.JoinStrings(" ")}
+               {keyword.Usage}
                {(keyword is StatementContext ? "    # some code\nend" : string.Empty)}
                ```
                """;
@@ -347,11 +347,25 @@ public static class DocsProvider
             $"""
             {Heading($"{Code(keyword.KeywordName)} keyword", 1)}
             {keyword.Description}
+
+            {RenderContextArguments(keyword)}
             
             {usageInfo}
             {extendableInfo}
             {exampel}
             """;
+    }
+
+    private static string RenderContextArguments(IKeywordContext keyword)
+    {
+        if (keyword.Arguments.Length == 0) return string.Empty;
+
+        var lines = keyword.Arguments.Select(argument =>
+            $"- **{Code(argument.Syntax)}**{(argument.IsOptional ? " (optional)" : "")} — " +
+            $"{argument.Description} Expected: {argument.InputDescription}" +
+            (argument.ConsumesRemainingValues ? " This argument accepts all remaining values." : string.Empty));
+
+        return $"{Heading("Arguments")}\n{BulletList(lines)}\n";
     }
 
     public static string GetKeywordHelpPage()

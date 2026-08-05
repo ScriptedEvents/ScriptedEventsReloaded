@@ -26,17 +26,14 @@ public class Audio_LoadMethod : SynchronousMethod, IAdditionalDescription, ICanE
     [
         "File doesn't exist",
         "File is not of type 'ogg'",
-        "The file path resolves outside the main SER folder"
+        "More than one file with the same name exists"
     ];
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new TextArgument("file path")
+        new TextArgument("file name")
         {
-            Description = 
-                "This path starts at the main SER folder. " +
-                "If your file is in [.. -> Scripted Events Reloaded -> audio.ogg] path, then the path will be 'audio.ogg'. " +
-                "If your file is deeper, like [.. -> Scripted Events Reloaded -> subfolder -> audio.ogg], then the path will be 'subfolder/audio.ogg'." 
+            Description = "The .ogg file name. SER searches all folders under its main data directory automatically."
         },
         new TextArgument("clip name")
         {
@@ -52,10 +49,13 @@ public class Audio_LoadMethod : SynchronousMethod, IAdditionalDescription, ICanE
             return;
         }
         
-        if (FileSystem.FileSystem.GetContainedPath(
+        var fileName = Args.GetText("file name");
+        if (!fileName.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
+            throw new ScriptRuntimeError(this, "Audio file name must have an '.ogg' extension.");
+
+        if (FileSystem.FileSystem.FindFileByName(
                 FileSystem.FileSystem.MainDirPath,
-                Args.GetText("file path"),
-                string.Empty)
+                fileName)
             .HasErrored(out var pathError, out var path))
         {
             throw new ScriptRuntimeError(this, pathError);

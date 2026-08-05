@@ -14,10 +14,15 @@ public class ElseStatement : StatementContext, IStatementExtender, IKeywordConte
     public string KeywordName => "else";
     public string Description =>
         "If the statement above it didn't execute, 'else' statement will execute instead.";
-    public string[] Arguments => [];
-    public string? Example => null;
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public ContextArgument[] Arguments => [];
+    public string Example =>
+        """
+        if {@sender -> team} is "SCPs"
+            Reply "You are an SCP"
+        else
+            Reply "You are not an SCP"
+        end
+        """;
 
     public IExtendableStatement.Signal Extends => IExtendableStatement.Signal.DidntExecute;
 

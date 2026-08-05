@@ -20,14 +20,17 @@ public class AttemptStatement : StatementContext, IExtendableStatement, IKeyword
         "Runs everything inside the statement, and if something throws an exception (error), the error will not " +
         "terminate the script. If there is an 'on_error' statement, it will be executed.";
 
-    public string[] Arguments => [];
+    public ContextArgument[] Arguments => [];
     public string Example =>
         """
         &collection = Coll.Empty
-        # swallows the error (doesn't stop the script)
         attempt
             Print {Coll.Fetch &collection 2}
-            # throws because there's nothing at index 2
+        end
+
+        # The error is handled by on_error when one is present.
+        on_error with $message
+            Print "Handled: {$message}"
         end
         """;
 

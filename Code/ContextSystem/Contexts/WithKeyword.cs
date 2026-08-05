@@ -21,35 +21,19 @@ public class WithKeyword : StandardContext, IKeywordContext, INotRunningContext,
     public string Description =>
         "This keyword is designed to provide a variable or a collection of variables to a statement.";
 
-    public string[] Arguments => ["[variables...]"];
+    public ContextArgument[] Arguments => [ContextArgument.Variadic(
+        "[variables...]", "Defines temporary variables for the preceding statement.",
+        "One or more variable names compatible with that statement.")];
 
     public string Example =>
         """
-        # CORRECT
         over @all with @plr
             Print {@plr -> name}
         end
 
-        # CORRECT - with can be on its own line
-        over @all 
-            with @plr
-            
-            Print {@plr -> name}
+        repeat 3 with $iteration
+            Print "iteration {$iteration}"
         end
-
-        # WRONG - "with" keyword does not add indentation
-        over @all
-            with @plr
-                Print {@plr -> name}
-        end
-
-        # WRONG - with keyword is not a statement that can be closed
-        # this causes an error
-        # over @all
-        #     with @plr
-        #         Print {@plr -> name}
-        #     end
-        # end
         """;
 
     public Result AcceptStatement(StatementContext context)

@@ -283,4 +283,68 @@ public static class FileSystem
 
         return new ExampleGenerationSummary(created, alreadyExisted, exampleDir.FullName);
     }
+
+    public static TryGet<string> FindFileByName(string rootDirectory, string fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            return TryGet<string>.Error("A file name cannot be empty.");
+        }
+
+        if (Path.GetFileName(fileName) != fileName)
+        {
+            return TryGet<string>.Error("Audio.Load expects a file name, not a path.");
+        }
+
+        try
+        {
+            var root = Path.GetFullPath(rootDirectory)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            if (!Directory.Exists(root))
+            {
+                return TryGet<string>.Error($"SER data directory '{root}' does not exist.");
+            }
+
+            var matches = new List<string>();
+            var directories = new Stack<string>();
+            directories.Push(root);
+
+            while (directories.Count > 0)
+            {
+                var directory = directories.Pop();
+                foreach (var file in Directory.GetFiles(directory, "*", SearchOption.TopDirectoryOnly))
+                {
+                    if (!string.Equals(Path.GetFileName(file), fileName, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    if ((File.GetAttributes(file) & FileAttributes.ReparsePoint) == 0)
+                        matches.Add(file);
+                }
+
+                foreach (var childDirectory in Directory.GetDirectories(directory, "*", SearchOption.TopDirectoryOnly))
+                {
+                    if ((File.GetAttributes(childDirectory) & FileAttributes.ReparsePoint) == 0)
+                        directories.Push(childDirectory);
+                }
+            }
+
+            if (matches.Count == 0)
+                return TryGet<string>.Error($"Audio file '{fileName}' was not found under the SER data directory.");
+
+            if (matches.Count > 1)
+            {
+                return TryGet<string>.Error(
+                    $"Multiple audio files named '{fileName}' were found. Audio file names must be unique:\n" +
+                    string.Join("\n", matches.OrderBy(path => path, StringComparer.OrdinalIgnoreCase)));
+            }
+
+            return matches[0].AsSuccess();
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException
+                                       or IOException or UnauthorizedAccessException
+                                       or System.Security.SecurityException)
+        {
+            return TryGet<string>.Error($"Could not search for audio file '{fileName}': {ex.Message}");
+        }
+    }
 }

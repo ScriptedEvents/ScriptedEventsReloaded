@@ -11,22 +11,21 @@ public abstract class LoopContext : StatementContext, IKeywordContext
 
     protected bool ReceivedContinue;
 
-    protected abstract string? Usage { get; }
+    protected abstract string? DetailedUsage { get; }
 
     public sealed override string FriendlyName => $"'{KeywordName}' loop statement";
     public Dictionary<IExtendableStatement.Signal, StatementContext> RegisteredSignals { get; } = [];
 
     public abstract string KeywordName { get; }
     public abstract string Description { get; }
-    public abstract string[] Arguments { get; }
+    public abstract ContextArgument[] Arguments { get; }
 
     public string Example => ExampleHandler.GetExample($"{KeywordName}KeywordExample") ??
-                             $"""
-                              {Usage}
+                              $"""
+                               {DetailedUsage}
 
-                              # ========================================
-                              # "break" and "continue" keywords work as usual and you are free to use them inside "{KeywordName}" loops
-                              """;
+                               # Use break to leave the loop or continue to skip to its next iteration.
+                               """;
 
     protected override void OnReceivedControlMessageFromChild(ParentContextControlMessage msg)
     {

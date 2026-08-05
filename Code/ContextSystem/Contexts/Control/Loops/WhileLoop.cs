@@ -21,18 +21,20 @@ public class WhileLoop : LoopContextWithSingleIterationVariable<NumberValue>
     public override string Description =>
         "A loop which will execute its body as long as the provided condition is evaluated to true.";
 
-    public override string[] Arguments => ["$condition"];
+    public override ContextArgument[] Arguments => [ContextArgument.Required(
+        "$condition", "Condition checked before each iteration.", "A boolean expression."),
+        ContextArgument.Optional("with $iter", "Stores the current 1-based iteration number.",
+            "A number variable compatible with the loop iteration value.")];
 
-    protected override string Usage =>
+    protected override string DetailedUsage =>
         """
-        # while loop repeats its body while the provided condition is met
+        # Check the condition before every iteration.
         while {AmountOf @all} > 0
             wait 1s
             Print "there are players on the server!"
         end
 
-        # ========================================
-        # you may also use a "with" keyword to define an iteration variable
+        # Bind the current 1-based iteration number when needed.
         while {Chance 90%} with $iter
             Print "current attempt to leave loop: {$iter}"
             wait 1s

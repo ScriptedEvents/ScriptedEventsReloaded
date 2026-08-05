@@ -1676,9 +1676,18 @@ public static class Builder
             .OrderBy(keyword => keyword.KeywordName)
             .ToDictionary(keyword => keyword.KeywordName, object (keyword) => new
             {
-                syntax = $"{keyword.KeywordName} {string.Join(" ", keyword.Arguments)}".TrimEnd(),
+                syntax = keyword.Usage,
+                usage = keyword.Usage,
                 description = keyword.Description,
-                arguments = keyword.Arguments,
+                arguments = keyword.Arguments.Select(argument => argument.Syntax).ToArray(),
+                argumentDetails = keyword.Arguments.Select(argument => new
+                {
+                    syntax = argument.Syntax,
+                    description = argument.Description,
+                    inputDescription = argument.InputDescription,
+                    optional = argument.IsOptional,
+                    consumesRemainingValues = argument.ConsumesRemainingValues
+                }).ToArray(),
                 example = keyword.Example,
                 isStatement = keyword is StatementContext,
                 extendsSignal = (keyword as IStatementExtender)?.Extends.ToString(),

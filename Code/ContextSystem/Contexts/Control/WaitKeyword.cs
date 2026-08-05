@@ -23,17 +23,22 @@ public class WaitKeyword : YieldingContext, IKeywordContext
 
     public virtual string Description => "Halts execution of the script for a specified amount of time.";
 
-    public virtual string[] Arguments => ["<duration>"];
+    public virtual ContextArgument[] Arguments => [ContextArgument.Required(
+        "<duration>", "How long execution should pause.", "A duration such as 5s, 250ms, or a duration variable.")];
 
-    public virtual string Example => ExampleHandler.GetExample($"{KeywordName}KeywordExample") ??
-                                      """
-                                      # wait for 5 seconds
-                                      wait 5s
-
-                                      # Waits using a variable
-                                      $duration = 10s
-                                      wait $duration
-                                      """;
+    public virtual string Example =>
+        """
+        # Wait for a fixed duration. 
+        wait 5s
+        
+        # A duration can also come from a variable.
+        $duration = 10s
+        wait $duration
+        
+        # Or from a random value
+        $duration = ToDuration {Random 1 10} seconds
+        wait $duration
+        """;
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

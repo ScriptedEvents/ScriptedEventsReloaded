@@ -16,17 +16,17 @@ public class DeleteKeyword : StandardContext, IKeywordContext
 
     public string KeywordName => "delete";
     public string Description => "Deletes a variable.";
-    public string[] Arguments => ["$varToDelete"];
+    public ContextArgument[] Arguments => [ContextArgument.Required(
+        "$varToDelete", "Variable to remove from the local or global scope.",
+        "An existing variable name such as $value or @players.")];
     public string Example =>
         """
-        global $someVar = "value"
-        
-        # some code
-        # ...
-        
-        # delete a global variable after it's no longer needed
-        # in order to not pollute the global namespace
-        delete $someVar
+        global $temporaryMessage = "delete me"
+        delete $temporaryMessage
+
+        # Local variables can be deleted the same way.
+        $localValue = 42
+        delete $localValue
         """;
 
     public override TryAddTokenRes TryAddToken(BaseToken token)

@@ -16,9 +16,18 @@ public class ContinueKeyword : StandardContext, IKeywordContext
     public string Description =>
         "Makes a given loop (that the 'continue' keyword is inside) act as it has reached the end of its body.";
 
-    public string[] Arguments => [];
+    public ContextArgument[] Arguments => [];
 
-    public string? Example => null;
+    public string Example =>
+        """
+        # number 3 will be skipped
+        repeat 5 with $iteration
+            if $iteration is 3
+                continue
+            end
+            Print "iteration {$iteration}"
+        end
+        """;
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

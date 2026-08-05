@@ -9,6 +9,10 @@ public abstract class Context
 {
     public required Script Script { get; set; } = null!;
 
+    public virtual string Usage => this is SER.Code.ContextSystem.Interfaces.IKeywordContext keyword
+        ? $"{keyword.KeywordName} {string.Join(" ", keyword.Arguments.Select(argument => argument.Syntax))}".TrimEnd()
+        : FriendlyName;
+
     public abstract string FriendlyName { get; }
 
     public abstract TryAddTokenRes TryAddToken(BaseToken token);

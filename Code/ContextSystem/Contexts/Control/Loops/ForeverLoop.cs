@@ -13,29 +13,25 @@ public class ForeverLoop : LoopContextWithSingleIterationVariable<NumberValue>, 
 {
     private readonly Result _mainErr = "Cannot create 'forever' loop.";
 
-    protected override string Usage =>
+    protected override string DetailedUsage =>
         $$"""
-          # {{Description}}
-          # it can be interrupted only when the script is stopped, when "break" keyword is used, or the server restarts
-
-          # this will send an ad every 2 minutes
+          # A forever loop must yield so the server can continue processing.
           forever
-              wait 2m
-              Broadcast @all 10s "Join our discord server! {{MainPlugin.DiscordLink}}"
+              wait 1m
+              Print "One minute has passed."
           end
 
-          # ========================================
-          # you can also use "with" keyword to define an iteration variable
-          #  which will hold the current iteration number, starting from 1
+          # The optional binding contains the 1-based iteration number.
           forever with $iter
               wait 1s
               Print "current iteration: {$iter}"
           end
           """;
     public override string KeywordName => "forever";
-    public override string Description => "Makes the code inside the statement run indefinitely. " +
-                                          "REMEMBER TO YIELD! - otherwise your server may crash.";
-    public override string[] Arguments => [];
+    public override string Description => "Runs the body indefinitely. The body must yield periodically so the server can continue processing.";
+    public override ContextArgument[] Arguments => [ContextArgument.Optional(
+        "with $iter", "Stores the current 1-based iteration number.",
+        "A number variable compatible with the loop iteration value.")];
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

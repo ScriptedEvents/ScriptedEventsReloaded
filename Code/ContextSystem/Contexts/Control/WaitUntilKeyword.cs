@@ -22,13 +22,18 @@ public class WaitUntilKeyword : YieldingContext, IKeywordContext
 
     public virtual string Description => "Halts execution of the script until a condition is met.";
 
-    public virtual string[] Arguments => ["$condition"];
+    public virtual ContextArgument[] Arguments => [ContextArgument.Required(
+        "$condition", "Expression polled until it evaluates to true.",
+        "A boolean expression; it is evaluated once per frame while waiting.")];
 
-    public virtual string Example => ExampleHandler.GetExample($"{KeywordName}KeywordExample") ??
-                                     """
-                                     # wait until there are no players on the server
-                                     wait_until {AmountOf @all} is 0
-                                     """;
+    public virtual string Example =>
+        """
+        # Wait until the server is empty.
+        wait_until {AmountOf @all} is 0
+
+        # Conditions can use variables and properties too.
+        wait_until {@sender -> isAlive} is false
+        """;
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

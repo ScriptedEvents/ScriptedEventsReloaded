@@ -38,6 +38,8 @@ public static class NumericExpressionResolver
 
     public static TryGet<CompiledExpression> CompileExpression(BaseToken[] tokens)
     {
+        if (tokens.Length <= 0) return "Expression is empty.";
+        
         var initial = tokens.Select(t => t.RawRep).JoinStrings(" ");
         Result mainErr = $"Expression '{initial}' is invalid.";
 

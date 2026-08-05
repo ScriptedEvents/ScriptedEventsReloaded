@@ -17,26 +17,25 @@ public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
     
     public override string KeywordName => "repeat";
     public override string Description => "Repeats everything inside its body a given amount of times.";
-    public override string[] Arguments => ["$number"];
+    public override ContextArgument[] Arguments => [ContextArgument.Required(
+        "$number", "Number of times the body should run.", "A non-negative whole-number expression."),
+        ContextArgument.Optional("with $iter", "Stores the current 1-based iteration number.",
+            "A number variable compatible with the loop iteration value.")];
     
-    protected override string Usage =>
+    protected override string DetailedUsage =>
         """
-        # repeat loop repeats its body a given amount of times
-        # in this case, it will print "hi" 10 times
+        # Repeat a fixed number of times.
         repeat 10
             Print "hi"
         end
 
-        # ========================================
-        # you can also use a variable to define the amount of times to repeat
+        # The count can be an expression or variable.
         repeat {Random 1 10 int}
             Print "hi"
         end
 
-        # ========================================
-        # you can also define a variable which will hold the current iteration number, starting from 1
+        # Bind the current 1-based iteration number.
         repeat 10 with $iter
-            
             Print "current iteration: {$iter}"
         end
         """;

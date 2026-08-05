@@ -12,8 +12,13 @@ public class EndKeyword : StandardContext, IKeywordContext
     public override string FriendlyName => "'end' keyword";
     public string KeywordName => "end";
     public string Description => "Ends the current statement's body.";
-    public string[] Arguments => [];
-    public string? Example => null;
+    public ContextArgument[] Arguments => [];
+    public string Example =>
+        """
+        if {@sender -> role} is "ClassD"
+            Print "This block ends here."
+        end
+        """;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

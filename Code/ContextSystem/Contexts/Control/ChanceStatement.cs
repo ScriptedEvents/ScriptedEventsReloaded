@@ -22,8 +22,21 @@ public class ChanceStatement : StatementContext, IExtendableStatement, IKeywordC
     public Dictionary<IExtendableStatement.Signal, StatementContext> RegisteredSignals { get; } = [];
     public string KeywordName => "chance";
     public string Description => "This statement will execute with the provided chance.";
-    public string[] Arguments => ["$chance"];
-    public string? Example => null;
+    public ContextArgument[] Arguments => [ContextArgument.Required(
+        "$chance", "Probability that the body will execute.",
+        "A number from 0 to 1, where 1 is 100%.")];
+    public string Example =>
+        """
+        chance 25%
+            Print "This happens about one time in four."
+        end
+
+        # The chance can also come from a value expression.
+        $probability = 50%
+        chance $probability
+            Print "This happens about half the time."
+        end
+        """;
 
     public override TryAddTokenRes TryAddToken(BaseToken token)
     {

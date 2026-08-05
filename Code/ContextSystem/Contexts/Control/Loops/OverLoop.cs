@@ -26,40 +26,31 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
     public override string Description =>
         "Repeats its body for each player in the player variable or a value in a collection variable, " +
         "assigning it its own custom variable.";
-    public override string[] Arguments => ["@players with @player"];
+    public override ContextArgument[] Arguments => [ContextArgument.Required(
+        "@players", "Players or collection whose values are iterated.",
+        "A player value or collection value."), ContextArgument.Optional(
+        "with @item [$index]", "Names variables receiving the current item and optional 1-based index.",
+        "One or two variables compatible with the iterated value.")];
 
-    protected override string Usage =>
+    protected override string DetailedUsage =>
         """
-        # instead of writing something like this:
-        repeat {AmountOf @all}
-            Print "found player"
-        end
-
-        # you can use 'over' to do the same:
+        # Run once for every player.
         over @all
             Print "found player"
         end
 
-        # ========================================
-        # additionally, "over" loop can tell you which item is currently being iterated over
-        # this is usually known as a "for each" loop in other languages
-        # this can be done using "with" keyword and naming a temporary variable:
+        # Bind the current item to a temporary variable.
         over @all with @plr
             Print "found player {@plr -> name}"
         end
 
-        # this also works for collections:
+        # Collections can be iterated in the same way.
         &inventory = @sender -> inventory
         over &inventory with *item
             Print "found item {*item -> type}"
         end
-        # its important to remember that the variable type in "with" keyword 
-        #  MUST match the value type inside the collection,
-        #  if this is not the case, like using $var for a reference value, there will be an error
 
-        # ========================================
-        # "with" can also define a second variable, which will hold the index of the current item
-        # this is a number value starting at 1, and incrementing by 1 for each iteration
+        # Add a 1-based index as a second binding.
         over @all with @plr $index
             Print "found player #{$index}: {@plr -> name}"
         end

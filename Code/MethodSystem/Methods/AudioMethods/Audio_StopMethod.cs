@@ -10,7 +10,7 @@ namespace SER.Code.MethodSystem.Methods.AudioMethods;
 // ReSharper disable once InconsistentNaming
 public class Audio_StopMethod : SynchronousMethod, ICanError
 {
-    public override string Description => "Plays a loaded audio clip from a created speaker.";
+    public override string Description => "Stops all audio clips playing through a speaker.";
 
     public string[] ErrorReasons =>
     [

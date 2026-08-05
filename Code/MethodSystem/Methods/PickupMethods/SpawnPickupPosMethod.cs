@@ -48,11 +48,12 @@ public class SpawnPickupPosMethod : SynchronousMethod, ICanError
 
     public static void SpawnPickup(Pickup obj, Vector3 pos, Method caller)
     {
+        if (NetworkServer.spawned.ContainsValue(obj.NetworkIdentity))
+            throw new ScriptRuntimeError(caller, Singleton.ErrorReasons[0]);
+
         obj.Position = pos;
         obj.Rotation = Quaternion.identity;
         obj.GameObject.SetActive(true);
-        if (NetworkServer.spawned.ContainsValue(obj.NetworkIdentity))
-            throw new ScriptRuntimeError(caller, Singleton.ErrorReasons[0]);
         obj.Spawn();
         if (obj is Projectile projectile)
             projectile.Base.ServerActivate();

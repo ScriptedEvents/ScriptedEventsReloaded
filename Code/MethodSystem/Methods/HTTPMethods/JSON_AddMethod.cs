@@ -38,16 +38,19 @@ public class JSON_AddMethod : ReferenceReturningMethod<JObject>, ICanError
         if (value is TextValue textValue)
         {
             jsonToAddValueTo[key] = textValue.Value;
-            return;
+        }
+        else
+        {
+            try
+            {
+                jsonToAddValueTo[key] = JToken.FromObject(value.Value);
+            }
+            catch
+            {
+                throw new ScriptRuntimeError(this, ErrorReasons[0]);
+            }
         }
 
-        try
-        {
-            jsonToAddValueTo[key] = JToken.FromObject(value.Value);
-        }
-        catch
-        {
-            throw new ScriptRuntimeError(this, ErrorReasons[0]);
-        }
+        ReturnValue = jsonToAddValueTo;
     }
 }

@@ -1,5 +1,4 @@
-﻿using LabApi.Features.Wrappers;
-using SER.Code.ArgumentSystem.Arguments;
+﻿using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
@@ -7,7 +6,7 @@ using SER.Code.MethodSystem.Structures;
 namespace SER.Code.MethodSystem.Methods.ItemMethods;
 
 [UsedImplicitly]
-public class GiveItemMethod : ReferenceReturningMethod<Item>, IEssential
+public class GiveItemMethod : SynchronousMethod, IEssential
 {
     public override string Description => "Gives an item to players.";
     

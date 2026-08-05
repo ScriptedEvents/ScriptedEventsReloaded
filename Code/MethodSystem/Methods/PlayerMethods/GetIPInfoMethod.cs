@@ -1,3 +1,4 @@
+using System.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SER.Code.ArgumentSystem.Arguments;
@@ -54,7 +55,7 @@ public class GetIPInfoMethod : YieldingReferenceReturningMethod<IPInfo>, ICanErr
     {
         var ip = Args.GetPlayer("player").IpAddress;
 
-        if (ip == "127.0.0.1" || ip == "localhost" || ip.StartsWith("192.168.") || ip.StartsWith("10.") || ip.StartsWith("172."))
+        if (IsLocalNetworkAddress(ip))
         {
             ReturnValue = new IPInfo(Type: "Local Network");
             yield break;
@@ -118,5 +119,23 @@ public class GetIPInfoMethod : YieldingReferenceReturningMethod<IPInfo>, ICanErr
             detections?["first_seen"]?.ToString() ?? "Unknown",
             detections?["last_seen"]?.ToString() ?? "Unknown"
         );
+    }
+
+    private static bool IsLocalNetworkAddress(string ip)
+    {
+        if (string.Equals(ip, "localhost", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!IPAddress.TryParse(ip, out var address))
+            return false;
+
+        if (IPAddress.IsLoopback(address))
+            return true;
+
+        var bytes = address.GetAddressBytes();
+        return bytes.Length == 4 &&
+               (bytes[0] == 10 ||
+                bytes[0] == 192 && bytes[1] == 168 ||
+                bytes[0] == 172 && bytes[1] is >= 16 and <= 31);
     }
 }

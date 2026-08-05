@@ -15,12 +15,12 @@ public class DamageRuleHandler : CustomEventsHandler
     }
     
     public static readonly List<DamageRule> AttackerRules = [];
-    public static readonly List<DamageRule> RecieverRules = [];
+    public static readonly List<DamageRule> ReceiverRules = [];
 
     public static void ResetAll()
     {
         AttackerRules.Clear();
-        RecieverRules.Clear();
+        ReceiverRules.Clear();
     }
 
     public static void RemoveRule(string? id)
@@ -32,16 +32,16 @@ public class DamageRuleHandler : CustomEventsHandler
         }
         
         AttackerRules.RemoveAll(rule => rule.Id == id);
-        RecieverRules.RemoveAll(rule => rule.Id == id);
+        ReceiverRules.RemoveAll(rule => rule.Id == id);
     }
 
     public override void OnPlayerHurting(PlayerHurtingEventArgs ev)
     {
         if (ev.DamageHandler is not StandardDamageHandler handler) return;
         
-        if (ev.Player is { } reciever)
+        if (ev.Player is { } receiver)
         {
-            Apply(RecieverRules, reciever);
+            Apply(ReceiverRules, receiver);
         }
         
         if (ev.Attacker is { } attacker)

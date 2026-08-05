@@ -12,10 +12,10 @@ public class AddDamageRuleMethod : SynchronousMethod
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new OptionsArgument("mode", "attacker", "reciever")
+        new OptionsArgument("mode", "attacker", "receiver", "reciever")
         {
             Description = "Indicates whether the damage rule will be applied on all damage dealt by the attacker " +
-                          "or on all damage received by the reciever."
+                          "or on all damage received by the receiver."
         },
         new PlayersArgument("players affected"),
         new FloatArgument("multiplier", preferPercent: true),
@@ -60,8 +60,9 @@ public class AddDamageRuleMethod : SynchronousMethod
             case "attacker":
                 DamageRuleHandler.AttackerRules.Add(damageRule);
                 break;
-            case "reciever":
-                DamageRuleHandler.RecieverRules.Add(damageRule);
+            case "receiver":
+            case "reciever": // Preserve the existing misspelled option for compatibility.
+                DamageRuleHandler.ReceiverRules.Add(damageRule);
                 break;
             default:
                 throw new ArgumentException("Invalid mode");

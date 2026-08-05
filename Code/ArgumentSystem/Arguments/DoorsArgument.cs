@@ -8,6 +8,12 @@ using SER.Code.ValueSystem;
 
 namespace SER.Code.ArgumentSystem.Arguments;
 
+/// <summary>
+/// This truly amazing argument has some major issues.
+/// Pretty much everything that opens is a door, like elevator doors or SCP-914 doors.
+/// This is technically correct but practically no one wants to close 914 doors on `CloseDoor LightContainment`
+///
+/// </summary>
 public class DoorsArgument(string name) : EnumHandlingArgument(name)
 {
     public override string InputDescription =>
@@ -21,9 +27,17 @@ public class DoorsArgument(string name) : EnumHandlingArgument(name)
     [UsedImplicitly]
     public DynamicTryGet<Door[]> GetConvertSolution(BaseToken token)
     {
+        var doorPool = new List<Door>(Door.List.Count);
+        foreach (var door in Door.List)
+        {
+            if (door is ElevatorDoor) continue;
+            if (door is NonInteractableDoor) continue; // im not sure if this is the right call
+            doorPool.Add(door);
+        }
+
         if (token is SymbolToken { IsJoker: true } or AllToken)
         {
-            return new(() => Door.List.Where(d => d is not ElevatorDoor).ToArray());
+            return new(doorPool.ToArray);
         }
         
         return ValueOrEnumResolver<Door[]>(token, value =>
@@ -47,27 +61,20 @@ public class DoorsArgument(string name) : EnumHandlingArgument(name)
         }, [
             new EnumHandler<DoorName, Door[]>(name => new(() =>
             {
-                return Door.List
-                .Where(door => door.DoorName == name
-                    && door is not ElevatorDoor)
-                .Distinct()
-                .ToArray();
+                return doorPool
+                    .Where(door => door.DoorName == name)
+                    .ToArray();
             })),
             new EnumHandler<FacilityZone, Door[]>(zone => new(() =>
             {
-                return Door.List
-                    .Where(door => door.Zone == zone
-                        && door is not ElevatorDoor)
-                    .Distinct()
+                return doorPool
+                    .Where(door => door.Zone == zone)
                     .ToArray();
             })),
             new EnumHandler<RoomName, Door[]>(name => new(() =>
             {
-                return Door.List
-                    .Where(d => 
-                        d.Rooms.Any(r => r.Name == name) 
-                        && d is not ElevatorDoor)
-                    .Distinct()
+                return doorPool
+                    .Where(d => d.Rooms.Any(r => r.Name == name))
                     .ToArray();
             }))
         ]);

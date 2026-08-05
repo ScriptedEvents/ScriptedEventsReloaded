@@ -23,6 +23,8 @@ public class AdvGiveItemMethod : ReferenceReturningMethod<Item?>, IAdditionalDes
 
     public override void Execute()
     {
-        ReturnValue = Args.GetPlayer("player to give item").AddItem(Args.GetEnum<ItemType>("item type to add"));
+        ReturnValue = Args
+            .GetPlayer("player to give item")
+            .AddItem(Args.GetEnum<ItemType>("item type to add"));
     }
 }

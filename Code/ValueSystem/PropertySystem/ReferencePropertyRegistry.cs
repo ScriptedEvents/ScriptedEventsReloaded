@@ -286,6 +286,8 @@ public static class ReferencePropertyRegistry
         Register<Door, BoolValue>("isGate", d => d is Gate, "Is the door a gate?");
         Register<Door, BoolValue>("isBreakable", d => d is BreakableDoor, "Is the door breakable?");
         Register<Door, BoolValue>("isCheckpoint", d => d is CheckpointDoor, "Is the door a part of a checkpoint?");
+        Register<Door, BoolValue>("isBroken", d => new BoolValue(d is BreakableDoor { IsBroken: true }), "Whether the door is broken - DONT USE isDestroyed!");
+        Register<Door, BoolValue>("isMoving", d => new BoolValue(d.ExactState is not (0 or 1)), "Whether the door is moving.");
         
         Register<Pickup, NumberValue>("posX", p => new NumberValue((decimal)p.Position.x), "The X position of the pickup");
         Register<Pickup, NumberValue>("posY", p => new NumberValue((decimal)p.Position.y), "The Y position of the pickup");
@@ -311,7 +313,7 @@ public static class ReferencePropertyRegistry
         Register<JToken, ReferenceValue<JToken>>("root", t => t.Root, "The root of the JSON token");
         Register<JToken, ReferenceValue<JToken>>("parent", t => t.Parent, "The parent of the JSON token");
         Register<JToken, CollectionValue<ReferenceValue<JToken>>>("children", t => new CollectionValue<ReferenceValue<JToken>>(t.Children()), "The children of the JSON token");
-        Register<JToken, StaticTextValue>("asString", t => new StaticTextValue(t.ToString()), "The JSON representation of the token");
+        Register<JToken, StaticTextValue>("asText", t => new StaticTextValue(t.ToString()), "The JSON representation of the token");
         Register<JToken, NumberValue>("asNumber", t => new NumberValue(t.Type is JTokenType.Integer or JTokenType.Float ? (decimal)t : 0), "The numeric value of the token");
         Register<JToken, BoolValue>("asBool", t => new BoolValue(t.Type == JTokenType.Boolean && (bool)t), "The boolean value of the token");
         

@@ -31,6 +31,19 @@ run Greet "Scientist"
 Inline `func`/`run` is different from the legacy `!-- Function` flag and
 `RunFunc` method used for cross-file compatibility.
 
+Name a legacy function in its flag and call that name with `RunFunc`; the name
+is globally unique, so it works even when multiple function sections share a
+file:
+
+```ser
+!-- Function HandleDoor
+-- argument *door
+
+LockDoor *door NoPower
+```
+
+Call it with `RunFunc HandleDoor *door`.
+
 ## Visibility and lifetime are different ideas
 
 Words such as “local scope” and “function scope” are convenient shorthand, but

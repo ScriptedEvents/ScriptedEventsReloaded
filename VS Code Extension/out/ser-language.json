@@ -593,7 +593,7 @@
           "argumentKind": "TextArgument",
           "mustBeProvided": true,
           "type": "Any text e.g. \"Hello, World!\"",
-          "description": null,
+          "description": "Has to be exactly 1 character long.",
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "\"character\"",
@@ -666,7 +666,7 @@
       "errors": []
     },
     "Text.Slice": {
-      "syntax": "Text.Slice \"text\" beginning_amount? end_amount",
+      "syntax": "Text.Slice \"text\" beginning_amount? end_amount?",
       "description": "Slices off characters from beginning and end of a text value.",
       "subgroup": "Text",
       "essential": false,
@@ -707,12 +707,12 @@
         {
           "name": "end amount",
           "argumentKind": "IntArgument",
-          "mustBeProvided": true,
+          "mustBeProvided": false,
           "type": "A whole number bigger or equal 0",
           "description": "The amount of characters to remove from the end of the text.",
-          "defaultValue": null,
+          "defaultValue": "0",
           "consumesRemainingValues": false,
-          "syntax": "end_amount",
+          "syntax": "end_amount?",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,
@@ -1275,7 +1275,7 @@
       "arguments": [
         {
           "name": "script to run",
-          "argumentKind": "CreatedScriptArgument",
+          "argumentKind": "FunctionScriptArgument",
           "mustBeProvided": true,
           "type": "Name of a script to create",
           "description": null,
@@ -3361,6 +3361,48 @@
       ],
       "errors": []
     },
+    "SetPlayerIntercom": {
+      "syntax": "SetPlayerIntercom @players state",
+      "description": "Sets whether a player is using a global intercom.",
+      "subgroup": "Player",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": null,
+      "returns": null,
+      "arguments": [
+        {
+          "name": "players",
+          "argumentKind": "PlayersArgument",
+          "mustBeProvided": true,
+          "type": "Player variable (e.g. @all, @classDPlayers)",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "@players",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "state",
+          "argumentKind": "BoolArgument",
+          "mustBeProvided": true,
+          "type": "bool (true or false) value",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "state",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
     "SetRole": {
       "syntax": "SetRole @players newRole spawnFlags? reason?",
       "description": "Sets a role for players.",
@@ -4862,7 +4904,10 @@
           ]
         }
       ],
-      "errors": []
+      "errors": [
+        "The starting number must not be greater than the ending number.",
+        "The requested integer range does not contain an integer."
+      ]
     },
     "Round": {
       "syntax": "Round number_to_round decimal_places?",
@@ -6233,7 +6278,7 @@
       "description": "Gives an item to players.",
       "subgroup": "Item",
       "essential": true,
-      "additionalDescription": null,
+      "additionalDescription": "The return reference can be invalid if the player does not have enough space for the item. If adding multiple items, the reference will be for the last item added.",
       "requiredFramework": null,
       "returns": "reference to Item object",
       "arguments": [
@@ -9416,8 +9461,8 @@
           "name": "mode",
           "argumentKind": "OptionsArgument",
           "mustBeProvided": true,
-          "type": "One of the following options:\n > attacker\n > reciever",
-          "description": "Indicates whether the damage rule will be applied on all damage dealt by the attacker or on all damage received by the reciever.",
+          "type": "One of the following options:\n > attacker\n > receiver\n > reciever",
+          "description": "Indicates whether the damage rule will be applied on all damage dealt by the attacker or on all damage received by the receiver.",
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "mode",
@@ -9428,6 +9473,10 @@
           "options": [
             {
               "value": "attacker",
+              "description": ""
+            },
+            {
+              "value": "receiver",
               "description": ""
             },
             {
@@ -11264,7 +11313,7 @@
     },
     "Audio.Stop": {
       "syntax": "Audio.Stop \"speaker_name\"",
-      "description": "Plays a loaded audio clip from a created speaker.",
+      "description": "Stops all audio clips playing through a speaker.",
       "subgroup": "Audio",
       "essential": false,
       "additionalDescription": null,
@@ -15437,9 +15486,14 @@
       ]
     },
     "Function": {
-      "syntax": "!-- Function",
+      "syntax": "!-- Function name",
       "description": "Requires this script to be executed only when required arguments are supplied.",
-      "inlineArgument": null,
+      "inlineArgument": {
+        "name": "name",
+        "description": "The unique name used to call this function with RunFunc.",
+        "required": false,
+        "example": "!-- Function HandleDoor"
+      },
       "arguments": [
         {
           "name": "argument",

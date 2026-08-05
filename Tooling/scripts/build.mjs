@@ -48,7 +48,7 @@ function buildEditorHtml(mediaPath, webview = false) {
     .replace("<!-- SER_TOOLING_BLOCKLY -->", `${scriptOpen}\n${blockly}\n</script>`)
     .replace(
       "<!-- SER_TOOLING_MANIFEST -->",
-      `${scriptOpen}\nconst SER_TRUTH_TABLE = ${JSON.stringify(manifest)};\n</script>`
+      `${scriptOpen}\nconst SER_TRUTH_TABLE = ${JSON.stringify(manifest, null, 2)};\n</script>`
     )
     .replace("<!-- SER_TOOLING_CORE -->", `${scriptOpen}\n${core}\n</script>`)
     .replace("<!-- SER_TOOLING_EDITOR -->", `${scriptOpen}\n${editor}\n</script>`);

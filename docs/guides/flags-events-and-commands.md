@@ -113,6 +113,19 @@ version.
 
 Prefer inline functions for new logic contained in one file.
 
+Name each legacy function and call it by that name, including when the file
+contains other sections:
+
+```ser
+!-- Function HandleDoor
+-- argument *door
+
+LockDoor *door NoPower
+```
+
+Use `RunFunc HandleDoor *door`. Function names are globally unique. Unnamed
+legacy functions remain callable by their file or section name.
+
 Existing bindings reload their script before the next execution. After adding or
 removing bindings which cannot trigger yet, run `serreload` (or restart the round)
 and inspect `serstatus`.

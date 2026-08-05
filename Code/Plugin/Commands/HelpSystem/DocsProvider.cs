@@ -39,6 +39,9 @@ public static class DocsProvider
     private static string Heading(string title, int level = 2) =>
         $"{new string('#', level)} {title}";
 
+    public static string Render(string content, DocsFormat format) =>
+        format == DocsFormat.Markdown ? content : RenderPlainText(content);
+
     public static readonly Dictionary<HelpOption, Func<string>> GeneralOptions = new()
     {
         [HelpOption.Start] = GetStartHelpPage,
@@ -52,7 +55,18 @@ public static class DocsProvider
         [HelpOption.Keywords] = GetKeywordHelpPage
     };
 
-    public static bool GetGeneralOutput(ArraySegment<string> args, ICommandSender sender, out string response)
+    public static bool GetGeneralOutput(
+        ArraySegment<string> args,
+        ICommandSender sender,
+        out string response,
+        DocsFormat format = DocsFormat.Markdown)
+    {
+        var result = GetGeneralOutputMarkdown(args, sender, out var markdownResponse);
+        response = Render(markdownResponse, format);
+        return result;
+    }
+
+    private static bool GetGeneralOutputMarkdown(ArraySegment<string> args, ICommandSender sender, out string response)
     {
         var arg = args.Array?[args.Offset].ToLowerInvariant() 
                   ?? throw new CoreInvariantException("Help arguments were provided in an invalid format.");
@@ -141,7 +155,12 @@ public static class DocsProvider
         return false;
     }
 
-    public static string GetOptionsList()
+    public static string GetOptionsList(DocsFormat format = DocsFormat.Markdown)
+    {
+        return Render(GetOptionsListMarkdown(), format);
+    }
+
+    private static string GetOptionsListMarkdown()
     {
         return $"""
                 # SER help
@@ -338,7 +357,7 @@ public static class DocsProvider
     public static string GetKeywordHelpPage()
     {
         return
-            """
+            $"""
             Keywords alter how the script behaves, not by changing someones role, but the internal script execution.
             They can range from simple things from stopping the script to handling advanced logic.
 
@@ -1026,6 +1045,61 @@ public static class DocsProvider
         
         response = RenderProperties(typeName, props, reflectedType);
         return true;
+    }
+
+    private static string RenderPlainText(string content)
+    {
+        var lines = content.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+        var output = new StringBuilder();
+        var inCodeBlock = false;
+
+        for (var index = 0; index < lines.Length; index++)
+        {
+            var line = lines[index];
+            var trimmed = line.Trim();
+
+            if (trimmed.StartsWith("```", StringComparison.Ordinal))
+            {
+                inCodeBlock = !inCodeBlock;
+                continue;
+            }
+
+            if (inCodeBlock)
+            {
+                output.AppendLine(line);
+                continue;
+            }
+
+            if (trimmed.Length == 0)
+            {
+                output.AppendLine();
+                continue;
+            }
+
+            var heading = trimmed.TakeWhile(c => c == '#').Count();
+            if (heading is > 0 and <= 6 && trimmed.Length > heading && char.IsWhiteSpace(trimmed[heading]))
+            {
+                var title = StripInlineMarkdown(trimmed[(heading + 1)..].Trim());
+                output.AppendLine(title);
+                output.AppendLine(new string(heading == 1 ? '=' : '-', Math.Max(3, title.Length)));
+                continue;
+            }
+
+            output.AppendLine(StripInlineMarkdown(line));
+        }
+
+        return output.ToString().TrimEnd();
+    }
+
+    private static string StripInlineMarkdown(string line)
+    {
+        line = line.Replace("\\`", "`");
+        line = System.Text.RegularExpressions.Regex.Replace(line, @"`([^`]*)`", "$1");
+        line = System.Text.RegularExpressions.Regex.Replace(line, @"\[([^\]]+)\]\([^\)]+\)", "$1");
+        line = line.Replace("**", string.Empty).Replace("__", string.Empty);
+        line = System.Text.RegularExpressions.Regex.Replace(line, @"(?<!\w)[*_](.*?)[*_](?!\w)", "$1");
+        line = System.Text.RegularExpressions.Regex.Replace(line, @"^\s*>\s?", "");
+        return line;
     }
 
     // ai

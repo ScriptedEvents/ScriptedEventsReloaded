@@ -14,10 +14,10 @@ public class HelpCommand : ICommand
     {
         if (arguments.Count > 0)
         {
-            return DocsProvider.GetGeneralOutput(arguments, sender, out response);
+            return DocsProvider.GetGeneralOutput(arguments, sender, out response, DocsFormat.PlainText);
         }
 
-        response = DocsProvider.GetOptionsList();
+        response = DocsProvider.GetOptionsList(DocsFormat.PlainText);
         return true;
     }
 }

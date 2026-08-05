@@ -127,6 +127,6 @@ public class DocsCommand : ICommand, IUsePermissions
         if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
         
         using var sw = File.CreateText(Path.Combine(folder, $"#{type}.txt"));
-        sw.Write(content.ToString());
+        sw.Write(DocsProvider.Render(content.ToString(), DocsFormat.PlainText));
     }
 }

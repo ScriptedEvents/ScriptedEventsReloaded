@@ -6278,9 +6278,9 @@
       "description": "Gives an item to players.",
       "subgroup": "Item",
       "essential": true,
-      "additionalDescription": "The return reference can be invalid if the player does not have enough space for the item. If adding multiple items, the reference will be for the last item added.",
+      "additionalDescription": null,
       "requiredFramework": null,
-      "returns": "reference to Item object",
+      "returns": null,
       "arguments": [
         {
           "name": "players",

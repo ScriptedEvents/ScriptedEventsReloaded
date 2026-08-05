@@ -136,6 +136,25 @@ public class Script
         return CreateByScriptName(ScriptName.CreateUnsafe(dirtyName), executor);
     }
 
+    public static TryGet<Script> CreateFunctionByScriptName(string dirtyName, ScriptExecutor? executor)
+    {
+        if (string.IsNullOrWhiteSpace(dirtyName))
+        {
+            return "A script name cannot be empty.";
+        }
+
+        var requestedName = ScriptName.CreateUnsafe(dirtyName);
+        FileSystem.FileSystem.RefreshRequested(requestedName);
+
+        if (FileSystem.ScriptCatalog.GetFunctionSection(requestedName)
+            .HasErrored(out var error, out var section))
+        {
+            return error;
+        }
+
+        return CreateByVerifiedSection(section, executor, true);
+    }
+
     public static Script CreateByVerifiedSection(ScriptSection section, ScriptExecutor? executor) =>
         CreateByVerifiedSection(section, executor, false);
 

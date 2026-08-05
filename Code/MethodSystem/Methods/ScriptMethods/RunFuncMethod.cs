@@ -5,6 +5,7 @@ using SER.Code.FlagSystem;
 using SER.Code.FlagSystem.Flags;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
+using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.ValueSystem;
 using SER.Code.VariableSystem.Bases;
@@ -24,7 +25,7 @@ public class RunFuncMethod : SynchronousMethod, ICanError
 
     public override Argument[] ExpectedArguments { get; } =
     [
-        new CreatedScriptArgument("script to run"),
+        new FunctionScriptArgument("script to run"),
         new AnyValueArgument("values to pass")
         {
             ConsumesRemainingValues = true,
@@ -36,7 +37,7 @@ public class RunFuncMethod : SynchronousMethod, ICanError
 
     public override void Execute()
     {
-        var scriptToRun = Args.GetCreatedScript("script to run");
+        var scriptToRun = Args.GetValue<Script, FunctionScriptArgument>("script to run");
         var valuesToPass = Args.GetRemainingArguments<Value, AnyValueArgument>("values to pass");
 
         if (ScriptFlagHandler.GetScriptFlags(scriptToRun.Name).FirstOrDefault(f => f.GetType() == typeof(FunctionFlag))

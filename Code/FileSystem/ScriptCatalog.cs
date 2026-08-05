@@ -241,6 +241,52 @@ public static class ScriptCatalog
         return snapshot.Sections[0];
     }
 
+    public static TryGet<ScriptSection> GetFunctionSection(ScriptName requestedName)
+    {
+        FileSystem.ParseSectionSelector(requestedName, out var fileName, out var requestedSection);
+        var namedFunctions = FindFunctionsByName(requestedName.ToString());
+        if (namedFunctions.Length == 1)
+        {
+            return namedFunctions[0];
+        }
+
+        if (namedFunctions.Length > 1)
+        {
+            return $"Function '{requestedName}' is registered more than once. " +
+                   "Function names must be globally unique.";
+        }
+
+        if (!SnapshotsByFileName.TryGetValue(fileName, out var snapshot))
+        {
+            return $"Function '{requestedName}' is not registered.";
+        }
+
+        if (requestedSection is not null)
+        {
+            if (GetSection(requestedName).HasErrored(out var sectionError, out var selectedSection))
+            {
+                return sectionError;
+            }
+
+            return IsFunctionSection(snapshot, selectedSection)
+                ? selectedSection
+                : $"Script section '{selectedSection.Name}' is not a function.";
+        }
+
+        var functionSections = snapshot.Sections
+            .Where(section => IsFunctionSection(snapshot, section))
+            .ToArray();
+
+        return functionSections.Length switch
+        {
+            1 => functionSections[0],
+            0 => $"Script '{fileName}' does not contain a Function section.",
+            _ => $"Script '{fileName}' contains {functionSections.Length} Function sections. " +
+                 "Select one explicitly using its section name (for example, " +
+                 $"'{functionSections[0].Name}')."
+        };
+    }
+
     public static TryGet<string> GetPath(ScriptName requestedName)
     {
         FileSystem.ParseSectionSelector(requestedName, out var fileName, out _);
@@ -395,11 +441,32 @@ public static class ScriptCatalog
             preparedFlags[section.Name] = flags;
         }
 
+        var duplicateFunctionName = preparedFlags
+            .SelectMany(pair => pair.Value.OfType<FunctionFlag>())
+            .Where(flag => !string.IsNullOrWhiteSpace(flag.FunctionName))
+            .GroupBy(flag => flag.FunctionName!, StringComparer.OrdinalIgnoreCase)
+            .FirstOrDefault(group => group.Count() > 1);
+        if (duplicateFunctionName is not null)
+        {
+            return $"Function '{duplicateFunctionName.Key}' is defined more than once in script '{fileName}'.";
+        }
+
         return new Snapshot(path, fileName, content, lastWriteTimeUtc, length, sections, preparedFlags);
     }
 
     private static Result CommitSnapshot(Snapshot candidate)
     {
+        var duplicateFunctionName = candidate.Flags
+            .SelectMany(pair => pair.Value.OfType<FunctionFlag>())
+            .Select(flag => flag.FunctionName)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .FirstOrDefault(name => FindFunctionsByName(name!)
+                .Any(section => !string.Equals(section.Path, candidate.Path, StringComparison.OrdinalIgnoreCase)));
+        if (duplicateFunctionName is not null)
+        {
+            return $"Function '{duplicateFunctionName}' is already defined in another registered script.";
+        }
+
         SnapshotsByPath.TryGetValue(candidate.Path, out var previous);
         if (previous is not null)
         {
@@ -503,6 +570,22 @@ public static class ScriptCatalog
             SnapshotsByFileName[snapshot.FileName] = snapshot;
         }
     }
+
+    private static bool IsFunctionSection(Snapshot snapshot, ScriptSection section) =>
+        GetFunctionFlag(snapshot, section) is not null;
+
+    private static FunctionFlag? GetFunctionFlag(Snapshot snapshot, ScriptSection section) =>
+        snapshot.Flags.TryGetValue(section.Name, out var flags)
+            ? flags.OfType<FunctionFlag>().FirstOrDefault()
+            : null;
+
+    private static ScriptSection[] FindFunctionsByName(string functionName) => SnapshotsByPath.Values
+        .SelectMany(snapshot => snapshot.Sections.Where(section =>
+            string.Equals(
+                GetFunctionFlag(snapshot, section)?.FunctionName,
+                functionName,
+                StringComparison.OrdinalIgnoreCase)))
+        .ToArray();
 
     private static bool TryGetFileStamp(string path, out DateTime lastWriteTimeUtc, out long length)
     {

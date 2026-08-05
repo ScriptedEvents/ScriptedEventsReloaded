@@ -10,12 +10,29 @@ namespace SER.Code.FlagSystem.Flags;
 public class FunctionFlag : Flag, IMajorBehaviorFlag
 {
     private readonly List<VariableToken> _expectedVarTokens = [];
+    private string? _functionName;
+
     public IReadOnlyCollection<VariableToken> ExpectedVarTokens => _expectedVarTokens;
+    public string? FunctionName => _functionName;
     
     public override string Description =>
         "Requires this script to be executed only when required arguments are supplied.";
 
-    public override Argument? InlineArgument => null;
+    public override Argument? InlineArgument => new(
+        "name",
+        "The unique name used to call this function with RunFunc.",
+        args =>
+        {
+            if (args.Length != 1 || string.IsNullOrWhiteSpace(args[0]))
+            {
+                return "Function requires exactly one name.";
+            }
+
+            _functionName = args[0];
+            return true;
+        },
+        false,
+        "!-- Function HandleDoor");
 
     public override Argument[] Arguments =>
     [

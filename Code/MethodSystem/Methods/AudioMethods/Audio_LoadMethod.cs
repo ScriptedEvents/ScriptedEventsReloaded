@@ -33,7 +33,8 @@ public class Audio_LoadMethod : SynchronousMethod, IAdditionalDescription, ICanE
     [
         new TextArgument("file name")
         {
-            Description = "The .ogg file name. SER searches all folders under its main data directory automatically."
+            Description = "The .ogg file name. SER searches all folders under its main data directory automatically " +
+                          "- no need to provide a full path."
         },
         new TextArgument("clip name")
         {

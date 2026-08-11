@@ -1,4 +1,5 @@
-﻿using LabApi.Features.Console;
+﻿using System.Security;
+using LabApi.Features.Console;
 using LabApi.Loader.Features.Paths;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
@@ -293,7 +294,7 @@ public static class FileSystem
 
         if (Path.GetFileName(fileName) != fileName)
         {
-            return TryGet<string>.Error("Audio.Load expects a file name, not a path.");
+            return TryGet<string>.Error("Expected a file name, not a path.");
         }
 
         try
@@ -329,20 +330,18 @@ public static class FileSystem
             }
 
             if (matches.Count == 0)
-                return TryGet<string>.Error($"Audio file '{fileName}' was not found under the SER data directory.");
+                return TryGet<string>.Error($"File '{fileName}' was not found under the SER data directory.");
 
             if (matches.Count > 1)
             {
                 return TryGet<string>.Error(
-                    $"Multiple audio files named '{fileName}' were found. Audio file names must be unique:\n" +
+                    $"Multiple files named '{fileName}' were found. Audio file names must be unique:\n" +
                     string.Join("\n", matches.OrderBy(path => path, StringComparer.OrdinalIgnoreCase)));
             }
 
             return matches[0].AsSuccess();
         }
-        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException
-                                       or IOException or UnauthorizedAccessException
-                                       or System.Security.SecurityException)
+        catch (Exception ex)
         {
             return TryGet<string>.Error($"Could not search for audio file '{fileName}': {ex.Message}");
         }

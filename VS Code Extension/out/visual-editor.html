@@ -14859,7 +14859,7 @@ const SER_TRUTH_TABLE = {
           "argumentKind": "TextArgument",
           "mustBeProvided": true,
           "type": "Any text e.g. \"Hello, World!\"",
-          "description": "The .ogg file name. SER searches all folders under its main data directory automatically.",
+          "description": "The .ogg file name. SER searches all folders under its main data directory automatically - no need to provide a full path.",
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "\"file_name\"",
@@ -18790,7 +18790,7 @@ const SER_TRUTH_TABLE = {
       "description": "Makes a given loop or function (that the 'break' keyword is inside) act as it has completely ended its execution (\"breaks\" free from the loop/function)",
       "arguments": [],
       "argumentDetails": [],
-      "example": "repeat 10 with $iteration\n    if {$iteration is 3}\n        break\n    end\n    Print \"iteration {$iteration}\"\nend",
+      "example": "# the execution will \"break\" free after the third iteration\r\nrepeat 10 with $iteration\r\n    if {$iteration is 3}\r\n        break\r\n    end\r\n    Print \"iteration {$iteration}\"\r\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -18811,7 +18811,7 @@ const SER_TRUTH_TABLE = {
           "consumesRemainingValues": false
         }
       ],
-      "example": "chance 25%\n    Print \"This happens about one time in four.\"\nend\n\n# The chance can also come from a value expression.\n$probability = 0.5\nchance $probability\n    Print \"This happens about half the time.\"\nend",
+      "example": "chance 25%\r\n    Print \"This happens about one time in four.\"\r\nend\r\n\r\n# The chance can also come from a value expression.\r\n$probability = 50%\r\nchance $probability\r\n    Print \"This happens about half the time.\"\r\nend",
       "isStatement": true,
       "extendsSignal": null,
       "allowedSignals": "DidntExecute"
@@ -18822,7 +18822,7 @@ const SER_TRUTH_TABLE = {
       "description": "Makes a given loop (that the 'continue' keyword is inside) act as it has reached the end of its body.",
       "arguments": [],
       "argumentDetails": [],
-      "example": "repeat 5 with $iteration\n    if {$iteration is 3}\n        continue\n    end\n    Print \"iteration {$iteration}\"\nend",
+      "example": "# number 3 will be skipped\r\nrepeat 5 with $iteration\r\n    if $iteration is 3\r\n        continue\r\n    end\r\n    Print \"iteration {$iteration}\"\r\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -18864,7 +18864,7 @@ const SER_TRUTH_TABLE = {
           "consumesRemainingValues": false
         }
       ],
-      "example": "if {@sender -> role is \"ClassD\"}\n    Print \"You are a Class-D.\"\nelif {@sender -> role is \"Scientist\"}\n    Print \"You are a scientist.\"\nelse\n    Print \"You have another role.\"\nend",
+      "example": "if {@sender -> role} is \"ClassD\"\r\n    Print \"You are a Class-D.\"\r\nelif {@sender -> role} is \"Scientist\"\r\n    Print \"You are a scientist.\"\r\nelse\r\n    Print \"You have another role.\"\r\nend",
       "isStatement": true,
       "extendsSignal": "DidntExecute",
       "allowedSignals": "DidntExecute"
@@ -18875,7 +18875,7 @@ const SER_TRUTH_TABLE = {
       "description": "If the statement above it didn't execute, 'else' statement will execute instead.",
       "arguments": [],
       "argumentDetails": [],
-      "example": "if {@sender -> is_alive}\n    Print \"You are alive.\"\nelse\n    Print \"You are not alive.\"\nend",
+      "example": "if {@sender -> team} is \"SCPs\"\r\n    Reply \"You are an SCP\"\r\nelse\r\n    Reply \"You are not an SCP\"\r\nend",
       "isStatement": true,
       "extendsSignal": "DidntExecute",
       "allowedSignals": null
@@ -18886,7 +18886,7 @@ const SER_TRUTH_TABLE = {
       "description": "Ends the current statement's body.",
       "arguments": [],
       "argumentDetails": [],
-      "example": "if {@sender -> is_alive}\n    Print \"This block ends here.\"\nend",
+      "example": "if {@sender -> role} is \"ClassD\"\r\n    Print \"This block ends here.\"\r\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -18923,7 +18923,7 @@ const SER_TRUTH_TABLE = {
           "consumesRemainingValues": false
         }
       ],
-      "example": "if {@sender -> is_alive}\n    ephm $message = \"Only needed during this statement\"\n    Print $message\nend",
+      "example": "if {@sender -> isAlive}\r\n    ephm $message = \"Only needed during this statement\"\r\n    Print $message\r\nend\r\n\r\n# accessing $message outside that if statement will not work!\r\n# Print $message <-- will error",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -19023,7 +19023,7 @@ const SER_TRUTH_TABLE = {
           "consumesRemainingValues": false
         }
       ],
-      "example": "if {@sender -> is_alive}\n    Print \"You are still alive.\"\nend\n\nif {AmountOf @all > 0}\n    Print \"There is at least one player online.\"\nend",
+      "example": "if {@sender -> isAlive}\r\n    Print \"You are still alive.\"\r\nend\r\n\r\nif {AmountOf @all} > 0\r\n    Print \"There is at least one player online.\"\r\nend",
       "isStatement": true,
       "extendsSignal": null,
       "allowedSignals": "DidntExecute"
@@ -19063,7 +19063,7 @@ const SER_TRUTH_TABLE = {
           "consumesRemainingValues": false
         }
       ],
-      "example": "# Run once for every player.\nover @all\n    Print \"Hello, {@sender -> name}!\"\nend\n\n# Bind the current item to a temporary variable.\nover @all with @plr\n    Print \"found player {@plr -> name}\"\nend\n\n# Collections can be iterated in the same way.\n&inventory = @sender -> inventory\nover &inventory with *item\n    Print \"found item {*item -> type}\"\nend\n\n# Add a 1-based index as a second binding.\nover @all with @plr $index\n    Print \"found player #{$index}: {@plr -> name}\"\nend\n\n# Use break to leave the loop or continue to skip to its next iteration.",
+      "example": "# Run once for every player.\r\nover @all\r\n    Print \"found player\"\r\nend\r\n\r\n# Bind the current item to a temporary variable.\r\nover @all with @plr\r\n    Print \"found player {@plr -> name}\"\r\nend\r\n\r\n# Collections can be iterated in the same way.\r\n&inventory = @sender -> inventory\r\nover &inventory with *item\r\n    Print \"found item {*item -> type}\"\r\nend\r\n\r\n# Add a 1-based index as a second binding.\r\nover @all with @plr $index\r\n    Print \"found player #{$index}: {@plr -> name}\"\r\nend\n\n# Use break to leave the loop or continue to skip to its next iteration.",
       "isStatement": true,
       "extendsSignal": null,
       "allowedSignals": null
@@ -19113,7 +19113,7 @@ const SER_TRUTH_TABLE = {
           "consumesRemainingValues": false
         }
       ],
-      "example": "func $IsAdult with $player\n    return {$player -> age >= 18}\nend\n\n$adult = run $IsAdult @sender\nif $adult\n    Print \"You are an adult.\"\nend",
+      "example": "func $IsAdult with $age\r\n    return age >= 18\r\nend\r\n\r\n$adult = run $IsAdult 16\r\nif $adult\r\n    Print \"You are an adult.\"\r\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -19124,7 +19124,7 @@ const SER_TRUTH_TABLE = {
       "description": "Stops the script from executing.",
       "arguments": [],
       "argumentDetails": [],
-      "example": "if {@sender -> is_alive}\n    Print \"The script is stopping now.\"\n    stop\nend",
+      "example": "if {@sender -> isAlive}\r\n    Print \"The script is stopping now.\"\r\n    stop\r\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -19145,7 +19145,7 @@ const SER_TRUTH_TABLE = {
           "consumesRemainingValues": false
         }
       ],
-      "example": "  # Wait for a fixed duration.\n  wait 5s\n\n  # A duration can also come from a variable.\n  $duration = 10s\n  wait $duration",
+      "example": "# Wait for a fixed duration. \r\nwait 5s\r\n\r\n# A duration can also come from a variable.\r\n$duration = 10s\r\nwait $duration\r\n\r\n# Or from a random value\r\n$duration = ToDuration {Random 1 10} seconds\r\nwait $duration",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -19166,7 +19166,7 @@ const SER_TRUTH_TABLE = {
           "consumesRemainingValues": false
         }
       ],
-      "example": "# Wait until the server is empty.\nwait_until {AmountOf @all} is 0\n\n# Conditions can use variables and properties too.\nwait_until {@sender -> is_alive}",
+      "example": "# Wait until the server is empty.\r\nwait_until {AmountOf @all} is 0\r\n\r\n# Conditions can use variables and properties too.\r\nwait_until {@sender -> isAlive} is false",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -19216,7 +19216,7 @@ const SER_TRUTH_TABLE = {
           "consumesRemainingValues": true
         }
       ],
-      "example": "over @all with @plr\n    Print {@plr -> name}\nend\n\n# The same binding can be written on its own line.\nrepeat 3\n    with $iteration\n    Print \"iteration {$iteration}\"\nend",
+      "example": "over @all with @plr\r\n    Print {@plr -> name}\r\nend\r\n\r\nrepeat 3 with $iteration\r\n    Print \"iteration {$iteration}\"\r\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null

@@ -69,15 +69,6 @@ folder and its entire contents during script discovery.
 Linked folders (symbolic links and directory junctions) are also skipped so
 discovery cannot leave the SER directory or loop indefinitely.
 
-# Building release artifacts
-
-Run `tools/package-release.ps1` from PowerShell. It rebuilds and verifies both
-plugin hosts and the editor tooling, then creates minimal LabAPI and EXILED
-plugin bundles, the examples/documentation bundle, the standalone editor, the
-VS Code extension, a complete bundle, and `SHA256SUMS.txt` under `artifacts/`.
-Release maintainers can pass `-UcrReferencePath <path>` to compile against the
-exact official UCR DLL selected for that compatibility baseline.
-
 # Examples
 
 The build validates every script in the
@@ -173,5 +164,19 @@ For a complete event script, see
 [`hotPotato.ser`](./Example%20Scripts/hotPotato.ser), which is validated during
 every build.
 
-## Are you an LLM?
+# Are you an LLM?
 Check the [syntax definition](https://raw.githubusercontent.com/ScriptedEvents/ScriptedEventsReloaded/refs/heads/main/language_specification.md) for guidance about SER script-making.
+
+# Building release artifacts
+
+Run `tools/package-release.ps1` from PowerShell. It rebuilds and verifies both
+plugin hosts and the editor tooling, then creates minimal LabAPI and EXILED
+plugin bundles, the examples/documentation bundle, the standalone editor, the
+VS Code extension, a complete bundle, and `SHA256SUMS.txt` under `artifacts/`.
+Release maintainers can pass `-UcrReferencePath <path>` to compile against the
+exact official UCR DLL selected for that compatibility baseline.
+
+# Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for a fresh-clone setup, the normal
+verification commands, generated-file rules, and pull-request checklist.

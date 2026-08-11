@@ -1,22 +1,44 @@
-﻿.idea
-.vs
-/bin
-/obj
-/packages
-SER.sln.DotSettings.user
+# IDE and per-user settings
+.idea/
+.vs/
+*.suo
 *.user
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+*.rsuser
+
+# .NET, NuGet, and release outputs
+[Bb]in/
+[Oo]bj/
+[Pp]ackages/
+artifacts/
+*.nupkg
+*.snupkg
+
+# Node.js dependencies, logs, and coverage
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+coverage/
+.nyc_output/
+
+# Generated SER language/editor artifacts
 /SER Visual Editor.html
 /ser_method_info.js
-/VS Code Extension/node_modules
+/Tooling/visual-editor/dist/
 /VS Code Extension/out/ser_method_info.js
-/Tooling/node_modules
-/Tooling/visual-editor/dist
-/artifacts
-/website/node_modules
-/website/.docusaurus
-/website/build
-/website/.site-docs
+/website/data/ser-truth-table.json
 /website/src/data/constructs.json
-/website/static/assets
-/website/static/ser-blocks
-/website/static/img
+/website/static/assets/
+/website/static/ser-blocks/
+/website/static/img/
+/website/.docusaurus/
+/website/.site-docs/
+/website/build/
+
+# Operating-system files
+.DS_Store
+Thumbs.db

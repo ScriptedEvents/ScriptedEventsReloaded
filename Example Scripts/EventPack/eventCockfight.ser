@@ -1,0 +1,189 @@
+# Event Pack worker. Start through the `event` command from eventManager.ser.
+
+func PrepareCockfightLoadout with @loadoutTargets $loadoutWeapon
+    ClearInventory @loadoutTargets destroy
+    GiveItem @loadoutTargets $loadoutWeapon
+    ForceEquip @loadoutTargets $loadoutWeapon
+end
+
+if {VarExists $serPackActive} is false
+    Print "Event Pack rejected a direct run of eventCockfight. Use the 'event' command."
+    stop
+end
+
+
+if {VarExists $serPackName} is false
+    Print "Event Pack rejected a direct run of eventCockfight. Use the 'event' command."
+    stop
+end
+
+
+if $serPackActive is false or $serPackName isnt "Cockfight"
+    Print "Event Pack rejected a direct run of eventCockfight. Use the 'event' command."
+    stop
+end
+
+
+if {VarExists @eventParticipants} is false
+    Print "Event Pack rejected a direct run of eventCockfight. Use the 'event' command."
+    stop
+end
+
+attempt
+    global $serPackPhase = "Przygotowanie rundy"
+    SetRoundLock true
+    SetLobbyLock false
+    SetFriendlyFire true
+    Decontamination disable
+    Warhead stop
+    Warhead lock
+    WaveRespawnTokens chaosWave set 0
+    WaveRespawnTokens miniChaosWave set 0
+    WaveRespawnTokens miniMtfWave set 0
+    WaveRespawnTokens mtfWave set 0
+    WaveRespawnTime chaosWave set 1h
+    WaveRespawnTime miniChaosWave set 1h
+    WaveRespawnTime miniMtfWave set 1h
+    WaveRespawnTime mtfWave set 1h
+    CleanupPickups
+    CleanupRagdolls
+    StartRound
+    wait 1s
+
+    SetRole @all Spectator None
+    wait 500ms
+    LockDoor Lcz173 AdminCommand
+
+    @queue = @eventParticipants
+    @champion = Take @queue 1
+    @queue = Except @queue @champion
+    $duelNumber = 0
+
+    Broadcast @all 8s "<size=32><color=#ff9f43><b>COCKFIGHT</b></color></size><br>Broń: {$eventWeapon}<br>Zwycięzca pojedynku walczy z następną osobą."
+
+    while {AmountOf @queue} > 0
+        @connectedChampion = Except @champion {Except @champion @all}
+        if {AmountOf @connectedChampion} is 0
+            @champion = Take @queue 1
+            @queue = Except @queue @champion
+            continue
+        end
+
+        @challenger = Take @queue 1
+        @queue = Except @queue @challenger
+        @connectedChallenger = Except @challenger {Except @challenger @all}
+        if {AmountOf @connectedChallenger} is 0
+            continue
+        end
+
+        $duelNumber = $duelNumber + 1
+        global $serPackPhase = "Pojedynek {$duelNumber}"
+        @duelists = Join @champion @challenger
+
+        SetRole @duelists ClassD None
+        wait 500ms
+        SetMaxHealth @duelists 100
+        SetHealth @duelists 100
+        SetGodMode @duelists true
+        GiveEffect @duelists Ensnared 7s
+        SetCustomInfo @champion "<color=#feca57>COCKFIGHT | OBROŃCA</color>"
+        SetCustomInfo @challenger "<color=#54a0ff>COCKFIGHT | WYZYWAJĄCY</color>"
+        run PrepareCockfightLoadout @duelists $eventWeapon
+        TPRoom @champion Lcz173 -3 1 0
+        TPRoom @challenger Lcz173 3 1 0
+
+        Broadcast @all 6s "<color=#ff9f43><b>POJEDYNEK {$duelNumber}</b></color><br>{@champion -> name} kontra {@challenger -> name}"
+        Countdown @duelists 6s "<color=#ff9f43><b>START ZA %seconds%...</b></color>"
+        wait 6s
+        ClearEffect @duelists Ensnared
+        SetGodMode @duelists false
+        ClearCountdown @duelists
+
+        $duelSeconds = 0
+        while $duelSeconds < 90
+            wait 1s
+            $duelSeconds = $duelSeconds + 1
+            @connectedDuelists = Except @duelists {Except @duelists @all}
+            @aliveDuelists = Filter @connectedDuelists isAlive true
+            @intruders = Except @alivePlayers @aliveDuelists
+
+            if {AmountOf @intruders} > 0
+                SetRole @intruders Spectator None
+            end
+
+            if {AmountOf @aliveDuelists} < 2
+                break
+            end
+        end
+
+        @connectedDuelists = Except @duelists {Except @duelists @all}
+        @aliveDuelists = Filter @connectedDuelists isAlive true
+
+        if {AmountOf @aliveDuelists} > 1
+            Broadcast @all 5s "<color=#ff6b6b><b>KONIEC CZASU</b></color><br>Wygrywa zawodnik z większą liczbą HP."
+            $championHealth = @champion -> health
+            $challengerHealth = @challenger -> health
+
+            if $championHealth > $challengerHealth
+                @duelWinner = @champion
+            elif $challengerHealth > $championHealth
+                @duelWinner = @challenger
+            else
+                @duelWinner = Take @aliveDuelists 1
+                Broadcast @all 4s "<color=#ffb347>Remis HP — zwycięzca pojedynku został wylosowany.</color>"
+            end
+
+            @duelLoser = Except @aliveDuelists @duelWinner
+            Kill @duelLoser "Cockfight: przegrana po limicie czasu"
+            wait 1s
+            @champion = @duelWinner
+        elif {AmountOf @aliveDuelists} is 1
+            @champion = @aliveDuelists
+        elif {AmountOf @connectedDuelists} > 0
+            @champion = Take @connectedDuelists 1
+            SetRole @champion ClassD None
+            wait 500ms
+            Broadcast @all 4s "<color=#ffb347>Obaj zawodnicy zginęli — gracz przechodzący dalej został wylosowany.</color>"
+        else
+            @champion = @empty
+        end
+
+        @connectedChampion = Except @champion {Except @champion @all}
+        if {AmountOf @connectedChampion} is 1
+            @connectedEliminated = Except @connectedDuelists @champion
+            if {AmountOf @connectedEliminated} > 0
+                SetCustomInfo @connectedEliminated ""
+            end
+
+            SetGodMode @champion true
+            SetMaxHealth @champion 100
+            SetHealth @champion 100
+            SetCustomInfo @champion "<color=#feca57>COCKFIGHT | OCZEKUJE</color>"
+            Broadcast @all 4s "<color=#2ed573>{@champion -> name} wygrywa pojedynek {$duelNumber}.</color>"
+            wait 3s
+        end
+    end
+
+    global $serPackPhase = "Zakończenie"
+    @connectedChampion = Except @champion {Except @champion @all}
+    if {AmountOf @connectedChampion} is 1
+        SetGodMode @champion true
+        SetCustomInfo @champion "<color=#2ed573><b>ZWYCIĘZCA COCKFIGHTU</b></color>"
+        Broadcast @all 9s "<size=34><color=#2ed573><b>ZWYCIĘZCA COCKFIGHTU</b></color></size><br>{@champion -> name}"
+    else
+        Broadcast @all 8s "<color=#ff6b6b><b>COCKFIGHT ZAKOŃCZONY BEZ ZWYCIĘZCY</b></color>"
+    end
+
+    wait 9s
+    SetCustomInfo @all ""
+    RestartRound
+on_error with $eventError $eventErrorType
+    global $serPackPhase = "Awaria — restart"
+    Print "Event Pack Cockfight error ({$eventErrorType}): {$eventError}" Red
+    Broadcast @all 7s "<color=#ff6b6b><b>COCKFIGHT ZATRZYMANY</b></color><br>Wystąpił błąd techniczny. Runda zostanie bezpiecznie zrestartowana."
+    SetCustomInfo @all ""
+    ClearEffect @all Ensnared
+    SetGodMode @all false
+    wait 7s
+    RestartRound
+end

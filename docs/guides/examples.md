@@ -16,6 +16,7 @@ old releases.
 | Store persistent-style data | [`coinTracker.ser`](../../Example%20Scripts/coinTracker.ser) |
 | Create custom roles | [`customRoles.ser`](../../Example%20Scripts/customRoles.ser) |
 | Build a larger multi-event system | [`zombieInfection.ser`](../../Example%20Scripts/zombieInfection.ser) |
+| Run whole-round administrator events | [`EventPack`](../../Example%20Scripts/EventPack) |
 
 Generate disabled copies on a server with:
 

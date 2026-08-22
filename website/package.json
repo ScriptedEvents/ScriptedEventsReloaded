@@ -5,11 +5,12 @@
   "description": "Public documentation and generated language reference for Scripted Events Reloaded",
   "scripts": {
     "sync:data": "node scripts/sync-data.mjs",
-    "prepare:site": "node scripts/prepare-site.mjs",
+    "prepare:site": "node scripts/prepare-site.mjs && node scripts/build-llms.mjs",
     "prestart": "npm run prepare:site",
     "start": "docusaurus start",
     "prebuild": "npm run prepare:site",
     "build": "docusaurus build",
+    "validate:llms": "node scripts/validate-llms.mjs",
     "serve": "docusaurus serve",
     "clear": "docusaurus clear"
   },

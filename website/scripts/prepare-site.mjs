@@ -72,6 +72,14 @@ function rewriteRepositoryLinks(content, relativeFilename) {
   rewritten = rewritten.replace(
     /(?:\.\.\/)+Example%20Scripts(?:\/([^\s)#]+))?/g,
     (_match, exampleFilename) => {
+      if (exampleFilename) {
+        const decodedFilename = decodeURIComponent(exampleFilename);
+        const repositoryTarget = path.join(repositoryDirectory, 'Example Scripts', ...decodedFilename.split('/'));
+        if (fs.statSync(repositoryTarget, {throwIfNoEntry: false})?.isDirectory()) {
+          const encodedPath = decodedFilename.split('/').map(encodeURIComponent).join('/');
+          return `https://github.com/ScriptedEvents/ScriptedEventsReloaded/tree/main/Example%20Scripts/${encodedPath}`;
+        }
+      }
       const target = exampleFilename
         ? `examples/${slug(decodeURIComponent(exampleFilename).replace(/\.(?:ser|txt)$/i, ''))}.md`
         : 'examples/index.md';

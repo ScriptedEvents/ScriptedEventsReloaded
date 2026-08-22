@@ -2,8 +2,22 @@
 
 This Docusaurus site publishes the Markdown in `../docs` without duplicating it.
 Its preparation step also generates searchable reference pages from
-`data/ser-truth-table.json`, turns every file in `../Example Scripts` into a
-cross-linked documentation page, and embeds the standalone SER Blocks editor.
+`data/ser-truth-table.json`, turns every top-level file in `../Example Scripts`
+into a cross-linked documentation page, and embeds the standalone SER Blocks
+editor.
+The same step publishes an AI-readable Markdown index, complete corpus, and
+truth table without changing the Docusaurus routes:
+
+- `/ScriptedEventsReloaded/llms.txt` indexes every generated Markdown page.
+- `/ScriptedEventsReloaded/llms/<route>.md` exposes the downloadable pages.
+- `/ScriptedEventsReloaded/llms-full.txt` concatenates the complete corpus.
+- `/ScriptedEventsReloaded/data/ser-truth-table.json` exposes the language data.
+
+There is no page-count or byte-size exclusion: every Markdown file prepared in
+`.site-docs`, including all generated reference and build-validated example
+pages, is included. `docs/SUMMARY.md` is also included in the AI corpus without
+adding a Docusaurus UI route, as are build-validated scripts in nested example
+directories. Docusaurus category metadata is not Markdown and is omitted.
 
 ## Local development
 
@@ -35,8 +49,10 @@ npm run sync:data
 ```powershell
 cd website
 npm run build
+npm run validate:llms
 ```
 
 GitHub Actions builds pull requests and deploys `main` to GitHub Pages. The
 workflow also rebuilds the standalone visual editor from the committed language
-manifest snapshot before Docusaurus runs.
+manifest snapshot before Docusaurus runs, then validates the machine-readable
+artifacts before uploading the Pages bundle.

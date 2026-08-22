@@ -55,6 +55,9 @@ jobs:
       - name: Build documentation
         run: npm run build --prefix website
 
+      - name: Validate machine-readable documentation
+        run: npm run validate:llms --prefix website
+
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v4

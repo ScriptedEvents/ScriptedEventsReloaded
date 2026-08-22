@@ -34,6 +34,10 @@ coverage/
 /website/static/assets/
 /website/static/ser-blocks/
 /website/static/img/
+/website/static/llms/
+/website/static/llms.txt
+/website/static/llms-full.txt
+/website/static/data/
 /website/.docusaurus/
 /website/.site-docs/
 /website/build/

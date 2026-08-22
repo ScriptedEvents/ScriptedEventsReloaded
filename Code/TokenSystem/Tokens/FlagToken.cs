@@ -13,5 +13,9 @@ public class FlagToken : BaseToken, IContextableToken
             : new Ignore();
     }
 
-    public RunnableContext? GetContext(Script scr) => null;   
+    public RunnableContext GetContext(Script scr) => new SER.Code.ContextSystem.Contexts.FlagContext
+    {
+        LineNum = LineNum,
+        Script = scr,
+    };
 }

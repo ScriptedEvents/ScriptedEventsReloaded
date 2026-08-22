@@ -21,7 +21,7 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
         new DurationArgument("duration"),
         new TextArgument("content")
         {
-            Description = 
+            Description =
                 "Use <charwait=x> and </charwait> tags to specify how much time each character will take to be printed, " +
                 "or <wait=x> to specify a single wait action. " +
                 "Example: \"<charwait=100ms>Slow print</charwait><br><wait=2s>waited 2 seconds for that!\""
@@ -32,23 +32,23 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
             DefaultValue = new(60, null)
         }
     ];
-    
+
     public override void Execute()
     {
         var players = Args.GetPlayers("players");
         var content = Args.GetText("content");
         var duration = Args.GetDuration("duration").TotalSeconds;
         var lineBreakLength = Args.GetInt("line break length");
-        
+
         foreach (var plr in players)
         {
             plr.Connection.Send(new CassieTtsPayload(string.Empty, string.Empty, false));
             plr.SendCassieMessage(
-                $"$SLEEP_{duration-1} .", 
+                $"$SLEEP_{duration-1} .",
                 Helper.FormatToCassieCentralScreenSubtitles(
-                    content, 
+                    content,
                     lineBreakLength
-                ), 
+                ),
                 false,
                 0
             );
@@ -58,7 +58,7 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
     public string AdditionalDescription =>
         "Uses CASSIE to make an animated broadcast - if there is CASSIE playing, it will be stopped. " +
         "Keep custom formatting to a minimum, this system is very limited.";
-    
+
     public static class Helper
     {
         public static string FormatToRawCassieSubtitles(string text, int lineBreakLength)
@@ -66,7 +66,7 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
             var result = new StringBuilder();
             var index = 72;
             var timePerCharStack = new Stack<TimeSpan>();
-        
+
             foreach (var line in text.Split('\n'))
             {
                 // Skip empty lines
@@ -75,11 +75,11 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
                     index -= 1;
                     continue;
                 }
-        
+
                 // Calculate actual length excluding HTML tags
                 var len = CalculateTextLength(line);
                 var parts = new List<string>();
-        
+
                 // Split long lines
                 if (len > lineBreakLength)
                 {
@@ -89,7 +89,7 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
                 {
                     parts.Add(line);
                 }
-        
+
                 // Add all parts to result with proper formatting
                 foreach (var part in parts)
                 {
@@ -97,15 +97,15 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
                     result.Append(FormatLine(part, index, timePerCharStack));
                 }
             }
-        
+
             return result.ToString();
         }
-        
+
         private static int CalculateTextLength(string line)
         {
             var len = 0;
             var isTag = false;
-        
+
             foreach (var c in line)
             {
                 switch (c)
@@ -117,17 +117,17 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
                         isTag = false;
                         continue;
                 }
-        
+
                 if (!isTag) len++;
             }
-        
+
             return len;
         }
-        
+
         private static void SplitLongLine(string line, List<string> parts, int lineBreakLength)
         {
             int? lastUnusedSpaceIndex = null;
-            
+
             for (var i = 0; i < line.Length; i++)
             {
                 if (!char.IsWhiteSpace(line[i])) continue;
@@ -137,11 +137,11 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
                     lastUnusedSpaceIndex = i;
                     continue;
                 }
-                
+
                 var lastAvailableSpaceIndex = lastUnusedSpaceIndex ?? i;
                 var leftPart = line[..lastAvailableSpaceIndex].Trim();
                 parts.Add(leftPart);
-                
+
                 var rightPart = line[(lastAvailableSpaceIndex + 1)..].Trim();
                 if (CalculateTextLength(rightPart) > lineBreakLength)
                 {
@@ -151,10 +151,10 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
                 {
                     parts.Add(rightPart);
                 }
-                
+
                 return;
             }
-            
+
             parts.Add(line);
         }
 
@@ -163,12 +163,12 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
             var dots = new string('c', (int)Math.Round(time.TotalMilliseconds / 20, MidpointRounding.AwayFromZero));
             return $"<size=0>{dots}</size>";
         }
-        
+
         private static string FormatLine(string text, int index, Stack<TimeSpan> activeDelayTags)
         {
             var openTags = new Regex(@"<charwait=((\d|\.)+(ms|s))>").Matches(text).Cast<Match>().ToArray();
             var closeTags = new Regex("</charwait>").Matches(text).Cast<Match>().ToArray();
-            
+
             StringBuilder newText = new();
             var isTag = false;
             for (int i = 0; i < text.Length; i++)
@@ -183,18 +183,17 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
 
                 if (openTags.FirstOrDefault(t => t.Index == i) is { } openTag)
                 {
-                    if (DurationToken.Parse(openTag.Groups[1].Value).HasErrored(out _, out var nullableTimeSpan)
-                        || nullableTimeSpan is not { } timeSpan)
+                    if (DurationToken.Parse(openTag.Groups[1].Value) is not { } timeSpan)
                     {
                         newText.Append(c);
                         continue;
                     }
-                    
+
                     activeDelayTags.Push(timeSpan);
                     i = openTag.Index + openTag.Length - 1;
                     continue;
                 }
-                
+
                 if (closeTags.FirstOrDefault(t => t.Index == i) is { } closeTag)
                 {
                     if (activeDelayTags.Count == 0)
@@ -202,12 +201,12 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
                         newText.Append(c);
                         continue;
                     }
-                    
+
                     activeDelayTags.Pop();
                     i = closeTag.Index + closeTag.Length - 1;
                     continue;
                 }
-                
+
                 isTag = c switch
                 {
                     '<' => true,
@@ -227,15 +226,14 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
 
             foreach (var match in new Regex(@"<wait=(\d+(ms|s))>").Matches(newText.ToString()).Cast<Match>().ToArray())
             {
-                if (DurationToken.Parse(match.Groups[1].Value).HasErrored(out _, out var nullableTimeSpan)
-                    || nullableTimeSpan is not { } timeSpan)
+                if (DurationToken.Parse(match.Groups[1].Value) is not { } timeSpan)
                 {
                     continue;
                 }
-                
+
                 newText.Replace(match.Value, GetDelayString(timeSpan));
             }
-            
+
             return $"<voffset={index}em>{newText}</voffset>\\n";
         }
 

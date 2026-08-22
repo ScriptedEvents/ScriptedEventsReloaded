@@ -22,6 +22,6 @@
   - [Optional integrations](guides/integrations.md)
   - [Debugging](guides/debugging.md)
   - [Validated examples](guides/examples.md)
-  - [Event Pack: Deathmatch and Cockfight](guides/event-pack.md)
+  - [Event Pack: Deathmatch and Duel](guides/event-pack.md)
 - [Translation policy](translations.md)
 - [Language specification](../language_specification.md)

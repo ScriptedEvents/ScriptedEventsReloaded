@@ -107,14 +107,13 @@ if $serPackActive is false or $serPackName isnt "Deathmatch"
     stop
 end
 
-
 if {VarExists @eventParticipants} is false
     Print "Event Pack rejected a direct run of eventDeathmatch. Use the 'event' command."
     stop
 end
 
 attempt
-    global $serPackPhase = "Przygotowanie rundy"
+    global $serPackPhase = "Preparing round"
     SetRoundLock true
     SetLobbyLock false
     Decontamination disable
@@ -132,6 +131,15 @@ attempt
     CleanupRagdolls
     StartRound
     wait 1s
+
+    @eventParticipants = Except @eventParticipants {Except @eventParticipants @all}
+    if {AmountOf @eventParticipants} < 2
+        global $serPackPhase = "Cancelled — restarting"
+        Broadcast @all 5s "<color=#ff6b6b><b>DEATHMATCH CANCELLED</b></color><br>Fewer than two participants remain connected. The round will restart."
+        wait 5s
+        RestartRound
+        stop
+    end
 
     @nonParticipants = Except @all @eventParticipants
     if {AmountOf @nonParticipants} > 0
@@ -154,8 +162,8 @@ attempt
         run SpawnDeathmatchFfa @eventParticipants $eventZone
         run LockDeathmatchZone $eventZone
 
-        Broadcast @all 8s "<size=30><color=#ffd166><b>DEATHMATCH — FFA</b></color></size><br>Strefa: {$eventZone} | Broń: {$eventWeapon}<br>Wygrywa ostatni żywy gracz."
-        Countdown @eventParticipants 7s "<color=#ffd166><b>WALKA ZA %seconds%...</b></color>"
+        Broadcast @all 8s "<size=30><color=#ffd166><b>DEATHMATCH — FFA</b></color></size><br>Zone: {$eventZone} | Weapon: {$eventWeapon}<br>The last player alive wins."
+        Countdown @eventParticipants 7s "<color=#ffd166><b>FIGHT STARTS IN %seconds%...</b></color>"
         wait 7s
         ClearEffect @eventParticipants Ensnared
         SetGodMode @eventParticipants false
@@ -184,8 +192,8 @@ attempt
             @aliveEventPlayers = Filter @connectedParticipants isAlive true
 
             if {AmountOf @aliveEventPlayers} > 1
-                global $serPackPhase = "Nagła śmierć FFA"
-                Broadcast @all 6s "<color=#ff6b6b><b>NAGŁA ŚMIERĆ</b></color><br>Każdy pozostały gracz ma teraz 1 HP."
+                global $serPackPhase = "FFA sudden death"
+                Broadcast @all 6s "<color=#ff6b6b><b>SUDDEN DEATH</b></color><br>Every remaining player now has 1 HP."
                 SetMaxHealth @aliveEventPlayers 1
                 SetHealth @aliveEventPlayers 1
 
@@ -205,11 +213,11 @@ attempt
                 @winner = @aliveEventPlayers
             elif {AmountOf @aliveEventPlayers} > 1
                 @winner = Take @aliveEventPlayers 1
-                Broadcast @all 5s "<color=#ffb347>Limit czasu minął — zwycięzca został wylosowany spośród ocalałych.</color>"
+                Broadcast @all 5s "<color=#ffb347>The time limit expired — the winner was selected at random from the survivors.</color>"
             end
         end
     else
-        global $serPackPhase = "Deathmatch drużynowy"
+        global $serPackPhase = "Team Deathmatch"
         SetFriendlyFire false
         $participantCount = AmountOf @eventParticipants
         $blueCount = Round ($participantCount / 2)
@@ -223,14 +231,14 @@ attempt
         GiveEffect @eventParticipants Ensnared 8s
         SetMaxHealth @eventParticipants 100
         SetHealth @eventParticipants 100
-        SetCustomInfo @blueTeam "<color=#70a1ff>DEATHMATCH | NIEBIESCY</color>"
-        SetCustomInfo @redTeam "<color=#ff6b6b>DEATHMATCH | CZERWONI</color>"
+        SetCustomInfo @blueTeam "<color=#70a1ff>DEATHMATCH | BLUE</color>"
+        SetCustomInfo @redTeam "<color=#ff6b6b>DEATHMATCH | RED</color>"
         run PrepareDeathmatchLoadout @eventParticipants $eventWeapon
         run SpawnDeathmatchTeams @blueTeam @redTeam $eventZone
         run LockDeathmatchZone $eventZone
 
-        Broadcast @all 8s "<size=30><color=#70a1ff><b>DEATHMATCH — TEAM</b></color></size><br>Strefa: {$eventZone} | Broń: {$eventWeapon}<br>Zwycięska drużyna przejdzie do finału FFA."
-        Countdown @eventParticipants 7s "<color=#70a1ff><b>WALKA ZA %seconds%...</b></color>"
+        Broadcast @all 8s "<size=30><color=#70a1ff><b>DEATHMATCH — TEAM</b></color></size><br>Zone: {$eventZone} | Weapon: {$eventWeapon}<br>The winning team advances to an FFA final."
+        Countdown @eventParticipants 7s "<color=#70a1ff><b>FIGHT STARTS IN %seconds%...</b></color>"
         wait 7s
         ClearEffect @eventParticipants Ensnared
         SetGodMode @eventParticipants false
@@ -270,10 +278,10 @@ attempt
             @finalists = @aliveRed
         elif $aliveBlueCount > $aliveRedCount
             @finalists = @aliveBlue
-            Broadcast @all 5s "<color=#70a1ff>Niebiescy wygrywają etap drużynowy liczbą ocalałych.</color>"
+            Broadcast @all 5s "<color=#70a1ff>Blue wins the team stage with more survivors.</color>"
         elif $aliveRedCount > $aliveBlueCount
             @finalists = @aliveRed
-            Broadcast @all 5s "<color=#ff6b6b>Czerwoni wygrywają etap drużynowy liczbą ocalałych.</color>"
+            Broadcast @all 5s "<color=#ff6b6b>Red wins the team stage with more survivors.</color>"
         elif $aliveBlueCount > 0
             @tiePlayer = Take {Join @aliveBlue @aliveRed} 1
             if {Contains @aliveBlue @tiePlayer}
@@ -281,13 +289,13 @@ attempt
             else
                 @finalists = @aliveRed
             end
-            Broadcast @all 5s "<color=#ffb347>Remis po limicie czasu — drużyna finalistów została wylosowana.</color>"
+            Broadcast @all 5s "<color=#ffb347>The survivor count is tied — the finalist team was selected at random.</color>"
         end
 
         if {AmountOf @finalists} is 1
             @winner = @finalists
         elif {AmountOf @finalists} > 1
-            global $serPackPhase = "Finał zwycięskiej drużyny"
+            global $serPackPhase = "Winning team final"
             SetFriendlyFire true
             SetGodMode @finalists true
             SetRole @finalists ClassD None
@@ -295,12 +303,12 @@ attempt
             SetMaxHealth @finalists 100
             SetHealth @finalists 100
             GiveEffect @finalists Ensnared 8s
-            SetCustomInfo @finalists "<color=#c56cf0>DEATHMATCH | FINAŁ FFA</color>"
+            SetCustomInfo @finalists "<color=#c56cf0>DEATHMATCH | FFA FINAL</color>"
             run PrepareDeathmatchLoadout @finalists $eventWeapon
             run SpawnDeathmatchFinal @finalists $eventZone
 
-            Broadcast @all 8s "<size=30><color=#c56cf0><b>FINAŁ FFA</b></color></size><br>Zwycięska drużyna walczy teraz między sobą."
-            Countdown @finalists 7s "<color=#c56cf0><b>FINAŁ ZA %seconds%...</b></color>"
+            Broadcast @all 8s "<size=30><color=#c56cf0><b>FFA FINAL</b></color></size><br>The winning team's survivors now fight each other."
+            Countdown @finalists 7s "<color=#c56cf0><b>FINAL STARTS IN %seconds%...</b></color>"
             wait 7s
             ClearEffect @finalists Ensnared
             SetGodMode @finalists false
@@ -323,27 +331,27 @@ attempt
                 @winner = @aliveFinalists
             elif {AmountOf @aliveFinalists} > 1
                 @winner = Take @aliveFinalists 1
-                Broadcast @all 5s "<color=#ffb347>Limit finału minął — zwycięzca został wylosowany.</color>"
+                Broadcast @all 5s "<color=#ffb347>The final's time limit expired — the winner was selected at random.</color>"
             end
         end
     end
 
-    global $serPackPhase = "Zakończenie"
+    global $serPackPhase = "Finishing"
     if {AmountOf @winner} is 1
         SetGodMode @winner true
-        SetCustomInfo @winner "<color=#2ed573><b>ZWYCIĘZCA DEATHMATCHU</b></color>"
-        Broadcast @all 9s "<size=34><color=#2ed573><b>ZWYCIĘZCA DEATHMATCHU</b></color></size><br>{@winner -> name}"
+        SetCustomInfo @winner "<color=#2ed573><b>DEATHMATCH WINNER</b></color>"
+        Broadcast @all 9s "<size=34><color=#2ed573><b>DEATHMATCH WINNER</b></color></size><br>{@winner -> name}"
     else
-        Broadcast @all 8s "<color=#ff6b6b><b>DEATHMATCH ZAKOŃCZONY BEZ ZWYCIĘZCY</b></color>"
+        Broadcast @all 8s "<color=#ff6b6b><b>DEATHMATCH ENDED WITHOUT A WINNER</b></color>"
     end
 
     wait 9s
     SetCustomInfo @all ""
     RestartRound
 on_error with $eventError $eventErrorType
-    global $serPackPhase = "Awaria — restart"
+    global $serPackPhase = "Failure — restarting"
     Print "Event Pack Deathmatch error ({$eventErrorType}): {$eventError}" Red
-    Broadcast @all 7s "<color=#ff6b6b><b>DEATHMATCH ZATRZYMANY</b></color><br>Wystąpił błąd techniczny. Runda zostanie bezpiecznie zrestartowana."
+    Broadcast @all 7s "<color=#ff6b6b><b>DEATHMATCH STOPPED</b></color><br>A technical error occurred. The round will restart safely."
     SetCustomInfo @all ""
     ClearEffect @all Ensnared
     SetGodMode @all false

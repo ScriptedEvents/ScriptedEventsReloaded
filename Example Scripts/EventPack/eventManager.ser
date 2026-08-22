@@ -5,7 +5,7 @@
 -- availableFor RemoteAdmin Server
 -- description "Starts and controls the build-validated SER Event Pack."
 -- neededPermission serverevent.manage
--- noPermissionMessage "Nie masz uprawnienia serverevent.manage."
+-- noPermissionMessage "You do not have the serverevent.manage permission."
 -- arguments action eventName? optionOne? optionTwo? optionThree?
 
 func $DeathmatchWeapon with $rawWeapon
@@ -62,78 +62,78 @@ if {VarExists $optionTwo}
 end
 
 if $action is "list" or $action is "help"
-    Reply "EVENT PACK | deathmatch (dm), cockfight (cock)<br>Start: event start deathmatch [ffa/team] [lcz/hcz/entrance] [weapon]<br>Start: event start cockfight [Jailbird/SCP1509]<br>Control: event status | event stop confirm"
+    Reply "EVENT PACK | deathmatch (dm), duel<br>Start: event start deathmatch [ffa/team] [lcz/hcz/entrance] [weapon]<br>Start: event start duel [Jailbird/SCP1509]<br>Control: event status | event stop confirm"
     stop
 end
 
 if $action is "status"
     if {VarExists $serPackActive} is false
-        Reply "EVENT PACK | Żaden event nie jest aktywny."
+        Reply "EVENT PACK | No event is active."
         stop
     end
 
     if $serPackActive is false
-        Reply "EVENT PACK | Żaden event nie jest aktywny."
+        Reply "EVENT PACK | No event is active."
         stop
     end
 
-    Reply "EVENT PACK | Aktywny: {$serPackName} | Etap: {$serPackPhase}"
+    Reply "EVENT PACK | Active: {$serPackName} | Phase: {$serPackPhase}"
     stop
 end
 
 if $action is "stop"
     if {VarExists $serPackActive} is false
-        Reply "EVENT PACK | Nie ma aktywnego eventu."
+        Reply "EVENT PACK | No event is active."
         stop
     end
 
     if $serPackActive is false
-        Reply "EVENT PACK | Nie ma aktywnego eventu."
+        Reply "EVENT PACK | No event is active."
         stop
     end
 
     if {VarExists $eventName} is false
-        Reply "EVENT PACK | Ta operacja restartuje rundę. Użyj: event stop confirm"
+        Reply "EVENT PACK | This operation restarts the round. Use: event stop confirm"
         stop
     end
 
     if $eventName isnt "confirm"
-        Reply "EVENT PACK | Ta operacja restartuje rundę. Użyj: event stop confirm"
+        Reply "EVENT PACK | This operation restarts the round. Use: event stop confirm"
         stop
     end
 
-    Broadcast @all 5s "<color=#ff6b6b><b>EVENT PRZERWANY</b></color><br>Administrator zatrzymał event. Runda zostanie zrestartowana."
+    Broadcast @all 5s "<color=#ff6b6b><b>EVENT CANCELLED</b></color><br>An administrator stopped the event. The round will restart."
     SetCustomInfo @all ""
-    Reply "EVENT PACK | Zatrzymywanie eventu i restart rundy."
+    Reply "EVENT PACK | Stopping the event and restarting the round."
     wait 2s
     RestartRound
     stop
 end
 
 if $action isnt "start"
-    Reply "EVENT PACK | Nieznana akcja. Użyj: event list"
+    Reply "EVENT PACK | Unknown action. Use: event list"
     stop
 end
 
 if {VarExists $eventName} is false
-    Reply "EVENT PACK | Brakuje nazwy eventu. Użyj: event list"
+    Reply "EVENT PACK | Missing event name. Use: event list"
     stop
 end
 
 if {VarExists $serPackActive}
     if $serPackActive
-        Reply "EVENT PACK | Event {$serPackName} już działa (etap: {$serPackPhase})."
+        Reply "EVENT PACK | {$serPackName} is already running (phase: {$serPackPhase})."
         stop
     end
 end
 
 if {RoundInfo hasStarted}
-    Reply "EVENT PACK | Event można uruchomić wyłącznie z lobby przed rozpoczęciem rundy."
+    Reply "EVENT PACK | Events can only be started from the pre-round lobby."
     stop
 end
 
 if {RoundInfo hasEnded}
-    Reply "EVENT PACK | Runda właśnie się kończy. Zaczekaj na nowe lobby."
+    Reply "EVENT PACK | The round is ending. Wait for the next lobby."
     stop
 end
 
@@ -147,11 +147,11 @@ if {VarExists @sender}
 end
 
 if {AmountOf @eventParticipants} < 2
-    Reply "EVENT PACK | Potrzeba co najmniej 2 uczestników (organizator nie jest liczony)."
+    Reply "EVENT PACK | At least two participants are required (the organizer is not included)."
     stop
 end
 
-if $eventName is "deathmatch" or $eventName is "deadmatch" or $eventName is "dm"
+if $eventName is "deathmatch" or $eventName is "dm"
     $eventMode = "ffa"
     $eventZone = "hcz"
     $eventWeapon = "GunAK"
@@ -162,7 +162,7 @@ if $eventName is "deathmatch" or $eventName is "deadmatch" or $eventName is "dm"
         elif $optionOne is "team" or $optionOne is "teams"
             $eventMode = "team"
         else
-            Reply "EVENT PACK | Tryb musi mieć wartość ffa albo team."
+            Reply "EVENT PACK | Mode must be ffa or team."
             stop
         end
     end
@@ -175,7 +175,7 @@ if $eventName is "deathmatch" or $eventName is "deadmatch" or $eventName is "dm"
         elif $optionTwo is "entrance" or $optionTwo is "ez"
             $eventZone = "entrance"
         else
-            Reply "EVENT PACK | Strefa musi mieć wartość lcz, hcz albo entrance."
+            Reply "EVENT PACK | Zone must be lcz, hcz, or entrance."
             stop
         end
     end
@@ -183,14 +183,14 @@ if $eventName is "deathmatch" or $eventName is "deadmatch" or $eventName is "dm"
     if {VarExists $optionThree}
         $eventWeapon = run $DeathmatchWeapon $optionThree
         if $eventWeapon is "invalid"
-            Reply "EVENT PACK | Nieobsługiwana broń. Użyj pełnej nazwy ItemType albo skrótu: AK, E11, Crossvec, FSP9, Logicer, Shotgun, Revolver, COM15, COM18, COM45, FRMG0, A7, Particle, Micro, Jailbird, SCP127, SCP1509."
+            Reply "EVENT PACK | Unsupported weapon. Use a full ItemType name or one of these short names: AK, E11, Crossvec, FSP9, Logicer, Shotgun, Revolver, COM15, COM18, COM45, FRMG0, A7, Particle, Micro, Jailbird, SCP127, SCP1509."
             stop
         end
     end
 
     global $serPackActive = true
     global $serPackName = "Deathmatch"
-    global $serPackPhase = "Uruchamianie"
+    global $serPackPhase = "Starting"
 
     attempt
         RunScript eventDeathmatch @eventParticipants $eventMode $eventZone $eventWeapon
@@ -198,16 +198,26 @@ if $eventName is "deathmatch" or $eventName is "deadmatch" or $eventName is "dm"
         delete $serPackActive
         delete $serPackName
         delete $serPackPhase
-        Reply "EVENT PACK | Nie udało się uruchomić Deathmatchu: {$startError}"
+        Reply "EVENT PACK | Failed to start Deathmatch: {$startError}"
         stop
     end
 
-    Reply "EVENT PACK | Uruchomiono Deathmatch: {$eventMode}, {$eventZone}, {$eventWeapon}."
+    Reply "EVENT PACK | Started Deathmatch: {$eventMode}, {$eventZone}, {$eventWeapon}."
     stop
 end
 
-if $eventName is "cockfight" or $eventName is "cock"
+if $eventName is "duel"
     $eventWeapon = "Jailbird"
+
+    if {VarExists $optionTwo}
+        Reply "EVENT PACK | Duel accepts one weapon option. Use: event start duel [Jailbird/SCP1509]"
+        stop
+    end
+
+    if {VarExists $optionThree}
+        Reply "EVENT PACK | Duel accepts one weapon option. Use: event start duel [Jailbird/SCP1509]"
+        stop
+    end
 
     if {VarExists $optionOne}
         if $optionOne is "jailbird"
@@ -215,27 +225,27 @@ if $eventName is "cockfight" or $eventName is "cock"
         elif $optionOne is "scp1509" or $optionOne is "1509"
             $eventWeapon = "SCP1509"
         else
-            Reply "EVENT PACK | Broń Cockfightu musi mieć wartość Jailbird albo SCP1509."
+            Reply "EVENT PACK | Duel weapon must be Jailbird or SCP1509."
             stop
         end
     end
 
     global $serPackActive = true
-    global $serPackName = "Cockfight"
-    global $serPackPhase = "Uruchamianie"
+    global $serPackName = "Duel"
+    global $serPackPhase = "Starting"
 
     attempt
-        RunScript eventCockfight @eventParticipants $eventWeapon
+        RunScript eventDuel @eventParticipants $eventWeapon
     on_error with $startError
         delete $serPackActive
         delete $serPackName
         delete $serPackPhase
-        Reply "EVENT PACK | Nie udało się uruchomić Cockfightu: {$startError}"
+        Reply "EVENT PACK | Failed to start Duel: {$startError}"
         stop
     end
 
-    Reply "EVENT PACK | Uruchomiono Cockfight z bronią {$eventWeapon}."
+    Reply "EVENT PACK | Started Duel with {$eventWeapon}."
     stop
 end
 
-Reply "EVENT PACK | Nieznany event. Użyj: event list"
+Reply "EVENT PACK | Unknown event. Use: event list"

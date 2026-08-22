@@ -1,36 +1,33 @@
 # Event Pack worker. Start through the `event` command from eventManager.ser.
 
-func PrepareCockfightLoadout with @loadoutTargets $loadoutWeapon
+func PrepareDuelLoadout with @loadoutTargets $loadoutWeapon
     ClearInventory @loadoutTargets destroy
     GiveItem @loadoutTargets $loadoutWeapon
     ForceEquip @loadoutTargets $loadoutWeapon
 end
 
 if {VarExists $serPackActive} is false
-    Print "Event Pack rejected a direct run of eventCockfight. Use the 'event' command."
+    Print "Event Pack rejected a direct run of eventDuel. Use the 'event' command."
     stop
 end
-
 
 if {VarExists $serPackName} is false
-    Print "Event Pack rejected a direct run of eventCockfight. Use the 'event' command."
+    Print "Event Pack rejected a direct run of eventDuel. Use the 'event' command."
     stop
 end
 
-
-if $serPackActive is false or $serPackName isnt "Cockfight"
-    Print "Event Pack rejected a direct run of eventCockfight. Use the 'event' command."
+if $serPackActive is false or $serPackName isnt "Duel"
+    Print "Event Pack rejected a direct run of eventDuel. Use the 'event' command."
     stop
 end
-
 
 if {VarExists @eventParticipants} is false
-    Print "Event Pack rejected a direct run of eventCockfight. Use the 'event' command."
+    Print "Event Pack rejected a direct run of eventDuel. Use the 'event' command."
     stop
 end
 
 attempt
-    global $serPackPhase = "Przygotowanie rundy"
+    global $serPackPhase = "Preparing round"
     SetRoundLock true
     SetLobbyLock false
     SetFriendlyFire true
@@ -50,6 +47,15 @@ attempt
     StartRound
     wait 1s
 
+    @eventParticipants = Except @eventParticipants {Except @eventParticipants @all}
+    if {AmountOf @eventParticipants} < 2
+        global $serPackPhase = "Cancelled — restarting"
+        Broadcast @all 5s "<color=#ff6b6b><b>DUEL CANCELLED</b></color><br>Fewer than two participants remain connected. The round will restart."
+        wait 5s
+        RestartRound
+        stop
+    end
+
     SetRole @all Spectator None
     wait 500ms
     LockDoor Lcz173 AdminCommand
@@ -59,7 +65,7 @@ attempt
     @queue = Except @queue @champion
     $duelNumber = 0
 
-    Broadcast @all 8s "<size=32><color=#ff9f43><b>COCKFIGHT</b></color></size><br>Broń: {$eventWeapon}<br>Zwycięzca pojedynku walczy z następną osobą."
+    Broadcast @all 8s "<size=32><color=#ff9f43><b>DUEL</b></color></size><br>Weapon: {$eventWeapon}<br>The winner stays in the arena to face the next challenger."
 
     while {AmountOf @queue} > 0
         @connectedChampion = Except @champion {Except @champion @all}
@@ -77,7 +83,7 @@ attempt
         end
 
         $duelNumber = $duelNumber + 1
-        global $serPackPhase = "Pojedynek {$duelNumber}"
+        global $serPackPhase = "Duel {$duelNumber}"
         @duelists = Join @champion @challenger
 
         SetRole @duelists ClassD None
@@ -86,14 +92,14 @@ attempt
         SetHealth @duelists 100
         SetGodMode @duelists true
         GiveEffect @duelists Ensnared 7s
-        SetCustomInfo @champion "<color=#feca57>COCKFIGHT | OBROŃCA</color>"
-        SetCustomInfo @challenger "<color=#54a0ff>COCKFIGHT | WYZYWAJĄCY</color>"
-        run PrepareCockfightLoadout @duelists $eventWeapon
+        SetCustomInfo @champion "<color=#feca57>DUEL | DEFENDER</color>"
+        SetCustomInfo @challenger "<color=#54a0ff>DUEL | CHALLENGER</color>"
+        run PrepareDuelLoadout @duelists $eventWeapon
         TPRoom @champion Lcz173 -3 1 0
         TPRoom @challenger Lcz173 3 1 0
 
-        Broadcast @all 6s "<color=#ff9f43><b>POJEDYNEK {$duelNumber}</b></color><br>{@champion -> name} kontra {@challenger -> name}"
-        Countdown @duelists 6s "<color=#ff9f43><b>START ZA %seconds%...</b></color>"
+        Broadcast @all 6s "<color=#ff9f43><b>DUEL {$duelNumber}</b></color><br>{@champion -> name} versus {@challenger -> name}"
+        Countdown @duelists 6s "<color=#ff9f43><b>STARTING IN %seconds%...</b></color>"
         wait 6s
         ClearEffect @duelists Ensnared
         SetGodMode @duelists false
@@ -120,7 +126,7 @@ attempt
         @aliveDuelists = Filter @connectedDuelists isAlive true
 
         if {AmountOf @aliveDuelists} > 1
-            Broadcast @all 5s "<color=#ff6b6b><b>KONIEC CZASU</b></color><br>Wygrywa zawodnik z większą liczbą HP."
+            Broadcast @all 5s "<color=#ff6b6b><b>TIME LIMIT REACHED</b></color><br>The duelist with more HP wins."
             $championHealth = @champion -> health
             $challengerHealth = @challenger -> health
 
@@ -130,11 +136,11 @@ attempt
                 @duelWinner = @challenger
             else
                 @duelWinner = Take @aliveDuelists 1
-                Broadcast @all 4s "<color=#ffb347>Remis HP — zwycięzca pojedynku został wylosowany.</color>"
+                Broadcast @all 4s "<color=#ffb347>HP is tied — the duel winner was selected at random.</color>"
             end
 
             @duelLoser = Except @aliveDuelists @duelWinner
-            Kill @duelLoser "Cockfight: przegrana po limicie czasu"
+            Kill @duelLoser "Duel: lost on time"
             wait 1s
             @champion = @duelWinner
         elif {AmountOf @aliveDuelists} is 1
@@ -143,7 +149,7 @@ attempt
             @champion = Take @connectedDuelists 1
             SetRole @champion ClassD None
             wait 500ms
-            Broadcast @all 4s "<color=#ffb347>Obaj zawodnicy zginęli — gracz przechodzący dalej został wylosowany.</color>"
+            Broadcast @all 4s "<color=#ffb347>Both duelists died — the advancing player was selected at random.</color>"
         else
             @champion = @empty
         end
@@ -158,29 +164,29 @@ attempt
             SetGodMode @champion true
             SetMaxHealth @champion 100
             SetHealth @champion 100
-            SetCustomInfo @champion "<color=#feca57>COCKFIGHT | OCZEKUJE</color>"
-            Broadcast @all 4s "<color=#2ed573>{@champion -> name} wygrywa pojedynek {$duelNumber}.</color>"
+            SetCustomInfo @champion "<color=#feca57>DUEL | WAITING</color>"
+            Broadcast @all 4s "<color=#2ed573>{@champion -> name} wins duel {$duelNumber}.</color>"
             wait 3s
         end
     end
 
-    global $serPackPhase = "Zakończenie"
+    global $serPackPhase = "Finishing"
     @connectedChampion = Except @champion {Except @champion @all}
     if {AmountOf @connectedChampion} is 1
         SetGodMode @champion true
-        SetCustomInfo @champion "<color=#2ed573><b>ZWYCIĘZCA COCKFIGHTU</b></color>"
-        Broadcast @all 9s "<size=34><color=#2ed573><b>ZWYCIĘZCA COCKFIGHTU</b></color></size><br>{@champion -> name}"
+        SetCustomInfo @champion "<color=#2ed573><b>DUEL WINNER</b></color>"
+        Broadcast @all 9s "<size=34><color=#2ed573><b>DUEL WINNER</b></color></size><br>{@champion -> name}"
     else
-        Broadcast @all 8s "<color=#ff6b6b><b>COCKFIGHT ZAKOŃCZONY BEZ ZWYCIĘZCY</b></color>"
+        Broadcast @all 8s "<color=#ff6b6b><b>DUEL ENDED WITHOUT A WINNER</b></color>"
     end
 
     wait 9s
     SetCustomInfo @all ""
     RestartRound
 on_error with $eventError $eventErrorType
-    global $serPackPhase = "Awaria — restart"
-    Print "Event Pack Cockfight error ({$eventErrorType}): {$eventError}" Red
-    Broadcast @all 7s "<color=#ff6b6b><b>COCKFIGHT ZATRZYMANY</b></color><br>Wystąpił błąd techniczny. Runda zostanie bezpiecznie zrestartowana."
+    global $serPackPhase = "Failure — restarting"
+    Print "Event Pack Duel error ({$eventErrorType}): {$eventError}" Red
+    Broadcast @all 7s "<color=#ff6b6b><b>DUEL STOPPED</b></color><br>A technical error occurred. The round will restart safely."
     SetCustomInfo @all ""
     ClearEffect @all Ensnared
     SetGodMode @all false

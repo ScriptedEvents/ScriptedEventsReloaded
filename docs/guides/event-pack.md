@@ -1,8 +1,8 @@
-# Event Pack: Deathmatch and Cockfight
+# Event Pack: Deathmatch and Duel
 
 The build-validated `EventPack` examples provide whole-round events operated
 through one Remote Admin command. The first version contains Deathmatch and
-Cockfight and uses only built-in SER/LabAPI features. It does not require
+Duel and uses only built-in SER/LabAPI features. It does not require
 Callvote, EXILED, ProjectMER, UCR, or another optional integration.
 
 ## Enable the pack
@@ -34,7 +34,10 @@ Events can start only in the pre-round lobby. A player-backed administrator who
 runs the command is treated as the organizer and excluded from the participant
 list. A command run from the server console includes every eligible player.
 Overwatch players, NPCs, and dummies are always excluded. At least two
-participants are required.
+participants are required. Each worker checks the connected participant count
+again after starting the round. If fewer than two remain, the event announces
+the cancellation and safely restarts the round before assigning match roles or
+loadouts.
 
 ## Deathmatch
 
@@ -63,14 +66,14 @@ between NTF and Chaos and keeps friendly fire disabled. When one team wins,
 its survivors are moved to a smaller room, changed to a common role, and fight
 a final FFA as required by the event rules.
 
-## Cockfight
+## Duel
 
 Use one of the following:
 
 ```text
-event start cockfight
-event start cockfight Jailbird
-event start cockfight SCP1509
+event start duel
+event start duel Jailbird
+event start duel SCP1509
 ```
 
 Jailbird is the default. The script randomizes the queue. The winner of each

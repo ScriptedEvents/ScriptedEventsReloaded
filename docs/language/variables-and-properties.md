@@ -26,6 +26,22 @@ Predefined variables such as `@all`, `@alivePlayers`, and `@scpPlayers` are
 provided by SER. Event and command flags can inject additional local variables.
 Run `serhelp variables` for the current predefined list.
 
+## Player variable readiness
+
+Every read of a player variable checks its entries against LabAPI's
+`Player.ReadyList`. Entries which are not in that list are silently and
+permanently removed before the value reaches a method, property, loop, or
+argument. Ready dummy players remain; unauthenticated players, the host,
+non-ready NPCs, and disconnected wrappers do not. An empty player value is
+valid.
+
+The check compares the current player wrapper itself, not only an account or
+round ID. If somebody disconnects and reconnects, the new player is not restored
+to an older stored variable. Pruning also does not add later joiners or update a
+stored selection after role, team, or zone changes. Reassign a predefined player
+group when a fresh snapshot is required. Predefined groups are generated from
+the current ready-player list each time they are read.
+
 ## Text interpolation
 
 Inside quoted text, wrap a variable or expression in braces:

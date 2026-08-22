@@ -80,8 +80,8 @@ wait_until {AmountOf @scpPlayers} is 0
 Broadcast @all 5s "No living SCPs remain."
 ```
 
-After a long wait, remember that players may disconnect and item or room
-references may become invalid. Recheck important state before using it.
+After a long wait, remember that players may disconnect and item, room, or any 
+other references may become invalid.
 
 ## Try one change
 

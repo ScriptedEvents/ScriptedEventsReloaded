@@ -90,8 +90,10 @@ first or use a value which is guaranteed to identify one player:
 $name = @target -> name
 ```
 
-There is still one problem: `@alivePlayers` might be empty. The next lesson
-makes this safe by adding a decision before the property is read.
+There is still one problem: `@alivePlayers` might be empty, and a previously
+selected player might disconnect before the property is read. Automatic cleanup
+prevents a stale player from being used, but the next lesson still checks that
+exactly one player remains before reading the property.
 
 The reference has the full rules for [variable families and properties](../language/variables-and-properties.md).
 It saves the unusual details about visibility and lifetime for when you need

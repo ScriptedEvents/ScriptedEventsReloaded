@@ -44,6 +44,19 @@ but do not create separate access namespaces.
   and removed when the function call finishes. They are not stored in a separate
   lexical environment.
 
+### Player Variable Readiness
+
+Every player-variable read is sanitized against LabAPI's `Player.ReadyList`
+before its value reaches a method, property, loop, or argument. Players which
+are no longer ready are silently and permanently removed, and the variable may
+become empty. Ready dummy players remain; unauthenticated players, the host,
+non-ready NPCs, and disconnected wrappers are removed.
+
+Stored player variables are snapshots: cleanup does not add later joiners or
+re-evaluate role, team, or zone membership. A reconnect creates a new player
+wrapper and does not restore the old entry. Predefined player groups are rebuilt
+from the current ready-player list whenever they are read.
+
 ---
 
 ## 2. Text, Math, & Syntax

@@ -2540,6 +2540,48 @@
       ],
       "errors": []
     },
+    "Intersect": {
+      "syntax": "Intersect @first_value @other_values...",
+      "description": "Returns players that are present in every provided player variable.",
+      "subgroup": "PlayerValue",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": null,
+      "returns": "player value",
+      "arguments": [
+        {
+          "name": "first value",
+          "argumentKind": "PlayersArgument",
+          "mustBeProvided": true,
+          "type": "Player variable (e.g. @all, @classDPlayers)",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "@first_value",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "other values",
+          "argumentKind": "PlayersArgument",
+          "mustBeProvided": true,
+          "type": "Player variable (e.g. @all, @classDPlayers)",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": true,
+          "syntax": "@other_values...",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
     "Join": {
       "syntax": "Join @players...",
       "description": "Returns all players that were provided from multiple player variables.",

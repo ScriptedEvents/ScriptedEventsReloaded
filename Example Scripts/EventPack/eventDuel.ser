@@ -47,7 +47,7 @@ attempt
     StartRound
     wait 1s
 
-    @eventParticipants = Except @eventParticipants {Except @eventParticipants @all}
+    @eventParticipants = Intersect @eventParticipants @all
     if {AmountOf @eventParticipants} < 2
         global $serPackPhase = "Cancelled — restarting"
         Broadcast @all 5s "<color=#ff6b6b><b>DUEL CANCELLED</b></color><br>Fewer than two participants remain connected. The round will restart."
@@ -68,7 +68,7 @@ attempt
     Broadcast @all 8s "<size=32><color=#ff9f43><b>DUEL</b></color></size><br>Weapon: {$eventWeapon}<br>The winner stays in the arena to face the next challenger."
 
     while {AmountOf @queue} > 0
-        @connectedChampion = Except @champion {Except @champion @all}
+        @connectedChampion = Intersect @champion @all
         if {AmountOf @connectedChampion} is 0
             @champion = Take @queue 1
             @queue = Except @queue @champion
@@ -77,7 +77,7 @@ attempt
 
         @challenger = Take @queue 1
         @queue = Except @queue @challenger
-        @connectedChallenger = Except @challenger {Except @challenger @all}
+        @connectedChallenger = Intersect @challenger @all
         if {AmountOf @connectedChallenger} is 0
             continue
         end
@@ -109,7 +109,7 @@ attempt
         while $duelSeconds < 90
             wait 1s
             $duelSeconds = $duelSeconds + 1
-            @connectedDuelists = Except @duelists {Except @duelists @all}
+            @connectedDuelists = Intersect @duelists @all
             @aliveDuelists = Filter @connectedDuelists isAlive true
             @intruders = Except @alivePlayers @aliveDuelists
 
@@ -122,7 +122,7 @@ attempt
             end
         end
 
-        @connectedDuelists = Except @duelists {Except @duelists @all}
+        @connectedDuelists = Intersect @duelists @all
         @aliveDuelists = Filter @connectedDuelists isAlive true
 
         if {AmountOf @aliveDuelists} > 1
@@ -154,7 +154,7 @@ attempt
             @champion = @empty
         end
 
-        @connectedChampion = Except @champion {Except @champion @all}
+        @connectedChampion = Intersect @champion @all
         if {AmountOf @connectedChampion} is 1
             @connectedEliminated = Except @connectedDuelists @champion
             if {AmountOf @connectedEliminated} > 0
@@ -171,7 +171,7 @@ attempt
     end
 
     global $serPackPhase = "Finishing"
-    @connectedChampion = Except @champion {Except @champion @all}
+    @connectedChampion = Intersect @champion @all
     if {AmountOf @connectedChampion} is 1
         SetGodMode @champion true
         SetCustomInfo @champion "<color=#2ed573><b>DUEL WINNER</b></color>"

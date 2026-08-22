@@ -55,6 +55,18 @@ Heal @classDPlayers 20
 Heal @all 20
 ```
 
+Combine player groups with `Join`, `Except`, and `Intersect`. `Intersect` keeps
+only players that appear in every supplied group while preserving the order of
+the first group:
+
+```ser
+@connectedParticipants = Intersect @eventParticipants @all
+```
+
+This is useful when a stored group may contain players who have since
+disconnected. Additional players in `@all` are not added because they were not
+in `@eventParticipants`.
+
 Be careful when reading a property such as a name or health value. Those
 questions normally make sense for exactly one player, not a group. We will
 select one player and inspect them in the next lesson.

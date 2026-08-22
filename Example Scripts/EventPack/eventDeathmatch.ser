@@ -132,7 +132,7 @@ attempt
     StartRound
     wait 1s
 
-    @eventParticipants = Except @eventParticipants {Except @eventParticipants @all}
+    @eventParticipants = Intersect @eventParticipants @all
     if {AmountOf @eventParticipants} < 2
         global $serPackPhase = "Cancelled — restarting"
         Broadcast @all 5s "<color=#ff6b6b><b>DEATHMATCH CANCELLED</b></color><br>Fewer than two participants remain connected. The round will restart."
@@ -173,7 +173,7 @@ attempt
         while $fightSeconds < 900
             wait 1s
             $fightSeconds = $fightSeconds + 1
-            @connectedParticipants = Except @eventParticipants {Except @eventParticipants @all}
+            @connectedParticipants = Intersect @eventParticipants @all
             @aliveEventPlayers = Filter @connectedParticipants isAlive true
             @intruders = Except @alivePlayers @connectedParticipants
 
@@ -188,7 +188,7 @@ attempt
         end
 
         if {AmountOf @winner} is 0
-            @connectedParticipants = Except @eventParticipants {Except @eventParticipants @all}
+            @connectedParticipants = Intersect @eventParticipants @all
             @aliveEventPlayers = Filter @connectedParticipants isAlive true
 
             if {AmountOf @aliveEventPlayers} > 1
@@ -201,7 +201,7 @@ attempt
                 while $suddenSeconds < 60
                     wait 1s
                     $suddenSeconds = $suddenSeconds + 1
-                    @connectedParticipants = Except @eventParticipants {Except @eventParticipants @all}
+                    @connectedParticipants = Intersect @eventParticipants @all
                     @aliveEventPlayers = Filter @connectedParticipants isAlive true
                     if {AmountOf @aliveEventPlayers} < 2
                         break
@@ -248,8 +248,8 @@ attempt
         while $teamFightSeconds < 900
             wait 1s
             $teamFightSeconds = $teamFightSeconds + 1
-            @connectedBlue = Except @blueTeam {Except @blueTeam @all}
-            @connectedRed = Except @redTeam {Except @redTeam @all}
+            @connectedBlue = Intersect @blueTeam @all
+            @connectedRed = Intersect @redTeam @all
             @aliveBlue = Filter @connectedBlue isAlive true
             @aliveRed = Filter @connectedRed isAlive true
             @connectedParticipants = Join @connectedBlue @connectedRed
@@ -264,8 +264,8 @@ attempt
             end
         end
 
-        @connectedBlue = Except @blueTeam {Except @blueTeam @all}
-        @connectedRed = Except @redTeam {Except @redTeam @all}
+        @connectedBlue = Intersect @blueTeam @all
+        @connectedRed = Intersect @redTeam @all
         @aliveBlue = Filter @connectedBlue isAlive true
         @aliveRed = Filter @connectedRed isAlive true
         $aliveBlueCount = AmountOf @aliveBlue
@@ -318,14 +318,14 @@ attempt
             while $finalSeconds < 600
                 wait 1s
                 $finalSeconds = $finalSeconds + 1
-                @connectedFinalists = Except @finalists {Except @finalists @all}
+                @connectedFinalists = Intersect @finalists @all
                 @aliveFinalists = Filter @connectedFinalists isAlive true
                 if {AmountOf @aliveFinalists} < 2
                     break
                 end
             end
 
-            @connectedFinalists = Except @finalists {Except @finalists @all}
+            @connectedFinalists = Intersect @finalists @all
             @aliveFinalists = Filter @connectedFinalists isAlive true
             if {AmountOf @aliveFinalists} is 1
                 @winner = @aliveFinalists

@@ -235,7 +235,7 @@ The sections of a multi-section file named `roundHandlers.ser` can be addressed 
 | **Health & Damage** | `Kill`, `Damage`, `Heal`, `SetHealth`, `SetMaxHealth`, `Explode`                                                          |
 | **Environment**     | `CloseDoor`, `OpenDoor`, `LockDoor`, `UnlockDoor`                                                                         |
 | **Movement**        | `TPPlayer`, `TPPosition`                                                                                                  |
-| **Utility**         | `AmountOf`, `Take`, `Random`, `Chance`, `SetRoundLock`, `SetLobbyLock`, `SetPlayerData`, `GetPlayerData`, `HasPlayerData` |
+| **Utility**         | `AmountOf`, `Take`, `Intersect`, `Random`, `Chance`, `SetRoundLock`, `SetLobbyLock`, `SetPlayerData`, `GetPlayerData`, `HasPlayerData` |
 
 ### Top Essential Events
 

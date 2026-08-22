@@ -46,17 +46,11 @@ but do not create separate access namespaces.
 
 ### Player Variable Readiness
 
-Every player-variable read is sanitized against LabAPI's `Player.ReadyList`
-before its value reaches a method, property, loop, or argument. Players which
-are no longer ready are silently and permanently removed, and the variable may
-become empty. Ready dummy players remain; unauthenticated players, the host,
-non-ready NPCs, and disconnected wrappers are removed.
-
-Stored player variables are snapshots: cleanup does not add later joiners or
-re-evaluate role, team, or zone membership. A reconnect creates a new player
-wrapper and does not restore the old entry. Predefined player groups are rebuilt
-from the current ready-player list whenever they are read.
-
+Every player-variable read is sanitized against players that have incomplete state.
+This includes disconnected players, players in the process of connecting, etc.
+When a player has incomplete state, he is automatically purged from the variable.
+This means user-defined player variables can change by themselves to avoid "ghost"
+players. Players are never automatically added back.
 ---
 
 ## 2. Text, Math, & Syntax

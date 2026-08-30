@@ -24,12 +24,14 @@ public class GetFromMapMethod : ReturningMethod<CollectionValue<ReferenceValue>>
             Option.ReferenceCollection<LightsController>("roomLights"),
             Option.ReferenceCollection<Ragdoll>("ragdolls"))
     ];
-    
+
     public override void Execute()
     {
         ReturnValue = Args.GetOption("object") switch
         {
-            "doors" => new(Map.Doors.Select(d => new ReferenceValue<Door>(d))),
+            "doors" => new(Map.Doors
+                .Where(d => d is not ElevatorDoor and not NonInteractableDoor) // not sure about non interactible still
+                .Select(d => new ReferenceValue<Door>(d))),
             "elevators" => new(Map.Elevators.Select(e => new ReferenceValue<Elevator>(e))),
             "generators" => new(Map.Generators.Select(g => new ReferenceValue<Generator>(g))),
             "cameras" => new(Map.Cameras.Select(c => new ReferenceValue<Camera>(c))),

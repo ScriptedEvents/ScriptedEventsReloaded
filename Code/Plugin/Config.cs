@@ -22,8 +22,8 @@ public class Config
     public bool SendInitMessage { get; set; } = true;
 
     [Description(
-        "Inserts frame yields while scripts execute, reducing the risk that a tight script stalls the server. " +
-        "Disable this only after reviewing every active script."
+        "Slows scripts down slightly to help stop them from freezing the server. " +
+        "Keep this enabled unless you have checked every active script."
     )]
     public bool SafeScripts { get; set; } = true;
 

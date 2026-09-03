@@ -1,5 +1,6 @@
 # Normalize text in the repository while preserving binary assets.
 * text=auto
+.gitattributes text eol=lf
 
 *.cs text eol=crlf
 *.csproj text eol=crlf
@@ -14,6 +15,7 @@
 *.jsx text eol=lf
 *.css text eol=lf
 *.html text eol=lf
+*.svg text eol=lf
 
 *.dll binary
 *.exe binary

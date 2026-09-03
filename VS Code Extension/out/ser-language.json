@@ -327,7 +327,7 @@
       "description": "Formats a duration into a special format.",
       "subgroup": "Time",
       "essential": false,
-      "additionalDescription": "Here are some examples: \r\n\r\n#1) \"HH:SS\"\r\nShows only minutes and seconds, perfect for round timers or cooldowns.\r\nResult: 01:30\r\n\r\n#2) \"DD days, HH hours and MM minutes\"\r\nCreates a readable sentence. The system automatically handles the spaces and commas.\r\nResult: 2 days, 04 hours and 15 minutes\r\n\r\n#3) \"MMm SSs FFFms\"\r\nDisplays minutes, seconds, and milliseconds for pinpoint accuracy.\r\nResult: 01m 22s 450ms",
+      "additionalDescription": "Here are some examples: \n\n#1) \"HH:SS\"\nShows only minutes and seconds, perfect for round timers or cooldowns.\nResult: 01:30\n\n#2) \"DD days, HH hours and MM minutes\"\nCreates a readable sentence. The system automatically handles the spaces and commas.\nResult: 2 days, 04 hours and 15 minutes\n\n#3) \"MMm SSs FFFms\"\nDisplays minutes, seconds, and milliseconds for pinpoint accuracy.\nResult: 01m 22s 450ms",
       "requiredFramework": null,
       "returns": "text value",
       "arguments": [
@@ -351,7 +351,7 @@
           "argumentKind": "TextArgument",
           "mustBeProvided": true,
           "type": "Any text e.g. \"Hello, World!\"",
-          "description": "Use these tags to format your time: DD for days, HH for hours, MM for minutes, and SS for seconds. \r\nYou can separate them with colons (:) or dashes (-).",
+          "description": "Use these tags to format your time: DD for days, HH for hours, MM for minutes, and SS for seconds. \nYou can separate them with colons (:) or dashes (-).",
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "\"format\"",
@@ -11252,7 +11252,7 @@
       "description": "Loads an audio file into the audio player.",
       "subgroup": "Audio",
       "essential": false,
-      "additionalDescription": "SER is using 'AudioPlayerApi' to manage audio. \r\nThis method does not error using SER's system, most audio errors will be logged by AudioPlayerApi to the console.\r\nYour .ogg file MUST BE:\r\n- 48kHz\r\n- single (mono) channel\r\n- medium quality",
+      "additionalDescription": "SER is using 'AudioPlayerApi' to manage audio. \nThis method does not error using SER's system, most audio errors will be logged by AudioPlayerApi to the console.\nYour .ogg file MUST BE:\n- 48kHz\n- single (mono) channel\n- medium quality",
       "requiredFramework": null,
       "returns": null,
       "arguments": [
@@ -15192,7 +15192,7 @@
       "description": "Makes a given loop or function (that the 'break' keyword is inside) act as it has completely ended its execution (\"breaks\" free from the loop/function)",
       "arguments": [],
       "argumentDetails": [],
-      "example": "# the execution will \"break\" free after the third iteration\r\nrepeat 10 with $iteration\r\n    if {$iteration is 3}\r\n        break\r\n    end\r\n    Print \"iteration {$iteration}\"\r\nend",
+      "example": "# the execution will \"break\" free after the third iteration\nrepeat 10 with $iteration\n    if {$iteration is 3}\n        break\n    end\n    Print \"iteration {$iteration}\"\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -15213,7 +15213,7 @@
           "consumesRemainingValues": false
         }
       ],
-      "example": "chance 25%\r\n    Print \"This happens about one time in four.\"\r\nend\r\n\r\n# The chance can also come from a value expression.\r\n$probability = 50%\r\nchance $probability\r\n    Print \"This happens about half the time.\"\r\nend",
+      "example": "chance 25%\n    Print \"This happens about one time in four.\"\nend\n\n# The chance can also come from a value expression.\n$probability = 50%\nchance $probability\n    Print \"This happens about half the time.\"\nend",
       "isStatement": true,
       "extendsSignal": null,
       "allowedSignals": "DidntExecute"
@@ -15224,7 +15224,7 @@
       "description": "Makes a given loop (that the 'continue' keyword is inside) act as it has reached the end of its body.",
       "arguments": [],
       "argumentDetails": [],
-      "example": "# number 3 will be skipped\r\nrepeat 5 with $iteration\r\n    if $iteration is 3\r\n        continue\r\n    end\r\n    Print \"iteration {$iteration}\"\r\nend",
+      "example": "# number 3 will be skipped\nrepeat 5 with $iteration\n    if $iteration is 3\n        continue\n    end\n    Print \"iteration {$iteration}\"\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -15266,7 +15266,7 @@
           "consumesRemainingValues": false
         }
       ],
-      "example": "if {@sender -> role} is \"ClassD\"\r\n    Print \"You are a Class-D.\"\r\nelif {@sender -> role} is \"Scientist\"\r\n    Print \"You are a scientist.\"\r\nelse\r\n    Print \"You have another role.\"\r\nend",
+      "example": "if {@sender -> role} is \"ClassD\"\n    Print \"You are a Class-D.\"\nelif {@sender -> role} is \"Scientist\"\n    Print \"You are a scientist.\"\nelse\n    Print \"You have another role.\"\nend",
       "isStatement": true,
       "extendsSignal": "DidntExecute",
       "allowedSignals": "DidntExecute"
@@ -15277,7 +15277,7 @@
       "description": "If the statement above it didn't execute, 'else' statement will execute instead.",
       "arguments": [],
       "argumentDetails": [],
-      "example": "if {@sender -> team} is \"SCPs\"\r\n    Reply \"You are an SCP\"\r\nelse\r\n    Reply \"You are not an SCP\"\r\nend",
+      "example": "if {@sender -> team} is \"SCPs\"\n    Reply \"You are an SCP\"\nelse\n    Reply \"You are not an SCP\"\nend",
       "isStatement": true,
       "extendsSignal": "DidntExecute",
       "allowedSignals": null
@@ -15288,7 +15288,7 @@
       "description": "Ends the current statement's body.",
       "arguments": [],
       "argumentDetails": [],
-      "example": "if {@sender -> role} is \"ClassD\"\r\n    Print \"This block ends here.\"\r\nend",
+      "example": "if {@sender -> role} is \"ClassD\"\n    Print \"This block ends here.\"\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -15325,7 +15325,7 @@
           "consumesRemainingValues": false
         }
       ],
-      "example": "if {@sender -> isAlive}\r\n    ephm $message = \"Only needed during this statement\"\r\n    Print $message\r\nend\r\n\r\n# accessing $message outside that if statement will not work!\r\n# Print $message <-- will error",
+      "example": "if {@sender -> isAlive}\n    ephm $message = \"Only needed during this statement\"\n    Print $message\nend\n\n# accessing $message outside that if statement will not work!\n# Print $message <-- will error",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -15425,7 +15425,7 @@
           "consumesRemainingValues": false
         }
       ],
-      "example": "if {@sender -> isAlive}\r\n    Print \"You are still alive.\"\r\nend\r\n\r\nif {AmountOf @all} > 0\r\n    Print \"There is at least one player online.\"\r\nend",
+      "example": "if {@sender -> isAlive}\n    Print \"You are still alive.\"\nend\n\nif {AmountOf @all} > 0\n    Print \"There is at least one player online.\"\nend",
       "isStatement": true,
       "extendsSignal": null,
       "allowedSignals": "DidntExecute"
@@ -15465,7 +15465,7 @@
           "consumesRemainingValues": false
         }
       ],
-      "example": "# Run once for every player.\r\nover @all\r\n    Print \"found player\"\r\nend\r\n\r\n# Bind the current item to a temporary variable.\r\nover @all with @plr\r\n    Print \"found player {@plr -> name}\"\r\nend\r\n\r\n# Collections can be iterated in the same way.\r\n&inventory = @sender -> inventory\r\nover &inventory with *item\r\n    Print \"found item {*item -> type}\"\r\nend\r\n\r\n# Add a 1-based index as a second binding.\r\nover @all with @plr $index\r\n    Print \"found player #{$index}: {@plr -> name}\"\r\nend\n\n# Use break to leave the loop or continue to skip to its next iteration.",
+      "example": "# Run once for every player.\nover @all\n    Print \"found player\"\nend\n\n# Bind the current item to a temporary variable.\nover @all with @plr\n    Print \"found player {@plr -> name}\"\nend\n\n# Collections can be iterated in the same way.\n&inventory = @sender -> inventory\nover &inventory with *item\n    Print \"found item {*item -> type}\"\nend\n\n# Add a 1-based index as a second binding.\nover @all with @plr $index\n    Print \"found player #{$index}: {@plr -> name}\"\nend\n\n# Use break to leave the loop or continue to skip to its next iteration.",
       "isStatement": true,
       "extendsSignal": null,
       "allowedSignals": null
@@ -15515,7 +15515,7 @@
           "consumesRemainingValues": false
         }
       ],
-      "example": "func $IsAdult with $age\r\n    return age >= 18\r\nend\r\n\r\n$adult = run $IsAdult 16\r\nif $adult\r\n    Print \"You are an adult.\"\r\nend",
+      "example": "func $IsAdult with $age\n    return age >= 18\nend\n\n$adult = run $IsAdult 16\nif $adult\n    Print \"You are an adult.\"\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -15526,7 +15526,7 @@
       "description": "Stops the script from executing.",
       "arguments": [],
       "argumentDetails": [],
-      "example": "if {@sender -> isAlive}\r\n    Print \"The script is stopping now.\"\r\n    stop\r\nend",
+      "example": "if {@sender -> isAlive}\n    Print \"The script is stopping now.\"\n    stop\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -15547,7 +15547,7 @@
           "consumesRemainingValues": false
         }
       ],
-      "example": "# Wait for a fixed duration. \r\nwait 5s\r\n\r\n# A duration can also come from a variable.\r\n$duration = 10s\r\nwait $duration\r\n\r\n# Or from a random value\r\n$duration = ToDuration {Random 1 10} seconds\r\nwait $duration",
+      "example": "# Wait for a fixed duration. \nwait 5s\n\n# A duration can also come from a variable.\n$duration = 10s\nwait $duration\n\n# Or from a random value\n$duration = ToDuration {Random 1 10} seconds\nwait $duration",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -15568,7 +15568,7 @@
           "consumesRemainingValues": false
         }
       ],
-      "example": "# Wait until the server is empty.\r\nwait_until {AmountOf @all} is 0\r\n\r\n# Conditions can use variables and properties too.\r\nwait_until {@sender -> isAlive} is false",
+      "example": "# Wait until the server is empty.\nwait_until {AmountOf @all} is 0\n\n# Conditions can use variables and properties too.\nwait_until {@sender -> isAlive} is false",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -15618,7 +15618,7 @@
           "consumesRemainingValues": true
         }
       ],
-      "example": "over @all with @plr\r\n    Print {@plr -> name}\r\nend\r\n\r\nrepeat 3 with $iteration\r\n    Print \"iteration {$iteration}\"\r\nend",
+      "example": "over @all with @plr\n    Print {@plr -> name}\nend\n\nrepeat 3 with $iteration\n    Print \"iteration {$iteration}\"\nend",
       "isStatement": false,
       "extendsSignal": null,
       "allowedSignals": null
@@ -15639,7 +15639,7 @@
   "flags": {
     "CustomCommand": {
       "syntax": "!-- CustomCommand command name",
-      "description": "Creates a command and binds it to the script. When the command is ran, it executes the script. \r\n\r\nInjects the following variables into the script:\r\n> @sender (the player who ran the command, NOT added when command is ran by the server console)\r\n> *command (reference to this 'CustomCommand', used for resetting cooldown)",
+      "description": "Creates a command and binds it to the script. When the command is ran, it executes the script. \n\nInjects the following variables into the script:\n> @sender (the player who ran the command, NOT added when command is ran by the server console)\n> *command (reference to this 'CustomCommand', used for resetting cooldown)",
       "inlineArgument": {
         "name": "command name",
         "description": "The name of the command to create",
@@ -15667,7 +15667,7 @@
         },
         {
           "name": "neededPermission",
-          "description": "The permission that the player has to have in order to be able to use this command.\r\nYou can provide multiple permissions, and if the player has any of the listed permissions, they will be able to use the command.",
+          "description": "The permission that the player has to have in order to be able to use this command.\nYou can provide multiple permissions, and if the player has any of the listed permissions, they will be able to use the command.",
           "required": false,
           "example": "-- neededPermission ban.use ban.bypass"
         },
@@ -15679,7 +15679,7 @@
         },
         {
           "name": "neededRank",
-          "description": "The required remote admin rank in order to have access to this command.\r\nYou can provide multiple ranks, and if the player has any of the listed ranks, they will be able to use the command.",
+          "description": "The required remote admin rank in order to have access to this command.\nYou can provide multiple ranks, and if the player has any of the listed ranks, they will be able to use the command.",
           "required": false,
           "example": "-- neededRank owner admin moderator staff"
         },
@@ -15697,19 +15697,19 @@
         },
         {
           "name": "onCooldownMessage",
-          "description": "Defines a message for when the player tries to run a command but is on cooldown. \r\nAdditionally, you can use %time% in the message to show the remaining time (in seconds) the player has to wait before being able to use the command again.",
+          "description": "Defines a message for when the player tries to run a command but is on cooldown. \nAdditionally, you can use %time% in the message to show the remaining time (in seconds) the player has to wait before being able to use the command again.",
           "required": false,
           "example": "-- onCooldownMessage \"You are on cooldown! You can use this command in %time% seconds.\""
         },
         {
           "name": "globalCooldown",
-          "description": "The time all players have to wait before being able to use the command again.\r\nIf anyone uses a command, everyone else will be unable to use it for the specified duration.\r\nThis also applies to the server console.",
+          "description": "The time all players have to wait before being able to use the command again.\nIf anyone uses a command, everyone else will be unable to use it for the specified duration.\nThis also applies to the server console.",
           "required": false,
           "example": "-- globalCooldown 30s"
         },
         {
           "name": "onGlobalCooldownMessage",
-          "description": "Defines a message for when someone tries to run a command but is on global cooldown. \r\nAdditionally, you can use %time% in the message to show the remaining time (in seconds) someone has to wait before being able to use the command.",
+          "description": "Defines a message for when someone tries to run a command but is on global cooldown. \nAdditionally, you can use %time% in the message to show the remaining time (in seconds) someone has to wait before being able to use the command.",
           "required": false,
           "example": "-- onGlobalCooldownMessage \"This command is on cooldown! You can use this command in %time% seconds\""
         },
@@ -15739,7 +15739,7 @@
         },
         {
           "name": "arguments",
-          "description": "The arguments that this command expects in order to run. \r\nThe script cannot run unless every single argument is specified. \r\n\r\nWhen the command is ran, the provided values for the arguments turn into their own literal local variables for you to use in the script. \r\nFor example: making a command with an argument 'name' will then create a local variable '$name' in your script.\r\n\r\nIf you want some arguments to be optional, you can use the '?' symbol after the argument name. \r\nFor example: 'reason?' argument will be optional, and if the sender does not provide a value for it, the script will still run.\r\nThen, the '$reason' command will not be created in your script.\r\n\r\n(the '?' suffix is NOT added to the variable names)",
+          "description": "The arguments that this command expects in order to run. \nThe script cannot run unless every single argument is specified. \n\nWhen the command is ran, the provided values for the arguments turn into their own literal local variables for you to use in the script. \nFor example: making a command with an argument 'name' will then create a local variable '$name' in your script.\n\nIf you want some arguments to be optional, you can use the '?' symbol after the argument name. \nFor example: 'reason?' argument will be optional, and if the sender does not provide a value for it, the script will still run.\nThen, the '$reason' command will not be created in your script.\n\n(the '?' suffix is NOT added to the variable names)",
           "required": false,
           "example": "-- arguments id time reason?"
         }
@@ -15765,13 +15765,13 @@
     },
     "InteractableToyEvent": {
       "syntax": "!-- InteractableToyEvent",
-      "description": " Triggers whenever an InteractableToy gets interacted with\r\n (Only works on SER-created interactables)\r\n \r\n Injects the following variables into the script:\r\n   -- @evPlayer (the player who interacted with the InteractableToy)\r\n   -- *evToy (the toy that got interacted with)",
+      "description": " Triggers whenever an InteractableToy gets interacted with\n (Only works on SER-created interactables)\n \n Injects the following variables into the script:\n   -- @evPlayer (the player who interacted with the InteractableToy)\n   -- *evToy (the toy that got interacted with)",
       "inlineArgument": null,
       "arguments": []
     },
     "OnCRole": {
       "syntax": "!-- OnCRole event",
-      "description": "Similar to OnEvent flag, but for custom roles.\r\nThis also adds @evPlayer and *evCRole variables when executed.",
+      "description": "Similar to OnEvent flag, but for custom roles.\nThis also adds @evPlayer and *evCRole variables when executed.",
       "inlineArgument": {
         "name": "event",
         "description": "The event to bind to: either Spawned or Removed",
@@ -15800,7 +15800,7 @@
     },
     "OnEvent": {
       "syntax": "!-- OnEvent eventName",
-      "description": "Binds a script to an in-game event. \r\nWhen the event happens, the script will execute. \r\nFind events using 'serhelp events' command.",
+      "description": "Binds a script to an in-game event. \nWhen the event happens, the script will execute. \nFind events using 'serhelp events' command.",
       "inlineArgument": {
         "name": "eventName",
         "description": "The name of the event to bind to.",

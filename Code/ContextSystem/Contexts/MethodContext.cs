@@ -18,7 +18,7 @@ using MethodToken = SER.Code.TokenSystem.Tokens.MethodToken;
 
 namespace SER.Code.ContextSystem.Contexts;
 
-public class MethodContext(MethodToken methodToken) : YieldingContext, IMayReturnValueContext
+public class MethodContext(MethodToken methodToken, bool yieldForSafety = true) : YieldingContext, IMayReturnValueContext
 {
     public readonly MethodArgumentDispatcher Dispatcher = new(methodToken.Method);
     public readonly Method Method = methodToken.Method;
@@ -68,7 +68,7 @@ public class MethodContext(MethodToken methodToken) : YieldingContext, IMayRetur
     {
         Log.Debug($"'{Method.Name}' method is now running..");
 
-        if (MainPlugin.Instance.Config?.SafeScripts is true)
+        if (yieldForSafety && MainPlugin.Instance.Config?.SafeScripts is true)
         {
             yield return Timing.WaitForOneFrame;
         }

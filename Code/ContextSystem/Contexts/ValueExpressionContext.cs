@@ -143,7 +143,9 @@ public class MethodHandler : ValueExpressionContext.Handler
 
     public MethodHandler(MethodToken token, bool allowsYielding, Script scr)
     {
-        _context = new MethodContext(token)
+        // Inline expressions are evaluated through IValueToken.Value(), which cannot resume after a yield.
+        // Their methods must therefore execute immediately even when SafeScripts is enabled.
+        _context = new MethodContext(token, yieldForSafety: allowsYielding)
         {
             Script = scr,
             LineNum = null

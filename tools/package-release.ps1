@@ -90,17 +90,15 @@ if (Test-Path -LiteralPath $releaseDirectory) {
 }
 
 $stagingDirectory = Join-Path $releaseDirectory 'staging'
-$labApiStage = Join-Path $stagingDirectory 'LabAPI'
-$exiledStage = Join-Path $stagingDirectory 'EXILED'
 $learningStage = Join-Path $stagingDirectory 'Examples-and-Documentation'
 $editorStage = Join-Path $stagingDirectory 'Visual-Editor'
 $completeStage = Join-Path $stagingDirectory 'Complete'
-New-Item -ItemType Directory -Path $labApiStage, $exiledStage, $learningStage, $editorStage, $completeStage -Force | Out-Null
+New-Item -ItemType Directory -Path $learningStage, $editorStage, $completeStage -Force | Out-Null
 
-Copy-Item -LiteralPath $labApiAssembly -Destination $labApiStage
-Copy-ReleaseNotices -Destination $labApiStage
-Copy-Item -LiteralPath $exiledAssembly -Destination $exiledStage
-Copy-ReleaseNotices -Destination $exiledStage
+# Keep the normal server install as a one-file download. Notices remain in the
+# optional bundles and in the repository without hiding the plugin DLLs.
+Copy-Item -LiteralPath $labApiAssembly -Destination (Join-Path $releaseDirectory 'SER.dll')
+Copy-Item -LiteralPath $exiledAssembly -Destination (Join-Path $releaseDirectory 'SER-Exiled.dll')
 
 Copy-Item -LiteralPath (Join-Path $repositoryDirectory 'Example Scripts') -Destination $learningStage -Recurse
 Copy-Item -LiteralPath (Join-Path $repositoryDirectory 'docs') -Destination $learningStage -Recurse
@@ -125,8 +123,6 @@ $vsixPath = Join-Path $releaseDirectory "ser-$extensionVersion.vsix"
 Invoke-CheckedCommand -FilePath 'npm' -Arguments @('run', 'package', '--', '--out', $vsixPath) -WorkingDirectory $extensionDirectory
 Copy-Item -LiteralPath $vsixPath -Destination (Join-Path $completeStage 'VS Code Extension')
 
-Compress-ReleaseDirectory -Source $labApiStage -Destination (Join-Path $releaseDirectory "SER-$coreVersion-LabAPI.zip")
-Compress-ReleaseDirectory -Source $exiledStage -Destination (Join-Path $releaseDirectory "SER-$coreVersion-EXILED.zip")
 Compress-ReleaseDirectory -Source $learningStage -Destination (Join-Path $releaseDirectory "SER-$coreVersion-Examples-and-Documentation.zip")
 Compress-ReleaseDirectory -Source $editorStage -Destination (Join-Path $releaseDirectory "SER-Visual-Editor-$coreVersion.zip")
 Compress-ReleaseDirectory -Source $completeStage -Destination (Join-Path $releaseDirectory "SER-$coreVersion-Complete.zip")

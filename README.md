@@ -179,9 +179,10 @@ Check the [syntax definition](https://raw.githubusercontent.com/ScriptedEvents/S
 # Building release artifacts
 
 Run `tools/package-release.ps1` from PowerShell. It rebuilds and verifies both
-plugin hosts and the editor tooling, then creates minimal LabAPI and EXILED
-plugin bundles, the examples/documentation bundle, the standalone editor, the
-VS Code extension, a complete bundle, and `SHA256SUMS.txt` under `artifacts/`.
+plugin hosts and the editor tooling, then creates ready-to-install `SER.dll` and
+`SER-Exiled.dll` files, the examples/documentation bundle, the standalone
+editor, the VS Code extension, a complete bundle, and `SHA256SUMS.txt` under
+`artifacts/`.
 Release maintainers can pass `-UcrReferencePath <path>` to compile against the
 exact official UCR DLL selected for that compatibility baseline.
 

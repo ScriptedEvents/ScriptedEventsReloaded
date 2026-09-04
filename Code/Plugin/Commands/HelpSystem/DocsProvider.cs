@@ -599,7 +599,7 @@ public static class DocsProvider
 
              Event values are exposed as ev variables. Use `serhelp <eventName>`
              to inspect them and `-- require` to skip execution when selected values are absent.
-             Returning false from Registering or Spawning stops that UCR action.
+             Using `IsAllowed false` in scripts using Registering or Spawning stops that UCR action.
 
              ## Available UCR events
              {sb}

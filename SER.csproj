@@ -7,7 +7,7 @@
         <AssemblyName>SER</AssemblyName>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <LangVersion>preview</LangVersion>
+        <LangVersion>14.0</LangVersion>
         <PlatformTarget>x64</PlatformTarget>
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -18,7 +18,37 @@
         <Configurations>Release;Full Debug;Partial Debug;EXILED</Configurations>
         <Platforms>AnyCPU</Platforms>
         <WarningLevel>4</WarningLevel>
+        <DefaultItemExcludes>$(DefaultItemExcludes);Tooling\**;website\**;VS Code Extension\**;tools\**</DefaultItemExcludes>
+        <RunSerPostBuildValidation Condition="'$(RunSerPostBuildValidation)' == ''">true</RunSerPostBuildValidation>
+        <CopySerToReferenceDirectory Condition="'$(CopySerToReferenceDirectory)' == ''">false</CopySerToReferenceDirectory>
+        <InstallSerExtensionAfterBuild Condition="'$(InstallSerExtensionAfterBuild)' == ''">false</InstallSerExtensionAfterBuild>
     </PropertyGroup>
+
+    <!-- Fail once with an actionable setup message instead of emitting a warning for every missing game assembly. -->
+    <Target Name="ValidateSerReferenceDirectory" BeforeTargets="ResolveAssemblyReferences" Condition="'$(DesignTimeBuild)' != 'true'">
+        <Error
+            Condition="'$(SL_DEV_REFERENCES)' == ''"
+            Text="SER cannot build because SL_DEV_REFERENCES is not set. Point it to the SCP:SL managed-assembly directory described in CONTRIBUTING.md." />
+
+        <ItemGroup Condition="'$(SL_DEV_REFERENCES)' != ''">
+            <SerRequiredReference Include="$(SL_DEV_REFERENCES)\0Harmony.dll" />
+            <SerRequiredReference Include="$(SL_DEV_REFERENCES)\Assembly-CSharp-firstpass.dll" />
+            <SerRequiredReference Include="$(SL_DEV_REFERENCES)\CommandSystem.Core.dll" />
+            <SerRequiredReference Include="$(SL_DEV_REFERENCES)\Mirror.dll" />
+            <SerRequiredReference Include="$(SL_DEV_REFERENCES)\Pooling.dll" />
+            <SerRequiredReference Include="$(SL_DEV_REFERENCES)\ProjectMER.dll" />
+            <SerRequiredReference Include="$(SL_DEV_REFERENCES)\UnityEngine.dll" />
+            <SerRequiredReference Include="$(SL_DEV_REFERENCES)\UnityEngine.AnimationModule.dll" />
+            <SerRequiredReference Include="$(SL_DEV_REFERENCES)\UnityEngine.CoreModule.dll" />
+            <SerRequiredReference Include="$(SL_DEV_REFERENCES)\UnityEngine.PhysicsModule.dll" />
+            <SerRequiredReference Include="$(SL_DEV_REFERENCES)\UnityEngine.UnityWebRequestModule.dll" />
+            <SerRequiredReference Include="$(UcrReferencePath)" />
+        </ItemGroup>
+
+        <Error
+            Condition="'$(SL_DEV_REFERENCES)' != '' and !Exists('%(SerRequiredReference.Identity)')"
+            Text="SER cannot build because this required reference is missing: %(SerRequiredReference.Identity). Update SL_DEV_REFERENCES or pass -p:UcrReferencePath for UncomplicatedCustomRoles.dll." />
+    </Target>
 
     <PropertyGroup Condition="'$(Configuration)'=='Full Debug' or '$(Configuration)'=='Debug'">
         <DebugSymbols>true</DebugSymbols>
@@ -101,7 +131,7 @@
         <Copy
             SourceFiles="$(TargetPath)"
             DestinationFolder="$(SL_DEV_REFERENCES)"
-            Condition="'$(SL_DEV_REFERENCES)' != ''" 
+            Condition="'$(SL_DEV_REFERENCES)' != '' and '$(CopySerToReferenceDirectory)' == 'true'"
         />
     </Target>
 
@@ -110,7 +140,7 @@
         <ExiledApiXmlPath>$(UserProfile)\.nuget\packages\exmod.exiled\9.14.2\lib\net48\Exiled.API.xml</ExiledApiXmlPath>
         <ExiledEventsXmlPath>$(UserProfile)\.nuget\packages\exmod.exiled\9.14.2\lib\net48\Exiled.Events.xml</ExiledEventsXmlPath>
         <UcrReferencePath Condition="'$(UcrReferencePath)' == ''">$(SL_DEV_REFERENCES)\UncomplicatedCustomRoles.dll</UcrReferencePath>
-        <!-- The extension is versioned with SER; the installed copy is updated after a successful build. -->
+        <!-- The extension is versioned with SER; installation into VS Code is an explicit local-development opt-in. -->
         <SerExtensionDirectory Condition="'$(SerExtensionDirectory)' == ''">$(MSBuildProjectDirectory)\VS Code Extension</SerExtensionDirectory>
         <SerExtensionInstallDirectory Condition="'$(SerExtensionInstallDirectory)' == ''">$(UserProfile)\.vscode\extensions\ser</SerExtensionInstallDirectory>
     </PropertyGroup>
@@ -366,7 +396,7 @@ finally
         </Task>
     </UsingTask>
 
-    <Target Name="RunValidation" AfterTargets="Build">
+    <Target Name="RunValidation" AfterTargets="Build" Condition="'$(RunSerPostBuildValidation)' == 'true'">
         <RunDllValidation
             AssemblyPath="$(TargetPath)"
             ReferencePath="$(SL_DEV_REFERENCES)"
@@ -402,14 +432,18 @@ finally
             />
         </ItemGroup>
 
-        <MakeDir Directories="@(SerExtensionDestinationDirectories)" />
+        <MakeDir
+            Directories="@(SerExtensionDestinationDirectories)"
+            Condition="'$(InstallSerExtensionAfterBuild)' == 'true'" />
         <Copy
             SourceFiles="@(SerExtensionFiles)"
             DestinationFiles="@(SerExtensionDestinationFiles)"
+            Condition="'$(InstallSerExtensionAfterBuild)' == 'true'"
             SkipUnchangedFiles="true"
         />
 
         <Message
+            Condition="'$(InstallSerExtensionAfterBuild)' == 'true'"
             Importance="High"
             Text=">>> VS Code extension exported to $(SerExtensionInstallDirectory)"
         />
@@ -440,11 +474,8 @@ finally
         </Task>
     </UsingTask>
 
-    <Target Name="CountLines" BeforeTargets="BeforeBuild">
-        <ItemGroup>
-            <SourceFilesToCount Include="**\*.cs" Exclude="obj\**\*;bin\**\*" />
-        </ItemGroup>
-        <CountLinesTask SourceFiles="@(SourceFilesToCount)">
+    <Target Name="CountLines" BeforeTargets="BeforeBuild" Condition="'$(RunSerPostBuildValidation)' == 'true'">
+        <CountLinesTask SourceFiles="@(Compile)">
             <Output TaskParameter="TotalLines" PropertyName="LOC" />
         </CountLinesTask>
         <Message Importance="High" Text=">>> Total lines of code in project: $(LOC)" />

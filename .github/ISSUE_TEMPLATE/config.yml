@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: SER documentation
+    url: https://scriptedevents.github.io/ScriptedEventsReloaded/
+    about: Check setup, language, example, and debugging guidance.
+  - name: SER Discord
+    url: https://discord.gg/3j54zBnbbD
+    about: Ask for help with a script or server setup.

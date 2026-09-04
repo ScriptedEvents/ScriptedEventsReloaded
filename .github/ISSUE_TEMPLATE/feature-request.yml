@@ -1,0 +1,40 @@
+name: Feature request
+description: Suggest a script feature, example, editor change, or server-owner workflow.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: What should a server owner or script author be able to do?
+      description: Start with the result you want, not an internal implementation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-workaround
+    attributes:
+      label: What do you do today?
+      description: Share an existing script, command sequence, or plugin workaround if one exists.
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Smallest useful example
+      description: Show what the script or command could look like. It does not need to use final syntax.
+      render: text
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Script language or runtime
+        - Example script
+        - Visual editor
+        - VS Code extension
+        - Documentation
+        - Build or release tooling
+        - Other
+    validations:
+      required: true

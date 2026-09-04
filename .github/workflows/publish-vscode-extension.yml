@@ -1,0 +1,88 @@
+name: Publish VS Code extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to publish, such as 1.6.1
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-vscode-extension
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            Tooling/package-lock.json
+            VS Code Extension/package-lock.json
+
+      - name: Check release version
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        shell: bash
+        run: |
+          node -e 'const version = process.env.RELEASE_VERSION; if (!/^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/.test(version)) { console.error(`Use a stable version such as 1.6.1; received: ${version}`); process.exit(1); }'
+
+      - name: Install build dependencies
+        run: |
+          npm ci --prefix Tooling
+          npm ci --prefix "VS Code Extension"
+
+      - name: Set extension version
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: npm version "$RELEASE_VERSION" --prefix "VS Code Extension" --no-git-tag-version --ignore-scripts --allow-same-version
+
+      - name: Build and test extension
+        run: |
+          node website/scripts/materialize-manifest.mjs
+          npm run verify --prefix "VS Code Extension"
+
+      - name: Package extension
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        working-directory: VS Code Extension
+        run: |
+          mkdir -p ../artifacts
+          npx --no-install vsce package --out "../artifacts/ser-${RELEASE_VERSION}.vsix"
+
+      - name: Save VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: ser-vscode-${{ inputs.version }}
+          path: artifacts/ser-${{ inputs.version }}.vsix
+          if-no-files-found: error
+
+      - name: Publish to Visual Studio Marketplace
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        working-directory: VS Code Extension
+        run: npx --no-install vsce publish --oidc --packagePath "../artifacts/ser-${RELEASE_VERSION}.vsix"
+
+      - name: Write release summary
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          echo "### VS Code extension ${RELEASE_VERSION} published" >> "$GITHUB_STEP_SUMMARY"
+          echo "[Open the Marketplace listing](https://marketplace.visualstudio.com/items?itemName=ElektrykAndrzej.ser)" >> "$GITHUB_STEP_SUMMARY"

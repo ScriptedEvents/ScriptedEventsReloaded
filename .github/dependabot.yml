@@ -1,0 +1,46 @@
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      nuget-dependencies:
+        patterns: ['*']
+
+  - package-ecosystem: npm
+    directory: /Tooling
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      tooling-dependencies:
+        patterns: ['*']
+
+  - package-ecosystem: npm
+    directory: /VS Code Extension
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      extension-dependencies:
+        patterns: ['*']
+
+  - package-ecosystem: npm
+    directory: /website
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      website-dependencies:
+        patterns: ['*']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns: ['*']

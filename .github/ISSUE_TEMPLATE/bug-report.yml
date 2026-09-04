@@ -1,0 +1,82 @@
+name: Bug report
+description: Report something that failed while loading or running an SER script.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please remove passwords, webhook URLs, IP addresses, and player identifiers before posting logs or scripts.
+
+  - type: input
+    id: ser-version
+    attributes:
+      label: SER version
+      description: Use the version printed when SER starts.
+      placeholder: 1.0.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: host
+    attributes:
+      label: Plugin host
+      options:
+        - LabAPI
+        - EXILED
+    validations:
+      required: true
+
+  - type: input
+    id: game-version
+    attributes:
+      label: SCP:SL and API versions
+      description: Include the game version and your LabAPI or EXILED version.
+    validations:
+      required: true
+
+  - type: textarea
+    id: attempted
+    attributes:
+      label: What did you try?
+      description: Include the command or event and the smallest script that reproduces the problem.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: result
+    attributes:
+      label: What went wrong?
+      description: Include the exact SER message, source line, and internal-error identifier if one was printed.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant server log
+      description: Include the matching console trace. Remove secrets and player data first.
+      render: text
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start the server with...
+        2. Run...
+        3. Observe...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I ran `serstatus` and included any failed or conflicting script entry above.
+          required: true
+        - label: I removed secrets, IP addresses, and player identifiers.
+          required: true

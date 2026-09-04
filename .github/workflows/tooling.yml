@@ -1,0 +1,76 @@
+name: Tooling
+
+on:
+  pull_request:
+    paths:
+      - 'Tooling/**'
+      - 'VS Code Extension/**'
+      - 'tools/scpsl-console-mcp/**'
+      - 'website/data/ser-truth-table.json'
+      - 'website/scripts/materialize-manifest.mjs'
+      - 'Directory.Build.targets'
+      - '.github/workflows/tooling.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'Tooling/**'
+      - 'VS Code Extension/**'
+      - 'tools/scpsl-console-mcp/**'
+      - 'website/data/ser-truth-table.json'
+      - 'website/scripts/materialize-manifest.mjs'
+      - 'Directory.Build.targets'
+      - '.github/workflows/tooling.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tooling-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  clients:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            Tooling/package-lock.json
+            VS Code Extension/package-lock.json
+
+      - name: Install locked dependencies
+        run: |
+          npm ci --prefix Tooling
+          npm ci --prefix "VS Code Extension"
+
+      - name: Materialize the build manifest
+        run: node website/scripts/materialize-manifest.mjs
+
+      - name: Verify the shared editor and language core
+        run: npm run verify --prefix Tooling
+
+      - name: Verify the VS Code extension
+        run: npm run verify --prefix "VS Code Extension"
+
+  console-bridge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Test the LocalAdmin bridge
+        run: node --test tools/scpsl-console-mcp/server.test.mjs

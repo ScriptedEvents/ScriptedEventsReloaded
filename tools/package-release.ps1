@@ -58,7 +58,7 @@ if (-not $SkipDependencyInstall) {
     Invoke-CheckedCommand -FilePath 'npm' -Arguments @('ci') -WorkingDirectory $extensionDirectory
 }
 
-$exiledBuildArguments = @('build', 'SER.csproj', '--configuration', 'EXILED')
+$exiledBuildArguments = @('build', 'SER.csproj', '--configuration', 'EXILED', '--no-restore')
 $releaseBuildArguments = @('build', 'SER.csproj', '--configuration', 'Release', '--no-restore')
 if (-not [string]::IsNullOrWhiteSpace($UcrReferencePath)) {
     $resolvedUcrReferencePath = (Resolve-Path -LiteralPath $UcrReferencePath -ErrorAction Stop).Path

@@ -11,6 +11,6 @@
     "verify": "npm run build && npm run check && npm test"
   },
   "dependencies": {
-    "blockly": "13.2.0"
+    "blockly": "13.2.1"
   }
 }

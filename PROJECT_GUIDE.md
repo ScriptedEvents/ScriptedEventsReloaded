@@ -62,7 +62,10 @@ $env:SL_DEV_REFERENCES
 $env:LABAPI_PLUGINS
 ```
 
-`dotnet --info` must report `global.json` as valid. Use an SDK feature-band version such as `10.0.100`, not a runtime-style version such as `10.0.0`.
+`dotnet --info` must report `global.json` as valid. The repository stays on the
+latest installed patch of the .NET 10.0.1xx feature band and does not select
+preview SDKs. Use an SDK feature-band version such as `10.0.100`, not a
+runtime-style version such as `10.0.0`.
 
 ### Build commands
 
@@ -77,9 +80,16 @@ For a complete pre-release check, also compile `Full Debug` and `Partial Debug`.
 Build side effects matter:
 
 - A non-EXILED build copies the resulting assembly to `LABAPI_PLUGINS` when that variable is set.
-- Every build copies the assembly to `SL_DEV_REFERENCES` when that variable is set.
+- A build copies the assembly to `SL_DEV_REFERENCES` only when
+  `CopySerToReferenceDirectory=true` is passed. The reference directory is
+  read-only by default.
 - The `RunValidation` target loads the newly built DLL and compiles all embedded example scripts.
 - Validation calls `Builder.CreateFiles()`, which regenerates `SER Visual Editor.html` and `ser_method_info.js` in the working directory.
+- `RunSerPostBuildValidation=false` skips validation and tooling generation for
+  a quick local compile. Never use that switch for the final Release build.
+- `InstallSerExtensionAfterBuild=true` copies the built extension into the
+  configured VS Code extension directory. Normal plugin builds do not change
+  the user profile.
 
 Do not interpret “build succeeded” as full server compatibility. Always smoke-test both release assemblies against the exact SCP:SL, LabAPI and EXILED versions intended for release.
 

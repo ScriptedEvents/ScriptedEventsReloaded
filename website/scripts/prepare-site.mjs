@@ -169,11 +169,12 @@ function methodPage(name, method, exampleNames) {
   return parts.filter(part => part !== null && part !== undefined).join('\n');
 }
 
-function eventPage(name, details, pmer, exampleNames) {
-  const flag = pmer ? 'OnPMER' : 'OnEvent';
+function eventPage(name, details, source, exampleNames) {
+  const flag = source === 'pmer' ? 'OnPMER' : source === 'ucr' ? 'OnUCR' : 'OnEvent';
+  const sourceName = source === 'pmer' ? 'ProjectMER' : source === 'ucr' ? 'UCR' : 'Game';
   const parts = [
     frontMatter(name, {sidebar_label: name}),
-    prose(details?.description) || `${pmer ? 'ProjectMER' : 'Game'} event exposed to SER scripts.`,
+    prose(details?.description) || `${sourceName} event exposed to SER scripts.`,
     '',
     '## Start a script section',
     '',
@@ -286,11 +287,13 @@ function exampleUsage(content) {
   });
   const events = [...content.matchAll(/^\s*!--\s+OnEvent\s+(\S+)/gim)].map(match => match[1]);
   const pmerEvents = [...content.matchAll(/^\s*!--\s+OnPMER\s+(\S+)/gim)].map(match => match[1]);
+  const ucrEvents = [...content.matchAll(/^\s*!--\s+OnUCR\s+(\S+)/gim)].map(match => match[1]);
   const flags = [...content.matchAll(/^\s*!--\s+(\S+)/gim)].map(match => match[1]);
   return {
     methods: [...new Set(methods)].sort(),
     events: [...new Set(events)].sort(),
     pmerEvents: [...new Set(pmerEvents)].sort(),
+    ucrEvents: [...new Set(ucrEvents)].sort(),
     flags: [...new Set(flags)].sort(),
   };
 }
@@ -308,6 +311,7 @@ function buildExamples() {
   const methodExamples = new Map();
   const eventExamples = new Map();
   const pmerEventExamples = new Map();
+  const ucrEventExamples = new Map();
   for (const example of examples) {
     for (const name of example.usage.methods) {
       if (!methodExamples.has(name)) methodExamples.set(name, []);
@@ -321,6 +325,10 @@ function buildExamples() {
       if (!pmerEventExamples.has(name)) pmerEventExamples.set(name, []);
       pmerEventExamples.get(name).push(example.name);
     }
+    for (const name of example.usage.ucrEvents) {
+      if (!ucrEventExamples.has(name)) ucrEventExamples.set(name, []);
+      ucrEventExamples.get(name).push(example.name);
+    }
   }
 
   const indexRows = [];
@@ -333,6 +341,7 @@ function buildExamples() {
       ...example.usage.methods.map(name => `[${name}](../reference/methods/${slug(name)}.md)`),
       ...example.usage.events.map(name => `[${name}](../reference/events/${slug(name)}.md)`),
       ...example.usage.pmerEvents.map(name => `[${name}](../reference/pmer-events/${slug(name)}.md)`),
+      ...example.usage.ucrEvents.map(name => `[${name}](../reference/ucr-events/${slug(name)}.md)`),
       ...example.usage.flags.filter(name => manifest.flags[name]).map(name => `[${name}](../reference/flags/${slug(name)}.md)`),
     ];
     write(`examples/${slug(example.name)}.md`, [
@@ -361,7 +370,7 @@ function buildExamples() {
     ...indexRows,
   ].join('\n'));
 
-  return {examples, methodExamples, eventExamples, pmerEventExamples};
+  return {examples, methodExamples, eventExamples, pmerEventExamples, ucrEventExamples};
 }
 
 function buildReference(exampleMaps) {
@@ -412,15 +421,22 @@ function buildReference(exampleMaps) {
   for (const name of manifest.events) {
     const details = manifest.eventDetails[name] || {};
     const filename = `reference/events/${slug(name)}.md`;
-    write(filename, eventPage(name, details, false, exampleMaps.eventExamples.get(name) || []));
+    write(filename, eventPage(name, details, 'ser', exampleMaps.eventExamples.get(name) || []));
     addConstruct('Event', name, details.description, `!-- OnEvent ${name}`, details.group, `/${filename.replace(/\.md$/, '/')}`);
   }
 
   for (const name of manifest.pmerEvents) {
     const details = manifest.pmerEventDetails[name] || {};
     const filename = `reference/pmer-events/${slug(name)}.md`;
-    write(filename, eventPage(name, details, true, exampleMaps.pmerEventExamples.get(name) || []));
+    write(filename, eventPage(name, details, 'pmer', exampleMaps.pmerEventExamples.get(name) || []));
     addConstruct('PMER event', name, details.description, `!-- OnPMER ${name}`, details.group, `/${filename.replace(/\.md$/, '/')}`);
+  }
+
+  for (const name of manifest.ucrEvents || []) {
+    const details = manifest.ucrEventDetails[name] || {};
+    const filename = `reference/ucr-events/${slug(name)}.md`;
+    write(filename, eventPage(name, details, 'ucr', exampleMaps.ucrEventExamples.get(name) || []));
+    addConstruct('UCR event', name, details.description, `!-- OnUCR ${name}`, details.group, `/${filename.replace(/\.md$/, '/')}`);
   }
 
   const counts = constructs.reduce((result, item) => {
@@ -485,9 +501,10 @@ const constructs = buildReference(exampleMaps);
 category('reference/methods', 'Methods', 1);
 category('reference/events', 'Game events', 2);
 category('reference/pmer-events', 'ProjectMER events', 3);
-category('reference/flags', 'Flags', 4);
-category('reference/keywords', 'Keywords', 5);
-category('reference/variables', 'Predefined variables', 6);
+category('reference/ucr-events', 'UCR events', 4);
+category('reference/flags', 'Flags', 5);
+category('reference/keywords', 'Keywords', 6);
+category('reference/variables', 'Predefined variables', 7);
 copyStaticAssets();
 
 console.log(`Prepared the SER documentation site: ${constructs.length} constructs and ${exampleMaps.examples.length} examples.`);

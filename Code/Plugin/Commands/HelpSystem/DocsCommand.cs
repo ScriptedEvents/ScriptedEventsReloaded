@@ -53,6 +53,12 @@ public class DocsCommand : ICommand, IUsePermissions
             eventSb.AppendLine(DocsProvider.GetEventInfo(@event));
             eventSb.AppendLine();
         }
+
+        foreach (var @event in EventSystem.EventHandler.AvailableUcrEvents)
+        {
+            eventSb.AppendLine(DocsProvider.GetEventInfo(@event));
+            eventSb.AppendLine();
+        }
         
         MakeDocFile("events", eventSb);
         

@@ -102,6 +102,21 @@ MER.PlayAnimation *evSchematic "Open"
 Run `serhelp pmerevents` to list events exposed by the installed ProjectMER
 version.
 
+## UncomplicatedCustomRoles events
+
+UCR 9.6.0 or newer can start scripts when a custom role changes state:
+
+```ser
+# requires UncomplicatedCustomRoles 9.6.0 or newer
+!-- OnUCR Spawned
+-- require @evPlayer *evRole
+
+Hint @evPlayer 5s "UCR role: {*evRole -> name}"
+```
+
+Run `serhelp ucrevents` to list the events exposed by the installed UCR
+version. Returning `false` from `Registering` or `Spawning` stops that action.
+
 ## Other flags
 
 | Flag | Purpose |

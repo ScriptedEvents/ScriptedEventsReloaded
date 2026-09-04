@@ -1,16 +1,15 @@
 ﻿using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Helpers;
+using SER.Code.Integrations.Ucr;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
-using SER.Code.ValueSystem;
-using UncomplicatedCustomRoles.API.Features;
 
 namespace SER.Code.MethodSystem.Methods.UCRMethods;
 
 [UsedImplicitly]
 // ReSharper disable once InconsistentNaming
-public class UCR_GetRoleMethod : ReturningMethod<ReferenceValue>, IAdditionalDescription, IDependOnFramework
+public class UCR_GetRoleMethod : ReferenceReturningMethod<UCRRole>, IAdditionalDescription, IDependOnFramework
 {
     public FrameworkBridge.Type DependsOn => FrameworkBridge.Type.UncomplicatedCustomRoles;
     
@@ -26,6 +25,6 @@ public class UCR_GetRoleMethod : ReturningMethod<ReferenceValue>, IAdditionalDes
 
     public override void Execute()
     {
-        ReturnValue = new(SummonedCustomRole.Get(Args.GetPlayer("player"))?.Role);
+        ReturnValue = UcrBridge.GetRole(Args.GetPlayer("player"))!;
     }
 }

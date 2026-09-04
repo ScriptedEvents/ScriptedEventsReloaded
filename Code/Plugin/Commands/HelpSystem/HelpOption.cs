@@ -8,6 +8,7 @@ public enum HelpOption
     Enums,
     Events,
     PmerEvents,
+    UcrEvents,
     Properties,
     Flags,
     Keywords

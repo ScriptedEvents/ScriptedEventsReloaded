@@ -224,10 +224,12 @@ The sections of a multi-section file named `roundHandlers.ser` can be addressed 
 | **Custom Command** | `!-- CustomCommand heal`<br>`-- availableFor RemoteAdmin`  | Binds the script to a custom command.     |
 | **Event**          | `!-- OnEvent Dying`<br>`-- require @evPlayer`              | Triggers on a LabAPI game event.          |
 | **ProjectMER**     | `!-- OnPMER SchematicSpawned`<br>`-- require *evSchematic` | Triggers on an optional ProjectMER event. |
+| **UCR**            | `!-- OnUCR Spawned`<br>`-- require @evPlayer *evRole` | Triggers on an optional UncomplicatedCustomRoles event. |
 
 * *Event Cancellation:* Use `IsAllowed false` followed by `stop` to cancel the base game event.
 * *Event Variables:* Provided via C# reflection, but may not always exist. Use `-- require` to validate.
 * *ProjectMER Events:* Use `serhelp pmerevents` to list the events exposed by the installed ProjectMER version. Schematic event values use SER's `MERSchematic` reference type and can be passed directly to `MER.*` methods.
+* *UCR Events:* Use `serhelp ucrevents` to list role lifecycle events exposed by UncomplicatedCustomRoles 9.6.0 or newer. Returning `false` from `Registering` or `Spawning` stops that action.
 
 ---
 

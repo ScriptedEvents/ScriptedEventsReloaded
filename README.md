@@ -109,6 +109,15 @@ Print "Spawned {$evName}"
 MER.PlayAnimation *evSchematic "Open"
 ```
 
+UncomplicatedCustomRoles 9.6.0 or newer exposes role lifecycle events too:
+
+```ser
+!-- OnUCR Spawned
+-- require @evPlayer *evRole
+
+Hint @evPlayer 5s "You spawned as {*evRole -> name}."
+```
+
 ### Welcome message
 ```
 !-- OnEvent Joined

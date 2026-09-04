@@ -114,7 +114,7 @@ for (const match of combinedDocumentation.matchAll(
   const framework = match[1].trim();
   const methods = [...match[2].matchAll(/^\s*([A-Z][A-Za-z0-9_.]*)\b/gm)]
     .map(methodMatch => methodMatch[1])
-    .filter(methodName => !["OnPMER"].includes(methodName));
+    .filter(methodName => !["OnPMER", "OnUCR"].includes(methodName));
 
   assert.ok(methods.length > 0, `The ${framework} example contains no methods to validate.`);
   for (const methodName of methods) {

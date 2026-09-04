@@ -5,7 +5,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import constructs from '@site/src/data/constructs.json';
 import styles from './reference.module.css';
 
-const filters = ['All', 'Method', 'Event', 'PMER event', 'Flag', 'Keyword', 'Variable', 'Example'];
+const filters = ['All', 'Method', 'Event', 'PMER event', 'UCR event', 'Flag', 'Keyword', 'Variable', 'Example'];
 
 export default function ReferenceExplorer() {
   const {siteConfig} = useDocusaurusContext();

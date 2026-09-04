@@ -83,7 +83,7 @@
         <Reference Include="UnityEngine.UnityWebRequestModule">
             <HintPath>$(SL_DEV_REFERENCES)\UnityEngine.UnityWebRequestModule.dll</HintPath>
         </Reference>
-        <Reference Include="UncomplicatedCustomRoles-LabAPI">
+        <Reference Include="UncomplicatedCustomRoles">
             <HintPath>$(UcrReferencePath)</HintPath>
         </Reference>
         <Reference Include="ProjectMER">
@@ -109,7 +109,7 @@
         <LabApiXmlPath>$(UserProfile)\.nuget\packages\northwood.labapi\1.1.7\lib\net48\LabApi.xml</LabApiXmlPath>
         <ExiledApiXmlPath>$(UserProfile)\.nuget\packages\exmod.exiled\9.14.2\lib\net48\Exiled.API.xml</ExiledApiXmlPath>
         <ExiledEventsXmlPath>$(UserProfile)\.nuget\packages\exmod.exiled\9.14.2\lib\net48\Exiled.Events.xml</ExiledEventsXmlPath>
-        <UcrReferencePath Condition="'$(UcrReferencePath)' == ''">$(SL_DEV_REFERENCES)\UncomplicatedCustomRoles-LabAPI.dll</UcrReferencePath>
+        <UcrReferencePath Condition="'$(UcrReferencePath)' == ''">$(SL_DEV_REFERENCES)\UncomplicatedCustomRoles.dll</UcrReferencePath>
         <!-- The extension is versioned with SER; the installed copy is updated after a successful build. -->
         <SerExtensionDirectory Condition="'$(SerExtensionDirectory)' == ''">$(MSBuildProjectDirectory)\VS Code Extension</SerExtensionDirectory>
         <SerExtensionInstallDirectory Condition="'$(SerExtensionInstallDirectory)' == ''">$(UserProfile)\.vscode\extensions\ser</SerExtensionInstallDirectory>

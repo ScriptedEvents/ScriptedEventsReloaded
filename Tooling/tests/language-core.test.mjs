@@ -90,6 +90,13 @@ test("blocks export when required values remain empty", () => {
   assert.ok(diagnostics.some(item => item.code === "missing-value" && item.severity === "error"));
 });
 
+test("requires an event name for optional integration flags", () => {
+  for (const flag of ["OnPMER", "OnUCR"]) {
+    const diagnostics = core.validateGeneratedCode(`!-- ${flag}\n`);
+    assert.ok(diagnostics.some(item => item.code === "missing-flag-argument" && item.severity === "error"));
+  }
+});
+
 test("does not treat ellipses inside text as missing inputs", () => {
   const diagnostics = core.validateGeneratedCode('Broadcast @all 5s "Wait... what?"\n');
   assert.ok(!diagnostics.some(item => item.code === "missing-value"));

@@ -275,6 +275,8 @@ Avoid broad `catch` blocks that discard the original exception. If recovery is p
 
 ProjectMER events are discovered into a separate optional catalog. `!-- OnPMER EventName` binds only against that catalog, while sharing the reflected variable and cancellation pipeline. ProjectMER schematic objects are converted to SER `MERSchematic` references before script execution. Keep this path late-bound so SER still loads when ProjectMER is absent.
 
+UCR 9.6.0 lifecycle events follow the same optional-catalog pattern. `!-- OnUCR EventName` binds only against `CustomRoleEvents`; UCR role definitions and spawned instances are converted to `UCRRole` and `UCRRoleInstance` shells. UCR uses `Action<T>` rather than LabAPI's event delegate, so the shared binder must build the exact delegate type reported by each `EventInfo`. `Registering` and `Spawning` expose a writable `IsAllowed` property without implementing LabAPI's cancellation interface.
+
 `DisableEvent` and `EnableEvent` only accept events whose argument type implements LabAPI's `ICancellableEvent`. Both are returning methods: they return `true` when the disabled state changed and `false` when it was already in the requested state. A missing or non-cancellable event is a script runtime error.
 
 `sermethod` detects a single synchronous `ReturningMethod` and includes its formatted value in the command response. Ordinary and yielding methods keep the normal coroutine execution path so a command cannot block the server thread.

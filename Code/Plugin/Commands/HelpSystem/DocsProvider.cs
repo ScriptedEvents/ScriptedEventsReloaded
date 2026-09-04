@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using System.Text;
 using CommandSystem;
-using LabApi.Events.Arguments.Interfaces;
 using LabApi.Features.Permissions;
 using SER.Code.ContextSystem;
 using SER.Code.ContextSystem.BaseContexts;
@@ -50,6 +49,7 @@ public static class DocsProvider
         [HelpOption.Enums] = GetEnumHelpPage,
         [HelpOption.Events] = GetEventsHelpPage,
         [HelpOption.PmerEvents] = GetPmerEventsHelpPage,
+        [HelpOption.UcrEvents] = GetUcrEventsHelpPage,
         [HelpOption.Properties] = GetPropertiesHelpPage,
         [HelpOption.Flags] = GetFlagHelpPage,
         [HelpOption.Keywords] = GetKeywordHelpPage
@@ -116,6 +116,7 @@ public static class DocsProvider
         
         var ev = EventSystem.EventHandler.AvailableEvents
             .Concat(EventSystem.EventHandler.AvailablePmerEvents)
+            .Concat(EventSystem.EventHandler.AvailableUcrEvents)
             .FirstOrDefault(e => e.Name.ToLowerInvariant() == arg);
         if (ev is not null)
         {
@@ -287,6 +288,7 @@ public static class DocsProvider
             .Concat(EnumIndex.GetAllEnums().Select(type => type.Name))
             .Concat(EventSystem.EventHandler.AvailableEvents
                 .Concat(EventSystem.EventHandler.AvailablePmerEvents)
+                .Concat(EventSystem.EventHandler.AvailableUcrEvents)
                 .Select(info => info.Name))
             .Concat(MethodIndex.GetMethods().Select(method => method.Name))
             .Concat(MethodIndex.FrameworkDependentMethods.Values
@@ -467,8 +469,7 @@ public static class DocsProvider
     {
         var variables = EventSystem.EventHandler.GetMimicVariableInfo(ev);
         var eventArgsType = ev.EventHandlerType.GetGenericArguments().FirstOrDefault();
-        var cancellable = eventArgsType is not null &&
-                          typeof(ICancellableEvent).IsAssignableFrom(eventArgsType);
+        var cancellable = EventSystem.EventHandler.IsCancellableEvent(ev);
         var msg = variables.Count > 0 
             ? variables.Aggregate(
                 "This event has the following variables attached to it:\n", 
@@ -479,7 +480,7 @@ public static class DocsProvider
             ) 
             : "This event does not have any variables attached to it.";
 
-        var eventDocumentation = XmlDocReader.GetDocumentation(ev);
+        var eventDocumentation = EventSystem.EventHandler.GetEventDescription(ev);
         var eventArgsDocumentation = eventArgsType is null
             ? null
             : XmlDocReader.GetDocumentation(eventArgsType);
@@ -563,6 +564,45 @@ public static class DocsProvider
              to inspect them and `-- require` to skip execution when selected variables are absent.
 
              ## Available ProjectMER events
+             {sb}
+             """;
+    }
+
+    public static string GetUcrEventsHelpPage()
+    {
+        if (EventSystem.EventHandler.AvailableUcrEvents.Count == 0)
+        {
+            return
+                """
+                UncomplicatedCustomRoles 9.6.0 or newer is not installed or did not expose any supported events.
+                The OnUCR flag becomes available for binding when a supported UCR version is loaded.
+                """;
+        }
+
+        var sb = new StringBuilder();
+        foreach (var category in EventSystem.EventHandler.AvailableUcrEvents
+                     .Select(ev => ev.DeclaringType)
+                     .ToHashSet()
+                     .OfType<Type>())
+        {
+            sb.AppendLine(Heading(category.Name));
+            if (XmlDocReader.GetDocumentation(category) is { Length: > 0 } categoryDocumentation)
+                sb.AppendLine(categoryDocumentation);
+            sb.AppendLine(BulletList(EventSystem.EventHandler.AvailableUcrEvents
+                .Where(ev => ev.DeclaringType == category)
+                .Select(ev => Code(ev.Name))));
+        }
+
+        return
+            $"""
+             UCR events tell scripts when a custom role is registered, spawned, or removed.
+             Use `!-- OnUCR EventName` to run a script when one occurs.
+
+             Event values are exposed as ev variables. Use `serhelp <eventName>`
+             to inspect them and `-- require` to skip execution when selected values are absent.
+             Returning false from Registering or Spawning stops that UCR action.
+
+             ## Available UCR events
              {sb}
              """;
     }

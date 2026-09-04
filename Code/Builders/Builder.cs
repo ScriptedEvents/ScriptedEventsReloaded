@@ -1,5 +1,4 @@
 using System.Reflection;
-using LabApi.Events.Arguments.Interfaces;
 using Newtonsoft.Json;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
@@ -32,6 +31,7 @@ public static class Builder
         {
             SER.Code.EventSystem.EventHandler.Initialize();
             SER.Code.EventSystem.EventHandler.LoadOptionalProjectMerEventsForTooling();
+            SER.Code.EventSystem.EventHandler.LoadOptionalUcrEventsForTooling();
         }
         catch (Exception ex)
         {
@@ -44,6 +44,8 @@ public static class Builder
             EventDetails = GetEventDetails(SER.Code.EventSystem.EventHandler.AvailableEvents),
             PMEREvents = SER.Code.EventSystem.EventHandler.AvailablePmerEvents.Select(e => e.Name).Distinct().OrderBy(n => n).ToArray(),
             PMEREventDetails = GetEventDetails(SER.Code.EventSystem.EventHandler.AvailablePmerEvents),
+            UCREvents = SER.Code.EventSystem.EventHandler.AvailableUcrEvents.Select(e => e.Name).Distinct().OrderBy(n => n).ToArray(),
+            UCREventDetails = GetEventDetails(SER.Code.EventSystem.EventHandler.AvailableUcrEvents),
             Methods = GetToolingMethods().Select(m =>
             {
                 return new
@@ -974,6 +976,8 @@ public static class Builder
                                         ? metadata.Events
                                         : flag.Name === "OnPMER"
                                             ? metadata.PMEREvents
+                                            : flag.Name === "OnUCR"
+                                                ? metadata.UCREvents
                                             : null;
                                     if (availableEvents?.length) {
                                         const eventOptions = availableEvents.map(e => [e, e]);
@@ -994,10 +998,12 @@ public static class Builder
                                 this.setColour(290);
                                 this.setTooltip(() => {
                                     let tooltip = flag.Description.replace(/\n(?!\n)/g, '\n\n');
-                                    if (flag.Name === "OnEvent" || flag.Name === "OnPMER") {
+                                    if (flag.Name === "OnEvent" || flag.Name === "OnPMER" || flag.Name === "OnUCR") {
                                         const selectedEvent = block.getFieldValue("INLINE");
                                         const eventDetails = (flag.Name === "OnPMER"
                                             ? metadata.PMEREventDetails
+                                            : flag.Name === "OnUCR"
+                                                ? metadata.UCREventDetails
                                             : metadata.EventDetails)?.[selectedEvent];
                                         if (eventDetails?.description) {
                                             tooltip += `\n\n${eventDetails.description}`;
@@ -1604,14 +1610,13 @@ public static class Builder
                 var eventArgsType = eventInfo.EventHandlerType?.GetGenericArguments().FirstOrDefault();
                 return new
                 {
-                    description = XmlDocReader.GetDocumentation(eventInfo),
+                    description = SER.Code.EventSystem.EventHandler.GetEventDescription(eventInfo),
                     group = eventInfo.DeclaringType?.Name,
                     eventDataType = eventArgsType?.AccurateName,
                     eventDataDescription = eventArgsType is null
                         ? null
                         : XmlDocReader.GetDocumentation(eventArgsType),
-                    isCancellable = eventArgsType is not null &&
-                                    typeof(ICancellableEvent).IsAssignableFrom(eventArgsType),
+                    isCancellable = SER.Code.EventSystem.EventHandler.IsCancellableEvent(eventInfo),
                     variables = SER.Code.EventSystem.EventHandler.GetMimicVariableInfo(eventInfo)
                         .Select(variable => new
                         {
@@ -1759,6 +1764,11 @@ public static class Builder
             .Distinct()
             .OrderBy(name => name);
         var pmerEventDetails = GetEventDetails(SER.Code.EventSystem.EventHandler.AvailablePmerEvents);
+        var ucrEvents = SER.Code.EventSystem.EventHandler.AvailableUcrEvents
+            .Select(eventInfo => eventInfo.Name)
+            .Distinct()
+            .OrderBy(name => name);
+        var ucrEventDetails = GetEventDetails(SER.Code.EventSystem.EventHandler.AvailableUcrEvents);
 
         var truthTable = new
         {
@@ -1770,7 +1780,9 @@ public static class Builder
             events,
             eventDetails,
             pmerEvents,
-            pmerEventDetails
+            pmerEventDetails,
+            ucrEvents,
+            ucrEventDetails
         };
         var json = JsonConvert.SerializeObject(truthTable, Formatting.Indented);
         var content = $"const SER_TRUTH_TABLE = {json};{Environment.NewLine}{Environment.NewLine}" +

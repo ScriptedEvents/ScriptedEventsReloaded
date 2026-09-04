@@ -13170,7 +13170,7 @@
       "essential": false,
       "additionalDescription": "Be sure to verify if the player has a role. The reference will be INVALID when the player doesn't have a role.",
       "requiredFramework": "UncomplicatedCustomRoles",
-      "returns": "reference value",
+      "returns": "reference to UCRRole object",
       "arguments": [
         {
           "name": "player",
@@ -13181,6 +13181,225 @@
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "@player",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "UCR.GetRoles": {
+      "syntax": "UCR.GetRoles ",
+      "description": "Lists registered UCR roles.",
+      "subgroup": "UCR",
+      "essential": false,
+      "additionalDescription": "Each reference exposes id, name, and object. UCR role properties are available through the same reference.",
+      "requiredFramework": "UncomplicatedCustomRoles",
+      "returns": "collection of reference to UCRRole object",
+      "arguments": [],
+      "errors": []
+    },
+    "UCR.GetRoleById": {
+      "syntax": "UCR.GetRoleById role_id",
+      "description": "Gets a registered UCR role by ID.",
+      "subgroup": "UCR",
+      "essential": false,
+      "additionalDescription": "The reference exposes id, name, and object. UCR role properties are available through the same reference.",
+      "requiredFramework": "UncomplicatedCustomRoles",
+      "returns": "reference to UCRRole object",
+      "arguments": [
+        {
+          "name": "role id",
+          "argumentKind": "IntArgument",
+          "mustBeProvided": true,
+          "type": "Any whole number",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "role_id",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The role ID is not registered in UCR."
+      ]
+    },
+    "UCR.GetRoleByName": {
+      "syntax": "UCR.GetRoleByName \"role_name\"",
+      "description": "Gets a registered UCR role by name.",
+      "subgroup": "UCR",
+      "essential": false,
+      "additionalDescription": "Role names are matched without case sensitivity.",
+      "requiredFramework": "UncomplicatedCustomRoles",
+      "returns": "reference to UCRRole object",
+      "arguments": [
+        {
+          "name": "role name",
+          "argumentKind": "TextArgument",
+          "mustBeProvided": true,
+          "type": "Any text e.g. \"Hello, World!\"",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "\"role_name\"",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The role name is not registered in UCR."
+      ]
+    },
+    "UCR.GetRoleInstance": {
+      "syntax": "UCR.GetRoleInstance @player",
+      "description": "Gets a player's active UCR role instance.",
+      "subgroup": "UCR",
+      "essential": false,
+      "additionalDescription": "Returns an invalid reference when the player does not have a UCR role. The reference exposes id, player, role, and object.",
+      "requiredFramework": "UncomplicatedCustomRoles",
+      "returns": "reference to UCRRoleInstance object",
+      "arguments": [
+        {
+          "name": "player",
+          "argumentKind": "PlayerArgument",
+          "mustBeProvided": true,
+          "type": "Player value e.g. @player, with EXACTLY 1 player.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "@player",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "UCR.GetRoleInstances": {
+      "syntax": "UCR.GetRoleInstances *role_reference",
+      "description": "Lists active instances of a UCR role.",
+      "subgroup": "UCR",
+      "essential": false,
+      "additionalDescription": "Each reference exposes id, player, role, and object.",
+      "requiredFramework": "UncomplicatedCustomRoles",
+      "returns": "collection of reference to UCRRoleInstance object",
+      "arguments": [
+        {
+          "name": "role reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to UCRRole object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*role_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "UCR.GetSpawnedCount": {
+      "syntax": "UCR.GetSpawnedCount *role_reference",
+      "description": "Counts players using a UCR role.",
+      "subgroup": "UCR",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": "UncomplicatedCustomRoles",
+      "returns": "number value",
+      "arguments": [
+        {
+          "name": "role reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to UCRRole object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*role_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "UCR.IsRegistered": {
+      "syntax": "UCR.IsRegistered *role_reference",
+      "description": "Checks whether a UCR role is still registered.",
+      "subgroup": "UCR",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": "UncomplicatedCustomRoles",
+      "returns": "bool value",
+      "arguments": [
+        {
+          "name": "role reference",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to UCRRole object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*role_reference",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": []
+    },
+    "UCR.RemoveRole": {
+      "syntax": "UCR.RemoveRole @player reset_role?",
+      "description": "Removes a player's UCR role.",
+      "subgroup": "UCR",
+      "essential": false,
+      "additionalDescription": "Returns false when the player did not have a UCR role. Enable reset role to discard health and other changes made by the role.",
+      "requiredFramework": "UncomplicatedCustomRoles",
+      "returns": "bool value",
+      "arguments": [
+        {
+          "name": "player",
+          "argumentKind": "PlayerArgument",
+          "mustBeProvided": true,
+          "type": "Player value e.g. @player, with EXACTLY 1 player.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "@player",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        },
+        {
+          "name": "reset role",
+          "argumentKind": "BoolArgument",
+          "mustBeProvided": false,
+          "type": "bool (true or false) value",
+          "description": null,
+          "defaultValue": "keep the current base role",
+          "consumesRemainingValues": false,
+          "syntax": "reset_role?",
           "enumValues": null,
           "enumDescription": null,
           "enumDescriptions": null,
@@ -13230,7 +13449,9 @@
           "options": null
         }
       ],
-      "errors": []
+      "errors": [
+        "The role ID is not registered in UCR."
+      ]
     },
     "GetAmmoLimit": {
       "syntax": "GetAmmoLimit @player_to_get_the_limit_from ammo_type",
@@ -15831,6 +16052,24 @@
           "description": "A list of variables that have to be present in order for this script to execute.",
           "required": false,
           "example": "-- require *evSchematic"
+        }
+      ]
+    },
+    "OnUCR": {
+      "syntax": "!-- OnUCR eventName",
+      "description": "Runs a script when UncomplicatedCustomRoles registers, spawns, or removes a role.\nEvent values include the player, role, or active role instance when UCR provides them.\nFind supported events using the 'serhelp ucrevents' command.",
+      "inlineArgument": {
+        "name": "eventName",
+        "description": "The name of the UCR event that starts the script.",
+        "required": true,
+        "example": "!-- OnUCR Spawned"
+      },
+      "arguments": [
+        {
+          "name": "require",
+          "description": "A list of variables that have to be present in order for this script to execute.",
+          "required": false,
+          "example": "-- require @evPlayer *evRole"
         }
       ]
     }
@@ -26003,6 +26242,135 @@
           "name": "$evIsAllowed",
           "type": "bool value",
           "description": null
+        }
+      ]
+    }
+  },
+  "ucrEvents": [
+    "Registered",
+    "Registering",
+    "Removed",
+    "Spawned",
+    "Spawning",
+    "Unregistered"
+  ],
+  "ucrEventDetails": {
+    "Registered": {
+      "description": "Runs after UCR registers a custom role.",
+      "group": "CustomRoleEvents",
+      "eventDataType": "CustomRoleRegisteredEventArgs",
+      "eventDataDescription": null,
+      "isCancellable": false,
+      "variables": [
+        {
+          "name": "*evRole",
+          "type": "reference to UCRRole object",
+          "description": "The UCR role involved in this event."
+        }
+      ]
+    },
+    "Registering": {
+      "description": "Runs before UCR registers a custom role. Return false to stop the registration.",
+      "group": "CustomRoleEvents",
+      "eventDataType": "CustomRoleRegisteringEventArgs",
+      "eventDataDescription": null,
+      "isCancellable": true,
+      "variables": [
+        {
+          "name": "*evRole",
+          "type": "reference to UCRRole object",
+          "description": "The UCR role involved in this event."
+        },
+        {
+          "name": "$evIsAllowed",
+          "type": "bool value",
+          "description": "Whether UCR will continue the action."
+        }
+      ]
+    },
+    "Removed": {
+      "description": "Runs after UCR removes a custom role from a player.",
+      "group": "CustomRoleEvents",
+      "eventDataType": "CustomRoleRemovedEventArgs",
+      "eventDataDescription": null,
+      "isCancellable": false,
+      "variables": [
+        {
+          "name": "*evInstance",
+          "type": "reference to UCRRoleInstance object",
+          "description": "The UCR role instance involved in this event."
+        },
+        {
+          "name": "@evPlayer",
+          "type": "player value",
+          "description": "The player involved in this event."
+        },
+        {
+          "name": "*evRole",
+          "type": "reference to UCRRole object",
+          "description": "The UCR role involved in this event."
+        }
+      ]
+    },
+    "Spawned": {
+      "description": "Runs after UCR gives a player a custom role.",
+      "group": "CustomRoleEvents",
+      "eventDataType": "CustomRoleSpawnedEventArgs",
+      "eventDataDescription": null,
+      "isCancellable": false,
+      "variables": [
+        {
+          "name": "*evInstance",
+          "type": "reference to UCRRoleInstance object",
+          "description": "The UCR role instance involved in this event."
+        },
+        {
+          "name": "@evPlayer",
+          "type": "player value",
+          "description": "The player involved in this event."
+        },
+        {
+          "name": "*evRole",
+          "type": "reference to UCRRole object",
+          "description": "The UCR role involved in this event."
+        }
+      ]
+    },
+    "Spawning": {
+      "description": "Runs before UCR gives a player a custom role. Return false to stop the spawn.",
+      "group": "CustomRoleEvents",
+      "eventDataType": "CustomRoleSpawningEventArgs",
+      "eventDataDescription": null,
+      "isCancellable": true,
+      "variables": [
+        {
+          "name": "@evPlayer",
+          "type": "player value",
+          "description": "The player involved in this event."
+        },
+        {
+          "name": "*evRole",
+          "type": "reference to UCRRole object",
+          "description": "The UCR role involved in this event."
+        },
+        {
+          "name": "$evIsAllowed",
+          "type": "bool value",
+          "description": "Whether UCR will continue the action."
+        }
+      ]
+    },
+    "Unregistered": {
+      "description": "Runs after UCR unregisters a custom role.",
+      "group": "CustomRoleEvents",
+      "eventDataType": "CustomRoleUnregisteredEventArgs",
+      "eventDataDescription": null,
+      "isCancellable": false,
+      "variables": [
+        {
+          "name": "*evRole",
+          "type": "reference to UCRRole object",
+          "description": "The UCR role involved in this event."
         }
       ]
     }

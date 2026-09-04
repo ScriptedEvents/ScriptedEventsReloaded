@@ -3,10 +3,10 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.Extensions;
 using SER.Code.Helpers;
+using SER.Code.Integrations.Ucr;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
 using SER.Code.ValueSystem;
-using UncomplicatedCustomRoles.API.Features;
 
 namespace SER.Code.MethodSystem.Methods.UCRMethods;
 
@@ -25,9 +25,6 @@ public class UCR_GetPlayersWithRoleMethod : ReturningMethod<PlayerValue>, IDepen
 
     public override void Execute()
     {
-        var id = Args.GetInt("role id");
-        ReturnValue = Player.ReadyList
-            .Where(p => SummonedCustomRole.Get(p)?.Role.Id == id)
-            .ToPlayerValue();
+        ReturnValue = UcrBridge.GetPlayersWithRole(Args.GetInt("role id")).ToPlayerValue();
     }
 }

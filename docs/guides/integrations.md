@@ -9,7 +9,7 @@ SER 1.0 was live-tested with the following integration baseline:
 | Framework | Tested version | SER surface |
 | --- | ---: | --- |
 | ProjectMER | 2025.11.2.1 | `MER.*` methods and `!-- OnPMER` events |
-| UncomplicatedCustomRoles | 9.5.1 | `UCR.*` methods |
+| UncomplicatedCustomRoles | 9.6.0 | `UCR.*` methods and `!-- OnUCR` events |
 | Callvote | 6.9.0 | `Vote.*` methods |
 
 All three LabAPI integrations were also loaded together, exercised, and kept
@@ -62,15 +62,35 @@ shows registration, callbacks, and spawn behavior together.
 ## UncomplicatedCustomRoles
 
 When UncomplicatedCustomRoles is installed, `UCR.*` methods operate on its
-registered roles. Discover the installed surface instead of assuming role IDs
-or behavior:
+registered roles. UCR 9.6.0 also lets scripts react when roles are registered,
+spawned, or removed. Discover the installed surface instead of assuming role
+IDs or behavior:
 
 ```text
 serhelp methods UncomplicatedCustomRoles
+serhelp ucrevents
 serhelp UCR.GetRole
-serhelp UCR.GetPlayersWithRole
+serhelp UCR.GetRoles
 serhelp UCR.SetRole
 ```
+
+Use a role event as its own script section:
+
+```ser
+!-- OnUCR Spawned
+-- require @evPlayer *evRole *evInstance
+
+Broadcast @evPlayer 5s "You spawned as {*evRole -> name}."
+```
+
+`Registering` and `Spawning` can be cancelled. Return `false` from the script
+to stop the registration or spawn. The other four events report what happened
+and cannot be cancelled.
+
+Role references expose `id` and `name`, then forward UCR's role properties.
+Active instance references expose `id`, `player`, `role`, and `isActive`. Check
+`isActive` after a wait. Use `UCR.IsRegistered` before reusing an older role
+reference after UCR has reloaded its roles.
 
 SER's own `CRole.*` system and the optional `UCR.*` integration are separate.
 

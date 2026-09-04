@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
-using LabApi.Events;
 using LabApi.Events.Arguments.Interfaces;
 using LabApi.Loader;
 using PlayerStatsSystem;
@@ -8,6 +7,7 @@ using SER.Code.Extensions;
 using SER.Code.Helpers;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.Integrations.Mer;
+using SER.Code.Integrations.Ucr;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.ValueSystem;
@@ -22,7 +22,8 @@ public static class EventHandler
     private enum EventSource
     {
         LabApi,
-        ProjectMer
+        ProjectMer,
+        Ucr
     }
 
     private readonly record struct EventKey(EventSource Source, string Name);
@@ -33,14 +34,32 @@ public static class EventHandler
     }
 
     private static readonly List<Action> UnsubscribeActions = [];
-    private static readonly Dictionary<EventKey, List<Action<EventArgs?, Variable[]>>> OnEventActions = [];
-    private static readonly Dictionary<(ScriptName Script, EventKey Event), Action<EventArgs?, Variable[]>> ScriptEventActions = [];
+    private static readonly Dictionary<EventKey, List<Action<object?, Variable[]>>> OnEventActions = [];
+    private static readonly Dictionary<(ScriptName Script, EventKey Event), Action<object?, Variable[]>> ScriptEventActions = [];
     private static readonly HashSet<string> DisabledEvents = [];
+    private static readonly Dictionary<string, string> UcrEventDescriptions = new(StringComparer.Ordinal)
+    {
+        ["Registering"] = "Runs before UCR registers a custom role. Return false to stop the registration.",
+        ["Registered"] = "Runs after UCR registers a custom role.",
+        ["Unregistered"] = "Runs after UCR unregisters a custom role.",
+        ["Spawning"] = "Runs before UCR gives a player a custom role. Return false to stop the spawn.",
+        ["Spawned"] = "Runs after UCR gives a player a custom role.",
+        ["Removed"] = "Runs after UCR removes a custom role from a player."
+    };
+    private static readonly Dictionary<string, string> UcrVariableDescriptions = new(StringComparer.Ordinal)
+    {
+        ["Role"] = "The UCR role involved in this event.",
+        ["Player"] = "The player involved in this event.",
+        ["Instance"] = "The UCR role instance involved in this event.",
+        ["IsAllowed"] = "Whether UCR will continue the action."
+    };
     public static List<EventInfo> AvailableEvents = [];
     public static List<EventInfo> AvailablePmerEvents = [];
+    public static List<EventInfo> AvailableUcrEvents = [];
     public static readonly HashSet<string> RegisteredHandlers = [];
     public static readonly HashSet<string> BindedEvents = [];
     public static readonly HashSet<string> BindedPmerEvents = [];
+    public static readonly HashSet<string> BindedUcrEvents = [];
     
     public static void Initialize()
     {
@@ -52,11 +71,17 @@ public static class EventHandler
             .Flatten().ToList();
 
         AvailablePmerEvents = GetOptionalProjectMerEvents(loadOptionalAssembly: false);
+        AvailableUcrEvents = GetOptionalUcrEvents(loadOptionalAssembly: false);
     }
 
     public static void LoadOptionalProjectMerEventsForTooling()
     {
         AvailablePmerEvents = GetOptionalProjectMerEvents(loadOptionalAssembly: true);
+    }
+
+    public static void LoadOptionalUcrEventsForTooling()
+    {
+        AvailableUcrEvents = GetOptionalUcrEvents(loadOptionalAssembly: true);
     }
 
     private static List<EventInfo> GetOptionalProjectMerEvents(bool loadOptionalAssembly)
@@ -92,6 +117,38 @@ public static class EventHandler
 
         return schematicHandler.GetEvents(BindingFlags.Public | BindingFlags.Static).ToList();
     }
+
+    private static List<EventInfo> GetOptionalUcrEvents(bool loadOptionalAssembly)
+    {
+        Assembly? ucrAssembly = GetOptionalAssembly("UncomplicatedCustomRoles", loadOptionalAssembly);
+        Type? eventHandler = ucrAssembly?.GetType("UncomplicatedCustomRoles.API.Events.CustomRoleEvents");
+        return eventHandler?.GetEvents(BindingFlags.Public | BindingFlags.Static).ToList() ?? [];
+    }
+
+    private static Assembly? GetOptionalAssembly(string assemblyName, bool loadOptionalAssembly)
+    {
+        Assembly? assembly = AppDomain.CurrentDomain.GetAssemblies()
+            .FirstOrDefault(candidate => candidate.GetName().Name == assemblyName);
+        if (assembly is not null || !loadOptionalAssembly)
+            return assembly;
+
+        try
+        {
+            return Assembly.Load(assemblyName);
+        }
+        catch (FileNotFoundException)
+        {
+            return null;
+        }
+        catch (FileLoadException)
+        {
+            return null;
+        }
+        catch (BadImageFormatException)
+        {
+            return null;
+        }
+    }
     
     public static void Clear()
     {
@@ -106,7 +163,9 @@ public static class EventHandler
         DisabledEvents.Clear();
         BindedEvents.Clear();
         BindedPmerEvents.Clear();
+        BindedUcrEvents.Clear();
         AvailablePmerEvents.Clear();
+        AvailableUcrEvents.Clear();
     }
 
     public static TryGet<bool> DisableEvent(string evName)
@@ -157,6 +216,9 @@ public static class EventHandler
     public static Result AddPmerEventHandler(string evName, ScriptName scriptName)
         => AddEventHandler(new EventKey(EventSource.ProjectMer, evName), scriptName);
 
+    public static Result AddUcrEventHandler(string evName, ScriptName scriptName)
+        => AddEventHandler(new EventKey(EventSource.Ucr, evName), scriptName);
+
     private static Result AddEventHandler(EventKey eventKey, ScriptName scriptName)
     {
         var handlerId = $"'{scriptName}' script";
@@ -189,6 +251,9 @@ public static class EventHandler
     public static void RemovePmerEventHandler(string evName, ScriptName scriptName)
         => RemoveEventHandler(new EventKey(EventSource.ProjectMer, evName), scriptName);
 
+    public static void RemoveUcrEventHandler(string evName, ScriptName scriptName)
+        => RemoveEventHandler(new EventKey(EventSource.Ucr, evName), scriptName);
+
     private static void RemoveEventHandler(EventKey eventKey, ScriptName scriptName)
     {
         if (!ScriptEventActions.TryGetValue((scriptName, eventKey), out var action))
@@ -210,7 +275,10 @@ public static class EventHandler
         RegisteredHandlers.Remove($"'{scriptName}' script");
     }
     
-    public static Result AddEventHandler(string evName, Action<EventArgs?, Variable[]> action, string handlerId) 
+    public static Result AddEventHandler(string evName, Action<EventArgs?, Variable[]> action, string handlerId)
+        => AddExternalEventHandler(evName, (eventArgs, variables) => action(eventArgs as EventArgs, variables), handlerId);
+
+    private static Result AddExternalEventHandler(string evName, Action<object?, Variable[]> action, string handlerId)
     {
         if (RegisteredHandlers.Contains(handlerId))
         {
@@ -238,20 +306,31 @@ public static class EventHandler
 
     private static Result BindEvent(EventKey eventKey)
     {
-        var availableEvents = eventKey.Source == EventSource.ProjectMer
-            ? AvailablePmerEvents
-            : AvailableEvents;
+        var availableEvents = eventKey.Source switch
+        {
+            EventSource.ProjectMer => AvailablePmerEvents,
+            EventSource.Ucr => AvailableUcrEvents,
+            _ => AvailableEvents
+        };
         EventInfo? matchingEventInfo = availableEvents.FirstOrDefault(e => e.Name == eventKey.Name);
         if (matchingEventInfo is null)
         {
-            return eventKey.Source == EventSource.ProjectMer && AvailablePmerEvents.Count == 0
-                ? "ProjectMER is not installed or did not expose any supported events."
-                : $"Event '{eventKey.Name}' does not exist!";
+            return eventKey.Source switch
+            {
+                EventSource.ProjectMer when AvailablePmerEvents.Count == 0 =>
+                    "ProjectMER is not installed or did not expose any supported events.",
+                EventSource.Ucr when AvailableUcrEvents.Count == 0 =>
+                    "UncomplicatedCustomRoles 9.6.0 or newer is not installed or did not expose any supported events.",
+                _ => $"Event '{eventKey.Name}' does not exist!"
+            };
         }
 
-        var boundEvents = eventKey.Source == EventSource.ProjectMer
-            ? BindedPmerEvents
-            : BindedEvents;
+        var boundEvents = eventKey.Source switch
+        {
+            EventSource.ProjectMer => BindedPmerEvents,
+            EventSource.Ucr => BindedUcrEvents,
+            _ => BindedEvents
+        };
         if (!boundEvents.Add(eventKey.Name))
         {
             // already binded
@@ -269,7 +348,7 @@ public static class EventHandler
         return true;
     }
 
-    private static Action<EventArgs?, Variable[]> RunScriptOnEvent(ScriptName scrName, EventKey eventKey)
+    private static Action<object?, Variable[]> RunScriptOnEvent(ScriptName scrName, EventKey eventKey)
     {
         return (ev, variables) =>
         {
@@ -284,15 +363,23 @@ public static class EventHandler
 
             script.AddLocalVariables(variables);
             var isAllowed = script.RunForEvent(RunReason.Event);
-            if (isAllowed.HasValue && ev is ICancellableEvent cancellable1)
-                cancellable1.IsAllowed = isAllowed.Value;
+            if (!isAllowed.HasValue || ev is null)
+                return;
+
+            if (ev is ICancellableEvent cancellable)
+                cancellable.IsAllowed = isAllowed.Value;
+            else if (eventKey.Source == EventSource.Ucr)
+                UcrBridge.TrySetEventAllowed(ev, isAllowed.Value);
         };
     }
 
     private static void BindNonArgumented(EventInfo eventInfo, EventKey eventKey)
     {
         // Create delegate that captures the event source and name
-        LabEventHandler handler = () => OnNonArgumentedEvent(eventKey);
+        var call = Expression.Call(
+            typeof(EventHandler).GetMethod(nameof(OnNonArgumentedEvent), BindingFlags.Static | BindingFlags.NonPublic)!,
+            Expression.Constant(eventKey));
+        var handler = Expression.Lambda(eventInfo.EventHandlerType!, call).Compile();
 
         // Subscribe
         eventInfo.GetAddMethod(false).Invoke(null!, [handler]);
@@ -314,9 +401,8 @@ public static class EventHandler
             evParam
         );
 
-        // Compile delegate of correct type: LabEventHandler<T>
-        var delegateType = typeof(LabEventHandler<>).MakeGenericType(generic);
-        var lambda = Expression.Lambda(delegateType, call, evParam);
+        // Compile the exact delegate type exposed by the optional framework.
+        var lambda = Expression.Lambda(eventInfo.EventHandlerType!, call, evParam);
         var handler = lambda.Compile();
 
         // Subscribe
@@ -339,7 +425,7 @@ public static class EventHandler
         foreach (var action in actions.ToArray()) action(null, []);
     }
 
-    private static void OnArgumentedEvent<T>(EventKey eventKey, T ev) where T : EventArgs
+    private static void OnArgumentedEvent<T>(EventKey eventKey, T ev)
     {
         Log.Debug($"[Arg] {eventKey.Source} event '{eventKey.Name}' triggered with {typeof(T).AccurateName}.");
 
@@ -352,7 +438,7 @@ public static class EventHandler
             return;
         }
 
-        var variables = GetVariablesFromEvent(ev, eventKey.Source);
+        var variables = GetVariablesFromEvent(ev!, eventKey.Source);
         if (!OnEventActions.TryGetValue(eventKey, out var actions))
         {
             Log.Debug($"Event '{eventKey.Name}' has no scripts connected.");
@@ -365,7 +451,7 @@ public static class EventHandler
     public static Variable[] GetVariablesFromEvent(EventArgs ev)
         => GetVariablesFromEvent(ev, EventSource.LabApi);
 
-    private static Variable[] GetVariablesFromEvent(EventArgs ev, EventSource source)
+    private static Variable[] GetVariablesFromEvent(object ev, EventSource source)
     {
         List<(object, string, Type)> properties = (
             from prop in ev.GetType().GetProperties()
@@ -373,13 +459,19 @@ public static class EventHandler
             let value = prop.GetValue(ev)
             let type = prop.PropertyType
             select (
-                source == EventSource.ProjectMer && value is not null
-                    ? MerBridge.WrapEventValue(value)
-                    : value,
+                value is null ? null : source switch
+                {
+                    EventSource.ProjectMer => MerBridge.WrapEventValue(value),
+                    EventSource.Ucr => UcrBridge.WrapEventValue(value),
+                    _ => value
+                },
                 prop.Name,
-                source == EventSource.ProjectMer
-                    ? MerBridge.GetEventValueType(type)
-                    : type)
+                source switch
+                {
+                    EventSource.ProjectMer => MerBridge.GetEventValueType(type),
+                    EventSource.Ucr => UcrBridge.GetEventValueType(type),
+                    _ => type
+                })
         ).ToList();
 
         return InternalGetVariablesFromProperties(properties);
@@ -401,9 +493,13 @@ public static class EventHandler
             let value = prop.PropertyType
             where value is not null
             select (
-                IsPmerEvent(ev) ? MerBridge.GetEventValueType(value) : value,
+                IsPmerEvent(ev)
+                    ? MerBridge.GetEventValueType(value)
+                    : IsUcrEvent(ev)
+                        ? UcrBridge.GetEventValueType(value)
+                        : value,
                 prop.Name,
-                XmlDocReader.GetDocumentation(prop))
+                GetEventVariableDescription(ev, prop))
         ).ToList();
         
         return GetMimicVariablesForEventHelp(properties);
@@ -411,6 +507,35 @@ public static class EventHandler
 
     public static bool IsPmerEvent(EventInfo eventInfo)
         => eventInfo.DeclaringType?.Assembly.GetName().Name == "ProjectMER";
+
+    public static bool IsUcrEvent(EventInfo eventInfo)
+        => eventInfo.DeclaringType?.Assembly.GetName().Name == "UncomplicatedCustomRoles";
+
+    public static bool IsCancellableEvent(EventInfo eventInfo)
+    {
+        var eventArgsType = eventInfo.EventHandlerType?.GetGenericArguments().FirstOrDefault();
+        return eventArgsType is not null &&
+               (typeof(ICancellableEvent).IsAssignableFrom(eventArgsType) ||
+                IsUcrEvent(eventInfo) && UcrBridge.IsCancellableEvent(eventArgsType));
+    }
+
+    public static string? GetEventDescription(EventInfo eventInfo)
+    {
+        return XmlDocReader.GetDocumentation(eventInfo) is { Length: > 0 } documentation
+            ? documentation
+            : IsUcrEvent(eventInfo) && UcrEventDescriptions.TryGetValue(eventInfo.Name, out var description)
+                ? description
+                : null;
+    }
+
+    private static string? GetEventVariableDescription(EventInfo eventInfo, PropertyInfo property)
+    {
+        return XmlDocReader.GetDocumentation(property) is { Length: > 0 } documentation
+            ? documentation
+            : IsUcrEvent(eventInfo) && UcrVariableDescriptions.TryGetValue(property.Name, out var description)
+                ? description
+                : null;
+    }
 
     private static Variable[] InternalGetVariablesFromProperties(List<(object value, string name, Type type)> properties)
     {

@@ -520,10 +520,14 @@ function flagCompletions(position, typedName) {
     return Object.entries(SER_TRUTH_TABLE.flags || {}).map(([name, flag]) => {
         const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Event);
         item.insertText = flag.inlineArgument ? `${name} ` : name;
-        if (name === 'OnEvent' || name === 'OnPMER') {
+        if (name === 'OnEvent' || name === 'OnPMER' || name === 'OnUCR') {
             item.command = {
                 command: 'editor.action.triggerSuggest',
-                title: name === 'OnPMER' ? 'Show ProjectMER events' : 'Show SER events'
+                title: name === 'OnPMER'
+                    ? 'Show ProjectMER events'
+                    : name === 'OnUCR'
+                        ? 'Show UCR events'
+                        : 'Show SER events'
             };
         }
         item.filterText = name;
@@ -551,18 +555,26 @@ function flagArgumentCompletions(document, position, typedName) {
     });
 }
 
-function eventCompletions(position, typedName, pmer = false) {
+function eventCompletions(position, typedName, source = 'ser') {
     const range = completionRange(position, typedName);
-    const events = pmer ? SER_TRUTH_TABLE.pmerEvents : SER_TRUTH_TABLE.events;
-    const eventDetails = pmer ? SER_TRUTH_TABLE.pmerEventDetails : SER_TRUTH_TABLE.eventDetails;
+    const events = source === 'pmer'
+        ? SER_TRUTH_TABLE.pmerEvents
+        : source === 'ucr'
+            ? SER_TRUTH_TABLE.ucrEvents
+            : SER_TRUTH_TABLE.events;
+    const eventDetails = source === 'pmer'
+        ? SER_TRUTH_TABLE.pmerEventDetails
+        : source === 'ucr'
+            ? SER_TRUTH_TABLE.ucrEventDetails
+            : SER_TRUTH_TABLE.eventDetails;
     return (events || []).map(eventName => {
         const details = eventDetails?.[eventName];
         const item = new vscode.CompletionItem(eventName, vscode.CompletionItemKind.Event);
         item.insertText = eventName;
         item.filterText = eventName;
         item.range = range;
-        const source = pmer ? 'ProjectMER event' : 'SER event';
-        item.detail = details?.group ? `${source} · ${details.group}` : source;
+        const sourceName = source === 'pmer' ? 'ProjectMER event' : source === 'ucr' ? 'UCR event' : 'SER event';
+        item.detail = details?.group ? `${sourceName} · ${details.group}` : sourceName;
         if (details) {
             let documentation = details.description ? `${escapeMarkdown(details.description)}\n\n` : '';
             if (details.eventDataType) {
@@ -764,9 +776,10 @@ async function provideCompletions(document, position) {
         }
     }
 
-    const eventMatch = linePrefix.match(/^\s*!--\s+(OnEvent|OnPMER)\s+([A-Za-z0-9_]*)$/);
+    const eventMatch = linePrefix.match(/^\s*!--\s+(OnEvent|OnPMER|OnUCR)\s+([A-Za-z0-9_]*)$/);
     if (eventMatch) {
-        return eventCompletions(position, eventMatch[2], eventMatch[1] === 'OnPMER');
+        const source = eventMatch[1] === 'OnPMER' ? 'pmer' : eventMatch[1] === 'OnUCR' ? 'ucr' : 'ser';
+        return eventCompletions(position, eventMatch[2], source);
     }
 
     const flagMatch = linePrefix.match(/^\s*!--\s*([A-Za-z0-9]*)$/);

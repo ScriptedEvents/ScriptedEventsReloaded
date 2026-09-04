@@ -7613,10 +7613,10 @@
     },
     "IsAllowed": {
       "syntax": "IsAllowed isAllowed",
-      "description": "Sets whether or not the event is allowed to run.",
+      "description": "Allows or cancels the event that started this script.",
       "subgroup": "Event",
       "essential": false,
-      "additionalDescription": "In order for it to have any impact, the script in which the method is used must be triggered by an event, and that event must be cancellable.",
+      "additionalDescription": "This only works in a cancellable event, before any Wait or other pause. It cannot cancel the current event while SafeScripts is enabled because the safety pause lets the event continue first.",
       "requiredFramework": null,
       "returns": null,
       "arguments": [

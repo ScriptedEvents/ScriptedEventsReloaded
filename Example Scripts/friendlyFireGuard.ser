@@ -1,0 +1,18 @@
+# Disabled by default: remove # from the filename to enable this script.
+# Stops direct damage between players on the same team and tells the attacker why.
+# Environmental damage and self-damage are left unchanged.
+# Requires SafeScripts: false so IsAllowed can cancel the damage in time.
+
+!-- OnEvent Hurting
+-- require @evPlayer @evAttacker
+
+if {Overlapping @evPlayer @evAttacker}
+    stop
+end
+
+if {@evPlayer -> team} isnt {@evAttacker -> team}
+    stop
+end
+
+IsAllowed false
+Hint @evAttacker 3s "<color=#ffb86c>Friendly fire is disabled for your team.</color>"

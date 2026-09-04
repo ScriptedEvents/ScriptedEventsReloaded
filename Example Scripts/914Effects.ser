@@ -1,6 +1,7 @@
 # Disabled by default: remove # from the filename to enable this script.
 # this script applies different effects for players in SCP-914
 # depending on the current setting of the knob
+# Requires SafeScripts: false so IsAllowed can change the 914 output in time.
 
 !-- OnEvent ProcessingPlayer
 -- require @evPlayer $evKnobSetting

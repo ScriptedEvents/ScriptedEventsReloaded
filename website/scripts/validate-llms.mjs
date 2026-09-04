@@ -74,6 +74,10 @@ for (const entry of fs.readdirSync(exampleSourceDirectory, {recursive: true, wit
   const exampleName = examplePath.replace(/\.(?:ser|txt)$/i, '');
   const generatedPage = path.join(buildDirectory, 'llms', 'examples', `${slug(exampleName)}.md`);
   assert.ok(fs.existsSync(generatedPage), `Build-validated example is absent from the AI corpus: ${examplePath}`);
+  const websitePage = path.join(buildDirectory, 'examples', slug(exampleName), 'index.html');
+  assert.ok(fs.existsSync(websitePage), `Build-validated example is absent from the website: ${examplePath}`);
+  const downloadAsset = path.join(buildDirectory, 'assets', 'examples', ...examplePath.split('/'));
+  assert.ok(fs.existsSync(downloadAsset), `Build-validated example has no download asset: ${examplePath}`);
 }
 
 const sourceFenceCount = markdownAssetFiles.reduce((count, filename) => {

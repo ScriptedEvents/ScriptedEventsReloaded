@@ -1,0 +1,28 @@
+# Disabled by default: remove # from the filename to enable this script.
+# Sends a small Discord report after each round.
+# Create Custom Configs/round-report.yml inside the SER config directory:
+# webhook_url: "https://discord.com/api/webhooks/..."
+
+!-- OnEvent RoundEnded
+-- require $evLeadingTeam
+
+*settings = Config.Read "round-report"
+if {*settings -> isInvalid}
+    Error "Round report was not sent. Create Custom Configs/round-report.yml and add webhook_url."
+    stop
+end
+
+$webhookUrl = Config.GetOption *settings "webhook_url" ""
+if {$webhookUrl -> length} is 0
+    Error "Round report was not sent. Set webhook_url in Custom Configs/round-report.yml."
+    stop
+end
+
+$content = "Round ended. Leading team: {$evLeadingTeam}. Players online: {AmountOf @all}."
+*message = Discord.CreateMessage $content
+
+attempt
+    Discord.SendMessage $webhookUrl *message
+on_error with $message
+    Error "Round report could not reach Discord: {$message}"
+end

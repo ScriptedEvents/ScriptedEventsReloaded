@@ -12,6 +12,8 @@ old releases.
 | Create a player command | [`selfHealCommand.ser`](../../Example%20Scripts/selfHealCommand.ser) |
 | Put several handlers in one file | [`multiSectionHandlers.ser`](../../Example%20Scripts/multiSectionHandlers.ser) |
 | Track round state | [`killStreak.ser`](../../Example%20Scripts/killStreak.ser) |
+| Block damage between teammates | [`friendlyFireGuard.ser`](../../Example%20Scripts/friendlyFireGuard.ser) |
+| Send a round result to Discord | [`roundReport.ser`](../../Example%20Scripts/roundReport.ser) |
 | Build a timed event | [`hotPotato.ser`](../../Example%20Scripts/hotPotato.ser) |
 | Store persistent-style data | [`coinTracker.ser`](../../Example%20Scripts/coinTracker.ser) |
 | Create custom roles | [`customRoles.ser`](../../Example%20Scripts/customRoles.ser) |

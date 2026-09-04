@@ -1,5 +1,6 @@
 # Disabled by default: remove # from the filename to enable this script.
 # this script adds a fully functioning coin with custom behaviors
+# Requires SafeScripts: false so IsAllowed can cancel a coin flip in time.
 
 !-- OnEvent FlippingCoin
 

@@ -167,6 +167,9 @@ end
 ```
 
 Keep `attempt` blocks small so it is obvious which instruction failed.
+`attempt` handles errors caused by script input or game state. The `stop`
+keyword still stops the script, and an internal SER failure still receives an
+identifier in the server console instead of being hidden by `on_error`.
 Unexpected internal SER failures are presented with a short identifier; full
 technical details remain in the server console.
 

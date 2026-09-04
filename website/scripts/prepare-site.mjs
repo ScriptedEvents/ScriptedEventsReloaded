@@ -300,11 +300,12 @@ function exampleUsage(content) {
 
 function buildExamples() {
   const sourceDirectory = path.join(repositoryDirectory, 'Example Scripts');
-  const filenames = fs.readdirSync(sourceDirectory)
-    .filter(filename => /\.(?:ser|txt)$/i.test(filename))
+  const filenames = fs.readdirSync(sourceDirectory, {recursive: true, withFileTypes: true})
+    .filter(entry => entry.isFile() && /\.(?:ser|txt)$/i.test(entry.name))
+    .map(entry => path.relative(sourceDirectory, path.join(entry.parentPath, entry.name)).replaceAll('\\', '/'))
     .sort((a, b) => a.localeCompare(b));
   const examples = filenames.map(filename => {
-    const content = fs.readFileSync(path.join(sourceDirectory, filename), 'utf8').trimEnd();
+    const content = fs.readFileSync(path.join(sourceDirectory, ...filename.split('/')), 'utf8').trimEnd();
     return {filename, name: filename.replace(/\.(?:ser|txt)$/i, ''), content, usage: exampleUsage(content)};
   });
 
@@ -346,7 +347,7 @@ function buildExamples() {
     ];
     write(`examples/${slug(example.name)}.md`, [
       frontMatter(example.name, {sidebar_label: example.name}),
-      `[Download the raw ${inlineCode(example.filename)} file](https://raw.githubusercontent.com/ScriptedEvents/ScriptedEventsReloaded/main/Example%20Scripts/${encodeURIComponent(example.filename)})`,
+      `[Download the raw ${inlineCode(example.filename)} file](https://raw.githubusercontent.com/ScriptedEvents/ScriptedEventsReloaded/main/Example%20Scripts/${example.filename.split('/').map(encodeURIComponent).join('/')})`,
       '',
       links.length ? `**Uses:** ${[...new Set(links)].join(' · ')}` : '',
       '',
@@ -472,10 +473,14 @@ function copyStaticAssets() {
   fs.mkdirSync(editorDirectory, {recursive: true});
   fs.mkdirSync(imageDirectory, {recursive: true});
 
-  for (const filename of fs.readdirSync(path.join(repositoryDirectory, 'Example Scripts'))) {
-    if (/\.(?:ser|txt)$/i.test(filename)) {
-      fs.copyFileSync(path.join(repositoryDirectory, 'Example Scripts', filename), path.join(assetsDirectory, filename));
-    }
+  const exampleSourceDirectory = path.join(repositoryDirectory, 'Example Scripts');
+  for (const entry of fs.readdirSync(exampleSourceDirectory, {recursive: true, withFileTypes: true})) {
+    if (!entry.isFile() || !/\.(?:ser|txt)$/i.test(entry.name)) continue;
+    const source = path.join(entry.parentPath, entry.name);
+    const relativeFilename = path.relative(exampleSourceDirectory, source);
+    const target = path.join(assetsDirectory, relativeFilename);
+    fs.mkdirSync(path.dirname(target), {recursive: true});
+    fs.copyFileSync(source, target);
   }
 
   const editorSource = path.join(repositoryDirectory, 'SER Visual Editor.html');

@@ -84,7 +84,18 @@ end
 ```
 
 `IsAllowed false` changes the game event. `stop` prevents later SER
-instructions in this section from running.
+instructions in this section from running. Put `IsAllowed` before any `Wait` or
+other pause.
+
+:::warning SafeScripts and event cancellation
+
+`IsAllowed` cannot cancel the current event while SafeScripts is enabled. The
+safety pause lets the game continue the event before the script can change it.
+Keep SafeScripts enabled for general scripts. If a script must cancel an event,
+turn it off only after checking every active script for loops that can freeze the
+server.
+
+:::
 
 ## ProjectMER events
 

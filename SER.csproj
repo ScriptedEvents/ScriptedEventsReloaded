@@ -122,10 +122,11 @@
         <EmbeddedResource Include="$(LabApiXmlPath)" Condition="Exists('$(LabApiXmlPath)')">
             <LogicalName>LabApi.xml</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="$(ExiledApiXmlPath)" Condition="'$(Configuration)' == 'EXILED' and Exists('$(ExiledApiXmlPath)')">
+        <!-- Keep shared help and editor data the same no matter which plugin build runs last. -->
+        <EmbeddedResource Include="$(ExiledApiXmlPath)" Condition="Exists('$(ExiledApiXmlPath)')">
             <LogicalName>Exiled.API.xml</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="$(ExiledEventsXmlPath)" Condition="'$(Configuration)' == 'EXILED' and Exists('$(ExiledEventsXmlPath)')">
+        <EmbeddedResource Include="$(ExiledEventsXmlPath)" Condition="Exists('$(ExiledEventsXmlPath)')">
             <LogicalName>Exiled.Events.xml</LogicalName>
         </EmbeddedResource>
         <None Include="App.config" />

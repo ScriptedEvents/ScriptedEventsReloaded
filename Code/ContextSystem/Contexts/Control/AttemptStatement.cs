@@ -1,6 +1,7 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
+using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
@@ -54,7 +55,7 @@ public class AttemptStatement : StatementContext, IExtendableStatement, IKeyword
             {
                 isRunning = coro.MoveNext();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (CanHandle(ex))
             {
                 _exception = ex;
                 break;
@@ -75,4 +76,6 @@ public class AttemptStatement : StatementContext, IExtendableStatement, IKeyword
         while (catchCoro.MoveNext())
             yield return catchCoro.Current;
     }
+
+    internal static bool CanHandle(Exception exception) => exception is ScriptRuntimeError;
 }

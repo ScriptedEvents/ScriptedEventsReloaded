@@ -1,6 +1,7 @@
 ﻿using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
+using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
@@ -19,16 +20,7 @@ public class OnErrorStatement : StatementContext, IStatementExtender, IKeywordCo
     private VariableToken? _typeVariableToken;
     public override string FriendlyName => "'on_error' statement";
 
-    public Exception? Exception
-    {
-        get;
-        set
-        {
-            if (field is not null)
-                return;
-            field = value;
-        }
-    }
+    public Exception? Exception { get; set; }
 
     public Result SetOptionalVariables(params VariableToken[] variableTokens)
     {
@@ -106,32 +98,43 @@ public class OnErrorStatement : StatementContext, IStatementExtender, IKeywordCo
 
     protected override IEnumerator<float> Execute()
     {
+        var exception = Exception ?? throw new ExecutionInvariantException(
+            "An on_error handler started without a script error.");
         Variable? messageVariable = null;
         Variable? typeVariable = null;
         Variable? stackTraceVariable = null;
 
-        if (_messageVariableToken is not null)
+        try
         {
-            messageVariable = Variable.Create(_messageVariableToken.Name, Value.Parse(Exception!.Message));
-            Script.AddLocalVariable(messageVariable);
-        }
-        if (_typeVariableToken is not null)
-        {
-            typeVariable = Variable.Create(_typeVariableToken.Name, Value.Parse(Exception!.GetType().AccurateName));
-            Script.AddLocalVariable(typeVariable);
-        }
-        if (_stackTraceVariableToken is not null)
-        {
-            stackTraceVariable = Variable.Create(_stackTraceVariableToken.Name, Value.Parse(Exception!.StackTrace));
-            Script.AddLocalVariable(stackTraceVariable);
-        }
+            if (_messageVariableToken is not null)
+            {
+                messageVariable = Variable.Create(_messageVariableToken.Name, Value.Parse(exception.Message));
+                Script.AddLocalVariable(messageVariable);
+            }
+            if (_typeVariableToken is not null)
+            {
+                typeVariable = Variable.Create(_typeVariableToken.Name, Value.Parse(exception.GetType().AccurateName));
+                Script.AddLocalVariable(typeVariable);
+            }
+            if (_stackTraceVariableToken is not null)
+            {
+                stackTraceVariable = Variable.Create(
+                    _stackTraceVariableToken.Name,
+                    Value.Parse(exception.StackTrace ?? "No stack trace was available."));
+                Script.AddLocalVariable(stackTraceVariable);
+            }
 
-        using var coro = RunChildren();
-        while (coro.MoveNext())
-            yield return coro.Current;
+            using var coro = RunChildren();
+            while (coro.MoveNext())
+                yield return coro.Current;
+        }
+        finally
+        {
+            if (messageVariable is not null) Script.RemoveLocalVariable(messageVariable);
+            if (typeVariable is not null) Script.RemoveLocalVariable(typeVariable);
+            if (stackTraceVariable is not null) Script.RemoveLocalVariable(stackTraceVariable);
 
-        if (messageVariable is not null) Script.RemoveLocalVariable(messageVariable);
-        if (typeVariable is not null) Script.RemoveLocalVariable(typeVariable);
-        if (stackTraceVariable is not null) Script.RemoveLocalVariable(stackTraceVariable);
+            Exception = null;
+        }
     }
 }

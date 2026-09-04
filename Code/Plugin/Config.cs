@@ -23,7 +23,8 @@ public class Config
 
     [Description(
         "Slows scripts down slightly to help stop them from freezing the server. " +
-        "Keep this enabled unless you have checked every active script."
+        "Keep this enabled unless you have checked every active script. " +
+        "While it is enabled, IsAllowed cannot cancel the current event because the event continues during the safety pause."
     )]
     public bool SafeScripts { get; set; } = true;
 

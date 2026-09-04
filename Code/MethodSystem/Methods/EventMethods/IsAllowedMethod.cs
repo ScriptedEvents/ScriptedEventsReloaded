@@ -8,11 +8,11 @@ namespace SER.Code.MethodSystem.Methods.EventMethods;
 [UsedImplicitly]
 public class IsAllowedMethod : SynchronousMethod, IAdditionalDescription
 {
-    public override string Description => "Sets whether or not the event is allowed to run.";
+    public override string Description => "Allows or cancels the event that started this script.";
 
     public string AdditionalDescription =>
-        "In order for it to have any impact, the script in which the method is used must be triggered by an event, " +
-        "and that event must be cancellable.";
+        "This only works in a cancellable event, before any Wait or other pause. " +
+        "It cannot cancel the current event while SafeScripts is enabled because the safety pause lets the event continue first.";
 
     public override Argument[] ExpectedArguments { get; } =
     [
@@ -21,6 +21,6 @@ public class IsAllowedMethod : SynchronousMethod, IAdditionalDescription
 
     public override void Execute()
     {
-        Script.IsEventAllowed = Args.GetBool("isAllowed");
+        Script.SetEventAllowed(Args.GetBool("isAllowed"));
     }
 }

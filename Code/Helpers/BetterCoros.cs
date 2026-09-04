@@ -17,13 +17,21 @@ public static class BetterCoros
         Action? onFinish = null)
     {
         CoroutineHandle handle = default;
-        var handle1 = handle;
+        var completedBeforeRegistration = false;
         handle = Timing.RunCoroutine(Wrapper(coro, scr, onException, () =>
         {
-            ActiveCoroutines.Remove(handle1);
+            completedBeforeRegistration = true;
+            ActiveCoroutines.Remove(handle);
             onFinish?.Invoke();
         }));
-        ActiveCoroutines.Add(handle);
+
+        // MEC may complete a coroutine before RunCoroutine returns. Do not add a
+        // handle which has already finished; later plugin cleanup would retain it.
+        if (!completedBeforeRegistration)
+        {
+            ActiveCoroutines.Add(handle);
+        }
+
         return handle;
     }
 
@@ -128,11 +136,30 @@ public static class BetterCoros
         Action<Exception>? onException)
     {
         var errorId = Guid.NewGuid().ToString("N")[..8];
-        Log.Error($"SER internal error [{errorId}]\n{exception}");
+        var scriptTrace = BuildScriptTrace(script);
+        Log.Error($"SER internal error [{errorId}]{scriptTrace}\n{exception}");
 
         var publicError = new CustomScriptRuntimeError(
             $"Internal SER error [{errorId}]. Check the server console and report this identifier.");
         onException?.Invoke(publicError);
         script?.Error(publicError.Message);
+    }
+
+    private static string BuildScriptTrace(Script? script)
+    {
+        if (script is null)
+        {
+            return string.Empty;
+        }
+
+        var entries = new List<string>();
+        var seen = new HashSet<Script>();
+        for (var current = script; current is not null && seen.Add(current); current = current.Caller)
+        {
+            var location = current.CurrentLine == 0 ? "during setup" : $"line {current.CurrentLine}";
+            entries.Add($"'{current.Name}' ({location}, started by {current.RunReason})");
+        }
+
+        return $"\nScript trace: {string.Join(" <- ", entries)}";
     }
 }

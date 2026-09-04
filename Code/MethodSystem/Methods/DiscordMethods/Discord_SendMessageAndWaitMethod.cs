@@ -65,7 +65,7 @@ public class Discord_SendMessageAndWaitMethod : YieldingReturningMethod<TextValu
         {
             ReturnValue = new StaticTextValue(
                 JObject.Parse(request.downloadHandler.text)["id"]?.Value<string>() ??
-                throw new NotOurFaultException("Excuse me? WHERE'S THE ID")
+                throw new NotOurFaultException("Discord returned a successful webhook response without a message ID.")
             );
         }
         catch

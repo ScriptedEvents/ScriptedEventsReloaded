@@ -28,7 +28,8 @@ public class Script
 {
     private Line[] _lines = [];
     private RunnableContext[] _contexts = [];
-    public bool IsEventAllowed = true;
+    public bool? IsEventAllowed { get; private set; }
+    private Action<bool>? _eventAllowedChanged;
     
     public required ScriptName Name { get; init; }
 
@@ -295,9 +296,15 @@ public class Script
     /// <summary>
     /// Executes the script.
     /// </summary>
-    /// <returns>Returns a boolean indicating whether the event is allowed.</returns>
-    public bool? RunForEvent(RunReason reason, Script? caller = null)
+    /// <returns>The last explicit event decision, or null when IsAllowed was not called.</returns>
+    public bool? RunForEvent(
+        RunReason reason,
+        Script? caller = null,
+        Action<bool>? eventAllowedChanged = null)
     {
+        IsEventAllowed = null;
+        _eventAllowedChanged = eventAllowedChanged;
+
         if (RefreshSourceBeforeExecution().HasErrored(out var refreshError))
         {
             Executor.Error(refreshError, this);
@@ -327,6 +334,13 @@ public class Script
         return IsEventAllowed;
     }
 
+    internal void SetEventAllowed(bool isAllowed)
+    {
+        IsEventAllowed = isAllowed;
+        Log.Debug($"Script '{Name}' set the current event decision to {isAllowed}.");
+        _eventAllowedChanged?.Invoke(isAllowed);
+    }
+
     public void DefineLines()
     {
         var prof = Profile is not null 
@@ -350,7 +364,7 @@ public class Script
         {
             if (Tokenizer.SliceLine(line).HasErrored(out var error))
             {
-                errors.Add(error);
+                errors.Add($"Line {line.LineNumber} could not be read: {error}");
             }
         }
 
@@ -377,7 +391,7 @@ public class Script
         {
             if (Tokenizer.TokenizeLine(line, this).HasErrored(out var error))
             {
-                errors.Add(error);
+                errors.Add($"Line {line.LineNumber} contains an invalid value: {error}");
             }
         }
         

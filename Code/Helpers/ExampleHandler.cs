@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using System.Text;
+using SER.Code.ContextSystem.Contexts.Control;
+using SER.Code.Exceptions;
 using SER.Code.Extensions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem;
@@ -7,6 +9,7 @@ using SER.Code.MethodSystem.Structures;
 using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
+using SER.Code.TokenSystem;
 
 namespace SER.Code.Helpers;
 
@@ -139,6 +142,41 @@ public static class ExampleHandler
                 return ($"The validator accepted invalid regression script '{invalidScript.Key}'.",
                     examples.Keys.ToArray());
             }
+        }
+
+        const string invalidSecondLine = "Print \"valid\"\nPrint \"unterminated";
+        if (!Script.CreateAnonymous("line_numbered_error", invalidSecondLine)
+                .Compile()
+                .HasErrored(out var numberedError)
+            || !numberedError.Contains("Line 2"))
+        {
+            return ("Early parser errors do not identify their physical source line.",
+                examples.Keys.ToArray());
+        }
+
+        if (!Tokenizer.GetTokenFromString("   ", null, null).HasErrored())
+        {
+            return ("The tokenizer accepted an empty value.", examples.Keys.ToArray());
+        }
+
+        if (!AttemptStatement.CanHandle(new CustomScriptRuntimeError("expected"))
+            || AttemptStatement.CanHandle(new StopScript())
+            || AttemptStatement.CanHandle(new CoreInvariantException("expected")))
+        {
+            return ("The attempt statement catches control flow or internal SER failures.",
+                examples.Keys.ToArray());
+        }
+
+        var eventDecisionScript = Script.CreateAnonymous("event_decision", "IsAllowed false");
+        if (eventDecisionScript.IsEventAllowed.HasValue)
+        {
+            return ("An event script changes cancellability without an IsAllowed call.", examples.Keys.ToArray());
+        }
+
+        eventDecisionScript.SetEventAllowed(false);
+        if (eventDecisionScript.IsEventAllowed is not false)
+        {
+            return ("An explicit IsAllowed decision was not stored by the script.", examples.Keys.ToArray());
         }
 
         const string multiSectionContent =

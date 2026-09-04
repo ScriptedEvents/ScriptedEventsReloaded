@@ -2,7 +2,7 @@
 
 public class NotOurFaultException(string msg) : SystemException(msg)
 {
-    public NotOurFaultException() : this("Yeh that's not our fault trust")
+    public NotOurFaultException() : this("An external game or plugin state did not match what SER expected.")
     {
     }
 }

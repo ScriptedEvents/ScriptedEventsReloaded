@@ -75,7 +75,7 @@ public static class Tokenizer
     /// Decides the line if it's collection slice or single slice.
     /// </summary>
     /// <param name="line">Line to parse</param>
-    /// <returns>The slices for the specificalious line</returns>
+    /// <returns>The slices for the specified line.</returns>
     public static TryGet<IEnumerable<Slice>> SliceLine(string line)
     {
         List<Slice> outList = [];
@@ -191,12 +191,17 @@ public static class Tokenizer
             return err;
         }
 
-        var bettaSlices = slices as Slice[] ?? slices.ToArray();
-        if (bettaSlices.Length > 1)
+        var materializedSlices = slices as Slice[] ?? slices.ToArray();
+        if (materializedSlices.Length == 0)
+        {
+            return "A value cannot be empty.";
+        }
+
+        if (materializedSlices.Length > 1)
         {
             return $"Value '{str}' contains multiple slices.";
         }
         
-        return GetTokenFromSlice(bettaSlices.First(), scr, lineNum);
+        return GetTokenFromSlice(materializedSlices[0], scr, lineNum);
     }
 }

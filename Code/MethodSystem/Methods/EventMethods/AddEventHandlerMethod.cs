@@ -48,10 +48,9 @@ public class AddEventHandlerMethod : SynchronousMethod, IAdditionalDescription
                     return;
                 }
 
-                if (scr.RunForEvent(RunReason.FunctionCallback) is { } isAllowed)
-                {
-                    cancellable.IsAllowed = isAllowed;
-                }
+                scr.RunForEvent(
+                    RunReason.FunctionCallback,
+                    eventAllowedChanged: isAllowed => cancellable.IsAllowed = isAllowed);
             }),
             handlerId
         );

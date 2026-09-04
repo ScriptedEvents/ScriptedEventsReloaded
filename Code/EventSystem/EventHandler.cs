@@ -362,15 +362,22 @@ public static class EventHandler
             }
 
             script.AddLocalVariables(variables);
-            var isAllowed = script.RunForEvent(RunReason.Event);
-            if (!isAllowed.HasValue || ev is null)
-                return;
-
-            if (ev is ICancellableEvent cancellable)
-                cancellable.IsAllowed = isAllowed.Value;
-            else if (eventKey.Source == EventSource.Ucr)
-                UcrBridge.TrySetEventAllowed(ev, isAllowed.Value);
+            script.RunForEvent(
+                RunReason.Event,
+                eventAllowedChanged: isAllowed => SetEventAllowed(ev, eventKey.Source, isAllowed));
         };
+    }
+
+    private static void SetEventAllowed(object? eventArgs, EventSource source, bool isAllowed)
+    {
+        if (eventArgs is ICancellableEvent cancellable)
+        {
+            cancellable.IsAllowed = isAllowed;
+        }
+        else if (eventArgs is not null && source == EventSource.Ucr)
+        {
+            UcrBridge.TrySetEventAllowed(eventArgs, isAllowed);
+        }
     }
 
     private static void BindNonArgumented(EventInfo eventInfo, EventKey eventKey)

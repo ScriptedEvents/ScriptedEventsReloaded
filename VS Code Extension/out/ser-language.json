@@ -13481,7 +13481,7 @@
           "name": "ammo type",
           "argumentKind": "EnumArgument`1",
           "mustBeProvided": true,
-          "type": "AmmoType enum value - found using 'serhelp AmmoType' command",
+          "type": "AmmoType enum value - found using 'serhelp AmmoType' command. Ammo types present in the game.",
           "description": null,
           "defaultValue": null,
           "consumesRemainingValues": false,
@@ -13494,8 +13494,15 @@
             "Ammo12Gauge",
             "Ammo44Cal"
           ],
-          "enumDescription": null,
-          "enumDescriptions": null,
+          "enumDescription": "Ammo types present in the game.",
+          "enumDescriptions": {
+            "None": "Not ammo.",
+            "Nato556": "5.56mm Ammunition. Used by GunE11SR.",
+            "Nato762": "7.62mm Ammunition. Used by and GunLogicer.",
+            "Nato9": "9mm Ammunition. Used by GunCOM15,.",
+            "Ammo12Gauge": "12 gauge shotgun ammo. Used by GunShotgun",
+            "Ammo44Cal": "44 Caliber Revolver Ammo Used by GunRevolver"
+          },
           "isEnumFlags": false,
           "options": null
         }
@@ -13530,7 +13537,7 @@
           "name": "ammo type",
           "argumentKind": "EnumArgument`1",
           "mustBeProvided": true,
-          "type": "AmmoType enum value - found using 'serhelp AmmoType' command",
+          "type": "AmmoType enum value - found using 'serhelp AmmoType' command. Ammo types present in the game.",
           "description": null,
           "defaultValue": null,
           "consumesRemainingValues": false,
@@ -13543,8 +13550,15 @@
             "Ammo12Gauge",
             "Ammo44Cal"
           ],
-          "enumDescription": null,
-          "enumDescriptions": null,
+          "enumDescription": "Ammo types present in the game.",
+          "enumDescriptions": {
+            "None": "Not ammo.",
+            "Nato556": "5.56mm Ammunition. Used by GunE11SR.",
+            "Nato762": "7.62mm Ammunition. Used by and GunLogicer.",
+            "Nato9": "9mm Ammunition. Used by GunCOM15,.",
+            "Ammo12Gauge": "12 gauge shotgun ammo. Used by GunShotgun",
+            "Ammo44Cal": "44 Caliber Revolver Ammo Used by GunRevolver"
+          },
           "isEnumFlags": false,
           "options": null
         },

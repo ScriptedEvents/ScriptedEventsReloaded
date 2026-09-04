@@ -115,7 +115,8 @@ Hint @evPlayer 5s "UCR role: {*evRole -> name}"
 ```
 
 Run `serhelp ucrevents` to list the events exposed by the installed UCR
-version. Returning `false` from `Registering` or `Spawning` stops that action.
+version. Use `IsAllowed false` in `Registering` or `Spawning` to stop that
+action.
 
 ## Other flags
 

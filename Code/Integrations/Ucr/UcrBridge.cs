@@ -3,6 +3,8 @@ using UncomplicatedCustomRoles.API.Features;
 using UncomplicatedCustomRoles.API.Interfaces;
 using UncomplicatedCustomRoles.Extensions;
 
+// ReSharper disable LoopCanBeConvertedToQuery
+
 namespace SER.Code.Integrations.Ucr;
 
 /// <summary>
@@ -52,7 +54,12 @@ internal static class UcrBridge
 
     internal static UCRRole[] GetRoles()
     {
-        return CustomRole.List.Select(WrapRole).OrderBy(role => role.Id).ToArray();
+        List<UCRRole> roles = [];
+        foreach (ICustomRole role in CustomRole.List)
+            roles.Add(WrapRole(role));
+
+        roles.Sort(static (left, right) => left.Id.CompareTo(right.Id));
+        return roles.ToArray();
     }
 
     internal static UCRRole GetRole(int roleId)
@@ -84,12 +91,23 @@ internal static class UcrBridge
     internal static UCRRoleInstance[] GetRoleInstances(object reference)
     {
         ICustomRole role = GetRawRole(reference);
-        return SummonedCustomRole.Get(role).Select(WrapInstance).ToArray();
+        List<UCRRoleInstance> instances = [];
+        foreach (SummonedCustomRole instance in SummonedCustomRole.Get(role))
+            instances.Add(WrapInstance(instance));
+
+        return instances.ToArray();
     }
 
     internal static Player[] GetPlayersWithRole(int roleId)
     {
-        return Player.ReadyList.Where(player => SummonedCustomRole.Get(player)?.Role.Id == roleId).ToArray();
+        List<Player> players = [];
+        foreach (Player player in Player.ReadyList)
+        {
+            if (SummonedCustomRole.Get(player)?.Role.Id == roleId)
+                players.Add(player);
+        }
+
+        return players.ToArray();
     }
 
     internal static int GetSpawnedCount(object reference)

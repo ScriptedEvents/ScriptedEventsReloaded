@@ -39,10 +39,10 @@ public static class EventHandler
     private static readonly HashSet<string> DisabledEvents = [];
     private static readonly Dictionary<string, string> UcrEventDescriptions = new(StringComparer.Ordinal)
     {
-        ["Registering"] = "Runs before UCR registers a custom role. Return false to stop the registration.",
+        ["Registering"] = "Runs before UCR registers a custom role. Use `IsAllowed false` to stop the registration.",
         ["Registered"] = "Runs after UCR registers a custom role.",
         ["Unregistered"] = "Runs after UCR unregisters a custom role.",
-        ["Spawning"] = "Runs before UCR gives a player a custom role. Return false to stop the spawn.",
+        ["Spawning"] = "Runs before UCR gives a player a custom role. Use `IsAllowed false` to stop the spawn.",
         ["Spawned"] = "Runs after UCR gives a player a custom role.",
         ["Removed"] = "Runs after UCR removes a custom role from a player."
     };

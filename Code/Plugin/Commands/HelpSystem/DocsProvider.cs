@@ -68,9 +68,9 @@ public static class DocsProvider
 
     private static bool GetGeneralOutputMarkdown(ArraySegment<string> args, ICommandSender sender, out string response)
     {
-        var arg = args.Array?[args.Offset].ToLowerInvariant() 
+        var arg = args.Array?[args.Offset].ToLowerInvariant()
                   ?? throw new CoreInvariantException("Help arguments were provided in an invalid format.");
-        
+
         if (Enum.TryParse(arg, true, out HelpOption option))
         {
             if (option == HelpOption.Properties && args.Count > 1)
@@ -82,38 +82,38 @@ public static class DocsProvider
             {
                 return GetMethodsOutput(args.Array![args.Offset + 1], out response);
             }
-            
+
             if (!GeneralOptions.TryGetValue(option, out var func))
             {
                 throw new CoreInvariantException($"Option {option} was not added to the help system.");
             }
-            
+
             response = func();
             return true;
         }
-        
+
         if (arg == "properties" && args.Count > 1)
         {
             return GetPropertiesForType(args.Array[args.Offset + 1], out response);
         }
-        
+
         var keyword = ContextableKeywordToken.KeywordContextTypes
             .Select(kType => kType.CreateInstance<IKeywordContext>())
             .FirstOrDefault(keyword => keyword.KeywordName == arg);
-        
+
         if (keyword is not null)
         {
             response = GetKeywordInfo(keyword);
             return true;
         }
-        
+
         var enumType = EnumIndex.GetAllEnums().FirstOrDefault(e => e.Name.ToLowerInvariant() == arg);
         if (enumType is not null)
         {
             response = GetEnum(enumType);
             return true;
         }
-        
+
         var ev = EventSystem.EventHandler.AvailableEvents
             .Concat(EventSystem.EventHandler.AvailablePmerEvents)
             .Concat(EventSystem.EventHandler.AvailableUcrEvents)
@@ -123,7 +123,7 @@ public static class DocsProvider
             response = GetEventInfo(ev);
             return true;
         }
-        
+
         var method = MethodIndex.GetMethods()
             .FirstOrDefault(met => met.Name.ToLowerInvariant() == arg);
         if (method is not null)
@@ -131,7 +131,7 @@ public static class DocsProvider
             response = GetMethodHelp(method);
             return true;
         }
-        
+
         var outsideMethodKvp = MethodIndex.FrameworkDependentMethods
             .Select(kvp => kvp.Value.Select(m => (m, kvp.Key)))
             .Flatten()
@@ -174,8 +174,8 @@ public static class DocsProvider
 
                 {BulletList(Enum.GetValues(typeof(HelpOption)).Cast<HelpOption>()
                     .Select(o => Code(o.ToString().LowerFirst())))}
-                    
-                    
+
+
                 ## Other commands
 
                 {BulletList(Assembly.GetExecutingAssembly().GetTypes()
@@ -183,7 +183,7 @@ public static class DocsProvider
                     .Select(Activator.CreateInstance)
                     .Cast<ICommand>()
                     .Where(c => !string.IsNullOrEmpty(c.Command))
-                    .Select(c 
+                    .Select(c
                         => $"{Code(c.Command)} (permission: {(c as IUsePermissions)?.Permission ?? "not required"})" +
                            $"{(string.IsNullOrEmpty(c.Description) ? string.Empty : $" — {c.Description}")}"))}
                 """;
@@ -325,16 +325,16 @@ public static class DocsProvider
                {(keyword is StatementContext ? "    # some code\nend" : string.Empty)}
                ```
                """;
-        
+
         var extendableInfo = keyword is IExtendableStatement extendable
             ? $"""
                {Heading("Signals")}
                **This statement is extendable.** Other statements can be added after this one when they support one of these signals:
                {BulletList(extendable.AllowedSignals.GetFlags().Select(f => Code(f.ToString())))}
-               
+
                """
             : string.Empty;
-        
+
         // exampel
         var exampel = keyword is { Example: {} e}
             ? $"""
@@ -344,14 +344,14 @@ public static class DocsProvider
                ```
                """
             : string.Empty;
-        
-        return 
+
+        return
             $"""
             {Heading($"{Code(keyword.KeywordName)} keyword", 1)}
             {keyword.Description}
 
             {RenderContextArguments(keyword)}
-            
+
             {usageInfo}
             {extendableInfo}
             {exampel}
@@ -384,7 +384,7 @@ public static class DocsProvider
 
             ## Available keywords
             Each keyword can be searched with {Code("serhelp keywordName")}.
-            
+
             """ + ContextableKeywordToken.KeywordContextTypes
                 .Select(t => t.CreateInstance<IKeywordContext>())
                 .Select(k => $"- {Code(k.KeywordName)}")
@@ -396,19 +396,19 @@ public static class DocsProvider
         var flags = Flag.FlagInfos.Keys
             .Select(f => $"- {Code(f)}")
             .JoinStrings("\n");
-        
+
         return
             $"""
             Flags are a way to change script behavior depending on your needs.
-            
+
             ## Usage
             ```ser
             !-- SomeFlag argValue1 argValue2
             -- customFlagArgument "some value"
             ```
-            
+
             Flags should be used at the top of the script.
-            
+
             ## Available flags
             For more information, use {Code("serhelp flagName")}.
             {flags}
@@ -418,11 +418,11 @@ public static class DocsProvider
     public static string GetFlagInfo(string flagName)
     {
         var flag = Flag.FlagInfos[flagName].CreateInstance<Flag>();
-        
+
         var inlineArgumentUsage = flag.InlineArgument.HasValue
             ? "..."
             : string.Empty;
-        
+
         var argumentsUsage = flag.Arguments
             .Select(arg => $"-- {arg.Name} ...")
             .JoinStrings("\n");
@@ -431,7 +431,7 @@ public static class DocsProvider
         if (flag.InlineArgument.HasValue)
         {
             argDesc.AppendLine(
-                (flag.InlineArgument.Value.IsRequired ? "> Required" : "> Optional") 
+                (flag.InlineArgument.Value.IsRequired ? "> Required" : "> Optional")
                 + $" inline argument '{flag.InlineArgument.Value.Name}':"
             );
             argDesc.AppendLine($"{flag.InlineArgument.Value.Description}");
@@ -448,18 +448,18 @@ public static class DocsProvider
             argDesc.AppendLine(arg.Example);
             argDesc.AppendLine();
         }
-        
+
         return
             $"""
              {Heading(Code(flagName), 1)}
              {flag.Description}
-             
+
              ## Usage
              ```ser
              !-- {flagName} {inlineArgumentUsage}
              {argumentsUsage}
              ```
-             
+
              {(argDesc.Length > 0 ? Heading("Arguments") : "")}
              {argDesc}
              """;
@@ -470,39 +470,38 @@ public static class DocsProvider
         var variables = EventSystem.EventHandler.GetMimicVariableInfo(ev);
         var eventArgsType = ev.EventHandlerType.GetGenericArguments().FirstOrDefault();
         var cancellable = EventSystem.EventHandler.IsCancellableEvent(ev);
-        var msg = variables.Count > 0 
-            ? variables.Aggregate(
-                "This event has the following variables attached to it:\n", 
-                (current, variable) => current + $"- {Code(variable.Display)}" +
-                                       (string.IsNullOrWhiteSpace(variable.Description)
-                                           ? "\n"
-                                           : $" - {variable.Description}\n")
-            ) 
+        string result = "This event has the following variables attached to it:\n";
+        foreach (var variable in variables)
+            result = result + $"- {Code(variable.Display)}" + (string.IsNullOrWhiteSpace(variable.Description)
+                ? "\n"
+                : $" - {variable.Description}\n");
+        var msg = variables.Count > 0
+            ? result
             : "This event does not have any variables attached to it.";
 
         var eventDocumentation = EventSystem.EventHandler.GetEventDescription(ev);
         var eventArgsDocumentation = eventArgsType is null
             ? null
             : XmlDocReader.GetDocumentation(eventArgsType);
-        
-        return 
+
+        return
              $"""
               {Heading($"{Code(ev.Name)} event", 1)}
               **Group:** {Code(ev.DeclaringType?.Name ?? "unknown event group")}
               {(string.IsNullOrWhiteSpace(eventDocumentation) ? "" : $"\n{eventDocumentation}\n")}
               {(eventArgsType is null ? "" : $"**Event data type:** {Code(eventArgsType.AccurateName)}" +
                   (string.IsNullOrWhiteSpace(eventArgsDocumentation) ? "" : $" - {eventArgsDocumentation}") + "\n")}
-              
+
               **Cancellable:** {cancellable}
-              
+
               {msg}
               """;
     }
-    
+
     public static string GetEventsHelpPage()
     {
         var sb = new StringBuilder();
-        
+
         foreach (var category in EventSystem.EventHandler.AvailableEvents.Select(ev => ev.DeclaringType).ToHashSet().OfType<Type>())
         {
             sb.AppendLine(Heading(category.Name));
@@ -512,19 +511,19 @@ public static class DocsProvider
                 .Where(ev => ev.DeclaringType == category)
                 .Select(ev => Code(ev.Name))));
         }
-        
+
         return
             $"""
-            Event is a signal that something happened on the server. 
+            Event is a signal that something happened on the server.
             If the round has started, server will invoke an event (signal) called RoundStarted.
             You can use this functionality to run your scripts when a certain event happens.
-            
+
             By putting `!-- OnEvent RoundStarted` at the top of your script, you will run your script when the round starts.
             You can put something different there, e.g. `!-- OnEvent Death`, which will run when someone has died.
-            
+
             Some events have additional information attached to them in a form of variables.
             If you wish to know what variables are available for a given event, just use 'serhelp <eventName>'!
-            
+
             ## Available events
             {sb}
             """;
@@ -606,7 +605,7 @@ public static class DocsProvider
              {sb}
              """;
     }
-    
+
     public static string GetEnum(Type enumType)
     {
         var enumDocumentation = XmlDocReader.GetDocumentation(enumType);
@@ -630,14 +629,14 @@ public static class DocsProvider
 
     public static string GetEnumHelpPage()
     {
-        return 
+        return
             $"""
             Enums are basically options, where an enum has set of all valid values, so a valid option is an enum value.
             These enums are usually used to specify a room, door, zone etc.
-            
+
             To get the list of all available values that an enum has, just use 'serhelp <enumName>'.
             For example: 'serhelp RoomName' will get you a list of all available room names to use in methods.
-            
+
             Here are some of the enums used in SER:
             {string.Join("\n", EnumIndex.GetNonReflectedEnums().Select(e => $"- {Code(e.Name)}"))}
             """;
@@ -658,7 +657,7 @@ public static class DocsProvider
                 methodsByCategory.Add(method.Subgroup, [method]);
             }
         }
-        
+
         return methodsByCategory;
     }
 
@@ -694,14 +693,14 @@ public static class DocsProvider
                 sb.AppendLine(GetFormatted(method));
             }
         }
-        
+
         foreach (var (framework, methods) in MethodIndex.FrameworkDependentMethods
                      .Where(kvp => FrameworkBridge.Found.All(fb => fb.Type != kvp.Key)))
         {
             sb.AppendLine();
             sb.AppendLine($"- **{framework} framework** (not installed) can add {methods.Count} more methods");
         }
-        
+
         return sb.ToString();
 
         string GetFormatted(Method method)
@@ -715,15 +714,15 @@ public static class DocsProvider
             return $"- {Code(name)} — {method.Description}";
         }
     }
-    
+
     public static string GetVariableList()
     {
         var allVars = VariableIndex.GlobalVariables
             .OfType<PredefinedPlayerVariable>()
             .ToList();
-        
+
         var sb = new StringBuilder($"Hi! There are {allVars.Count} variables available for your use!\n");
-        
+
         var categories = allVars.Select(var => var.Category).Distinct().ToList();
         foreach (var category in categories)
         {
@@ -734,7 +733,7 @@ public static class DocsProvider
             sb.AppendLine($"- {Code($"@{var.Name}")}");
             }
         }
-        
+
         return sb.ToString();
     }
 
@@ -747,7 +746,7 @@ public static class DocsProvider
         {
             sb.AppendLine(addDesc.AdditionalDescription);
         }
-        
+
         if (notLoadedFramework is {} framework)
         {
             sb.AppendLine();
@@ -759,7 +758,7 @@ public static class DocsProvider
         {
             sb.AppendLine();
             sb.AppendLine($"This method returns {retMethod.Returns}.");
-            
+
             // This fallback can be removed when the value system is redesigned.
             if (retMethod.Returns.AreKnown(out var known))
             {
@@ -767,7 +766,7 @@ public static class DocsProvider
                     .Select(t => Value.GetPrefixOfValue(new SingleTypeOfValue(t)))
                     .Distinct()
                     .ToArray();
-                
+
                 if (possiblePrefixes.Length == 1)
                 {
                     sb.AppendLine($"You can save it to a variable with a '{possiblePrefixes[0]}' prefix.");
@@ -783,13 +782,13 @@ public static class DocsProvider
             sb.AppendLine("This method does not expect any arguments.");
             return sb.ToString();
         }
-        
+
         sb.AppendLine();
         sb.AppendLine("This method expects the following arguments:");
         for (var index = 0; index < method.ExpectedArguments.Length; index++)
         {
             if (index > 0) sb.AppendLine();
-            
+
             var argument = method.ExpectedArguments[index];
             var optionalArgPrefix = argument.MustBeProvided ? "" : " optional";
             sb.AppendLine($"- **{argument.Name}**{optionalArgPrefix} argument");
@@ -798,7 +797,7 @@ public static class DocsProvider
             {
                 sb.AppendLine($"  - **Description:** {argument.Description}");
             }
-            
+
             sb.AppendLine($"  - **Expected value:** {argument.InputDescription.Replace("\n", "\n    ")}");
 
             if (argument.DefaultValue is { } defVal)
@@ -821,7 +820,7 @@ public static class DocsProvider
             sb.AppendLine("This method defines custom errors:");
             sb.AppendLine(errorMethod.ErrorReasons.Select(e => $"- {e}").JoinStrings("\n"));
         }
-        
+
         return sb.ToString();
     }
 
@@ -834,7 +833,7 @@ public static class DocsProvider
             response = $"Value {val.FriendlyName} does not have properties.";
             return false;
         }
-        
+
         // Special case for shell types
         if (val is ReferenceValue { Value: IFrameworkTypeShell shell })
         {
@@ -849,7 +848,7 @@ public static class DocsProvider
         }
 
         // Special case for collection of references: show both collection and element props
-        if (val is CollectionValue { StoredTypes: not null } collection 
+        if (val is CollectionValue { StoredTypes: not null } collection
             && typeof(ReferenceValue).IsAssignableFrom(collection.StoredTypes))
         {
             var elementProps = Value.GetPropertiesOfValue(collection.StoredTypes);
@@ -882,14 +881,14 @@ public static class DocsProvider
     {
         var sb = new StringBuilder(
             $"**Properties for {typeName} value**"
-            + (type is not null ? $" in '{type.Assembly.GetName().Name}' assembly" : "") 
+            + (type is not null ? $" in '{type.Assembly.GetName().Name}' assembly" : "")
             + "\n");
 
         if (type is not null && XmlDocReader.GetDocumentation(type) is { Length: > 0 } typeDocumentation)
         {
             sb.AppendLine(typeDocumentation);
         }
-        
+
         var sortedProps = props.OrderBy(kvp => kvp.Key).ToList();
         var custom = sortedProps.Where(p => !p.Value.IsReflected).ToList();
         var reflected = sortedProps.Where(p => p.Value.IsReflected).ToList();
@@ -911,7 +910,7 @@ public static class DocsProvider
                 sb.AppendLine(RenderPropertyLine(name, info));
             }
         }
-        
+
         return sb.ToString();
     }
 
@@ -951,23 +950,23 @@ public static class DocsProvider
 
             if {@sender -> role} is "ClassD"  - Or use {} when in a condition.
 
-            
+
             ## Enhanced property lookup
             You can now inspect properties without knowing the exact type name:
-            
+
             From a global variable:
             > serhelp properties *myVar
-            
+
             From a local variable from a running script:
             > serhelp properties *target script:round_start
-            
+
             From the return value of a method:
             > serhelp properties run:GetFromMap doors
-            
-            You can also specify the assembly:
-            > serhelp properties Door@LabAPI 
 
-            
+            You can also specify the assembly:
+            > serhelp properties Door@LabAPI
+
+
             ## Basic SER value properties
 
             Player:
@@ -991,7 +990,7 @@ public static class DocsProvider
             Duration:
             - {{durationPropsList}}
 
-            
+
             ## Registered SCP:SL objects
             Use 'serhelp properties <objectName>' to see available properties for these types:
             {{registeredTypes}}
@@ -1044,7 +1043,7 @@ public static class DocsProvider
             var types = ReferencePropertyRegistry.GetRegisteredTypes()
                 .Where(t => t.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase))
                 .ToList();
-            
+
             if (types.Count is 0)
             {
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -1056,7 +1055,7 @@ public static class DocsProvider
                     {
                         continue;
                     }
-                    
+
                     try
                     {
                         types.AddRange(assembly.GetTypes()
@@ -1086,7 +1085,7 @@ public static class DocsProvider
                     {
                         output.AppendLine(RenderProperties(typeName, ReferencePropertyRegistry.GetProperties(type), type));
                     }
-                
+
                     response = output.ToString();
                     return true;
                 }
@@ -1096,7 +1095,7 @@ public static class DocsProvider
                     break;
             }
         }
-        
+
         response = RenderProperties(typeName, props, reflectedType);
         return true;
     }
@@ -1229,7 +1228,7 @@ public static class DocsProvider
                 targetScript = Script.RunningScripts.FirstOrDefault(s => ((string)s.Name).Equals(scriptName, StringComparison.OrdinalIgnoreCase));
                 if (targetScript == null)
                 {
-                    response = $"Script '{scriptName}' is not currently running.\nRunning scripts: " + 
+                    response = $"Script '{scriptName}' is not currently running.\nRunning scripts: " +
                                (Script.RunningScripts.Any() ? string.Join(", ", Script.RunningScripts.Select(s => s.Name).ToArray()) : "none");
                     return false;
                 }

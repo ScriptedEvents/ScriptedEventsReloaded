@@ -83,9 +83,9 @@ Use a role event as its own script section:
 Broadcast @evPlayer 5s "You spawned as {*evRole -> name}."
 ```
 
-`Registering` and `Spawning` can be cancelled. Return `false` from the script
-to stop the registration or spawn. The other four events report what happened
-and cannot be cancelled.
+`Registering` and `Spawning` can be cancelled. Use `IsAllowed false` in the
+event script to stop the registration or spawn.
+The other four events report what happened and cannot be cancelled.
 
 Role references expose `id` and `name`, then forward UCR's role properties.
 Active instance references expose `id`, `player`, `role`, and `isActive`. Check

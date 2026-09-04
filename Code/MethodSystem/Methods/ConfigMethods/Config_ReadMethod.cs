@@ -11,14 +11,12 @@ namespace SER.Code.MethodSystem.Methods.ConfigMethods;
 [UsedImplicitly]
 public class Config_ReadMethod : ReferenceReturningMethod<CustomConfig?>, IAdditionalDescription, ICanError
 {
-    public override string Description => "Reads and returns a config.";
+    public override string Description => "Reads a YAML file from the Custom Configs folder.";
 
-    public string AdditionalDescription => 
-        $"This method will attempt to read basic '.yaml' files from '{FileSystem.FileSystem.ConfigsDirPath}' folder. " +
-        $"If the folder doesn't exist, you can safely make one and create '.yaml' files there. " +
-        $"The '.yml' extension is also supported. " +
-        $"If a file with the config name is not found, an invalid reference will be returned. " +
-        $"Learn more about YAML files: https://www.cloudbees.com/blog/yaml-tutorial-everything-you-need-get-started ";
+    public string AdditionalDescription =>
+        "Add a '.yml' or '.yaml' file to the Custom Configs folder inside the SER config directory. " +
+        "Pass the file name without its extension. If no matching file exists, this method returns an invalid " +
+        "reference. Learn more about YAML: https://www.cloudbees.com/blog/yaml-tutorial-everything-you-need-get-started";
 
     public override Argument[] ExpectedArguments { get; } =
     [

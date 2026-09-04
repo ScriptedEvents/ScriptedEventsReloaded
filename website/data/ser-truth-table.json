@@ -10267,10 +10267,10 @@
     },
     "Config.Read": {
       "syntax": "Config.Read \"config_name\"",
-      "description": "Reads and returns a config.",
+      "description": "Reads a YAML file from the Custom Configs folder.",
       "subgroup": "Config",
       "essential": false,
-      "additionalDescription": "This method will attempt to read basic '.yaml' files from 'C:\\Users\\Olgie\\AppData\\Roaming\\SCP Secret Laboratory\\LabAPI\\configs\\Scripted Events Reloaded\\Custom Configs' folder. If the folder doesn't exist, you can safely make one and create '.yaml' files there. The '.yml' extension is also supported. If a file with the config name is not found, an invalid reference will be returned. Learn more about YAML files: https://www.cloudbees.com/blog/yaml-tutorial-everything-you-need-get-started ",
+      "additionalDescription": "Add a '.yml' or '.yaml' file to the Custom Configs folder inside the SER config directory. Pass the file name without its extension. If no matching file exists, this method returns an invalid reference. Learn more about YAML: https://www.cloudbees.com/blog/yaml-tutorial-everything-you-need-get-started",
       "requiredFramework": null,
       "returns": "reference to CustomConfig object",
       "arguments": [
@@ -26270,7 +26270,7 @@
       ]
     },
     "Registering": {
-      "description": "Runs before UCR registers a custom role. Return false to stop the registration.",
+      "description": "Runs before UCR registers a custom role. Use `IsAllowed false` to stop the registration.",
       "group": "CustomRoleEvents",
       "eventDataType": "CustomRoleRegisteringEventArgs",
       "eventDataDescription": null,
@@ -26337,7 +26337,7 @@
       ]
     },
     "Spawning": {
-      "description": "Runs before UCR gives a player a custom role. Return false to stop the spawn.",
+      "description": "Runs before UCR gives a player a custom role. Use `IsAllowed false` to stop the spawn.",
       "group": "CustomRoleEvents",
       "eventDataType": "CustomRoleSpawningEventArgs",
       "eventDataDescription": null,

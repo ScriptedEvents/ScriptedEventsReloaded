@@ -1,7 +1,6 @@
 [mcp_servers.scpsl_console]
 command = "node"
 args = ["tools/scpsl-console-mcp/server.mjs"]
-cwd = "C:\\Users\\Olgie\\RiderProjects\\ScriptedEventsReloaded"
 env_vars = ["SL_DEV_REFERENCES", "LABAPI_PLUGINS"]
 startup_timeout_sec = 15
 tool_timeout_sec = 300

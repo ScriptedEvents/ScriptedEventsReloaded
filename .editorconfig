@@ -11,7 +11,7 @@ end_of_line = crlf
 indent_style = space
 indent_size = 4
 
-[*.{js,mjs,jsx,json,yml,yaml,css,html,md}]
+[*.{js,mjs,jsx,json,toml,yml,yaml,css,html,md}]
 indent_style = space
 indent_size = 2
 

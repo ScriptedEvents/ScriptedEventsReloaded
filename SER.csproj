@@ -223,6 +223,53 @@ bool TryInvoke(Assembly asm, string typeName, string methodName, object?[]? args
     }
 }
 
+string? FindOptionalAssembly(Type type, string[] optionalAssemblies)
+{
+    string? assemblyName = type.Assembly.GetName().Name;
+    if (Array.IndexOf(optionalAssemblies, assemblyName) >= 0)
+        return assemblyName;
+
+    if (type.HasElementType && type.GetElementType() is { } elementType)
+        return FindOptionalAssembly(elementType, optionalAssemblies);
+
+    if (!type.IsGenericType)
+        return null;
+
+    foreach (Type argument in type.GetGenericArguments())
+    {
+        if (FindOptionalAssembly(argument, optionalAssemblies) is { } optionalAssembly)
+            return optionalAssembly;
+    }
+
+    return null;
+}
+
+bool ValidateNoOptionalDependencyFields(Assembly asm)
+{
+    string[] optionalAssemblies = ["Callvote-LabAPI", "ProjectMER", "UncomplicatedCustomRoles"];
+    bool valid = true;
+    foreach (Type type in asm.GetTypes())
+    {
+        foreach (FieldInfo field in type.GetFields(
+                     BindingFlags.Public |
+                     BindingFlags.NonPublic |
+                     BindingFlags.Static |
+                     BindingFlags.Instance |
+                     BindingFlags.DeclaredOnly))
+        {
+            if (FindOptionalAssembly(field.FieldType, optionalAssemblies) is not { } optionalAssembly)
+                continue;
+
+            Log.LogError(
+                $"Optional dependency '{optionalAssembly}' is stored in field " +
+                $"'{type.FullName}.{field.Name}'. Move that value into a synchronous method local.");
+            valid = false;
+        }
+    }
+
+    return valid;
+}
+
 // 1. Setup Assembly Resolver
 ResolveEventHandler resolver = (sender, args) => 
 {
@@ -254,17 +301,21 @@ try
     // Loading the bytes preserves reflection validation without locking the file.
     Assembly assembly = Assembly.Load(File.ReadAllBytes(AssemblyPath));
 
-    // 2. Enable "Shenanigans" (Field Access)
+    // 2. Optional integrations must remain loadable when their assemblies are absent.
+    if (!ValidateNoOptionalDependencyFields(assembly))
+        return false;
+
+    // 3. Enable "Shenanigans" (Field Access)
     Type? mainPlugin = assembly.GetType("SER.Code.Plugin.MainPlugin");
     mainPlugin?.GetField("AllowDetachedScriptCompilingShenanigans")?.SetValue(null, true);
 
-    // 3. Method Indexing (Mandatory)
+    // 4. Method Indexing (Mandatory)
     if (!TryInvoke(assembly, "SER.Code.MethodSystem.MethodIndex", "AddAllDefinedMethodsInAssembly", [assembly], true))
         return false;
 
     Log.LogMessage(MessageImportance.High, ">>> Methods loaded.");
 
-    // 4. Script Validation (Special handling for return types)
+    // 5. Script Validation (Special handling for return types)
     {
         Type? handlerType = assembly.GetType("SER.Code.Helpers.ExampleHandler");
         var verifyMethod = handlerType?.GetMethod("Verify", BindingFlags.Public | BindingFlags.Static);
@@ -286,7 +337,7 @@ try
         Log.LogMessage(MessageImportance.High, $">>> Validation Passed for: {string.Join(", ", scripts)}.");
     }
 
-    // 5. Systems Initialization (Optional/Silent failure)
+    // 6. Systems Initialization (Optional/Silent failure)
     TryInvoke(assembly, "SER.Code.EventSystem.EventHandler", "Initialize");
     TryInvoke(assembly, "SER.Code.FlagSystem.Flags.Flag", "RegisterFlags", [null]);
     TryInvoke(assembly, "SER.Code.Builders.Builder", "CreateFiles");

@@ -14,7 +14,6 @@ const extensionOutputDirectory = path.join(extensionDirectory, "out");
 const paths = {
   license: path.join(repositoryDirectory, "LICENSE"),
   thirdPartyLicenses: path.join(repositoryDirectory, "THIRD_PARTY_LICENSES.txt"),
-  thirdPartyLicenses: path.join(repositoryDirectory, "THIRD_PARTY_LICENSES.txt"),
   manifest: path.join(repositoryDirectory, "ser_method_info.js"),
   template: path.join(editorSourceDirectory, "index.html"),
   styles: path.join(editorSourceDirectory, "styles.css"),
@@ -73,10 +72,6 @@ fs.writeFileSync(path.join(extensionOutputDirectory, "visual-editor.html"), exte
 fs.writeFileSync(path.join(extensionOutputDirectory, "ser-language.json"), manifestJson);
 fs.writeFileSync(paths.websiteManifest, manifestJson);
 fs.copyFileSync(paths.license, path.join(extensionDirectory, "LICENSE"));
-fs.copyFileSync(
-  paths.thirdPartyLicenses,
-  path.join(extensionDirectory, "THIRD_PARTY_LICENSES.txt")
-);
 fs.copyFileSync(
   paths.thirdPartyLicenses,
   path.join(extensionDirectory, "THIRD_PARTY_LICENSES.txt")

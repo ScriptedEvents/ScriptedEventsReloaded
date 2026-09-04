@@ -19,6 +19,7 @@ const files = {
   extensionEditorLogicOutput: path.join(extensionDirectory, "out", "ser-editor-logic.js"),
   extensionCore: path.join(extensionDirectory, "out", "ser-language-core.js"),
   extensionEditor: path.join(extensionDirectory, "out", "visual-editor.html"),
+  projectCodexConfig: path.join(repositoryDirectory, ".codex", "config.toml"),
   thirdPartyLicenses: path.join(repositoryDirectory, "THIRD_PARTY_LICENSES.txt"),
   extensionThirdPartyLicenses: path.join(extensionDirectory, "THIRD_PARTY_LICENSES.txt"),
   manifest: path.join(repositoryDirectory, "ser_method_info.js"),
@@ -44,6 +45,21 @@ for (const filename of [
 
 const manifest = readGeneratedManifest(files.manifest);
 const extensionManifest = readGeneratedManifest(files.extensionManifest);
+for (const [name, content] of [
+  ["generated manifest", JSON.stringify(manifest)],
+  ["project Codex config", fs.readFileSync(files.projectCodexConfig, "utf8")]
+]) {
+  assert.doesNotMatch(
+    content,
+    /[A-Za-z]:\\{1,2}Users\\{1,2}/i,
+    `The ${name} contains a Windows user-profile path.`
+  );
+  assert.doesNotMatch(
+    content,
+    /\/(?:Users|home)\//i,
+    `The ${name} contains a Unix user-profile path.`
+  );
+}
 assert.deepEqual(extensionManifest, manifest, "The extension manifest is out of sync with SER.");
 assert.deepEqual(
   JSON.parse(fs.readFileSync(files.websiteManifest, "utf8")),

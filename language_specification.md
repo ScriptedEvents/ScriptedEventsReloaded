@@ -229,7 +229,7 @@ The sections of a multi-section file named `roundHandlers.ser` can be addressed 
 * *Event Cancellation:* Use `IsAllowed false` followed by `stop` to cancel the base game event.
 * *Event Variables:* Provided via C# reflection, but may not always exist. Use `-- require` to validate.
 * *ProjectMER Events:* Use `serhelp pmerevents` to list the events exposed by the installed ProjectMER version. Schematic event values use SER's `MERSchematic` reference type and can be passed directly to `MER.*` methods.
-* *UCR Events:* Use `serhelp ucrevents` to list role lifecycle events exposed by UncomplicatedCustomRoles 9.6.0 or newer. Returning `false` from `Registering` or `Spawning` stops that action.
+* *UCR Events:* Use `serhelp ucrevents` to list role lifecycle events exposed by UncomplicatedCustomRoles 9.6.0 or newer. Use `IsAllowed false` in `Registering` or `Spawning` to stop that action.
 
 ---
 

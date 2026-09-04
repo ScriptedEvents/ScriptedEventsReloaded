@@ -1,5 +1,6 @@
 # Normalize text in the repository while preserving binary assets.
 * text=auto
+.editorconfig text eol=lf
 .gitattributes text eol=lf
 
 *.cs text eol=crlf
@@ -10,6 +11,7 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 *.json text eol=lf
+*.toml text eol=lf
 *.js text eol=lf
 *.mjs text eol=lf
 *.jsx text eol=lf

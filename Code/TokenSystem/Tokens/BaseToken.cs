@@ -14,7 +14,7 @@ public class BaseToken
     protected Slice Slice { get; private set; } = null!;
     public Script Script { get; private set; } = null!;
     protected uint? LineNum { get; private set; } = null;
-    
+
     public IParseResult TryInit(Slice slice, Script script, uint? lineNum)
     {
         RawRep = slice.RawRep;
@@ -25,17 +25,17 @@ public class BaseToken
     }
 
     public interface IParseResult;
-    
+
     /// <summary>
     /// Used when the token is successfully parsed.
     /// </summary>
     public record struct Success : IParseResult;
-    
+
     /// <summary>
     /// Used when the input was never intended to be this token. This will allow a different token to be parsed.
     /// </summary>
     public record struct Ignore : IParseResult;
-    
+
     /// <summary>
     /// Used when there was a clear intent of using this token, but parsing still failed. This will cause a compile error.
     /// </summary>
@@ -45,11 +45,11 @@ public class BaseToken
     {
         return new Success();
     }
-    
+
     public string BestStaticTextRepr() => InternalBestTextExpr().Value;
-    
+
     public DynamicGet<string> BestTextRepr() => InternalBestTextExpr();
-    
+
     public DynamicGet<string> InternalBestTextExpr()
     {
         // ReSharper disable once ConvertIfStatementToSwitchStatement
@@ -59,7 +59,7 @@ public class BaseToken
             {
                 return new(() => textToken.Value);
             }
-            
+
             return textToken.Value.Value;
         }
 
@@ -72,7 +72,7 @@ public class BaseToken
         {
             return func().WasSuccessful(out var value) ? value.StringRep : RawRep;
         }
-            
+
         return new(() => func().WasSuccessful(out var value) ? value.StringRep : RawRep);
     }
 
@@ -92,8 +92,8 @@ public class BaseToken
         {
             return $"Value '{rawRep}' cannot represent a single {typeof(T).FriendlyTypeName()}";
         }
-        
-        if (tokens.First().TryCast<T>(rawRep).HasErrored(out error, out var tToken))
+
+        if (tokens[0].TryCast<T>(rawRep).HasErrored(out error, out var tToken))
         {
             return error;
         }

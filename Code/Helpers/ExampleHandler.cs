@@ -103,6 +103,11 @@ public static class ExampleHandler
             return (methodContractError, examples.Keys.ToArray());
         }
 
+        if (AuditRegressionChecks.Verify() is { } auditError)
+        {
+            return (auditError, examples.Keys.ToArray());
+        }
+
         var regressionScripts = new Dictionary<string, string>
         {
             ["event_toggle_returns"] =

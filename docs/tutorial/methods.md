@@ -13,6 +13,15 @@ Broadcast @all 5s "Hello, facility!"
 
 ## Find a method instead of memorizing one
 
+Search by name or by what you want to change:
+
+```text
+serhelp find player health
+```
+
+This shows up to ten matches, including methods, events and properties. Follow
+the help command beside a result to learn how to use it.
+
 The running server carries its own reference. Start with the shorter beginner
 list:
 

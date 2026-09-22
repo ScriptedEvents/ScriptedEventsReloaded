@@ -71,6 +71,23 @@ public static class DocsProvider
         var arg = args.Array?[args.Offset].ToLowerInvariant()
                   ?? throw new CoreInvariantException("Help arguments were provided in an invalid format.");
 
+        if (arg == "find")
+        {
+            var query = string.Join(" ", args.Skip(1));
+            if (string.IsNullOrWhiteSpace(query) || query.Length > 300)
+            {
+                response = "Use 'serhelp find <words>' with 1 to 300 characters.";
+                return false;
+            }
+            var found = new SerSymbolFinder(SerSymbolCatalogue.Capture()).FindAsync(query, null).GetAwaiter().GetResult();
+            response = found.Results.Count == 0 ? "No matching symbols found. Try fewer words."
+                : string.Join("\n", found.Results.Select(c => $"- {Code(c.Symbol.Name)} ({c.Symbol.Kind}" +
+                    (c.Symbol.Owner is null ? "" : $", {c.Symbol.Owner}") + ") — " + c.Symbol.Description +
+                    (c.Symbol.Available ? "" : $" Requires {c.Symbol.RequiresIntegration}.") +
+                    $" See {Code("serhelp " + c.Symbol.HelpQuery)}."));
+            return true;
+        }
+
         if (Enum.TryParse(arg, true, out HelpOption option))
         {
             if (option == HelpOption.Properties && args.Count > 1)
@@ -167,6 +184,7 @@ public static class DocsProvider
                 # SER help
 
                 New here? Run {Code("serhelp start")}.
+                Search by name or purpose with {Code("serhelp find <words>")}.
                 For a compact method list, run {Code("serhelp methods essential")}.
                 For details about one item, run {Code("serhelp <name>")}, for example {Code("serhelp Print")}.
 
@@ -730,7 +748,7 @@ public static class DocsProvider
             sb.AppendLine(Heading($"{category ?? "Other"} variables"));
             foreach (var var in allVars.Where(var => var.Category == category))
             {
-            sb.AppendLine($"- {Code($"@{var.Name}")}");
+                sb.AppendLine($"- {Code($"@{var.Name}")}");
             }
         }
 

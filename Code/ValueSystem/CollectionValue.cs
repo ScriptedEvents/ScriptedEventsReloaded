@@ -157,7 +157,7 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties, I
             throw new CustomScriptRuntimeError("Collection is empty");
         }
         
-        if (type.IsInstanceOfType(value))
+        if (!type.IsInstanceOfType(value))
         {
             throw new CustomScriptRuntimeError($"Value {value.FriendlyName} has to be the same type as the collection ({GetFriendlyName(type)}).");
         }
@@ -170,7 +170,10 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties, I
                 return false;
             }
             
-            return amountToRemove-- > 0;
+            if (amountToRemove == -1) return true;
+            if (amountToRemove <= 0) return false;
+            amountToRemove--;
+            return true;
         });
 
         return new CollectionValue(values);

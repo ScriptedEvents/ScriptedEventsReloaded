@@ -16,9 +16,7 @@ namespace SER.Code.ContextSystem.Contexts.Control.Loops;
 public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
 {
     private readonly Result _mainErr = "Cannot create 'over' loop.";
-    private Variable? _indexIterationVariable;
     private VariableToken? _indexIterationVariableToken;
-    private Variable? _itemIterationVariable;
     private VariableToken? _itemIterationVariableToken;
     private IValueToken? _itemIterationValueToken;
     
@@ -121,26 +119,35 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
         {
             var value = values[index];
 
-            if (_itemIterationVariableToken is not null)
+            Variable? itemVariable = null;
+            Variable? indexVariable = null;
+            try
             {
-                _itemIterationVariable = Variable.Create(_itemIterationVariableToken.Name, value);
-                Script.AddLocalVariable(_itemIterationVariable);
-            }
+                if (_itemIterationVariableToken is not null)
+                {
+                    var variable = Variable.Create(_itemIterationVariableToken.Name, value);
+                    Script.AddLocalVariable(variable);
+                    itemVariable = variable;
+                }
 
-            if (_indexIterationVariableToken is not null)
+                if (_indexIterationVariableToken is not null)
+                {
+                    var variable = Variable.Create(_indexIterationVariableToken.Name, new NumberValue(index + 1));
+                    Script.AddLocalVariable(variable);
+                    indexVariable = variable;
+                }
+
+                using var coro = RunChildren();
+                while (coro.MoveNext())
+                {
+                    yield return coro.Current;
+                }
+            }
+            finally
             {
-                _indexIterationVariable = Variable.Create(_indexIterationVariableToken.Name, new NumberValue(index + 1));
-                Script.AddLocalVariable(_indexIterationVariable);
+                if (itemVariable is not null) Script.RemoveLocalVariable(itemVariable);
+                if (indexVariable is not null) Script.RemoveLocalVariable(indexVariable);
             }
-
-            using var coro = RunChildren();
-            while (coro.MoveNext())
-            {
-                yield return coro.Current;
-            }
-
-            if (_itemIterationVariable is not null) Script.RemoveLocalVariable(_itemIterationVariable);
-            if (_indexIterationVariable is not null) Script.RemoveLocalVariable(_indexIterationVariable);
 
             if (ReceivedBreak)
             {

@@ -14,6 +14,11 @@ public static class VariableIndex
     private static readonly Dictionary<(char, string), Variable> _globalVariables = [];
     public static IEnumerable<Variable> GlobalVariables => _globalVariables.Values;
 
+    /// <summary>Registered names only; unlike Variable.Prefix, this never evaluates a variable.</summary>
+    public static IEnumerable<(char Prefix, string Name, string? Category)> GetGlobalVariableInfo() =>
+        _globalVariables.Select(pair => (pair.Key.Item1, pair.Key.Item2,
+            (pair.Value as PredefinedPlayerVariable)?.Category)).ToArray();
+
     public static void Initialize()
     {
         _globalVariables.Clear();
@@ -84,7 +89,8 @@ public static class VariableIndex
         
         foreach (var v in allApiVariables)
         {
-            _globalVariables[(v.Prefix, v.Name)] = v;
+            // Every predefined selection is a player variable. Do not evaluate it to discover its prefix.
+            _globalVariables[('@', v.Name)] = v;
         }
     }
 

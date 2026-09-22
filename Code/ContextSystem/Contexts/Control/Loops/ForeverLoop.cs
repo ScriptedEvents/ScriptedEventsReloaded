@@ -1,4 +1,4 @@
-﻿using SER.Code.ContextSystem.BaseContexts;
+using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
 using SER.Code.Helpers.ResultSystem;
@@ -48,12 +48,18 @@ public class ForeverLoop : LoopContextWithSingleIterationVariable<NumberValue>, 
         while (true)
         {
             SetVariable(++iteration);
-            using var coro = RunChildren();
-            while (coro.MoveNext())
+            try
             {
-                yield return coro.Current;
+                using var coro = RunChildren();
+                while (coro.MoveNext())
+                {
+                    yield return coro.Current;
+                }
             }
-            RemoveVariable();
+            finally
+            {
+                RemoveVariable();
+            }
 
             if (ReceivedBreak) break;
         }

@@ -86,13 +86,18 @@ public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
         for (ulong i = 0; i < val; i++)
         {
             SetVariable(i + 1);
-            using var coro = RunChildren();
-            while (coro.MoveNext())
+            try
             {
-                yield return coro.Current;
+                using var coro = RunChildren();
+                while (coro.MoveNext())
+                {
+                    yield return coro.Current;
+                }
             }
-
-            RemoveVariable();
+            finally
+            {
+                RemoveVariable();
+            }
             if (ReceivedBreak) break;
         }
     }

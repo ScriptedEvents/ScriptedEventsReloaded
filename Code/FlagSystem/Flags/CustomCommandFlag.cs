@@ -405,7 +405,8 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
             cmd = flag.Command;
         }
 
-        if (sender is IPlayerExecutor { Player: { } player } && HandlePlayer(cmd, player) is { } plrErr)
+        var player = (sender as IPlayerExecutor)?.Player;
+        if (player is not null && ValidatePlayer(cmd, player) is { } plrErr)
         {
             return plrErr;
         }
@@ -438,7 +439,6 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
                 return $"This command is on cooldown! You will be able to use this command in {timeRemaining} seconds.";
             }
             
-            cmd.NextEligibleDateForGlobal = DateTime.UtcNow + cmd.GlobalCooldown;
         }
         
         if (Tokenizer.SliceLine(args.JoinStrings(" "))
@@ -501,6 +501,22 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
         }
 
         script.AddLocalVariable(new ReferenceVariable("command", new ReferenceValue<CustomCommand>(cmd)));
+
+        // Reserve usage only after every command check and argument conversion succeeds.
+        // Do this before Run so a script cannot re-enter the command before its limits apply.
+        var now = DateTime.UtcNow;
+        if (player is not null)
+        {
+            if (cmd.PlayerCooldown > TimeSpan.Zero)
+                cmd.NextEligibleDateForPlayer[player] = now + cmd.PlayerCooldown;
+            if (cmd.MaxUses > 0)
+            {
+                cmd.PlayerUses.TryGetValue(player, out var uses);
+                cmd.PlayerUses[player] = uses + 1;
+            }
+        }
+        if (cmd.GlobalCooldown > TimeSpan.Zero)
+            cmd.NextEligibleDateForGlobal = now + cmd.GlobalCooldown;
         
         if (cmd.GlobalMaxUses > 0)
         {
@@ -511,7 +527,7 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
         return true;
     }
 
-    private static string? HandlePlayer(CustomCommand cmd, Player plr)
+    private static string? ValidatePlayer(CustomCommand cmd, Player plr)
     {
         Log.Debug($"handling player in command {cmd.Command}");
         if (cmd.NeededRanks.Any())
@@ -555,11 +571,6 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
 
         if (cmd.PlayerCooldown <= TimeSpan.Zero)
         {
-            if (cmd.MaxUses > 0)
-            {
-                cmd.PlayerUses.TryGetValue(plr, out var uses);
-                cmd.PlayerUses[plr] = uses + 1;
-            }
             return null;
         }
         
@@ -578,14 +589,6 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
             return $"You are on cooldown! You will be able to use this command in {timeRemaining} seconds.";
         }
         
-        cmd.NextEligibleDateForPlayer[plr] = DateTime.UtcNow + cmd.PlayerCooldown;
-
-        if (cmd.MaxUses > 0)
-        {
-            cmd.PlayerUses.TryGetValue(plr, out var uses);
-            cmd.PlayerUses[plr] = uses + 1;
-        }
-
         return null;
     }
     

@@ -11,6 +11,7 @@
   - [Decisions, chance, and timing](tutorial/decisions-and-time.md)
   - [Build Hot Potato](tutorial/hot-potato.md)
 - Reference: exact behavior
+  - [Find a SER symbol](reference/symbol-finder.md)
   - [Files, names, and reloads](getting-started/files-and-reloads.md)
   - [Methods and values](language/methods-and-values.md)
   - [Variables and properties](language/variables-and-properties.md)

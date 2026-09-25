@@ -7,6 +7,7 @@ using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem.Structures;
 using SER.Code.TokenSystem.Tokens;
+using SER.Code.TokenSystem.Tokens.ValueTokens;
 
 namespace SER.Code.FlagSystem;
 
@@ -49,7 +50,10 @@ public static class ScriptFlagHandler
                 return $"Line {line.LineNumber}: Name of the flag is missing.";
             }
             
-            var args = tokens.Skip(2).Select(t => t.BestStaticTextRepr()).ToArray();
+            // DurationValue.StringRep can contain spaces, so keep the parseable source token.
+            var args = tokens.Skip(2)
+                .Select(t => t is DurationToken ? t.RawRep : t.BestStaticTextRepr())
+                .ToArray();
             var prefix = tokens.FirstOrDefault();
             
             var result = prefix switch

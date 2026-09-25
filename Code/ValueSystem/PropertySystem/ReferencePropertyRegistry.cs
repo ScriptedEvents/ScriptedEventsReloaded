@@ -72,7 +72,12 @@ public static class ReferencePropertyRegistry
             }
         }
         
-        combined.Add(
+        void AddIfMissing(string name, IValueWithProperties.PropInfo info)
+        {
+            if (!combined.ContainsKey(name)) combined.Add(name, info);
+        }
+
+        AddIfMissing(
             "isValid", 
             new IValueWithProperties.PropInfo<ReferenceValue, BoolValue>(
                 rv => rv.IsValid, 
@@ -80,7 +85,7 @@ public static class ReferencePropertyRegistry
             )
         );
         
-        combined.Add(
+        AddIfMissing(
             "isInvalid", 
             new IValueWithProperties.PropInfo<ReferenceValue, BoolValue>(
                 rv => !rv.IsValid, 
@@ -88,7 +93,7 @@ public static class ReferencePropertyRegistry
             )
         );
         
-        combined.Add(
+        AddIfMissing(
             "refName", 
             new IValueWithProperties.PropInfo<ReferenceValue, StaticTextValue>(
                 rv => rv.Value.GetType().AccurateName, 
@@ -96,7 +101,7 @@ public static class ReferencePropertyRegistry
             )
         );
         
-        combined.Add(
+        AddIfMissing(
             "refAssembly", 
             new IValueWithProperties.PropInfo<ReferenceValue, StaticTextValue>(
                 rv => rv.Value.GetType().Assembly.GetName().Name, 
@@ -104,7 +109,7 @@ public static class ReferencePropertyRegistry
             )
         );
         
-        combined.Add(
+        AddIfMissing(
             "valType", 
             new IValueWithProperties.PropInfo<ReferenceValue, EnumValue<SER.Code.ValueSystem.Other.ValueType>>(
                 _ => SER.Code.ValueSystem.Other.ValueType.Reference, 

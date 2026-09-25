@@ -75,6 +75,7 @@ public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
 
     protected override IEnumerator<float> Execute()
     {
+        ResetControlMessages();
         if (_repeatCountExpression == null)
             throw new CoreInvariantException("Repeat context has no amount specified");
 

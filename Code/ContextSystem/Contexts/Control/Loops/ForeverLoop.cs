@@ -44,6 +44,7 @@ public class ForeverLoop : LoopContextWithSingleIterationVariable<NumberValue>, 
 
     protected override IEnumerator<float> Execute()
     {
+        ResetControlMessages();
         ulong iteration = 0;
         while (true)
         {

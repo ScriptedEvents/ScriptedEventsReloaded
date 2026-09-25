@@ -11,6 +11,12 @@ public abstract class LoopContext : StatementContext, IKeywordContext
 
     protected bool ReceivedContinue;
 
+    protected void ResetControlMessages()
+    {
+        ReceivedBreak = false;
+        ReceivedContinue = false;
+    }
+
     protected abstract string? DetailedUsage { get; }
 
     public sealed override string FriendlyName => $"'{KeywordName}' loop statement";

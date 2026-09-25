@@ -98,6 +98,7 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
 
     protected override IEnumerator<float> Execute()
     {
+        ResetControlMessages();
         if (_itemIterationValueToken is null) throw new CoreInvariantException();
 
         if (_itemIterationValueToken.Value().HasErrored(out var error, out var dirtyValue))

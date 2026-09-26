@@ -336,6 +336,9 @@ public static class ReferencePropertyRegistry
         Register<DamageHandlerBase, EnumValue<HitboxType>>("hitbox", h => (h as StandardDamageHandler)?.Hitbox.ToEnumValue() ?? new EnumValue<HitboxType>(), "Hitbox type");
         Register<DamageHandlerBase, ReferenceValue<Firearm>>("firearmUsed", h => (h as FirearmDamageHandler)?.Firearm, "Firearm used");
         Register<DamageHandlerBase, PlayerValue>("attacker", h => new PlayerValue(Player.Get((h as AttackerDamageHandler)?.Attacker.PlayerId ?? -1)), "Attacker player");
+
+        Register<Ragdoll, PlayerValue>("owner", r => new PlayerValue(r.Base.Info.OwnerHub != null ? Player.Get(r.Base.Info.OwnerHub) : null), "Player whose body this is, if available");
+        Register<Ragdoll, NumberValue>("creationTime", r => new NumberValue((decimal)r.Base.Info.CreationTime), "Game time in seconds when this ragdoll was created");
         
         Register<RespawnWave, NumberValue>("respawnTokens", w => new NumberValue(w.Base is Respawning.Waves.Generic.ILimitedWave limitedWave ? limitedWave.RespawnTokens : -1), "Respawn tokens");
         Register<RespawnWave, NumberValue>("influence", w => new NumberValue((decimal)FactionInfluenceManager.Get(w.Faction)), "Faction influence");

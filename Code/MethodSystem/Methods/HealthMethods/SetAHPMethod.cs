@@ -14,19 +14,19 @@ public class SetAHPMethod : SynchronousMethod
     public override Argument[] ExpectedArguments { get; } =
     [
         new PlayersArgument("players"),
-        new FloatArgument("amount", 0)
+        new FloatArgument("amount")
         {
-            Description = "The amount of artificial health to ADD to the player. Use a negative number to remove."
+            Description = "Adds this much AHP. Use a negative amount to remove AHP."
         },
         new FloatArgument("limit", 0)
         {
             DefaultValue = new(75, null),
             Description = "The upper limit of AHP."
         },
-        new FloatArgument("decay", 0)
+        new FloatArgument("decay")
         {
             DefaultValue = new(1.2, null),
-            Description = "How much AHP is lost per second."
+            Description = "AHP lost per second. Use a negative number to regenerate AHP."
         },
         new FloatArgument("efficacy", 0, 1, true)
         {

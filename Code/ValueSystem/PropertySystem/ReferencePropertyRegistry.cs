@@ -20,7 +20,7 @@ public static class ReferencePropertyRegistry
 
     public static IEnumerable<Type> GetRegisteredTypes() => RegisteredProperties.Keys;
 
-    public static void Register<T, TValue>(string name, Func<T, TValue> handler, string? description = null) where TValue : Value
+    public static void Register<T, TValue>(string name, Func<T, TValue> handler, string? description = null, Func<T, TValue, Result>? setter = null) where TValue : Value
     {
         var type = typeof(T);
         if (!RegisteredProperties.TryGetValue(type, out var props))
@@ -28,7 +28,7 @@ public static class ReferencePropertyRegistry
             props = new Dictionary<string, IValueWithProperties.PropInfo>(StringComparer.OrdinalIgnoreCase);
             RegisteredProperties[type] = props;
         }
-        props[name] = new ReferencePropInfo<T, TValue>(handler, description);
+        props[name] = new ReferencePropInfo<T, TValue>(handler, description, setter);
         CachedCombinedProperties.Clear(); // Invalidate cache
         CachedShellProperties.Clear();
     }
@@ -266,7 +266,7 @@ public static class ReferencePropertyRegistry
         public override string Description => $"Accesses JSON property '{key}'";
     }
 
-    private class ReferencePropInfo<T, TValue>(Func<T, TValue> handler, string? description) 
+    private class ReferencePropInfo<T, TValue>(Func<T, TValue> handler, string? description, Func<T, TValue, Result>? setter)
         : IValueWithProperties.PropInfo<T, TValue>(handler, description) where TValue : Value
     {
         protected override Func<object, object> Translator => 
@@ -276,6 +276,25 @@ public static class ReferencePropertyRegistry
                 IValueWithProperties valWithProps and T => valWithProps,
                 _ => obj
             };
+
+        public override bool IsSettable => setter is not null;
+
+        public override Result SetValue(object obj, Value value)
+        {
+            if (setter is null) return base.SetValue(obj, value);
+            if (Translator is not null) obj = Translator(obj);
+            if (obj is not T target) return $"Provided value is not of type {typeof(T).AccurateName}";
+            if (value is not TValue newValue) return $"Property requires a {typeof(TValue).AccurateName}.";
+
+            try
+            {
+                return setter(target, newValue);
+            }
+            catch (Exception e)
+            {
+                return $"Failed to set property: {e.Message}";
+            }
+        }
     }
 
     private static bool _isInitialized;
@@ -302,7 +321,18 @@ public static class ReferencePropertyRegistry
         Register<Room, NumberValue>("posY", r => new NumberValue((decimal)r.Position.y), "The Y position of the room");
         Register<Room, NumberValue>("posZ", r => new NumberValue((decimal)r.Position.z), "The Z position of the room");
         
-        Register<DamageHandlerBase, NumberValue>("damage", h => new NumberValue((decimal)((h as StandardDamageHandler)?.Damage ?? -1)), "Damage amount, -1 if not applicable");
+        Register<DamageHandlerBase, NumberValue>(
+            "damage",
+            h => new NumberValue((decimal)((h as StandardDamageHandler)?.Damage ?? -1)),
+            "Damage amount, -1 if not applicable. Can be changed for standard damage handlers.",
+            (h, value) =>
+            {
+                if (h is not StandardDamageHandler standard)
+                    return "This damage handler does not have a damage amount to change.";
+
+                standard.Damage = (float)value.Value;
+                return true;
+            });
         Register<DamageHandlerBase, EnumValue<HitboxType>>("hitbox", h => (h as StandardDamageHandler)?.Hitbox.ToEnumValue() ?? new EnumValue<HitboxType>(), "Hitbox type");
         Register<DamageHandlerBase, ReferenceValue<Firearm>>("firearmUsed", h => (h as FirearmDamageHandler)?.Firearm, "Firearm used");
         Register<DamageHandlerBase, PlayerValue>("attacker", h => new PlayerValue(Player.Get((h as AttackerDamageHandler)?.Attacker.PlayerId ?? -1)), "Attacker player");

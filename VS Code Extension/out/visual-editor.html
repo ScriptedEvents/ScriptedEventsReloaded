@@ -9022,6 +9022,35 @@ const SER_TRUTH_TABLE = {
       ],
       "errors": []
     },
+    "DestroyRagdoll": {
+      "syntax": "DestroyRagdoll *ragdoll",
+      "description": "Destroys one ragdoll.",
+      "subgroup": "Map",
+      "essential": false,
+      "additionalDescription": null,
+      "requiredFramework": null,
+      "returns": null,
+      "arguments": [
+        {
+          "name": "ragdoll",
+          "argumentKind": "ReferenceArgument`1",
+          "mustBeProvided": true,
+          "type": "a reference to Ragdoll object.",
+          "description": null,
+          "defaultValue": null,
+          "consumesRemainingValues": false,
+          "syntax": "*ragdoll",
+          "enumValues": null,
+          "enumDescription": null,
+          "enumDescriptions": null,
+          "isEnumFlags": false,
+          "options": null
+        }
+      ],
+      "errors": [
+        "The ragdoll has already been destroyed."
+      ]
+    },
     "GetFromMap": {
       "syntax": "GetFromMap object",
       "description": "Gets a collection of objects from a map.",
@@ -11130,8 +11159,8 @@ const SER_TRUTH_TABLE = {
           "name": "amount",
           "argumentKind": "FloatArgument",
           "mustBeProvided": true,
-          "type": "A number bigger or equal 0",
-          "description": "The amount of artificial health to ADD to the player. Use a negative number to remove.",
+          "type": "Any number",
+          "description": "Adds this much AHP. Use a negative amount to remove AHP.",
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "amount",
@@ -11160,8 +11189,8 @@ const SER_TRUTH_TABLE = {
           "name": "decay",
           "argumentKind": "FloatArgument",
           "mustBeProvided": false,
-          "type": "A number bigger or equal 0",
-          "description": "How much AHP is lost per second.",
+          "type": "Any number",
+          "description": "AHP lost per second. Use a negative number to regenerate AHP.",
           "defaultValue": "1,2",
           "consumesRemainingValues": false,
           "syntax": "decay?",

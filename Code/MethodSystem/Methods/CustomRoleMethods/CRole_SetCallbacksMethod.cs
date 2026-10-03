@@ -2,6 +2,7 @@ using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
+using SER.Code.ScriptSystem.Structures;
 using SER.Code.ValueSystem;
 
 namespace SER.Code.MethodSystem.Methods.CustomRoleMethods;
@@ -11,7 +12,7 @@ namespace SER.Code.MethodSystem.Methods.CustomRoleMethods;
 public class CRole_SetCallbacksMethod : SynchronousMethod
 {
     public override string Description =>
-        "Sets the callbacks for a provided custom role. Calling it again from the same script replaces the previous callbacks.";
+        "Sets the callbacks for a provided custom role. Calling it again from the same script replaces that role's callbacks without changing callbacks for other roles.";
 
     public override Argument[] ExpectedArguments { get; } =
     [
@@ -53,9 +54,12 @@ public class CRole_SetCallbacksMethod : SynchronousMethod
             return new()
             {
                 Action = (plr, role) => callback.Action([new PlayerValue(plr), new ReferenceValue<CRole>(role)], null),
-                Id = $"callback '{callback.Name}' in script '{Script.Name}'",
+                Id = GetHandlerId(customRole.Id, Script.Name),
                 ForRoles = [customRole.Id]
             };
         }
     }
+
+    internal static string GetHandlerId(string roleId, ScriptName scriptName) =>
+        $"callbacks for custom role '{roleId}' in script '{scriptName}'";
 }

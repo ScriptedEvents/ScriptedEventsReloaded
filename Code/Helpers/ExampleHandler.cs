@@ -7,6 +7,7 @@ using SER.Code.Helpers.ResultSystem;
 using SER.Code.MethodSystem;
 using SER.Code.MethodSystem.Structures;
 using SER.Code.MethodSystem.Methods.CustomRoleMethods.Structures;
+using SER.Code.MethodSystem.Methods.CustomRoleMethods;
 using SER.Code.ScriptSystem;
 using SER.Code.ScriptSystem.Structures;
 using SER.Code.TokenSystem;
@@ -385,26 +386,49 @@ public static class ExampleHandler
             return null;
         }
 
-        const string handlerId = "custom-role handler audit";
+        var roleAId = CRole_SetCallbacksMethod.GetHandlerId("roleA", ScriptName.CreateUnsafe("role_callback_audit"));
+        var roleBId = CRole_SetCallbacksMethod.GetHandlerId("roleB", ScriptName.CreateUnsafe("role_callback_audit"));
+        var otherScriptId = CRole_SetCallbacksMethod.GetHandlerId("roleA", ScriptName.CreateUnsafe("other_callback_audit"));
+        var oldCalls = 0;
+        var replacementCalls = 0;
+        var roleBCalls = 0;
+        var otherScriptCalls = 0;
         var first = new CRole.Handler
         {
-            Id = handlerId,
-            Action = (_, _) => { }
+            Id = roleAId,
+            ForRoles = ["roleA"],
+            Action = (_, _) => oldCalls++
         };
         var replacement = new CRole.Handler
         {
-            Id = handlerId,
-            Action = (_, _) => { }
+            Id = roleAId,
+            ForRoles = ["roleA"],
+            Action = (_, _) => replacementCalls++
+        };
+        var roleB = new CRole.Handler
+        {
+            Id = roleBId,
+            ForRoles = ["roleB"],
+            Action = (_, _) => roleBCalls++
+        };
+        var otherScript = new CRole.Handler
+        {
+            Id = otherScriptId,
+            ForRoles = ["roleA"],
+            Action = (_, _) => otherScriptCalls++
         };
 
         try
         {
             CRole.AddOrReplaceHandler(CRole.CustomRoleEvent.Spawned, first);
+            CRole.AddOrReplaceHandler(CRole.CustomRoleEvent.Spawned, roleB);
+            CRole.AddOrReplaceHandler(CRole.CustomRoleEvent.Spawned, otherScript);
             CRole.AddOrReplaceHandler(CRole.CustomRoleEvent.Spawned, replacement);
-            return CRole.EventHandlers[CRole.CustomRoleEvent.Spawned] is { Count: 1 } handlers
-                   && ReferenceEquals(handlers.Single(), replacement)
-                ? null
-                : "Registering a custom-role callback twice left its stale handler active.";
+            var handlers = CRole.EventHandlers[CRole.CustomRoleEvent.Spawned];
+            foreach (var handler in handlers) handler.Action(null!, null!);
+            return handlers.Count == 3 && oldCalls == 0 && replacementCalls == 1
+                   && roleBCalls == 1 && otherScriptCalls == 1
+                ? null : "Replacing a custom-role callback lost another role or script's callback, or kept the stale handler.";
         }
         finally
         {

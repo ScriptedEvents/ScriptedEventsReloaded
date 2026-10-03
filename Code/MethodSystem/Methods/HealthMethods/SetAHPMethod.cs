@@ -9,14 +9,14 @@ namespace SER.Code.MethodSystem.Methods.HealthMethods;
 [UsedImplicitly]
 public class SetAHPMethod : SynchronousMethod
 {
-    public override string Description => "Sets the amount of AHP for players.";
+    public override string Description => "Adds or removes AHP for players.";
 
     public override Argument[] ExpectedArguments { get; } =
     [
         new PlayersArgument("players"),
         new FloatArgument("amount")
         {
-            Description = "Adds this much AHP. Use a negative amount to remove AHP."
+            Description = "Adds this much AHP. Use a negative amount to remove AHP immediately; the other settings apply only when adding AHP."
         },
         new FloatArgument("limit", 0)
         {
@@ -57,8 +57,36 @@ public class SetAHPMethod : SynchronousMethod
 
         foreach (var plr in players)
         {
-            plr.ReferenceHub.playerStats.GetModule<AhpStat>()
-                .ServerAddProcess(amount, limit, decay, efficacy, (float)sustain.TotalSeconds, isPersistent);
+            var stat = plr.ReferenceHub.playerStats.GetModule<AhpStat>();
+            if (amount < 0)
+            {
+                RemoveAhp(stat, -amount);
+            }
+            else
+            {
+                stat.ServerAddProcess(amount, limit, decay, efficacy, (float)sustain.TotalSeconds, isPersistent);
+            }
         }
+    }
+
+    internal static void RemoveAhp(AhpStat stat, float amount)
+    {
+        foreach (var snapshot in stat.GenerateSnapshots().ToArray())
+        {
+            if (amount <= 0) break;
+            if (!stat.ServerTryGetProcess(snapshot.KillCode, out var process)) continue;
+
+            var removed = Math.Min(amount, Math.Max(0, process.CurrentAmount));
+            process.CurrentAmount -= removed;
+            amount -= removed;
+            if (process.CurrentAmount == 0 && !process.Persistant)
+                stat.ServerKillProcess(process.KillCode);
+        }
+
+        // ServerUpdateProcesses also advances decay and sustain. Refresh the synced
+        // total directly so removing AHP does not advance those timers a second time.
+        var remaining = stat.GenerateSnapshots().ToArray();
+        var limit = remaining.Aggregate(stat.MaxValue, (maximum, process) => Math.Max(maximum, process.Limit));
+        stat.CurValue = Math.Min(limit, Math.Max(0, remaining.Sum(process => process.CurrentAmount)));
     }
 }

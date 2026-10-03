@@ -19,6 +19,8 @@ internal static class AuditRegressionChecks
 {
     internal static string? Verify()
     {
+        if (AhpRegressionChecks.Verify() is { } ahpError) return ahpError;
+
         var collection = new CollectionValue(new Value[] { new NumberValue(1), new NumberValue(2), new NumberValue(1) });
         foreach (var (amount, expected) in new[] { (-1, "2"), (0, "1,2,1"), (1, "2,1"), (2, "2"), (5, "2") })
         {

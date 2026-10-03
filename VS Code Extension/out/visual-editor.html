@@ -11133,7 +11133,7 @@ const SER_TRUTH_TABLE = {
     },
     "SetAHP": {
       "syntax": "SetAHP @players amount limit? decay? efficacy? sustain? isPersistent?",
-      "description": "Sets the amount of AHP for players.",
+      "description": "Adds or removes AHP for players.",
       "subgroup": "Health",
       "essential": false,
       "additionalDescription": null,
@@ -11160,7 +11160,7 @@ const SER_TRUTH_TABLE = {
           "argumentKind": "FloatArgument",
           "mustBeProvided": true,
           "type": "Any number",
-          "description": "Adds this much AHP. Use a negative amount to remove AHP.",
+          "description": "Adds this much AHP. Use a negative amount to remove AHP immediately; the other settings apply only when adding AHP.",
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "amount",

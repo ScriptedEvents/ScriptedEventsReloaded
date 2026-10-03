@@ -324,7 +324,7 @@ public static class ReferencePropertyRegistry
         Register<DamageHandlerBase, NumberValue>(
             "damage",
             h => new NumberValue((decimal)((h as StandardDamageHandler)?.Damage ?? -1)),
-            "Damage amount, -1 if not applicable. Can be changed for standard damage handlers.",
+            "Damage amount, -1 if not applicable. To change a standard hit in a Hurting script, disable SafeScripts and set this before any pause.",
             (h, value) =>
             {
                 if (h is not StandardDamageHandler standard)

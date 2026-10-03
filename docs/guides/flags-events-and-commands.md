@@ -97,6 +97,30 @@ server.
 
 :::
 
+### Change a hit's damage
+
+In a `Hurting` script, change the damage amount to keep the hit's original
+attacker:
+
+```ser
+!-- OnEvent Hurting
+-- require *evDamageHandler
+
+*evDamageHandler -> damage = 25
+```
+
+:::warning SafeScripts and hit damage
+
+This changes the current hit only with SafeScripts disabled and before any
+`Wait` or other pause. With SafeScripts enabled, the hit continues before the
+script can change it. Keep SafeScripts enabled for general scripts; turn it off
+only after checking every active script for loops that can freeze the server.
+
+:::
+
+Only standard damage handlers have a damage amount to change. Other handlers
+return an error if you try to set this property.
+
 ## ProjectMER events
 
 When ProjectMER is installed:

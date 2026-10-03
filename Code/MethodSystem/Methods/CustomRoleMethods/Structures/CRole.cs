@@ -174,8 +174,19 @@ public class CRole
                 return;
             }
 
-            plr.InfoArea = PlayerInfoArea.CustomInfo;
-            plr.CustomInfo = $"{plr.DisplayName}\n{DisplayName}";
+            var customInfo = $"{plr.DisplayName}\n{DisplayName}";
+            if (Player.ValidateCustomInfo(customInfo, out _))
+            {
+                plr.CustomInfo = customInfo;
+                plr.InfoArea = PlayerInfoArea.CustomInfo;
+            }
+            else
+            {
+                // The player's name may use syntax that custom info rejects.
+                // Show it separately and keep the already-validated role name.
+                plr.CustomInfo = DisplayName;
+                plr.InfoArea = PlayerInfoArea.Nickname | PlayerInfoArea.CustomInfo;
+            }
         });
          
         RunHandlers(CustomRoleEvent.Spawned, plr);

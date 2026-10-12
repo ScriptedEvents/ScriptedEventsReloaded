@@ -2515,7 +2515,8 @@
             "Unit",
             "CRole",
             "IsTransmitting",
-            "HasRemoteAdminAccess"
+            "HasRemoteAdminAccess",
+            "Zone"
           ],
           "enumDescription": null,
           "enumDescriptions": null,
@@ -3904,7 +3905,8 @@
             "Unit",
             "CRole",
             "IsTransmitting",
-            "HasRemoteAdminAccess"
+            "HasRemoteAdminAccess",
+            "Zone"
           ],
           "enumDescription": null,
           "enumDescriptions": null,

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using CustomPlayerEffects;
 using LabApi.Features.Wrappers;
+using MapGeneration;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using PlayerRoles.FirstPersonControl.Thirdperson.Subcontrollers;
@@ -28,7 +29,7 @@ public class PlayerValue : Value, IValueWithProperties, IEnumerable<Player>
     {
         Players = players.ToArray();
     }
-    
+
     public PlayerValue()
     {
         Players = [];
@@ -44,9 +45,9 @@ public class PlayerValue : Value, IValueWithProperties, IEnumerable<Player>
     public new static string FriendlyName => "player value";
 
     private static Dictionary<string, IValueWithProperties.PropInfo>? _properties;
-    public Dictionary<string, IValueWithProperties.PropInfo> Properties => _properties ??= 
+    public Dictionary<string, IValueWithProperties.PropInfo> Properties => _properties ??=
         PropertyInfoMap.ToDictionary(pair => pair.Key.ToString().LowerFirst(), pair => pair.Value, StringComparer.OrdinalIgnoreCase)
-            .Append(new KeyValuePair<string, IValueWithProperties.PropInfo>("valType", 
+            .Append(new KeyValuePair<string, IValueWithProperties.PropInfo>("valType",
                 new IValueWithProperties.PropInfo<PlayerValue, EnumValue<ValueType>>(_ => ValueType.Player, "The type of the value")))
             .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.OrdinalIgnoreCase);
 
@@ -116,13 +117,14 @@ public class PlayerValue : Value, IValueWithProperties, IEnumerable<Player>
         Unit,
         CRole,
         IsTransmitting,
-        HasRemoteAdminAccess
+        HasRemoteAdminAccess,
+        Zone
     }
 
     private class Info<T>(Func<Player, T> handler, string? description)
         : IValueWithProperties.PropInfo<Player, T>(handler, description) where T : Value
     {
-        protected override Func<object, object>? Translator { get; } = 
+        protected override Func<object, object>? Translator { get; } =
             obj => obj is PlayerValue { Players.Length: 1 } val ? val.Players[0] : obj;
     }
 
@@ -235,7 +237,8 @@ public class PlayerValue : Value, IValueWithProperties, IEnumerable<Player>
         [PlayerProperty.Unit] = new Info<TextValue>(plr => NamingRulesManager.ClientFetchReceived(plr.Team, plr.UnitId).ToStaticTextValue(), "Returns the player's unit (e.g FOXTROT-03) if player is NTF or Facility Guard, otherwise returns an empty text value."),
         [PlayerProperty.CRole] = new Info<ReferenceValue<CRole>>(plr => CRole.LifeIdAssignedRoles.TryGetValue(plr.LifeId, out var role) ? role : null, "Returns the player's CRole if player has a Custom Role, otherwise returns an invalid reference."),
         [PlayerProperty.IsTransmitting] = new Info<BoolValue>(plr => PersonalRadioPlayback.IsTransmitting(plr.ReferenceHub), "Returns true if player is speaking through a radio, otherwise false."),
-        [PlayerProperty.HasRemoteAdminAccess] = new Info<BoolValue>(plr => plr.RemoteAdminAccess, null)
+        [PlayerProperty.HasRemoteAdminAccess] = new Info<BoolValue>(plr => plr.RemoteAdminAccess, null),
+        [PlayerProperty.Zone] = new Info<EnumValue<FacilityZone>>(plr => plr.Zone, "The facility zone the player is in.")
     };
 
     public override TryGet<object> ToCSharpObject(Type? targetType)

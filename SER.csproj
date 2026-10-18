@@ -18,7 +18,7 @@
         <Configurations>Release;Full Debug;Partial Debug;EXILED</Configurations>
         <Platforms>AnyCPU</Platforms>
         <WarningLevel>4</WarningLevel>
-        <DefaultItemExcludes>$(DefaultItemExcludes);Tooling\**;website\**;VS Code Extension\**;tools\**</DefaultItemExcludes>
+        <DefaultItemExcludes>$(DefaultItemExcludes);Tooling\**;website\**;VS Code Extension\**;tools\**;artifacts\**</DefaultItemExcludes>
         <RunSerPostBuildValidation Condition="'$(RunSerPostBuildValidation)' == ''">true</RunSerPostBuildValidation>
         <CopySerToReferenceDirectory Condition="'$(CopySerToReferenceDirectory)' == ''">false</CopySerToReferenceDirectory>
         <InstallSerExtensionAfterBuild Condition="'$(InstallSerExtensionAfterBuild)' == ''">false</InstallSerExtensionAfterBuild>

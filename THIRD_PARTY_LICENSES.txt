@@ -36,7 +36,7 @@ Component inventory
   Copyright the Blockly contributors
   https://github.com/RaspberryPiFoundation/blockly
 
-- EXILED 9.14.2 API and Events XML documentation (CC BY-SA 3.0)
+- EXILED 9.15.2 API and Events XML documentation (CC BY-SA 3.0)
   Copyright (c) ExMod Team 2024-2026
   https://github.com/ExMod-Team/EXILED
   SER-Exiled.dll embeds unmodified Exiled.API and Exiled.Events XML

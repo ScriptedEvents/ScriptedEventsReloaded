@@ -100,7 +100,7 @@ for (const requiredNotice of [
   "Blockly 13.2.0",
   "Apache License",
   "AudioPlayerApi 1.1.3",
-  "EXILED 9.14.2",
+  "EXILED 9.15.2",
   "NCalc 1.3.8",
   "Newtonsoft.Json 13.0.4",
   "NVorbis 0.10.5",

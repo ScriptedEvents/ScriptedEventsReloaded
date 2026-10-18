@@ -137,8 +137,8 @@
 
     <PropertyGroup>
         <LabApiXmlPath>$(UserProfile)\.nuget\packages\northwood.labapi\1.1.7\lib\net48\LabApi.xml</LabApiXmlPath>
-        <ExiledApiXmlPath>$(UserProfile)\.nuget\packages\exmod.exiled\9.14.2\lib\net48\Exiled.API.xml</ExiledApiXmlPath>
-        <ExiledEventsXmlPath>$(UserProfile)\.nuget\packages\exmod.exiled\9.14.2\lib\net48\Exiled.Events.xml</ExiledEventsXmlPath>
+        <ExiledApiXmlPath>$(UserProfile)\.nuget\packages\exmod.exiled\9.15.2\lib\net48\Exiled.API.xml</ExiledApiXmlPath>
+        <ExiledEventsXmlPath>$(UserProfile)\.nuget\packages\exmod.exiled\9.15.2\lib\net48\Exiled.Events.xml</ExiledEventsXmlPath>
         <UcrReferencePath Condition="'$(UcrReferencePath)' == ''">$(SL_DEV_REFERENCES)\UncomplicatedCustomRoles.dll</UcrReferencePath>
         <!-- The extension is versioned with SER; installation into VS Code is an explicit local-development opt-in. -->
         <SerExtensionDirectory Condition="'$(SerExtensionDirectory)' == ''">$(MSBuildProjectDirectory)\VS Code Extension</SerExtensionDirectory>
@@ -180,7 +180,7 @@
     <ItemGroup>
         <PackageReference Include="AudioPlayerApi" Version="1.1.3" />
         <PackageReference Include="Callvote.LabAPI" Version="6.9.0" />
-        <PackageReference Include="ExMod.Exiled" Version="9.14.2" />
+        <PackageReference Include="ExMod.Exiled" Version="9.15.2" />
         <PackageReference Include="NCalc" Version="1.3.8" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="Northwood.LabAPI" Version="1.1.7" />

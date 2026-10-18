@@ -18,9 +18,9 @@ SER has two fully supported hosts:
 Most servers should use the LabAPI build. Install **one** of these assemblies,
 never both on the same server instance.
 
-SER 1.0 is built and runtime-tested against LabAPI 1.1.7 and EXILED 9.14.2.
-The release downloads keep the two plugin DLLs in separate archives so it is
-harder to install the wrong host accidentally.
+For the SCP:SL 14.2.8 Halloween update, use LabAPI 1.1.7 or EXILED 9.15.2.
+Download the matching plugin DLL from the SER release, replace your existing
+DLL, and restart the server.
 
 > Use the plugin and documentation from the same SER release. Old tutorials may
 > describe names or syntax which no longer exist.

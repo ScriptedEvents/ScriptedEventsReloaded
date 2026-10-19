@@ -46,6 +46,9 @@ public abstract class Value : IEquatable<Value>
         if (t == typeof(TimeSpan)) return typeof(DurationValue);
         if (typeof(Player).IsAssignableFrom(t) || typeof(IEnumerable<Player>).IsAssignableFrom(t)) return typeof(PlayerValue);
         
+        // JSON tokens list their children, but scripts read them through JSON properties, so keep them as references
+        if (typeof(Newtonsoft.Json.Linq.JToken).IsAssignableFrom(t)) return typeof(ReferenceValue<>).MakeGenericType(t);
+
         if (typeof(IEnumerable).IsAssignableFrom(t))
         {
             var itemType = t.GetInterfaces()

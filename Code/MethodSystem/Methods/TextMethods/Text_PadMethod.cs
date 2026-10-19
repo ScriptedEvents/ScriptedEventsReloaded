@@ -50,6 +50,6 @@ public class Text_PadMethod : ReturningMethod<TextValue>, ICanError, IAdditional
             "left" => text.PadLeft(length, character[0]),
             "right" => text.PadRight(length, character[0]),
             _ => throw new ExecutionInvariantException("out of order")
-        }).ToDynamicTextValue(Script);
+        }).ToStaticTextValue();
     }
 }

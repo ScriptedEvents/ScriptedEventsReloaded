@@ -36,7 +36,7 @@ public class Text_SliceMethod : ReturningMethod<TextValue>
 
         try
         {
-            ReturnValue = text[beginning..^end].ToDynamicTextValue(Script);
+            ReturnValue = text[beginning..^end].ToStaticTextValue();
         }
         catch (ArgumentOutOfRangeException)
         {

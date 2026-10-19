@@ -42,14 +42,23 @@ public class DurationToken : LiteralValueToken<DurationValue>
         }
 
         var unit = value[unitIndex..];
-        return unit switch
+        try
         {
-            "s" => TimeSpan.FromSeconds(valueAsDouble),
-            "ms" => TimeSpan.FromMilliseconds(valueAsDouble),
-            "m" => TimeSpan.FromMinutes(valueAsDouble),
-            "h" => TimeSpan.FromHours(valueAsDouble),
-            "d" => TimeSpan.FromDays(valueAsDouble),
-            _ => null
-        };
+            return unit switch
+            {
+                "s" => TimeSpan.FromSeconds(valueAsDouble),
+                "ms" => TimeSpan.FromMilliseconds(valueAsDouble),
+                "m" => TimeSpan.FromMinutes(valueAsDouble),
+                "h" => TimeSpan.FromHours(valueAsDouble),
+                "d" => TimeSpan.FromDays(valueAsDouble),
+                _ => null
+            };
+        }
+        catch (Exception ex) when (ex is OverflowException or ArgumentException)
+        {
+            // Too long to fit in a TimeSpan (or not a real number); treat it like any
+            // other text that is not a valid duration.
+            return null;
+        }
     }
 }

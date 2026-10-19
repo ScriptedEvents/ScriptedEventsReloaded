@@ -26,7 +26,7 @@ public class Coll_RemoveAtMethod : SynchronousMethod
         var collVar = Args.GetCollectionVariable("collection variable");
         var index = Args.GetInt("index");
 
-        Script.AddLocalVariable(
+        Script.ReplaceVariable(
             new CollectionVariable(
                 collVar.Name,
                 CollectionValue.RemoveAt(collVar, index)

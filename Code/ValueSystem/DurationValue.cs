@@ -24,6 +24,11 @@ public class DurationValue(TimeSpan value) : LiteralValue<TimeSpan>(value), IVal
         get
         {
             StringBuilder sb = new();
+            if (Value.Days > 0)
+            {
+                sb.Append($"{Value.Days}d ");
+            }
+
             if (Value.Hours > 0)
             {
                 sb.Append($"{Value.Hours}h ");
@@ -62,7 +67,8 @@ public class DurationValue(TimeSpan value) : LiteralValue<TimeSpan>(value), IVal
     private static Dictionary<string, IValueWithProperties.PropInfo>? _properties;
     public Dictionary<string, IValueWithProperties.PropInfo> Properties => _properties ??= new()
     {
-        ["h"] = new Prop<NumberValue>(d => d.Value.Hours, "Hours component of the duration"),
+        ["d"] = new Prop<NumberValue>(d => d.Value.Days, "Whole days in the duration"),
+        ["h"] = new Prop<NumberValue>(d => d.Value.Hours, "Hours component of the duration (0-23, days are in 'd')"),
         ["m"] = new Prop<NumberValue>(d => d.Value.Minutes, "Minutes component of the duration"),
         ["s"] = new Prop<NumberValue>(d => d.Value.Seconds, "Seconds component of the duration"),
         ["ms"] = new Prop<NumberValue>(d => d.Value.Milliseconds, "Milliseconds component of the duration"),

@@ -597,6 +597,22 @@ public class Script
         _localVariables[(variable.Prefix, variable.Name)] = variable;
     }
 
+    /// <summary>
+    /// Replaces an existing variable where it is stored: a local variable stays local and
+    /// a global variable stays global. Creates a local variable if neither exists.
+    /// </summary>
+    public void ReplaceVariable(Variable variable)
+    {
+        if (!_localVariables.ContainsKey((variable.Prefix, variable.Name))
+            && VariableIndex.TryGetGlobalVariable(variable.Prefix, variable.Name, out _))
+        {
+            VariableIndex.AddGlobalVariable(variable);
+            return;
+        }
+
+        AddLocalVariable(variable);
+    }
+
     public void AddLocalVariables(params Variable[] variables)
     {
         foreach (var variable in variables)

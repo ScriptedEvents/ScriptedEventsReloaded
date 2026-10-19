@@ -259,10 +259,14 @@ public static class ReferencePropertyRegistry
 
             if (!jobj.TryGetValue(key, out var val)) return $"Property '{key}' not found in JSON object";
 
-            return Value.Parse(val);
+            // Keep JSON children as tokens, including scalars: authors can continue with
+            // asNumber/asText/asBool, type, path or parent before converting the value.
+            return new ReferenceValue(val);
         }
 
         public override SingleTypeOfValue ReturnType => new(typeof(ReferenceValue));
+        // a JSON property can hold a number, text, true/false or another JSON object, so it is only known at runtime
+        public override TypeOfValue PossibleReturnTypes => new UnknownTypeOfValue();
         public override string Description => $"Accesses JSON property '{key}'";
     }
 

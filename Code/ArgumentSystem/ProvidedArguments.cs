@@ -291,23 +291,42 @@ public class ProvidedArguments(Method method)
         where TValue : struct
     {
         var evaluator = GetValueInternal<TValue?, TArg>(argName).First();
-        
-        if (evaluator.Result.HasErrored(out var error))
+
+        // Evaluate the expression exactly once, then check and return that same result.
+        // Reading evaluator.Result first would run dynamic expressions a second time.
+        string? error;
+        TValue? value;
+        switch (evaluator)
+        {
+            case DynamicTryGet<TValue> strict:
+            {
+                var result = strict.Invoke();
+                error = result.HasErrored() ? result.ErrorMsg : null;
+                value = result.Value;
+                break;
+            }
+            case DynamicTryGet<TValue?> nullable:
+            {
+                var result = nullable.Invoke();
+                error = result.HasErrored() ? result.ErrorMsg : null;
+                value = result.Value;
+                break;
+            }
+            default:
+                throw new CoreInvariantException(
+                    $"Argument '{argName}' evaluator type mismatch. " +
+                    $"Got {evaluator.GetType().AccurateName}, expected {typeof(TValue).AccurateName} or {typeof(TValue?).AccurateName}.");
+        }
+
+        if (error is not null)
         {
             throw new CustomScriptRuntimeError(
-                $"Fetching argument '{argName}' for method '{method.Name}' failed.".AsError() 
+                $"Fetching argument '{argName}' for method '{method.Name}' failed.".AsError()
                 + error
             );
         }
-        
-        return evaluator switch
-        {
-            DynamicTryGet<TValue> strict => strict.Invoke().Value,
-            DynamicTryGet<TValue?> nullable => nullable.Invoke().Value,
-            _ => throw new CoreInvariantException(
-                $"Argument '{argName}' evaluator type mismatch. " +
-                $"Got {evaluator.GetType().AccurateName}, expected {typeof(TValue).AccurateName} or {typeof(TValue?).AccurateName}.")
-        };
+
+        return value;
     }
 
     private List<(TValue value, DynamicTryGet<TValue> getter)> GetValues<TValue, TArg>(string argName)

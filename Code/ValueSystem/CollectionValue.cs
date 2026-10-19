@@ -102,14 +102,24 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties, I
     private class Prop<T>(Func<CollectionValue, T> handler, string? description)
         : IValueWithProperties.PropInfo<CollectionValue, T>(handler, description) where T : Value;
 
+    /// <summary>
+    /// A property that returns one of the stored values. The stored type is only known while the
+    /// script runs, so the property is treated as unknown to let scripts keep reading its properties.
+    /// </summary>
+    private class ElementProp(Func<CollectionValue, Value> handler, string? description)
+        : Prop<Value>(handler, description)
+    {
+        public override Other.TypeOfValue PossibleReturnTypes => new Other.UnknownTypeOfValue();
+    }
+
     private static Dictionary<string, IValueWithProperties.PropInfo>? _properties;
     public Dictionary<string, IValueWithProperties.PropInfo> Properties => _properties ??= new() 
     {
         ["length"] = new Prop<NumberValue>(c => c.CastedValues.Length, "Amount of values in the collection"),
         ["isEmpty"] = new Prop<BoolValue>(c => c.CastedValues.Length == 0, "Whether the collection is empty"),
-        ["first"] = new Prop<Value>(c => c.CastedValues.Length > 0 ? c.CastedValues[0] : throw new CustomScriptRuntimeError("Collection is empty"), "First value in the collection"),
-        ["last"] = new Prop<Value>(c => c.CastedValues.Length > 0 ? c.CastedValues[^1] : throw new CustomScriptRuntimeError("Collection is empty"), "Last value in the collection"),
-        ["random"] = new Prop<Value>(c => c.CastedValues.Length > 0 ? c.CastedValues[Random.Next(c.CastedValues.Length)] : throw new CustomScriptRuntimeError("Collection is empty"), "Random value from the collection"),
+        ["first"] = new ElementProp(c => c.CastedValues.Length > 0 ? c.CastedValues[0] : throw new CustomScriptRuntimeError("Collection is empty"), "First value in the collection"),
+        ["last"] = new ElementProp(c => c.CastedValues.Length > 0 ? c.CastedValues[^1] : throw new CustomScriptRuntimeError("Collection is empty"), "Last value in the collection"),
+        ["random"] = new ElementProp(c => c.CastedValues.Length > 0 ? c.CastedValues[Random.Next(c.CastedValues.Length)] : throw new CustomScriptRuntimeError("Collection is empty"), "Random value from the collection"),
         ["sum"] = new Prop<NumberValue>(c => c.CastedValues.OfType<NumberValue>().Sum(n => n.Value), "Sum of all numbers in the collection"),
         ["average"] = new Prop<NumberValue>(c => c.CastedValues.OfType<NumberValue>().Any() ? c.CastedValues.OfType<NumberValue>().Average(n => n.Value) : 0m, "Average of all numbers in the collection"),
         ["valType"] = new Prop<EnumValue<ValueType>>(_ => ValueType.Collection, "The type of the value")
@@ -191,11 +201,12 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties, I
 
     public static CollectionValue operator +(CollectionValue lhs, CollectionValue rhs)
     {
-        if (lhs.StoredTypes != rhs.StoredTypes)
+        // An empty collection has no type yet, so it can be joined with any collection.
+        if (lhs.StoredTypes is not null && rhs.StoredTypes is not null && lhs.StoredTypes != rhs.StoredTypes)
         {
             throw new CustomScriptRuntimeError(
                 $"Both collections have to be of same type. " +
-                $"Provided types: {lhs.GetType().AccurateName} and {rhs.StoredTypes?.AccurateName ?? "none"}"
+                $"Provided types: {GetFriendlyName(lhs.StoredTypes)} and {GetFriendlyName(rhs.StoredTypes)}"
             );
         }
 
@@ -204,11 +215,17 @@ public class CollectionValue(IEnumerable value) : Value, IValueWithProperties, I
 
     public static CollectionValue operator -(CollectionValue lhs, CollectionValue rhs)
     {
+        // Nothing to remove from, or nothing to remove.
+        if (lhs.StoredTypes is null || rhs.StoredTypes is null)
+        {
+            return new CollectionValue(lhs.CastedValues);
+        }
+
         if (lhs.StoredTypes != rhs.StoredTypes)
         {
             throw new CustomScriptRuntimeError(
                 $"Both collections have to be of same type. " +
-                $"Provided types: {lhs.StoredTypes?.AccurateName ?? "none"} and {rhs.StoredTypes?.AccurateName ?? "none"}"
+                $"Provided types: {GetFriendlyName(lhs.StoredTypes)} and {GetFriendlyName(rhs.StoredTypes)}"
             );
         }
 

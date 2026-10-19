@@ -30,7 +30,8 @@ public class PropertyAccess(BaseToken initialToken, IValueToken root)
         {
             foreach (var type in types)
             {
-                if (type == typeof(ReferenceValue))
+                // a plain reference or the base value type can hold anything, so the property is checked at runtime
+                if (type == typeof(ReferenceValue) || type == typeof(Value))
                 {
                     ExprRepr += $" {token.RawRep}";
                     PossibleValues = new UnknownTypeOfValue();

@@ -32,10 +32,14 @@ public class Database
         _path = path;
         _db = db;
         _name = Path.GetFileNameWithoutExtension(path);
-        AllDatabases.Add(this);
+        AllDatabases[path] = this;
     }
 
-    private static readonly List<Database> AllDatabases = [];
+    // Keyed by the full, normalized file path so every spelling that opens the same file
+    // (different casing on Windows, '/' vs '\') shares one cache, and nested names such as
+    // "sub/Stats" never collide with a root "Stats".
+    private static readonly Dictionary<string, Database> AllDatabases = new(
+        Path.DirectorySeparatorChar == '\\' ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
 
     public static Result Create(string name)
     {
@@ -56,16 +60,17 @@ public class Database
     
     public static TryGet<Database> TryGet(string name)
     {
-        if (AllDatabases.FirstOrDefault(d => d._name == name) is { } foundDb)
-        {
-            return foundDb;
-        }
-        
         if (FileSystem.GetContainedPath(FileSystem.DbDirPath, name, ".json")
             .HasErrored(out var pathError, out var path))
         {
             return pathError;
         }
+
+        if (AllDatabases.TryGetValue(path, out var foundDb))
+        {
+            return foundDb;
+        }
+
         if (!File.Exists(path))
         {
             return $"There is no database called '{name}'";

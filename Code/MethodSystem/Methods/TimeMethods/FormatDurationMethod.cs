@@ -1,4 +1,6 @@
-﻿using SER.Code.ArgumentSystem.Arguments;
+﻿using System.Globalization;
+using System.Text;
+using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
 using SER.Code.MethodSystem.BaseMethods.Synchronous;
 using SER.Code.MethodSystem.Structures;
@@ -15,7 +17,7 @@ public class FormatDurationMethod : ReturningMethod<TextValue>, IAdditionalDescr
         """
         Here are some examples: 
         
-        #1) "HH:SS"
+        #1) "MM:SS"
         Shows only minutes and seconds, perfect for round timers or cooldowns.
         Result: 01:30
         
@@ -36,7 +38,7 @@ public class FormatDurationMethod : ReturningMethod<TextValue>, IAdditionalDescr
             Description = 
                 """
                 Use these tags to format your time: DD for days, HH for hours, MM for minutes, and SS for seconds. 
-                You can separate them with colons (:) or dashes (-).
+                FFF shows milliseconds. Any other text, including apostrophes, is shown exactly as you wrote it.
                 """
         }
     ];
@@ -45,37 +47,46 @@ public class FormatDurationMethod : ReturningMethod<TextValue>, IAdditionalDescr
     {
         var durationToFormat = Args.GetDuration("duration to format");
         var format = Args.GetText("format");
-        ReturnValue = new DynamicTextValue(durationToFormat.ToString(CreateNativeFormat(format)), Script);
+        ReturnValue = new StaticTextValue(Format(durationToFormat, format));
     }
 
-    private static readonly Dictionary<string, string> TokenMap = new()
+    // Longest tags first, so "FFF" is matched before anything shorter.
+    private static readonly string[] Tags = ["FFF", "DD", "HH", "MM", "SS"];
+
+    /// <summary>
+    /// Replaces the DD/HH/MM/SS/FFF tags with the matching part of the duration.
+    /// Everything else in the format is kept exactly as written, so apostrophes,
+    /// backslashes and other symbols never break the result.
+    /// </summary>
+    public static string Format(TimeSpan duration, string userFormat)
     {
-        { "DD", @"d\ " }, 
-        { "HH", "hh" },   
-        { "MM", "mm" },   
-        { "SS", "ss" },   
-        { "FFF", "fff" }  
-    };
+        duration = duration.Duration();
+        if (string.IsNullOrEmpty(userFormat))
+            return duration.ToString("c", CultureInfo.InvariantCulture);
 
-    public static string CreateNativeFormat(string userFormat)
-    {
-        if (string.IsNullOrEmpty(userFormat)) return "c";
+        StringBuilder sb = new();
+        var i = 0;
+        while (i < userFormat.Length)
+        {
+            var tag = Tags.FirstOrDefault(t => string.CompareOrdinal(userFormat, i, t, 0, t.Length) == 0);
+            if (tag is null)
+            {
+                sb.Append(userFormat[i]);
+                i++;
+                continue;
+            }
 
-        // 1. Put a quote at the start and end of the string
-        // 2. "Break" the quotes only when we find a token
-        // Example: HH:MM -> 'hh':'mm'
-    
-        string result = "'" + userFormat + "'";
+            sb.Append(tag switch
+            {
+                "DD" => duration.Days.ToString(CultureInfo.InvariantCulture),
+                "HH" => duration.Hours.ToString("00", CultureInfo.InvariantCulture),
+                "MM" => duration.Minutes.ToString("00", CultureInfo.InvariantCulture),
+                "SS" => duration.Seconds.ToString("00", CultureInfo.InvariantCulture),
+                _ => duration.Milliseconds.ToString("000", CultureInfo.InvariantCulture)
+            });
+            i += tag.Length;
+        }
 
-        // We replace the User Token with: ' + Native Token + '
-        // This effectively closes the literal string, puts the command, and reopens the literal.
-        result = result.Replace("DD", "'d'")
-            .Replace("HH", "'hh'")
-            .Replace("MM", "'mm'")
-            .Replace("SS", "'ss'")
-            .Replace("FFF", "'fff'");
-
-        // Clean up empty quotes '' created if tokens are next to each other
-        return result.Replace("''", "");
+        return sb.ToString();
     }
 }

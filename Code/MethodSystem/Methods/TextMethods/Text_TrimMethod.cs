@@ -22,6 +22,6 @@ public class Text_TrimMethod : ReturningMethod<TextValue>
         ReturnValue = Args
             .GetText("text")
             .Trim()
-            .ToDynamicTextValue(Script);
+            .ToStaticTextValue();
     }
 }

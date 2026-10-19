@@ -111,3 +111,15 @@ test("warns when a forever loop has no wait", () => {
   const diagnostics = core.validateGeneratedCode("forever\nPrint \"busy\"\nend\n");
   assert.ok(diagnostics.some(item => item.code === "forever-without-wait"));
 });
+
+test("does not treat ellipses in comments as missing inputs", () => {
+  // A20: comment lines are valid SER and must not get a block-input error.
+  assert.deepEqual(core.validateGeneratedCode('# ...\nPrint "hello"'), []);
+  assert.deepEqual(core.validateGeneratedCode('    # todo ...\nPrint "hello"'), []);
+  assert.deepEqual(core.validateGeneratedCode('Print "hello" # ...'), []);
+  assert.equal(
+    core.validateGeneratedCode('# note\nBroadcast @all ... "hi"')
+      .filter(item => item.code === "missing-value").map(item => item.line).join(),
+    "2"
+  );
+});

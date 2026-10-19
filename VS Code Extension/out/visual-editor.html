@@ -742,7 +742,8 @@ dialog::backdrop {
         <ol>
           <li>Put the file in the SER script directory shown by <code>serhelp start</code>.</li>
           <li>If your host blocks <code>.ser</code>, rename it to <code>.txt</code>.</li>
-          <li>For a new manual script, run <code>serrun name</code>. For edits, run <code>serreload</code>.</li>
+          <li>For a new event or command script, run <code>serreload</code>. Then make the event happen or type the command.</li>
+          <li>For a new manual script, run <code>serrun name</code>. After editing any script, run <code>serreload</code>.</li>
           <li>Use <code>serstatus</code> if it does not run.</li>
         </ol>
         <p>Blocks teaches common tasks. The text editor and VS Code extension expose the full language.</p>
@@ -3968,7 +3969,7 @@ const SER_TRUTH_TABLE = {
       "description": "Formats a duration into a special format.",
       "subgroup": "Time",
       "essential": false,
-      "additionalDescription": "Here are some examples: \n\n#1) \"HH:SS\"\nShows only minutes and seconds, perfect for round timers or cooldowns.\nResult: 01:30\n\n#2) \"DD days, HH hours and MM minutes\"\nCreates a readable sentence. The system automatically handles the spaces and commas.\nResult: 2 days, 04 hours and 15 minutes\n\n#3) \"MMm SSs FFFms\"\nDisplays minutes, seconds, and milliseconds for pinpoint accuracy.\nResult: 01m 22s 450ms",
+      "additionalDescription": "Here are some examples: \n\n#1) \"MM:SS\"\nShows only minutes and seconds, perfect for round timers or cooldowns.\nResult: 01:30\n\n#2) \"DD days, HH hours and MM minutes\"\nCreates a readable sentence. The system automatically handles the spaces and commas.\nResult: 2 days, 04 hours and 15 minutes\n\n#3) \"MMm SSs FFFms\"\nDisplays minutes, seconds, and milliseconds for pinpoint accuracy.\nResult: 01m 22s 450ms",
       "requiredFramework": null,
       "returns": "text value",
       "arguments": [
@@ -3992,7 +3993,7 @@ const SER_TRUTH_TABLE = {
           "argumentKind": "TextArgument",
           "mustBeProvided": true,
           "type": "Any text e.g. \"Hello, World!\"",
-          "description": "Use these tags to format your time: DD for days, HH for hours, MM for minutes, and SS for seconds. \nYou can separate them with colons (:) or dashes (-).",
+          "description": "Use these tags to format your time: DD for days, HH for hours, MM for minutes, and SS for seconds. \nFFF shows milliseconds. Any other text, including apostrophes, is shown exactly as you wrote it.",
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "\"format\"",
@@ -6180,7 +6181,9 @@ const SER_TRUTH_TABLE = {
           "options": null
         }
       ],
-      "errors": []
+      "errors": [
+        "The chosen property cannot be used to filter players. Pick a real player property, not 'none'."
+      ]
     },
     "Intersect": {
       "syntax": "Intersect @first_value @other_values...",
@@ -6253,7 +6256,7 @@ const SER_TRUTH_TABLE = {
     },
     "Overlapping": {
       "syntax": "Overlapping @first_value @other_values...",
-      "description": "Checks if provided player variables have the exact same players.",
+      "description": "Checks if provided player variables have the exact same players, in any order.",
       "subgroup": "PlayerValue",
       "essential": false,
       "additionalDescription": null,
@@ -7876,10 +7879,10 @@ const SER_TRUTH_TABLE = {
     },
     "AddPickupToInventory": {
       "syntax": "AddPickupToInventory @player *pickup",
-      "description": "Forces a pickup to be added to the player's inventory.",
+      "description": "Moves a pickup from the ground into the player's inventory.",
       "subgroup": "Pickup",
       "essential": false,
-      "additionalDescription": "Pickup will not be added if the player's inventory is full.",
+      "additionalDescription": "The pickup disappears from the ground once the player has it. If the player's inventory is full, nothing happens and the pickup stays where it is.",
       "requiredFramework": null,
       "returns": null,
       "arguments": [
@@ -8605,10 +8608,10 @@ const SER_TRUTH_TABLE = {
       "arguments": [
         {
           "name": "number to round",
-          "argumentKind": "FloatArgument",
+          "argumentKind": "ValueArgument`1",
           "mustBeProvided": true,
-          "type": "Any number",
-          "description": null,
+          "type": "a value of type NumberValue",
+          "description": "Any number.",
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "number_to_round",
@@ -8622,8 +8625,8 @@ const SER_TRUTH_TABLE = {
           "name": "decimal places",
           "argumentKind": "IntArgument",
           "mustBeProvided": false,
-          "type": "A whole number bigger or equal 0",
-          "description": "The number of decimal places to round to.",
+          "type": "A whole number between 0 and 28 (inclusive)",
+          "description": "The number of decimal places to round to, from 0 to 28. Halves round away from zero, so 2.5 becomes 3.",
           "defaultValue": "rounds to whole number (0)",
           "consumesRemainingValues": false,
           "syntax": "decimal_places?",
@@ -14051,7 +14054,7 @@ const SER_TRUTH_TABLE = {
     },
     "CRole.SetCallbacks": {
       "syntax": "CRole.SetCallbacks custom_role on_spawning? on_removing?",
-      "description": "Sets the callbacks for a provided custom role. Calling it again from the same script replaces that role's callbacks without changing callbacks for other roles.",
+      "description": "Sets the callbacks for a provided custom role. Calling it again from the same script replaces both of that role's callbacks: a callback you leave out is turned off. Callbacks for other roles and from other scripts stay as they are.",
       "subgroup": "CustomRole",
       "essential": false,
       "additionalDescription": null,
@@ -14964,7 +14967,7 @@ const SER_TRUTH_TABLE = {
           "argumentKind": "DurationArgument",
           "mustBeProvided": true,
           "type": "Duration in format #ms, #s, #m, #h (e.g. 5s or 2m)",
-          "description": null,
+          "description": "Broadcasts are shown in whole seconds, so a part of a second rounds up (500ms shows for 1 second). The longest broadcast is 65535 seconds (about 18 hours).",
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "duration",
@@ -14990,7 +14993,9 @@ const SER_TRUTH_TABLE = {
           "options": null
         }
       ],
-      "errors": []
+      "errors": [
+        "A broadcast can last at most 65535 seconds (about 18 hours). Use a shorter duration."
+      ]
     },
     "ClearBroadcasts": {
       "syntax": "ClearBroadcasts @players",
@@ -19947,7 +19952,7 @@ const SER_TRUTH_TABLE = {
         },
         {
           "name": "arguments",
-          "description": "The arguments that this command expects in order to run. \nThe script cannot run unless every single argument is specified. \n\nWhen the command is ran, the provided values for the arguments turn into their own literal local variables for you to use in the script. \nFor example: making a command with an argument 'name' will then create a local variable '$name' in your script.\n\nIf you want some arguments to be optional, you can use the '?' symbol after the argument name. \nFor example: 'reason?' argument will be optional, and if the sender does not provide a value for it, the script will still run.\nThen, the '$reason' command will not be created in your script.\n\n(the '?' suffix is NOT added to the variable names)",
+          "description": "The arguments that this command expects in order to run. \nThe script cannot run unless every single argument is specified. \n\nWhen the command is ran, the provided values for the arguments turn into their own literal local variables for you to use in the script. \nFor example: making a command with an argument 'name' will then create a local variable '$name' in your script.\nThe variable keeps your exact spelling, so an argument 'Name' creates '$Name'.\nEach argument needs a different name (upper and lower case count as the same).\n\nIf you want some arguments to be optional, you can use the '?' symbol after the argument name. \nFor example: 'reason?' argument will be optional, and if the sender does not provide a value for it, the script will still run.\nThen, the '$reason' command will not be created in your script.\n\n(the '?' suffix is NOT added to the variable names)",
           "required": false,
           "example": "-- arguments id time reason?"
         }
@@ -30598,7 +30603,8 @@ const SER_TRUTH_TABLE = {
 
     lines.forEach((line, index) => {
       const lineNumber = index + 1;
-      const codeOnly = withoutQuotedText(line);
+      // A word starting with # begins a comment that runs to the end of the line.
+      const codeOnly = withoutQuotedText(line).replace(/(^|\s)#.*$/, "$1");
       if (/(^|\s)\.\.\.(?=\s|$)/.test(codeOnly)) {
         diagnostics.push({
           severity: "error",
@@ -31633,6 +31639,26 @@ const SER_TRUTH_TABLE = {
       });
     }
 
+    // SER can split one file into several event or command parts, but a
+    // manual part has no start line of its own. Placed above them, SER rejects
+    // the file; placed below, its actions join the part above it.
+    const manualEntries = entries.filter(entry => entry.type === "ser_when_manual");
+    if (manualEntries.length > 1) {
+      diagnostics.push({
+        severity: "error",
+        code: "multiple-manual-entries",
+        message: "A script can have only one “when I run this script manually” block. " +
+          "Put all its actions in one block, or save each one as a separate script."
+      });
+    } else if (manualEntries.length === 1 && entries.length > 1) {
+      diagnostics.push({
+        severity: "error",
+        code: "mixed-manual-entry",
+        message: "“When I run this script manually” can't share a script with an event or command. " +
+          "Save the manual part as a separate script."
+      });
+    }
+
     for (const entry of entries) {
       if (!entry.getInputTargetBlock("DO")) {
         diagnostics.push({
@@ -32211,12 +32237,14 @@ const SER_TRUTH_TABLE = {
 
   elements.download.addEventListener("click", () => {
     if (elements.download.disabled) return;
-    downloadText(
-      safeFilename(elements.scriptName.value, "ser"),
-      elements.codeOutput.value,
-      "text/plain;charset=utf-8"
-    );
-    showToast("Downloaded. Put it in the SER script directory, then run serrun or serreload.");
+    const filename = safeFilename(elements.scriptName.value, "ser");
+    downloadText(filename, elements.codeOutput.value, "text/plain;charset=utf-8");
+    // Event and command scripts only start working after serreload picks them up.
+    const isManualScript = workspace.getAllBlocks(false)
+      .every(block => !ENTRY_TYPES.has(block.type) || block.type === "ser_when_manual");
+    showToast(isManualScript
+      ? `Downloaded. Put it in the SER script directory, then run serrun ${filename.replace(/\.ser$/, "")}.`
+      : "Downloaded. Put it in the SER script directory, then run serreload.");
   });
 
   elements.scriptName.addEventListener("input", scheduleAutosave);

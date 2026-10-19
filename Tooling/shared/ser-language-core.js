@@ -231,7 +231,8 @@
 
     lines.forEach((line, index) => {
       const lineNumber = index + 1;
-      const codeOnly = withoutQuotedText(line);
+      // A word starting with # begins a comment that runs to the end of the line.
+      const codeOnly = withoutQuotedText(line).replace(/(^|\s)#.*$/, "$1");
       if (/(^|\s)\.\.\.(?=\s|$)/.test(codeOnly)) {
         diagnostics.push({
           severity: "error",

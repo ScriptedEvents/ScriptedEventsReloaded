@@ -952,6 +952,26 @@
       });
     }
 
+    // SER can split one file into several event or command parts, but a
+    // manual part has no start line of its own. Placed above them, SER rejects
+    // the file; placed below, its actions join the part above it.
+    const manualEntries = entries.filter(entry => entry.type === "ser_when_manual");
+    if (manualEntries.length > 1) {
+      diagnostics.push({
+        severity: "error",
+        code: "multiple-manual-entries",
+        message: "A script can have only one “when I run this script manually” block. " +
+          "Put all its actions in one block, or save each one as a separate script."
+      });
+    } else if (manualEntries.length === 1 && entries.length > 1) {
+      diagnostics.push({
+        severity: "error",
+        code: "mixed-manual-entry",
+        message: "“When I run this script manually” can't share a script with an event or command. " +
+          "Save the manual part as a separate script."
+      });
+    }
+
     for (const entry of entries) {
       if (!entry.getInputTargetBlock("DO")) {
         diagnostics.push({
@@ -1530,12 +1550,14 @@
 
   elements.download.addEventListener("click", () => {
     if (elements.download.disabled) return;
-    downloadText(
-      safeFilename(elements.scriptName.value, "ser"),
-      elements.codeOutput.value,
-      "text/plain;charset=utf-8"
-    );
-    showToast("Downloaded. Put it in the SER script directory, then run serrun or serreload.");
+    const filename = safeFilename(elements.scriptName.value, "ser");
+    downloadText(filename, elements.codeOutput.value, "text/plain;charset=utf-8");
+    // Event and command scripts only start working after serreload picks them up.
+    const isManualScript = workspace.getAllBlocks(false)
+      .every(block => !ENTRY_TYPES.has(block.type) || block.type === "ser_when_manual");
+    showToast(isManualScript
+      ? `Downloaded. Put it in the SER script directory, then run serrun ${filename.replace(/\.ser$/, "")}.`
+      : "Downloaded. Put it in the SER script directory, then run serreload.");
   });
 
   elements.scriptName.addEventListener("input", scheduleAutosave);

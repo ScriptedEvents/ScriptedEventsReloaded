@@ -30,13 +30,25 @@ Start with the
 or run `serhelp start` on a server to locate the active script directory and
 see the first-run workflow.
 
-This extension is maintained together with the main SER repository. SER's build
-regenerates the reflection-backed language manifest. The shared tooling build
-then produces the extension, visual-editor webview and standalone editor from
-that same manifest and shared language core.
+## Install
 
-The maintainable extension source is in `src`. Files in `out` are synchronized
-build artifacts used by VS Code.
+If you downloaded a SER release, install the extension from its `.vsix` file:
+
+1. Find `ser-<version>.vsix` in the release files. The Complete zip also has it
+   in its `VS Code Extension` folder.
+2. In VS Code, open **Extensions**, select the **...** menu, choose
+   **Install from VSIX...**, and pick the file. You can also run
+   `code --install-extension ser-<version>.vsix` in a terminal.
+3. Reload VS Code if it asks.
+
+## Build from source
+
+This extension is maintained together with the main SER repository. The
+extension, its Blocks editor and the standalone Blocks editor are all built
+from the same SER language data that the plugin's build creates.
+
+The editable source is in `src`. Files in `out` are generated from it and are
+what VS Code loads, so do not edit them by hand.
 
 From the repository's `Tooling` directory:
 
@@ -45,10 +57,25 @@ npm install
 npm run verify
 ```
 
-If the tooling dependencies are installed, the normal SER build runs this
-synchronization automatically before copying the extension to
-`%USERPROFILE%\\.vscode\\extensions\\ser`.
+Once these dependencies are installed, each SER build also refreshes the
+extension files in this folder.
 
-To use a different installed-extension path, pass
-`/p:SerExtensionInstallDirectory="C:\\path\\to\\.vscode\\extensions\\ser"`
-to MSBuild.
+### Building does not install the extension
+
+A normal SER build only refreshes the extension files in this folder. It does
+not change the extension your VS Code uses.
+
+To also copy the extension into VS Code during the build, add
+`/p:InstallSerExtensionAfterBuild=true`:
+
+```powershell
+dotnet build SER.csproj -c Release --no-restore /p:InstallSerExtensionAfterBuild=true
+```
+
+This copies the extension to `%USERPROFILE%\.vscode\extensions\ser`. Reload
+VS Code afterwards to use the new version.
+
+To copy it somewhere else, such as a VS Code Insiders profile, also pass
+`/p:SerExtensionInstallDirectory="C:\path\to\.vscode\extensions\ser"`. This
+setting only changes the destination. On its own, without
+`/p:InstallSerExtensionAfterBuild=true`, it copies nothing.

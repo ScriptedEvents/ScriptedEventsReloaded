@@ -35,13 +35,145 @@ function Invoke-CheckedCommand {
     }
 }
 
+# Online fallbacks for links whose target is not shipped in a bundle.
+$onlineDocsBaseUrl = 'https://scriptedevents.github.io/ScriptedEventsReloaded/'
+$repositoryWebUrl = 'https://github.com/ScriptedEvents/ScriptedEventsReloaded'
+$repositoryRawUrl = 'https://raw.githubusercontent.com/ScriptedEvents/ScriptedEventsReloaded/main'
+$markdownLinkPattern = '(?<prefix>\]\(|\bsrc=")(?<target>[^)"\s]+)(?<suffix>[)"])'
+
+function ConvertTo-UrlPath {
+    param([Parameter(Mandatory)] [AllowEmptyString()] [string]$RelativePath)
+
+    (($RelativePath -split '[\\/]') | ForEach-Object { [System.Uri]::EscapeDataString($_) }) -join '/'
+}
+
+function Test-IsRelativeLinkTarget {
+    param([Parameter(Mandatory)] [string]$Target)
+
+    # Skip web/mail links, in-page anchors and site-root paths.
+    return -not ($Target -match '^(?:[a-zA-Z][a-zA-Z0-9+.-]*:|#|/)')
+}
+
+function Split-LinkTarget {
+    param([Parameter(Mandatory)] [string]$Target)
+
+    $hashIndex = $Target.IndexOf('#')
+    if ($hashIndex -lt 0) {
+        return @([System.Uri]::UnescapeDataString($Target), '')
+    }
+    return @([System.Uri]::UnescapeDataString($Target.Substring(0, $hashIndex)), $Target.Substring($hashIndex))
+}
+
+function Get-OnlineLinkTarget {
+    param(
+        [Parameter(Mandatory)] [string]$RepositoryRelativePath,
+        [switch]$RawFile
+    )
+
+    $path = $RepositoryRelativePath -replace '\\', '/'
+    if ($path -match '^docs/(?<page>.+)\.md$') {
+        $page = $Matches['page']
+        if ($page -eq 'README') {
+            return $onlineDocsBaseUrl
+        }
+        if ($page.EndsWith('/README')) {
+            $page = $page.Substring(0, $page.Length - 'README'.Length)
+        }
+        return $onlineDocsBaseUrl + (ConvertTo-UrlPath $page)
+    }
+    if ($RawFile) {
+        return "$repositoryRawUrl/$(ConvertTo-UrlPath $path)"
+    }
+    $kind = if (Test-Path -LiteralPath (Join-Path $repositoryDirectory $path) -PathType Container) { 'tree' } else { 'blob' }
+    return "$repositoryWebUrl/$kind/main/$(ConvertTo-UrlPath $path)"
+}
+
+# Copies a repository Markdown file to the root of a bundle. Relative links are
+# pointed at the matching file inside that bundle when it is shipped there, and
+# at the online documentation or GitHub repository when it is not.
+function Copy-MarkdownToBundleRoot {
+    param(
+        [Parameter(Mandatory)] [string]$RepositoryRelativePath,
+        [Parameter(Mandatory)] [string]$BundleRoot
+    )
+
+    $sourceFile = Join-Path $repositoryDirectory $RepositoryRelativePath
+    $sourceDirectory = Split-Path -Parent $sourceFile
+    $repositoryPrefix = $repositoryDirectory.TrimEnd('\', '/') + [System.IO.Path]::DirectorySeparatorChar
+    $content = [System.IO.File]::ReadAllText($sourceFile)
+    $output = New-Object System.Text.StringBuilder
+    $position = 0
+
+    foreach ($match in [regex]::Matches($content, $markdownLinkPattern)) {
+        $target = $match.Groups['target'].Value
+        $newTarget = $target
+        if (Test-IsRelativeLinkTarget $target) {
+            $pathPart, $anchor = Split-LinkTarget $target
+            $fullPath = [System.IO.Path]::GetFullPath((Join-Path $sourceDirectory $pathPart))
+            if (-not $fullPath.StartsWith($repositoryPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+                throw "$RepositoryRelativePath links outside the repository: $target"
+            }
+            $relativeTarget = $fullPath.Substring($repositoryPrefix.Length).TrimEnd('\', '/')
+            if (Test-Path -LiteralPath (Join-Path $BundleRoot $relativeTarget)) {
+                $newTarget = (ConvertTo-UrlPath $relativeTarget) + $anchor
+            }
+            else {
+                $isImage = $match.Groups['prefix'].Value -ne ']('
+                $newTarget = (Get-OnlineLinkTarget -RepositoryRelativePath $relativeTarget -RawFile:$isImage) + $anchor
+            }
+        }
+
+        $targetGroup = $match.Groups['target']
+        [void]$output.Append($content, $position, $targetGroup.Index - $position)
+        [void]$output.Append($newTarget)
+        $position = $targetGroup.Index + $targetGroup.Length
+    }
+    [void]$output.Append($content, $position, $content.Length - $position)
+
+    $destination = Join-Path $BundleRoot (Split-Path -Leaf $sourceFile)
+    [System.IO.File]::WriteAllText($destination, $output.ToString(), (New-Object System.Text.UTF8Encoding($false)))
+}
+
+# Fails the release if any Markdown file in a bundle links to a local file that
+# is missing from that bundle.
+function Assert-BundleMarkdownLinks {
+    param([Parameter(Mandatory)] [string]$BundleRoot)
+
+    $bundlePrefix = [System.IO.Path]::GetFullPath($BundleRoot).TrimEnd('\', '/') + [System.IO.Path]::DirectorySeparatorChar
+    $brokenLinks = New-Object System.Collections.Generic.List[string]
+    foreach ($file in Get-ChildItem -LiteralPath $BundleRoot -Filter '*.md' -File -Recurse) {
+        $content = [System.IO.File]::ReadAllText($file.FullName)
+        foreach ($match in [regex]::Matches($content, $markdownLinkPattern)) {
+            $target = $match.Groups['target'].Value
+            if (-not (Test-IsRelativeLinkTarget $target)) {
+                continue
+            }
+            $pathPart = (Split-LinkTarget $target)[0]
+            if ($pathPart.Length -eq 0) {
+                continue
+            }
+            $fullPath = [System.IO.Path]::GetFullPath((Join-Path $file.DirectoryName $pathPart))
+            if (-not $fullPath.StartsWith($bundlePrefix, [System.StringComparison]::OrdinalIgnoreCase) -or
+                -not (Test-Path -LiteralPath $fullPath)) {
+                $brokenLinks.Add("$($file.FullName.Substring($bundlePrefix.Length)): $target")
+            }
+        }
+    }
+
+    if ($brokenLinks.Count -gt 0) {
+        throw "Bundle $BundleRoot has links to files it does not contain:`n$($brokenLinks -join "`n")"
+    }
+}
+
 function Copy-ReleaseNotices {
     param([Parameter(Mandatory)] [string]$Destination)
 
     Copy-Item -LiteralPath (Join-Path $repositoryDirectory 'LICENSE') -Destination $Destination
     Copy-Item -LiteralPath (Join-Path $repositoryDirectory 'THIRD_PARTY_LICENSES.txt') -Destination $Destination
-    Copy-Item -LiteralPath (Join-Path $repositoryDirectory 'README.md') -Destination $Destination
-    Copy-Item -LiteralPath (Join-Path $repositoryDirectory 'docs\getting-started\installation.md') -Destination $Destination
+    # Copy these last, after the bundle's other content, so their links can be
+    # pointed at files that are actually in the bundle.
+    Copy-MarkdownToBundleRoot -RepositoryRelativePath 'README.md' -BundleRoot $Destination
+    Copy-MarkdownToBundleRoot -RepositoryRelativePath 'docs\getting-started\installation.md' -BundleRoot $Destination
 }
 
 function Compress-ReleaseDirectory {
@@ -122,6 +254,10 @@ Copy-ReleaseNotices -Destination $completeStage
 $vsixPath = Join-Path $releaseDirectory "ser-$extensionVersion.vsix"
 Invoke-CheckedCommand -FilePath 'npm' -Arguments @('run', 'package', '--', '--out', $vsixPath) -WorkingDirectory $extensionDirectory
 Copy-Item -LiteralPath $vsixPath -Destination (Join-Path $completeStage 'VS Code Extension')
+
+foreach ($stage in @($learningStage, $editorStage, $completeStage)) {
+    Assert-BundleMarkdownLinks -BundleRoot $stage
+}
 
 Compress-ReleaseDirectory -Source $learningStage -Destination (Join-Path $releaseDirectory "SER-$coreVersion-Examples-and-Documentation.zip")
 Compress-ReleaseDirectory -Source $editorStage -Destination (Join-Path $releaseDirectory "SER-Visual-Editor-$coreVersion.zip")

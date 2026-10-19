@@ -113,6 +113,59 @@ function category(directory, label, position) {
   fs.writeFileSync(target, `${JSON.stringify({label, position, collapsed: true}, null, 2)}\n`);
 }
 
+// Matches the heading ids Docusaurus generates, so table links can jump to them.
+function headingAnchor(heading) {
+  return heading
+    .toLocaleLowerCase()
+    .replace(/[^\p{L}\p{N}\s_-]/gu, '')
+    .trim()
+    .replace(/\s/g, '-');
+}
+
+function enumChoicesHeading(argument) {
+  return `Choices for ${argument.name}`;
+}
+
+function enumTypeName(argument) {
+  return /^(\w+) enum value/.exec(normalize(argument.type))?.[1] ?? '';
+}
+
+// Lists the values an enum argument accepts, so authors can pick one without
+// running serhelp on a server.
+function enumChoices(argument) {
+  const values = argument.enumValues;
+  const descriptions = argument.enumDescriptions ?? {};
+  const hasDescriptions = values.some(value => normalize(descriptions[value]));
+  const typeName = enumTypeName(argument);
+  const parts = [`### ${prose(enumChoicesHeading(argument))}`, ''];
+
+  if (argument.enumDescription) parts.push(prose(argument.enumDescription), '');
+
+  if (argument.isEnumFlags) {
+    const combinable = values.filter(value => value !== 'None' && value !== 'All');
+    const example = combinable.length >= 2 ? ` For example: ${inlineCode(`${combinable[0]}|${combinable[1]}`)}.` : '';
+    parts.push(`You can combine several of these with ${inlineCode('|')}.${example}`, '');
+  }
+
+  if (hasDescriptions) {
+    parts.push(...values.map(value => {
+      const description = normalize(descriptions[value]);
+      return description ? `- ${inlineCode(value)}: ${prose(description)}` : `- ${inlineCode(value)}`;
+    }));
+  } else {
+    parts.push(values.map(value => inlineCode(value)).join(', '));
+  }
+
+  parts.push(
+    '',
+    typeName
+      ? `Game updates can change this list. To see the list for your server, run ${inlineCode(`serhelp ${typeName}`)}.`
+      : 'Game updates can change this list. If your server rejects a value, check its help.',
+    '',
+  );
+  return parts;
+}
+
 function methodPage(name, method, exampleNames) {
   const parts = [
     frontMatter(name, {sidebar_label: name}),
@@ -137,11 +190,19 @@ function methodPage(name, method, exampleNames) {
       const fallbackDescription = argument.options?.length
         ? `Options: ${argument.options.map(option => inlineCode(option.value)).join(', ')}`
         : '';
+      const description = cell(argument.description || fallbackDescription || argument.defaultValue && `Default: ${argument.defaultValue}`);
+      const choicesLink = argument.enumValues?.length
+        ? `[See the choices](#${headingAnchor(enumChoicesHeading(argument))}).`
+        : '';
       parts.push(
-        `| ${inlineCode(argument.name)} | ${argument.mustBeProvided ? 'Yes' : 'No'} | ${cell(argument.type || argument.argumentKind)} | ${cell(argument.description || fallbackDescription || argument.defaultValue && `Default: ${argument.defaultValue}`)} |`,
+        `| ${inlineCode(argument.name)} | ${argument.mustBeProvided ? 'Yes' : 'No'} | ${cell(argument.type || argument.argumentKind)} | ${[choicesLink && description && !/[.!?]$/.test(description) ? `${description}.` : description, choicesLink].filter(Boolean).join(' ')} |`,
       );
     }
     parts.push('');
+
+    for (const argument of method.arguments) {
+      if (argument.enumValues?.length) parts.push(...enumChoices(argument));
+    }
   }
 
   if (method.additionalDescription) {
@@ -376,14 +437,21 @@ function buildExamples() {
 
 function buildReference(exampleMaps) {
   const constructs = [];
-  const addConstruct = (type, name, description, syntax, group, href) => {
-    constructs.push({type, name, description: normalize(description), syntax: normalize(syntax), group: normalize(group), href});
+  const addConstruct = (type, name, description, syntax, group, href, keywords = []) => {
+    const construct = {type, name, description: normalize(description), syntax: normalize(syntax), group: normalize(group), href};
+    if (keywords.length) construct.keywords = keywords;
+    constructs.push(construct);
   };
 
   for (const [name, method] of Object.entries(manifest.methods).sort(([a], [b]) => a.localeCompare(b))) {
     const filename = `reference/methods/${slug(name)}.md`;
     write(filename, methodPage(name, method, exampleMaps.methodExamples.get(name) || []));
-    addConstruct('Method', name, method.description, method.syntax, method.subgroup, `/${filename.replace(/\.md$/, '/')}`);
+    // Enum names and their values make e.g. "ItemType" or "KeycardJanitor" find GiveItem.
+    const keywords = [...new Set((method.arguments ?? [])
+      .filter(argument => argument.enumValues?.length)
+      .flatMap(argument => [enumTypeName(argument), ...argument.enumValues])
+      .filter(Boolean))];
+    addConstruct('Method', name, method.description, method.syntax, method.subgroup, `/${filename.replace(/\.md$/, '/')}`, keywords);
   }
 
   for (const [name, keyword] of Object.entries(manifest.keywords).sort(([a], [b]) => a.localeCompare(b))) {

@@ -7,18 +7,30 @@ import styles from './reference.module.css';
 
 const filters = ['All', 'Method', 'Event', 'PMER event', 'UCR event', 'Flag', 'Keyword', 'Variable', 'Example'];
 
+// Each construct's searchable text, built once. Every word of a query must
+// appear somewhere in it, in any order, so "player health" finds SetHealth.
+const searchIndex = constructs.map(item => ({
+  item,
+  text: [item.name, item.description, item.syntax, item.group, ...(item.keywords ?? [])]
+    .join(' ')
+    .toLocaleLowerCase(),
+}));
+
 export default function ReferenceExplorer() {
   const {siteConfig} = useDocusaurusContext();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('All');
   const normalizedQuery = query.trim().toLocaleLowerCase();
-  const results = useMemo(() => constructs.filter(item => {
-    if (filter !== 'All' && item.type !== filter) return false;
-    if (!normalizedQuery) return true;
-    return `${item.name} ${item.description} ${item.syntax} ${item.group}`
-      .toLocaleLowerCase()
-      .includes(normalizedQuery);
-  }).slice(0, 120), [filter, normalizedQuery]);
+  const results = useMemo(() => {
+    const words = normalizedQuery.split(/\s+/).filter(Boolean);
+    return searchIndex
+      .filter(({item, text}) => {
+        if (filter !== 'All' && item.type !== filter) return false;
+        return words.every(word => text.includes(word));
+      })
+      .map(({item}) => item)
+      .slice(0, 120);
+  }, [filter, normalizedQuery]);
 
   return (
     <Layout title="Construct explorer" description="Search every SER method, event, flag, keyword, and predefined variable.">

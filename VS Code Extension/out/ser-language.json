@@ -327,7 +327,7 @@
       "description": "Formats a duration into a special format.",
       "subgroup": "Time",
       "essential": false,
-      "additionalDescription": "Here are some examples: \n\n#1) \"HH:SS\"\nShows only minutes and seconds, perfect for round timers or cooldowns.\nResult: 01:30\n\n#2) \"DD days, HH hours and MM minutes\"\nCreates a readable sentence. The system automatically handles the spaces and commas.\nResult: 2 days, 04 hours and 15 minutes\n\n#3) \"MMm SSs FFFms\"\nDisplays minutes, seconds, and milliseconds for pinpoint accuracy.\nResult: 01m 22s 450ms",
+      "additionalDescription": "Here are some examples: \n\n#1) \"MM:SS\"\nShows only minutes and seconds, perfect for round timers or cooldowns.\nResult: 01:30\n\n#2) \"DD days, HH hours and MM minutes\"\nCreates a readable sentence. The system automatically handles the spaces and commas.\nResult: 2 days, 04 hours and 15 minutes\n\n#3) \"MMm SSs FFFms\"\nDisplays minutes, seconds, and milliseconds for pinpoint accuracy.\nResult: 01m 22s 450ms",
       "requiredFramework": null,
       "returns": "text value",
       "arguments": [
@@ -351,7 +351,7 @@
           "argumentKind": "TextArgument",
           "mustBeProvided": true,
           "type": "Any text e.g. \"Hello, World!\"",
-          "description": "Use these tags to format your time: DD for days, HH for hours, MM for minutes, and SS for seconds. \nYou can separate them with colons (:) or dashes (-).",
+          "description": "Use these tags to format your time: DD for days, HH for hours, MM for minutes, and SS for seconds. \nFFF shows milliseconds. Any other text, including apostrophes, is shown exactly as you wrote it.",
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "\"format\"",
@@ -2539,7 +2539,9 @@
           "options": null
         }
       ],
-      "errors": []
+      "errors": [
+        "The chosen property cannot be used to filter players. Pick a real player property, not 'none'."
+      ]
     },
     "Intersect": {
       "syntax": "Intersect @first_value @other_values...",
@@ -2612,7 +2614,7 @@
     },
     "Overlapping": {
       "syntax": "Overlapping @first_value @other_values...",
-      "description": "Checks if provided player variables have the exact same players.",
+      "description": "Checks if provided player variables have the exact same players, in any order.",
       "subgroup": "PlayerValue",
       "essential": false,
       "additionalDescription": null,
@@ -4235,10 +4237,10 @@
     },
     "AddPickupToInventory": {
       "syntax": "AddPickupToInventory @player *pickup",
-      "description": "Forces a pickup to be added to the player's inventory.",
+      "description": "Moves a pickup from the ground into the player's inventory.",
       "subgroup": "Pickup",
       "essential": false,
-      "additionalDescription": "Pickup will not be added if the player's inventory is full.",
+      "additionalDescription": "The pickup disappears from the ground once the player has it. If the player's inventory is full, nothing happens and the pickup stays where it is.",
       "requiredFramework": null,
       "returns": null,
       "arguments": [
@@ -4964,10 +4966,10 @@
       "arguments": [
         {
           "name": "number to round",
-          "argumentKind": "FloatArgument",
+          "argumentKind": "ValueArgument`1",
           "mustBeProvided": true,
-          "type": "Any number",
-          "description": null,
+          "type": "a value of type NumberValue",
+          "description": "Any number.",
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "number_to_round",
@@ -4981,8 +4983,8 @@
           "name": "decimal places",
           "argumentKind": "IntArgument",
           "mustBeProvided": false,
-          "type": "A whole number bigger or equal 0",
-          "description": "The number of decimal places to round to.",
+          "type": "A whole number between 0 and 28 (inclusive)",
+          "description": "The number of decimal places to round to, from 0 to 28. Halves round away from zero, so 2.5 becomes 3.",
           "defaultValue": "rounds to whole number (0)",
           "consumesRemainingValues": false,
           "syntax": "decimal_places?",
@@ -10410,7 +10412,7 @@
     },
     "CRole.SetCallbacks": {
       "syntax": "CRole.SetCallbacks custom_role on_spawning? on_removing?",
-      "description": "Sets the callbacks for a provided custom role. Calling it again from the same script replaces that role's callbacks without changing callbacks for other roles.",
+      "description": "Sets the callbacks for a provided custom role. Calling it again from the same script replaces both of that role's callbacks: a callback you leave out is turned off. Callbacks for other roles and from other scripts stay as they are.",
       "subgroup": "CustomRole",
       "essential": false,
       "additionalDescription": null,
@@ -11323,7 +11325,7 @@
           "argumentKind": "DurationArgument",
           "mustBeProvided": true,
           "type": "Duration in format #ms, #s, #m, #h (e.g. 5s or 2m)",
-          "description": null,
+          "description": "Broadcasts are shown in whole seconds, so a part of a second rounds up (500ms shows for 1 second). The longest broadcast is 65535 seconds (about 18 hours).",
           "defaultValue": null,
           "consumesRemainingValues": false,
           "syntax": "duration",
@@ -11349,7 +11351,9 @@
           "options": null
         }
       ],
-      "errors": []
+      "errors": [
+        "A broadcast can last at most 65535 seconds (about 18 hours). Use a shorter duration."
+      ]
     },
     "ClearBroadcasts": {
       "syntax": "ClearBroadcasts @players",
@@ -16306,7 +16310,7 @@
         },
         {
           "name": "arguments",
-          "description": "The arguments that this command expects in order to run. \nThe script cannot run unless every single argument is specified. \n\nWhen the command is ran, the provided values for the arguments turn into their own literal local variables for you to use in the script. \nFor example: making a command with an argument 'name' will then create a local variable '$name' in your script.\n\nIf you want some arguments to be optional, you can use the '?' symbol after the argument name. \nFor example: 'reason?' argument will be optional, and if the sender does not provide a value for it, the script will still run.\nThen, the '$reason' command will not be created in your script.\n\n(the '?' suffix is NOT added to the variable names)",
+          "description": "The arguments that this command expects in order to run. \nThe script cannot run unless every single argument is specified. \n\nWhen the command is ran, the provided values for the arguments turn into their own literal local variables for you to use in the script. \nFor example: making a command with an argument 'name' will then create a local variable '$name' in your script.\nThe variable keeps your exact spelling, so an argument 'Name' creates '$Name'.\nEach argument needs a different name (upper and lower case count as the same).\n\nIf you want some arguments to be optional, you can use the '?' symbol after the argument name. \nFor example: 'reason?' argument will be optional, and if the sender does not provide a value for it, the script will still run.\nThen, the '$reason' command will not be created in your script.\n\n(the '?' suffix is NOT added to the variable names)",
           "required": false,
           "example": "-- arguments id time reason?"
         }

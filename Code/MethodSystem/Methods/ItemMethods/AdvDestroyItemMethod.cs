@@ -17,12 +17,32 @@ public class AdvDestroyItemMethod : SynchronousMethod
     
     public override void Execute()
     {
-        var items = Args.GetItems("items");
+        var selection = Args.GetValue<ItemSelection, ItemsArgument>("items");
 
-        foreach (var item in items)
+        // The same pickup can be reached both through an item's serial and through the
+        // ground list, so each one is destroyed only once.
+        HashSet<Pickup> destroyedPickups = [];
+
+        foreach (var item in selection.Items)
         {
             item.CurrentOwner?.RemoveItem(item);
-            Pickup.Get(item.Serial)?.Destroy();
+            if (Pickup.Get(item.Serial) is { } pickup)
+            {
+                DestroyPickup(pickup);
+            }
+        }
+
+        foreach (var pickup in selection.Pickups)
+        {
+            DestroyPickup(pickup);
+        }
+
+        return;
+
+        void DestroyPickup(Pickup pickup)
+        {
+            if (pickup.IsDestroyed || !destroyedPickups.Add(pickup)) return;
+            pickup.Destroy();
         }
     }
 }

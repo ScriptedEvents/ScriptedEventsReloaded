@@ -12,7 +12,9 @@ namespace SER.Code.MethodSystem.Methods.CustomRoleMethods;
 public class CRole_SetCallbacksMethod : SynchronousMethod
 {
     public override string Description =>
-        "Sets the callbacks for a provided custom role. Calling it again from the same script replaces that role's callbacks without changing callbacks for other roles.";
+        "Sets the callbacks for a provided custom role. Calling it again from the same script replaces " +
+        "both of that role's callbacks: a callback you leave out is turned off. " +
+        "Callbacks for other roles and from other scripts stay as they are.";
 
     public override Argument[] ExpectedArguments { get; } =
     [
@@ -36,27 +38,29 @@ public class CRole_SetCallbacksMethod : SynchronousMethod
     public override void Execute()
     {
         var customRole = Args.GetCustomRole("custom role");
+        var handlerId = GetHandlerId(customRole.Id, Script.Name);
 
-        if (Args.GetCallback("on spawning") is { } onSpawning)
-        {
-            CRole.AddOrReplaceHandler(CRole.CustomRoleEvent.Spawned, GetHandler(onSpawning));
-        }
-        
-        if (Args.GetCallback("on removing") is { } onRemoving)
-        {
-            CRole.AddOrReplaceHandler(CRole.CustomRoleEvent.Removed, GetHandler(onRemoving));
-        }
+        // Both callbacks are replaced on every call. An omitted callback removes the one
+        // this script installed earlier for this role, so it stops running.
+        SetOrRemove(CRole.CustomRoleEvent.Spawned, Args.GetCallback("on spawning"));
+        SetOrRemove(CRole.CustomRoleEvent.Removed, Args.GetCallback("on removing"));
 
         return;
 
-        CRole.Handler GetHandler(CallbackArgument.Callback callback)
+        void SetOrRemove(CRole.CustomRoleEvent @event, CallbackArgument.Callback? callback)
         {
-            return new()
+            if (callback is null)
+            {
+                CRole.RemoveHandler(@event, handlerId);
+                return;
+            }
+
+            CRole.AddOrReplaceHandler(@event, new()
             {
                 Action = (plr, role) => callback.Action([new PlayerValue(plr), new ReferenceValue<CRole>(role)], null),
-                Id = GetHandlerId(customRole.Id, Script.Name),
+                Id = handlerId,
                 ForRoles = [customRole.Id]
-            };
+            });
         }
     }
 

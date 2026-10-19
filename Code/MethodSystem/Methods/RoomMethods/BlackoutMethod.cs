@@ -48,6 +48,10 @@ public class BlackoutMethod : SynchronousMethod
         {
             foreach (var controller in lights)
             {
+                // An earlier timed blackout leaves a countdown in the game's light controller
+                // that turns the lights back on when it ends. Clear it so this blackout stays
+                // dark. FlickerLights(0) would also clear it, but it switches the lights on first.
+                controller.Base._flickerDuration = 0f;
                 controller.LightsEnabled = false;
                 InfiniteBlackouts.Add(controller);
             }

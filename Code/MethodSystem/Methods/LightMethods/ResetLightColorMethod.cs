@@ -18,8 +18,13 @@ public class ResetLightColorMethod : SynchronousMethod
     
     public override void Execute()
     {
-        Args.GetRooms("rooms").ForEach(room => 
-            room.AllLightControllers.ForEachItem(color => 
-                color.OverrideLightsColor = Color.clear));
+        Args.GetRooms("rooms").ForEach(room =>
+            room.AllLightControllers.ForEachItem(controller =>
+            {
+                // Stops any SetLightColor fade still running on these lights from
+                // bringing its color back after the reset.
+                LightColorGenerations.Claim(controller);
+                controller.OverrideLightsColor = Color.clear;
+            }));
     }
 }

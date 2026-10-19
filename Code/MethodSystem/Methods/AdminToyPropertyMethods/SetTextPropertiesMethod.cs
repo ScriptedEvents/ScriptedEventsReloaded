@@ -27,9 +27,11 @@ public class SetTextPropertiesMethod : SynchronousMethod
         
         if (Args.GetText("label") is { } label) text.TextFormat = label;
 
+        // DisplaySize is (width, height).
+        var current = text.DisplaySize;
         text.DisplaySize = new(
-            height ?? text.DisplaySize.x,
-            width  ?? text.DisplaySize.y
+            width  ?? current.x,
+            height ?? current.y
             );
     }
 

@@ -1,4 +1,4 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using MEC;
 using SER.Code.ArgumentSystem.Arguments;
 using SER.Code.ArgumentSystem.BaseArguments;
@@ -29,71 +29,101 @@ public class SetLightColorMethod : SynchronousMethod
             DefaultValue = new(null, "instant change")
         }
     ];
-    
+
     public override void Execute()
     {
         var rooms = Args.GetRooms("rooms");
         var intensity = Args.GetFloat("intensity");
         var color = Args.GetColor("color") * intensity;
 
+        // Rooms can share light controllers, so each controller is changed once.
+        var controllers = rooms
+            .SelectMany(room => room.AllLightControllers)
+            .Distinct()
+            .ToArray();
+
         if (Args.GetNullableDuration("transition duration") is { } duration)
         {
-            foreach (var room in rooms)
-            {
-                TransitionColor(room, color, duration.ToFloatSeconds()).Run(null);
-            }
-            
+            // Claim the controllers now, not inside the coroutine, so a later call in the
+            // same frame is always the newer one.
+            var fades = controllers
+                .Select(controller => new Fade(
+                    controller,
+                    GetStartColor(controller),
+                    LightColorGenerations.Claim(controller)))
+                .ToArray();
+
+            TransitionColor(fades, color, duration.ToFloatSeconds()).Run(null);
             return;
         }
-        
-        foreach (var room in rooms)
+
+        foreach (var lightsController in controllers)
         {
-            foreach (var lightsController in room.AllLightControllers)
-            {
-                lightsController.OverrideLightsColor = color;
-            }
+            // Stops any fade still running on these lights from overwriting this color.
+            LightColorGenerations.Claim(lightsController);
+            lightsController.OverrideLightsColor = color;
         }
     }
-    
-    private static IEnumerator<float> TransitionColor(Room room, Color targetColor, float duration)
+
+    private sealed record Fade(LightsController Controller, Color StartColor, int Generation);
+
+    private static Color GetStartColor(LightsController lightsController)
     {
-        Dictionary<LightsController, Color> startColor = [];
-        foreach (var lightsController in room.AllLightControllers)
+        if (lightsController.OverrideLightsColor != Color.clear)
         {
-            if (lightsController.OverrideLightsColor != Color.clear)
-            {
-                startColor[lightsController] = lightsController.OverrideLightsColor;
-                continue;
-            }
-            
-            var roomLights = lightsController.Base.transform.parent.GetComponentsInChildren<RoomLight>(true);
-            var startColorForLight = AverageColor(
-                roomLights
-                    .Select(l => l._overrideColorSet ? l._overrideColor : l._initialLightColor)
-                    .Where(c => c != Color.clear)
-                    .ToArray());
-            
-            startColor[lightsController] = startColorForLight;
+            return lightsController.OverrideLightsColor;
         }
-        
+
+        var roomLights = lightsController.Base.transform.parent.GetComponentsInChildren<RoomLight>(true);
+        return AverageColor(
+            roomLights
+                .Select(l => l._overrideColorSet ? l._overrideColor : l._initialLightColor)
+                .Where(c => c != Color.clear)
+                .ToArray());
+    }
+
+    private static IEnumerator<float> TransitionColor(Fade[] fades, Color targetColor, float duration)
+    {
         float elapsedTime = 0f;
-        
+
         while (elapsedTime < duration)
         {
             float t = elapsedTime / duration;
             elapsedTime += Time.deltaTime;
-            
-            foreach (var lightsController in room.AllLightControllers)
+
+            if (!Apply(t))
             {
-                Color currentColor = Color.Lerp(startColor[lightsController], targetColor, t);
-                lightsController.OverrideLightsColor = currentColor;
-                yield return Timing.WaitForOneFrame;
+                // A newer color change or reset took over every controller.
+                yield break;
             }
+
+            yield return Timing.WaitForOneFrame;
         }
-        
-        room.AllLightControllers.ForEachItem(ctrl => ctrl.OverrideLightsColor = targetColor);
+
+        Apply(null);
+
+        // Writes only to controllers that no newer SetLightColor or ResetLightColor has claimed.
+        bool Apply(float? progress)
+        {
+            var anyCurrent = false;
+            foreach (var fade in fades)
+            {
+                if (!LightColorGenerations.IsCurrent(fade.Controller, fade.Generation)
+                    || fade.Controller.Base == null)
+                {
+                    continue;
+                }
+
+                fade.Controller.OverrideLightsColor = progress is { } value
+                    ? Color.Lerp(fade.StartColor, targetColor, value)
+                    : targetColor;
+                anyCurrent = true;
+            }
+
+            return anyCurrent;
+        }
     }
-    
+
     private static Color AverageColor(Color[] colors)
     {
         if (colors.Length == 0)

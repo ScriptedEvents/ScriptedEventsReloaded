@@ -17,6 +17,7 @@ public class CRole
     {
         PlayerEvents.Death += OnDeath;
         PlayerEvents.ChangingRole += OnPlayerChangingRole;
+        PlayerEvents.ChangedRole += OnPlayerChangedRole;
         ServerEvents.RoundStarted += OnServerRoundStarted;
     }
 
@@ -24,6 +25,7 @@ public class CRole
     {
         PlayerEvents.Death -= OnDeath;
         PlayerEvents.ChangingRole -= OnPlayerChangingRole;
+        PlayerEvents.ChangedRole -= OnPlayerChangedRole;
         ServerEvents.RoundStarted -= OnServerRoundStarted;
     }
     
@@ -65,6 +67,11 @@ public class CRole
     public static readonly Dictionary<Player, CRole> LastRoles = [];
     public static readonly List<Player> PlayersInProcessOfReceivingCRole = [];
     private static readonly HashSet<Player> PlayersQueuedForCRole = [];
+
+    // A base-role change can still be cancelled after ChangingRole runs (by a later handler or a
+    // script), so the custom role is only dropped once ChangedRole confirms the change.
+    // LifeId changes with the new role, so the life the custom role belonged to is kept here.
+    private static readonly Dictionary<Player, int> PendingRoleRemovals = [];
     public static readonly Dictionary<CustomRoleEvent, HashSet<Handler>> EventHandlers = [];
 
     public required string Id;
@@ -87,6 +94,7 @@ public class CRole
         LastRoles.Clear();
         PlayersInProcessOfReceivingCRole.Clear();
         PlayersQueuedForCRole.Clear();
+        PendingRoleRemovals.Clear();
         EventHandlers.Clear();
         RegisteredRoles.Values.ForEachItem(role => role.Unload());
         RegisteredRoles.Clear();
@@ -112,6 +120,14 @@ public class CRole
 
         handlers.RemoveWhere(existing => existing.Id == handler.Id);
         handlers.Add(handler);
+    }
+
+    public static void RemoveHandler(CustomRoleEvent @event, string handlerId)
+    {
+        if (EventHandlers.TryGetValue(@event, out var handlers))
+        {
+            handlers.RemoveWhere(existing => existing.Id == handlerId);
+        }
     }
 
     public static void Unregister(CRole role)
@@ -204,13 +220,18 @@ public class CRole
 
     public void RemovePlayer(Player plr)
     {
-        if (!LifeIdAssignedRoles.TryGetValue(plr.LifeId, out var currentRole)
+        RemovePlayer(plr, plr.LifeId);
+    }
+
+    private void RemovePlayer(Player plr, int lifeId)
+    {
+        if (!LifeIdAssignedRoles.TryGetValue(lifeId, out var currentRole)
             || !ReferenceEquals(currentRole, this))
         {
             return;
         }
 
-        LifeIdAssignedRoles.Remove(plr.LifeId);
+        LifeIdAssignedRoles.Remove(lifeId);
         
         plr.CustomInfo = "";
         plr.InfoArea = (PlayerInfoArea)~0;
@@ -329,14 +350,21 @@ public class CRole
 
         if (PlayersInProcessOfReceivingCRole.Contains(plr))
         {
+            // AssignPlayer is changing the base role itself; the custom role it is
+            // assigning must not be removed by this change.
+            PendingRoleRemovals.Remove(plr);
             Log.Debug($"player {plr.DisplayName} is already in process of receiving a custom role");
             return;
         }
 
-        if (LifeIdAssignedRoles.TryGetValue(plr.LifeId, out var role))
+        // Every registered role runs this handler, so this must stay idempotent.
+        if (LifeIdAssignedRoles.ContainsKey(plr.LifeId))
         {
-            role.RemovePlayer(plr);
-            Log.Debug($"removing role {role.Id} from {plr.DisplayName}");
+            PendingRoleRemovals[plr] = plr.LifeId;
+        }
+        else
+        {
+            PendingRoleRemovals.Remove(plr);
         }
 
         if (PlayersQueuedForCRole.Contains(plr))
@@ -382,6 +410,19 @@ public class CRole
                 PlayersQueuedForCRole.Remove(plr);
             }
         });
+    }
+
+    public void OnPlayerChangedRole(PlayerChangedRoleEventArgs ev)
+    {
+        if (ev.Player is not {} plr) return;
+        if (PlayersInProcessOfReceivingCRole.Contains(plr)) return;
+        if (!PendingRoleRemovals.TryGetValue(plr, out var previousLifeId)) return;
+
+        PendingRoleRemovals.Remove(plr);
+        if (!LifeIdAssignedRoles.TryGetValue(previousLifeId, out var role)) return;
+
+        role.RemovePlayer(plr, previousLifeId);
+        Log.Debug($"removing role {role.Id} from {plr.DisplayName}");
     }
 
     internal static bool PassesSpawnChance(float spawnChance, double randomValue)

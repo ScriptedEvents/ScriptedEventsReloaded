@@ -50,23 +50,28 @@ public class SetCameraPropertiesMethod : SynchronousMethod, ICanError
         var minZoom = Args.GetNullableFloat("minimal zoom");
         var maxZoom = Args.GetNullableFloat("maximal zoom");
 
-        if (up > down)         throw new ScriptRuntimeError(this, ErrorReasons[0]);
-        if (left > right)      throw new ScriptRuntimeError(this, ErrorReasons[1]);
-        if (minZoom > maxZoom) throw new ScriptRuntimeError(this, ErrorReasons[2]);
-        
+        // Fill in omitted values from the camera first, so a one-sided change is
+        // checked against the limit it will actually be paired with.
+        var vertical   = camera.VerticalConstraints;
+        var horizontal = camera.HorizontalConstraint;
+        var zoom       = camera.ZoomConstraints;
+
+        var newUp      = up      ?? vertical.x;
+        var newDown    = down    ?? vertical.y;
+        var newLeft    = left    ?? horizontal.x;
+        var newRight   = right   ?? horizontal.y;
+        var newMinZoom = minZoom ?? zoom.x;
+        var newMaxZoom = maxZoom ?? zoom.y;
+
+        if (newUp > newDown)           throw new ScriptRuntimeError(this, ErrorReasons[0]);
+        if (newLeft > newRight)        throw new ScriptRuntimeError(this, ErrorReasons[1]);
+        if (newMinZoom > newMaxZoom)   throw new ScriptRuntimeError(this, ErrorReasons[2]);
+
         if (Args.GetText("label") is { } label) camera.Label = label;
 
-        camera.VerticalConstraints = new(
-            up ?? camera.VerticalConstraints.x,
-            down ?? camera.VerticalConstraints.y);
-
-        camera.HorizontalConstraint = new(
-            left ?? camera.HorizontalConstraint.x,
-            right ?? camera.HorizontalConstraint.y);
-
-        camera.ZoomConstraints = new(
-            minZoom ?? camera.ZoomConstraints.x,
-            maxZoom ?? camera.ZoomConstraints.y);
+        camera.VerticalConstraints  = new(newUp, newDown);
+        camera.HorizontalConstraint = new(newLeft, newRight);
+        camera.ZoomConstraints      = new(newMinZoom, newMaxZoom);
     }
 
 }

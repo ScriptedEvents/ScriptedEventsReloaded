@@ -9,9 +9,11 @@ namespace SER.Code.MethodSystem.Methods.PickupMethods;
 [UsedImplicitly]
 public class AddPickupToInventoryMethod : SynchronousMethod, IAdditionalDescription
 {
-    public override string Description => "Forces a pickup to be added to the player's inventory.";
+    public override string Description => "Moves a pickup from the ground into the player's inventory.";
 
-    public string AdditionalDescription => "Pickup will not be added if the player's inventory is full.";
+    public string AdditionalDescription =>
+        "The pickup disappears from the ground once the player has it. " +
+        "If the player's inventory is full, nothing happens and the pickup stays where it is.";
 
     public override Argument[] ExpectedArguments { get; } =
     [
@@ -24,8 +26,13 @@ public class AddPickupToInventoryMethod : SynchronousMethod, IAdditionalDescript
         var player = Args.GetPlayer("player");
         var pickup = Args.GetReference<Pickup>("pickup");
 
-        if (player.IsInventoryFull) return;
-        
-        player.AddItem(pickup);
+        if (player.IsInventoryFull || pickup.IsDestroyed) return;
+
+        // AddItem creates the inventory item but leaves the pickup in the world, the same as
+        // the game's own pickup flow before it destroys the pickup. Remove it only once the
+        // item was granted, so a failed transfer keeps the pickup.
+        if (player.AddItem(pickup) is null) return;
+
+        pickup.Destroy();
     }
 }

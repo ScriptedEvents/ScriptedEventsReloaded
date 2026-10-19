@@ -10,7 +10,7 @@ namespace SER.Code.MethodSystem.Methods.PlayerValueMethods;
 [UsedImplicitly]
 public class OverlappingMethod : ReturningMethod<BoolValue>
 {
-    public override string Description => "Checks if provided player variables have the exact same players.";
+    public override string Description => "Checks if provided player variables have the exact same players, in any order.";
 
     public override Argument[] ExpectedArguments { get; } =
     [
@@ -29,7 +29,9 @@ public class OverlappingMethod : ReturningMethod<BoolValue>
             .Concat([Args.GetPlayers("first value")])
             .ToArray();
         
-        int startHash = variables[0].GetEnumerableHashCode();
-        ReturnValue = variables.Skip(1).All(v => v.GetEnumerableHashCode() == startHash);
+        // Compare who is in each list; order and repeated players do not matter.
+        // Player does not override Equals, so this compares the actual player objects.
+        var firstPlayers = new HashSet<Player>(variables[0]);
+        ReturnValue = variables.Skip(1).All(v => firstPlayers.SetEquals(v));
     }
 }

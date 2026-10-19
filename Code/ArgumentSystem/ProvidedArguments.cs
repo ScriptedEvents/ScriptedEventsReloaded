@@ -104,9 +104,9 @@ public class ProvidedArguments(Method method)
         return GetValue<LiteralVariable, LiteralVariableArgument>(argName);
     }
     
-    public Item[] GetItems(string argName)
+    public ItemSelection GetItems(string argName)
     {
-        return GetValue<Item[], ItemsArgument>(argName);
+        return GetValue<ItemSelection, ItemsArgument>(argName);
     }
 
     public VariableToken GetVariableName(string argName)

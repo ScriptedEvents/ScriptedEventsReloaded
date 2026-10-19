@@ -164,9 +164,12 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
             return $"<size=0>{dots}</size>";
         }
 
+        // Shared by <charwait=x> and <wait=x>, so both accept whole and decimal numbers (500ms, 0.5s, 1.25s).
+        private const string DurationTagValuePattern = @"(?:\d+(?:\.\d*)?|\.\d+)(?:ms|s)";
+
         private static string FormatLine(string text, int index, Stack<TimeSpan> activeDelayTags)
         {
-            var openTags = new Regex(@"<charwait=((\d|\.)+(ms|s))>").Matches(text).Cast<Match>().ToArray();
+            var openTags = new Regex($"<charwait=({DurationTagValuePattern})>").Matches(text).Cast<Match>().ToArray();
             var closeTags = new Regex("</charwait>").Matches(text).Cast<Match>().ToArray();
 
             StringBuilder newText = new();
@@ -224,7 +227,7 @@ public class AnimatedBroadcastMethod : SynchronousMethod, IAdditionalDescription
                 }
             }
 
-            foreach (var match in new Regex(@"<wait=(\d+(ms|s))>").Matches(newText.ToString()).Cast<Match>().ToArray())
+            foreach (var match in new Regex($"<wait=({DurationTagValuePattern})>").Matches(newText.ToString()).Cast<Match>().ToArray())
             {
                 if (DurationToken.Parse(match.Groups[1].Value) is not { } timeSpan)
                 {

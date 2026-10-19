@@ -25,7 +25,7 @@ public class HintMethod : SynchronousMethod, IEssential
 
         foreach (var player in players)
         {
-            player.SendHint(message, (ushort)duration.TotalSeconds);
+            player.SendHint(message, (float)duration.TotalSeconds);
         }
     }
 }

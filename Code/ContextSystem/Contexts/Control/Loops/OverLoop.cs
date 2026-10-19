@@ -98,7 +98,6 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
 
     protected override IEnumerator<float> Execute()
     {
-        ResetControlMessages();
         if (_itemIterationValueToken is null) throw new CoreInvariantException();
 
         if (_itemIterationValueToken.Value().HasErrored(out var error, out var dirtyValue))
@@ -120,6 +119,7 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
         {
             var value = values[index];
 
+            var body = new BodyRun();
             Variable? itemVariable = null;
             Variable? indexVariable = null;
             try
@@ -138,7 +138,7 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
                     indexVariable = variable;
                 }
 
-                using var coro = RunChildren();
+                using var coro = RunChildren(body);
                 while (coro.MoveNext())
                 {
                     yield return coro.Current;
@@ -150,7 +150,7 @@ public class OverLoop : LoopContext, IAcceptOptionalVariableDefinitionsContext
                 if (indexVariable is not null) Script.RemoveLocalVariable(indexVariable);
             }
 
-            if (ReceivedBreak)
+            if (EndsLoop(body))
             {
                 break;
             }

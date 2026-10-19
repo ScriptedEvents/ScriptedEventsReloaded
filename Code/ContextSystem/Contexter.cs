@@ -121,6 +121,9 @@ public static class Contexter
             }
 
             extendable.RegisteredSignals[treeExtenderInfo.Extends] = treeExtenderContext;
+            // An extension such as 'else' or 'on_error' runs in place of the statement it extends,
+            // so 'return', 'break' and 'continue' inside it must reach the same enclosing loop or function.
+            treeExtenderContext.ParentContext = currentStatement.ParentContext;
             statementStack.Pop();
             statementStack.Push(treeExtenderContext);
             return context.VerifyCurrentState().HasErrored(out error) ? rs + error.AsError() : true;

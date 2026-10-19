@@ -75,7 +75,6 @@ public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
 
     protected override IEnumerator<float> Execute()
     {
-        ResetControlMessages();
         if (_repeatCountExpression == null)
             throw new CoreInvariantException("Repeat context has no amount specified");
 
@@ -86,10 +85,11 @@ public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
 
         for (ulong i = 0; i < val; i++)
         {
+            var body = new BodyRun();
             SetVariable(i + 1);
             try
             {
-                using var coro = RunChildren();
+                using var coro = RunChildren(body);
                 while (coro.MoveNext())
                 {
                     yield return coro.Current;
@@ -99,7 +99,7 @@ public class RepeatLoop : LoopContextWithSingleIterationVariable<NumberValue>
             {
                 RemoveVariable();
             }
-            if (ReceivedBreak) break;
+            if (EndsLoop(body)) break;
         }
     }
 }

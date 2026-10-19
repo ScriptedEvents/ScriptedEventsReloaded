@@ -94,24 +94,10 @@ public class ElifStatement : StatementContext, IStatementExtender, IExtendableSt
             yield break;
         }
 
-        foreach (var child in Children)
+        using var bodyCoro = RunChildren();
+        while (bodyCoro.MoveNext())
         {
-            switch (child)
-            {
-                case StandardContext standardContext:
-                    standardContext.Run();
-                    break;
-
-                case YieldingContext yieldingContext:
-                {
-                    using var coro = yieldingContext.Run();
-                    while (coro.MoveNext()) yield return coro.Current;
-                    break;
-                }
-
-                default:
-                    throw new CoreInvariantException("context is not standard nor yielding");
-            }
+            yield return bodyCoro.Current;
         }
     }
 }

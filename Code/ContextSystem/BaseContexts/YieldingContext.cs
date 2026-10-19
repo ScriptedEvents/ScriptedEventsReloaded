@@ -21,14 +21,21 @@ public abstract class YieldingContext : RunnableContext
             Script.CurrentLine = LineNum.Value;
         }
 
-        using var enumerator = Execute();
-        while (enumerator.MoveNext())
+        try
         {
-            yield return enumerator.Current;
+            using var enumerator = Execute();
+            while (enumerator.MoveNext())
+            {
+                yield return enumerator.Current;
+            }
         }
-
-        prof?.Stop();
-        OnEndedExecution();
+        finally
+        {
+            // Also runs when the statement fails with an error or is abandoned early (for example by 'return'),
+            // so cleanup such as removing ephemeral variables always happens.
+            prof?.Stop();
+            OnEndedExecution();
+        }
     }
 
     protected abstract IEnumerator<float> Execute();

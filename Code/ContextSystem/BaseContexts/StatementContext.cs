@@ -10,9 +10,32 @@ public abstract class StatementContext : YieldingContext
     public readonly HashSet<Variable> EphemeralVariables = [];
     public uint? EndLine;
 
+    // The body run that is executing right now. A function can call itself, so the same statement
+    // can be in the middle of several runs at once. Each run keeps its own stop state, and only the
+    // innermost (most recently started) run receives control messages.
+    private BodyRun? _activeRun;
+
+    /// <summary>
+    ///     Tracks a single run of a statement's body.
+    /// </summary>
+    protected sealed class BodyRun
+    {
+        /// <summary>
+        ///     The control message ('continue', 'break' or 'return') that stopped this run early, if any.
+        /// </summary>
+        public ParentContextControlMessage? StoppedBy { get; set; }
+    }
+
     public void SendControlMessage(ParentContextControlMessage msg)
     {
         Log.Debug($"{this} has received control message: {msg}");
+
+        // Every control message ends the body that is currently running, so its remaining lines must not run.
+        if (_activeRun is { StoppedBy: null } run)
+        {
+            run.StoppedBy = msg;
+        }
+
         OnReceivedControlMessageFromChild(msg);
     }
 
@@ -24,68 +47,102 @@ public abstract class StatementContext : YieldingContext
     [MustDisposeResource]
     protected IEnumerator<float> RunChildren(Func<bool>? endCond = null)
     {
+        return RunChildren(new BodyRun(), endCond);
+    }
+
+    /// <summary>
+    ///     Runs the children, stopping early when one of them sends a control message to this statement.
+    ///     Inspect <see cref="BodyRun.StoppedBy"/> afterward to see why the run stopped.
+    /// </summary>
+    [MustDisposeResource]
+    protected IEnumerator<float> RunChildren(BodyRun run, Func<bool>? endCond = null)
+    {
         // If we can run the whole thing synchronously right now, do it.
         // This still bypasses allocating OUR state machine.
-        return RunChildrenInternal(endCond) ?? Enumerable.Empty<float>().GetEnumerator(); 
+        return RunChildrenInternal(run, endCond) ?? Enumerable.Empty<float>().GetEnumerator();
     }
-    
-    // The compiler only builds a state machine for this helper method
-    private IEnumerator<float>? RunChildrenInternal(Func<bool>? endCond)
+
+    private static bool ShouldLeave(BodyRun run, Func<bool>? endCond)
     {
-        for (int i = 0; i < Children.Count; i++)
+        return run.StoppedBy is not null || endCond?.Invoke() is true;
+    }
+
+    // The compiler only builds a state machine for this helper method
+    private IEnumerator<float>? RunChildrenInternal(BodyRun run, Func<bool>? endCond)
+    {
+        var previousRun = _activeRun;
+        _activeRun = run;
+        var handedOff = false;
+        try
         {
-            if (endCond?.Invoke() is true) goto leave;
-
-            var child = Children[i];
-            switch (child)
+            for (int i = 0; i < Children.Count; i++)
             {
-                case StandardContext sc:
-                    sc.Run();
-                    continue;
+                if (ShouldLeave(run, endCond)) break;
 
-                case YieldingContext:
-                    // We hit a yielding context, so we MUST yield.
-                    // We pass the remaining index so we know where to resume.
-                    return RunChildrenYielding(i, endCond);
+                var child = Children[i];
+                switch (child)
+                {
+                    case StandardContext sc:
+                        sc.Run();
+                        continue;
+
+                    case YieldingContext:
+                        // We hit a yielding context, so we MUST yield.
+                        // We pass the remaining index so we know where to resume.
+                        handedOff = true;
+                        return RunChildrenYielding(i, run, endCond);
+                }
             }
-        }
 
-        leave:
-        WipeEphemeralVariables();
-        return null;
+            return null;
+        }
+        finally
+        {
+            // The yielding runner makes the run active again when it starts, and cleans up when it ends.
+            _activeRun = previousRun;
+            if (!handedOff) WipeEphemeralVariables();
+        }
     }
 
     // This handles the heavy lifting ONLY when a yield is actually encountered
-    private IEnumerator<float> RunChildrenYielding(int startIndex, Func<bool>? endCond)
+    private IEnumerator<float> RunChildrenYielding(int startIndex, BodyRun run, Func<bool>? endCond)
     {
-        for (int i = startIndex; i < Children.Count; i++)
+        var previousRun = _activeRun;
+        _activeRun = run;
+        try
         {
-            if (endCond?.Invoke() is true) goto leave;
-
-            var child = Children[i];
-            switch (child)
+            for (int i = startIndex; i < Children.Count; i++)
             {
-                case StandardContext sc:
-                    sc.Run();
-                    continue;
+                if (ShouldLeave(run, endCond)) yield break;
 
-                case YieldingContext yc:
+                var child = Children[i];
+                switch (child)
                 {
-                    using var coro = yc.Run();
-                    while (coro.MoveNext())
+                    case StandardContext sc:
+                        sc.Run();
+                        continue;
+
+                    case YieldingContext yc:
                     {
-                        if (endCond?.Invoke() is true) goto leave;
-                        yield return coro.Current;
+                        using var coro = yc.Run();
+                        while (coro.MoveNext())
+                        {
+                            if (ShouldLeave(run, endCond)) yield break;
+                            yield return coro.Current;
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }
-
-        leave:
-        WipeEphemeralVariables();
+        finally
+        {
+            // Runs on normal completion, on errors, and when the run is abandoned early.
+            _activeRun = previousRun;
+            WipeEphemeralVariables();
+        }
     }
-    
+
     public void MarkVariableAsEphemeral(Variable variable)
     {
         EphemeralVariables.Add(variable);
@@ -94,12 +151,12 @@ public abstract class StatementContext : YieldingContext
     protected void WipeEphemeralVariables()
     {
         if (EphemeralVariables.Count is 0) return;
-        
+
         foreach (var variable in EphemeralVariables)
         {
             Script.RemoveLocalVariable(variable);
         }
-        
+
         EphemeralVariables.Clear();
     }
 

@@ -36,7 +36,21 @@ public class ContinueKeyword : StandardContext, IKeywordContext
 
     public override Result VerifyCurrentState()
     {
-        return true;
+        // Look for the nearest loop around this keyword. A function body is a boundary:
+        // a loop outside the function is not running when the function's lines run.
+        for (var parent = ParentContext; parent is not null; parent = parent.ParentContext)
+        {
+            switch (parent)
+            {
+                case LoopContext:
+                    return true;
+                case FuncStatement:
+                    return "'continue' can only be used inside a loop ('repeat', 'over', 'while' or 'forever') " +
+                           "in the same function. To leave the function early, use 'return' instead.";
+            }
+        }
+
+        return "'continue' can only be used inside a loop ('repeat', 'over', 'while' or 'forever').";
     }
 
     protected override void Execute()

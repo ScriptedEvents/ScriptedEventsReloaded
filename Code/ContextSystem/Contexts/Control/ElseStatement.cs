@@ -1,7 +1,6 @@
 using SER.Code.ContextSystem.BaseContexts;
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
-using SER.Code.Exceptions;
 using SER.Code.Helpers.ResultSystem;
 using SER.Code.TokenSystem.Tokens;
 
@@ -38,26 +37,10 @@ public class ElseStatement : StatementContext, IStatementExtender, IKeywordConte
 
     protected override IEnumerator<float> Execute()
     {
-        foreach (var child in Children)
+        using var coro = RunChildren();
+        while (coro.MoveNext())
         {
-            switch (child)
-            {
-                case YieldingContext yielding:
-                {
-                    using var enumerator = yielding.Run();
-                    while (enumerator.MoveNext())
-                    {
-                        yield return enumerator.Current;
-                    }
-
-                    break;
-                }
-                case StandardContext standard:
-                    standard.Run();
-                    break;
-                default:
-                    throw new CoreInvariantException();
-            }
+            yield return coro.Current;
         }
     }
 }

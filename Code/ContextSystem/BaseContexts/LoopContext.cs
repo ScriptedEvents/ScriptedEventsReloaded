@@ -1,22 +1,11 @@
 using SER.Code.ContextSystem.Interfaces;
 using SER.Code.ContextSystem.Structures;
-using SER.Code.Exceptions;
 using SER.Code.Helpers;
 
 namespace SER.Code.ContextSystem.BaseContexts;
 
 public abstract class LoopContext : StatementContext, IKeywordContext
 {
-    protected bool ReceivedBreak;
-
-    protected bool ReceivedContinue;
-
-    protected void ResetControlMessages()
-    {
-        ReceivedBreak = false;
-        ReceivedContinue = false;
-    }
-
     protected abstract string? DetailedUsage { get; }
 
     public sealed override string FriendlyName => $"'{KeywordName}' loop statement";
@@ -37,47 +26,23 @@ public abstract class LoopContext : StatementContext, IKeywordContext
     {
         switch (msg)
         {
+            // 'continue' and 'break' belong to this loop. The current iteration has already stopped,
+            // and the loop checks the iteration's StoppedBy to decide whether to go on.
             case Continue:
-                ReceivedContinue = true;
-                return;
             case Break:
-                ReceivedBreak = true;
                 return;
             default:
+                // 'return' also ends the loop, but the enclosing function needs to receive it too.
                 ParentContext?.SendControlMessage(msg);
                 break;
         }
     }
 
-    protected IEnumerator<float> RunChildren()
+    /// <summary>
+    ///     Returns whether the loop must stop after an iteration that was stopped this way.
+    /// </summary>
+    protected static bool EndsLoop(BodyRun iteration)
     {
-        foreach (var child in Children)
-        {
-            if (ReceivedBreak) break;
-            
-            switch (child)
-            {
-                case StandardContext standardContext:
-                    standardContext.Run();
-                    break;
-
-                case YieldingContext yieldingContext:
-                {
-                    using var coro = yieldingContext.Run();
-                    while (coro.MoveNext()) yield return coro.Current;
-                    break;
-                }
-
-                default:
-                    throw new CoreInvariantException("context is not standard nor yielding");
-            }
-
-            if (!ReceivedContinue) continue;
-
-            ReceivedContinue = false;
-            break;
-        }
-
-        WipeEphemeralVariables();
+        return iteration.StoppedBy is Break or Return;
     }
 }

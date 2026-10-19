@@ -10,8 +10,6 @@ namespace SER.Code.ContextSystem.Contexts.Control;
 [UsedImplicitly]
 public class AttemptStatement : StatementContext, IExtendableStatement, IKeywordContext
 {
-    private Exception? _exception;
-    
     public override string FriendlyName => "'attempt' statement";
 
     public IExtendableStatement.Signal AllowedSignals => IExtendableStatement.Signal.ThrewException;
@@ -47,22 +45,34 @@ public class AttemptStatement : StatementContext, IExtendableStatement, IKeyword
 
     protected override IEnumerator<float> Execute()
     {
-        using IEnumerator<float> coro = RunChildren();
-        while (true)
+        // Kept per run (not as a field), so an attempt inside a function that calls itself
+        // cannot mix up the errors of different calls.
+        Exception? exception = null;
+        IEnumerator<float>? coro = null;
+        try
         {
-            bool isRunning;
-            try
+            while (true)
             {
-                isRunning = coro.MoveNext();
-            }
-            catch (Exception ex) when (CanHandle(ex))
-            {
-                _exception = ex;
-                break;
-            }
+                bool isRunning;
+                try
+                {
+                    // Starting the body can already run its first lines, so that also has to be inside the try.
+                    coro ??= RunChildren();
+                    isRunning = coro.MoveNext();
+                }
+                catch (Exception ex) when (CanHandle(ex))
+                {
+                    exception = ex;
+                    break;
+                }
 
-            if (!isRunning) yield break;
-            yield return coro.Current;
+                if (!isRunning) yield break;
+                yield return coro.Current;
+            }
+        }
+        finally
+        {
+            coro?.Dispose();
         }
 
         if (!RegisteredSignals.TryGetValue(IExtendableStatement.Signal.ThrewException, out var statement))
@@ -70,7 +80,7 @@ public class AttemptStatement : StatementContext, IExtendableStatement, IKeyword
 
         if (statement is OnErrorStatement catchStatement)
         {
-            catchStatement.Exception = _exception;
+            catchStatement.Exception = exception;
         }
         using var catchCoro = statement.Run();
         while (catchCoro.MoveNext())

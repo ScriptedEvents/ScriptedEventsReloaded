@@ -44,14 +44,14 @@ public class ForeverLoop : LoopContextWithSingleIterationVariable<NumberValue>, 
 
     protected override IEnumerator<float> Execute()
     {
-        ResetControlMessages();
         ulong iteration = 0;
         while (true)
         {
+            var body = new BodyRun();
             SetVariable(++iteration);
             try
             {
-                using var coro = RunChildren();
+                using var coro = RunChildren(body);
                 while (coro.MoveNext())
                 {
                     yield return coro.Current;
@@ -62,7 +62,7 @@ public class ForeverLoop : LoopContextWithSingleIterationVariable<NumberValue>, 
                 RemoveVariable();
             }
 
-            if (ReceivedBreak) break;
+            if (EndsLoop(body)) break;
         }
     }
 }

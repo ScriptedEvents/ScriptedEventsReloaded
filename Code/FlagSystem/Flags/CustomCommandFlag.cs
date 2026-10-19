@@ -46,6 +46,11 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
             }
         
             var name = inlineArgs.First();
+            if (name.Length == 0)
+            {
+                return "Command name is missing.";
+            }
+
             if (name.Any(char.IsWhiteSpace))
             {
                 return "Command name can only be a single word, no whitespace allowed.";
@@ -195,7 +200,9 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
             
             When the command is ran, the provided values for the arguments turn into their own literal local variables for you to use in the script. 
             For example: making a command with an argument 'name' will then create a local variable '$name' in your script.
-            
+            The variable keeps your exact spelling, so an argument 'Name' creates '$Name'.
+            Each argument needs a different name (upper and lower case count as the same).
+
             If you want some arguments to be optional, you can use the '?' symbol after the argument name. 
             For example: 'reason?' argument will be optional, and if the sender does not provide a value for it, the script will still run.
             Then, the '$reason' command will not be created in your script.
@@ -391,18 +398,44 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
 
     public CustomCommand Command = null!;
 
+    private static CustomCommandFlag? ResolveFlag(CustomCommand cmd)
+    {
+        if (ScriptCommands.TryGetValue(cmd, out var flag))
+        {
+            return flag;
+        }
+
+        return ScriptCommands.Values.FirstOrDefault(candidate =>
+            string.Equals(candidate.Command.Command, cmd.Command, StringComparison.OrdinalIgnoreCase));
+    }
+
     public static Result RunAttachedScript(CustomCommand cmd, ScriptExecutor sender, string[] args)
     {
-        if (!ScriptCommands.TryGetValue(cmd, out var flag))
+        const string scriptNotFound = "The script that was supposed to handle this command was not found.";
+        if (ResolveFlag(cmd) is not { } flag)
         {
-            flag = ScriptCommands.Values.FirstOrDefault(candidate =>
-                string.Equals(candidate.Command.Command, cmd.Command, StringComparison.OrdinalIgnoreCase));
-            if (flag is null)
-            {
-                return "The script that was supposed to handle this command was not found.";
-            }
+            return scriptNotFound;
+        }
 
-            cmd = flag.Command;
+        // Load any saved edits first, so the checks below use the command rules
+        // (permissions, ranks, arguments, limits) from the version that will run.
+        // A flag without a script name never came from a file (AuditRegressionChecks builds one).
+        if (!string.IsNullOrWhiteSpace(flag.ScriptName))
+        {
+            FileSystem.FileSystem.RefreshRequested(flag.ScriptName);
+        }
+
+        if (ResolveFlag(cmd) is not { } currentFlag)
+        {
+            return scriptNotFound;
+        }
+
+        flag = currentFlag;
+        cmd = flag.Command;
+
+        if (ValidateConsole(cmd, sender) is { } consoleError)
+        {
+            return consoleError;
         }
 
         var player = (sender as IPlayerExecutor)?.Player;
@@ -461,18 +494,23 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
                    $"Expected at most {cmd.Usage.Length}, but got {provided.Length}.";
         }
 
-        if (Script.CreateByScriptName(flag.ScriptName, sender)
-            .HasErrored(out var error, out var script))
+        // The script was already refreshed above. Use that exact accepted version, without a
+        // second refresh, so the code that runs always matches the rules checked above.
+        if (FileSystem.FileSystem.GetScriptSection(flag.ScriptName)
+            .HasErrored(out var error, out var section))
         {
             return error;
         }
+
+        var script = Script.CreateByVerifiedSection(section, sender);
 
         for (var index = 0; index < provided.Length; index++)
         {
             var slice = provided[index];
             var argVariable = cmd.Usage[index];
-            var name = argVariable[0].ToString().ToLowerInvariant() + argVariable[1..];
-            
+            // Keep the spelling from '-- arguments': 'Name' becomes $Name.
+            var name = argVariable;
+
             if (Tokenizer.GetTokenFromSlice(slice, null, null)
                 .HasErrored(out error, out var token))
             {
@@ -525,6 +563,21 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
         
         script.Run(RunReason.CustomCommand);
         return true;
+    }
+
+    private static string? ValidateConsole(CustomCommand cmd, ScriptExecutor sender)
+    {
+        var console = sender switch
+        {
+            PlayerConsoleExecutor => ConsoleType.Player,
+            RemoteAdminExecutor => ConsoleType.RemoteAdmin,
+            ServerConsoleExecutor => ConsoleType.Server,
+            _ => ConsoleType.None
+        };
+
+        return console != ConsoleType.None && cmd.ConsoleTypes.HasFlag(console)
+            ? null
+            : "This command is not available from this console.";
     }
 
     private static string? ValidatePlayer(CustomCommand cmd, Player plr)
@@ -595,8 +648,14 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
     private Result AddArguments(string[] args)
     {
         var onlyOptionals = false;
+        var usedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var arg in args)
         {
+            if (string.IsNullOrWhiteSpace(arg))
+            {
+                return "An argument name cannot be empty. Use a word made of letters, like 'reason'.";
+            }
+
             var markedOptional = arg.Last() == '?';
             if (markedOptional)
             {
@@ -616,6 +675,14 @@ public class CustomCommandFlag : Flag, IMajorBehaviorFlag
             if (markedOptional && arg.Length == 1)
             {
                 return $"You cannot provide a {arg} as an argument.";
+            }
+
+            // Each argument becomes its own variable, so two names that differ only in
+            // upper/lower case (or only by '?') would be too easy to mix up.
+            if (!usedNames.Add(varName))
+            {
+                return $"Argument '{varName}' is listed more than once. " +
+                       "Give each argument a different name (upper and lower case count as the same).";
             }
         }
 

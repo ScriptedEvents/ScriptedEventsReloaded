@@ -113,7 +113,7 @@ public static class ScriptCatalog
 
             foreach (var path in paths)
             {
-                summary += RefreshPath(path, force);
+                summary += RefreshPathSafely(path, force);
             }
 
             return summary;
@@ -176,7 +176,7 @@ public static class ScriptCatalog
         _isRefreshing = true;
         try
         {
-            return new RequestedRefreshResult(true, RefreshPath(path, false));
+            return new RequestedRefreshResult(true, RefreshPathSafely(path, false));
         }
         finally
         {
@@ -306,6 +306,49 @@ public static class ScriptCatalog
         SnapshotsByFileName.Clear();
         FailedFileStamps.Clear();
         FailedScriptsByPath.Clear();
+    }
+
+    /// <summary>
+    /// Refreshes one file. An unexpected exception counts as this file failing, so one broken
+    /// script cannot stop the remaining files from loading.
+    /// </summary>
+    private static RefreshSummary RefreshPathSafely(string path, bool force)
+    {
+        try
+        {
+            return RefreshPath(path, force);
+        }
+        catch (Exception exception)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(path);
+            var error = $"SER could not load this file because of an unexpected problem: {exception.Message}";
+            Log.Error($"Unexpected exception while loading script '{fileName}':\n{exception}");
+            Log.CompileError(fileName, error);
+
+            if (TryGetFileStamp(path, out var writeTime, out var length))
+            {
+                // Do not retry an unchanged file on every run; wait until it is saved again.
+                FailedFileStamps[path] = new FileStamp(writeTime, length);
+            }
+
+            FailedScriptsByPath[path] = new FailedScriptInfo(
+                fileName,
+                path,
+                error,
+                SnapshotsByPath.ContainsKey(path));
+
+            try
+            {
+                RestoreSnapshotBinding(path);
+            }
+            catch (Exception restoreException)
+            {
+                Log.Error($"Failed to restore the last known-good version of script '{fileName}': " +
+                          restoreException.Message);
+            }
+
+            return new RefreshSummary(0, 0, 1);
+        }
     }
 
     private static RefreshSummary RefreshPath(string path, bool force)

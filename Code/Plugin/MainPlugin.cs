@@ -225,6 +225,7 @@ public class MainPlugin : Exiled.API.Features.Plugin<Config>
              SER {Version} is ready.
              Active script files: {FileSystem.ScriptCatalog.GetAcceptedScripts().Length}
              Files requiring attention: {FileSystem.ScriptCatalog.GetFailedScripts().Length}
+             Name conflicts (not loaded, see serstatus): {FileSystem.FileSystem.DuplicateScriptPaths.Count}
              Disabled files (filename starts with #): {FileSystem.FileSystem.DisabledScriptPaths.Length}
              Excluded folders (name starts with #): {FileSystem.FileSystem.DisabledScriptDirectoryPaths.Length}
              Skipped linked folders: {FileSystem.FileSystem.SkippedLinkDirectoryPaths.Length}

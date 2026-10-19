@@ -3,7 +3,6 @@ using SER.Code.Helpers.ResultSystem;
 using SER.Code.ScriptSystem;
 using SER.Code.TokenSystem.Tokens;
 using SER.Code.TokenSystem.Tokens.VariableTokens;
-using SER.Code.VariableSystem.Bases;
 
 namespace SER.Code.FlagSystem.Flags;
 
@@ -66,29 +65,21 @@ public class FunctionFlag : Flag, IMajorBehaviorFlag
         mustReport = true;
         if (base.OnScriptRunning(scr, out _).HasErrored(out var error)) return error;
         
-        (VariableToken token, Variable var)[] provided = _expectedVarTokens
-            .Select(token => (token, scr.LocalVariables.FirstOrDefault(var => var.Name == token.Name)))
-            .OfType<(VariableToken, Variable)>()
-            .ToArray();
-
-        var missingVariable = _expectedVarTokens
-            .FirstOrDefault(token => !provided.Select(r => r.token).Contains(token));
-        
-        if (missingVariable is not null)
+        foreach (var token in _expectedVarTokens)
         {
-            return $"Variable '{missingVariable.Name}' was not provided to the script.";
+            // A missing variable comes back as null; report it instead of reading from it.
+            if (scr.LocalVariables.FirstOrDefault(var => var.Name == token.Name) is not { } variable)
+            {
+                return $"Variable '{token.Name}' was not provided to the script.";
+            }
+
+            if (!token.ValueType.CanHold(variable.BaseValue.Type))
+            {
+                return $"Variable '{token.Name}' is not of the correct type. " +
+                       $"Expected '{token.ValueType}', got '{variable.BaseValue.Type}'.";
+            }
         }
 
-        (VariableToken token, Variable var) mismatchedTypeVar = provided
-            .Select(x => (x.token, x.var))
-            .FirstOrDefault(x => !x.token.ValueType.CanHold(x.var.BaseValue.Type));
-
-        if (mismatchedTypeVar is { token: {} t, var: {} v })
-        {
-            return $"Variable '{t.Name}' is not of the correct type. " +
-                   $"Expected '{v.BaseValue.Type}', got '{t.ValueType}'.";
-        }
-        
         return true;
     }
 

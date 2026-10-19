@@ -55,13 +55,24 @@ public static class ScriptFlagHandler
                 .Select(t => t is DurationToken ? t.RawRep : t.BestStaticTextRepr())
                 .ToArray();
             var prefix = tokens.FirstOrDefault();
-            
-            var result = prefix switch
+
+            Result result;
+            try
             {
-                FlagToken => HandleFlag(name, args, scriptName, parsedFlags, ref currentFlag).Result,
-                FlagArgumentToken => HandleFlagArgument(name, args, currentFlag),
-                _ => throw new CoreInvariantException($"{prefix} not flag or flag arg")
-            };
+                result = prefix switch
+                {
+                    FlagToken => HandleFlag(name, args, scriptName, parsedFlags, ref currentFlag).Result,
+                    FlagArgumentToken => HandleFlagArgument(name, args, currentFlag),
+                    _ => throw new CoreInvariantException($"{prefix} not flag or flag arg")
+                };
+            }
+            catch (Exception exception)
+            {
+                // Flag handlers (including ones from other plugins) must not stop the whole
+                // refresh. Report the exception as this script's error instead.
+                Log.Error($"Unexpected exception while reading flags of script '{scriptName}':\n{exception}");
+                return $"Line {line.LineNumber}: SER could not understand this line ({exception.Message}).";
+            }
             
             if (result.HasErrored(out var error))
             {

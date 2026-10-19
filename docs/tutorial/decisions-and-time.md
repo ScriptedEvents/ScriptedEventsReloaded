@@ -28,8 +28,15 @@ Broadcast @all 5s "Eliminated {@target -> name} from the surface."
 ```
 
 This is the build-validated [`surfaceSmite.ser`](../../Example%20Scripts/surfaceSmite.ser)
-example. Test it away from a public round: its successful path really kills a
-player.
+example. Save it, then register the new command and check it:
+
+```text
+serreload
+serstatus
+```
+
+Run `surfacesmite` from the Remote Admin console to try it. Test it away from a
+public round: its successful path really kills a player.
 
 ## What the new pieces do
 

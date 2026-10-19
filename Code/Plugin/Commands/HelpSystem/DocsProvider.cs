@@ -960,7 +960,7 @@ public static class DocsProvider
             Properties allow you to access internal data of SER values and SCP:SL objects using the '->' operator.
 
             Syntax:
-            $hp = @player -> hp               - Accesses 'hp' property of a player variable.
+            $hp = @player -> health           - Accesses 'health' property of a player variable.
             $type = *item -> type             - Accesses 'type' property of a reference variable.
             $key = *json -> someKey           - Accesses 'someKey' from a JSON object.
 
@@ -981,8 +981,8 @@ public static class DocsProvider
             From the return value of a method:
             > serhelp properties run:GetFromMap doors
 
-            You can also specify the assembly:
-            > serhelp properties Door@LabAPI
+            If several objects share a name, add @ and the assembly name to pick one:
+            > serhelp properties Door@LabApi
 
 
             ## Basic SER value properties
@@ -1058,8 +1058,36 @@ public static class DocsProvider
         }
         else
         {
+            // Optional assembly selector: "Door@LabApi" looks for Door only in the LabApi assembly.
+            string? assemblyName = null;
+            var selectorIndex = typeName.LastIndexOf('@');
+            if (selectorIndex >= 0)
+            {
+                assemblyName = typeName[(selectorIndex + 1)..].Trim();
+                typeName = typeName[..selectorIndex].Trim();
+
+                if (typeName.Length == 0 || assemblyName.Length == 0)
+                {
+                    response = "Write the object name, then @, then the assembly name. " +
+                               "For example: serhelp properties Door@LabApi";
+                    return false;
+                }
+
+                if (!AppDomain.CurrentDomain.GetAssemblies().Any(a =>
+                        string.Equals(a.GetName().Name, assemblyName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    response = $"No loaded assembly is named '{assemblyName}'. " +
+                               $"Check the spelling, or use 'serhelp properties {typeName}' to search every assembly.";
+                    return false;
+                }
+            }
+
+            bool IsInRequestedAssembly(Type t) =>
+                assemblyName is null
+                || string.Equals(t.Assembly.GetName().Name, assemblyName, StringComparison.OrdinalIgnoreCase);
+
             var types = ReferencePropertyRegistry.GetRegisteredTypes()
-                .Where(t => t.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase))
+                .Where(t => t.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase) && IsInRequestedAssembly(t))
                 .ToList();
 
             if (types.Count is 0)
@@ -1067,7 +1095,15 @@ public static class DocsProvider
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
                     var name = assembly.GetName().Name;
-                    if (!name.StartsWith("UnityEngine") && !name.StartsWith("LabApi") && !name.StartsWith("NorthwoodLib")
+                    if (assemblyName is not null)
+                    {
+                        // An explicitly named assembly is searched even if it is not in the default list.
+                        if (!name.Equals(assemblyName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+                    }
+                    else if (!name.StartsWith("UnityEngine") && !name.StartsWith("LabApi") && !name.StartsWith("NorthwoodLib")
                         && !name.StartsWith("PluginAPI") && !name.StartsWith("Mirror") && !name.StartsWith("SER")
                         && !name.StartsWith("Assembly-CSharp"))
                     {
@@ -1094,11 +1130,15 @@ public static class DocsProvider
             switch (types.Count)
             {
                 case 0:
-                    response = $"Unknown object type: {typeName}";
+                    response = assemblyName is null
+                        ? $"Unknown object type: {typeName}"
+                        : $"Unknown object type: {typeName} in '{assemblyName}' assembly";
                     return false;
                 case > 1:
                 {
-                    var output = new StringBuilder($"Warning! There are {types.Count} defined types with the same name '{typeName}'.\n\n");
+                    var output = new StringBuilder(
+                        $"Warning! There are {types.Count} defined types with the same name '{typeName}'.\n" +
+                        $"To see only one, add @ and its assembly name, for example: serhelp properties {typeName}@{types[0].Assembly.GetName().Name}\n\n");
                     foreach (var type in types)
                     {
                         output.AppendLine(RenderProperties(typeName, ReferencePropertyRegistry.GetProperties(type), type));

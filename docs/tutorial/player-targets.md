@@ -41,6 +41,15 @@ Broadcast @surfacePlayers 8s "<b><color=red>Leave the Surface Zone!</color></b>"
 Damage @surfacePlayers 20 "Surface camping"
 ```
 
+Save it, then register the new command and check it:
+
+```text
+serreload
+serstatus
+```
+
+Run `surfacewarning` from the Remote Admin console to try it.
+
 An administrator now has one command which affects only players in that zone.
 There is no need to look up names or player IDs. The value of
 `@surfacePlayers` is resolved when the method runs.

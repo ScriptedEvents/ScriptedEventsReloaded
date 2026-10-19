@@ -76,6 +76,10 @@ serhelp properties player
 serhelp properties Door
 ```
 
+If SER finds more than one object with that name, it shows each one with its
+assembly. Add `@` and the assembly name to see just one, for example
+`serhelp properties Door@LabApi`.
+
 ## Reference safety
 
 Game objects may become invalid between instructions. Check a reference before

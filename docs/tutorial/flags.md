@@ -21,13 +21,16 @@ Hint @sender 4s "<color=#73ff73>Medic charge used: +35 HP</color>"
 Reply "Medic charge used."
 ```
 
-Reload once so the new command is registered:
+Save the file. SER does not notice a new command file on its own, so reload and
+check that it was accepted:
 
 ```text
 serreload
+serstatus
 ```
 
-A player can now enter `.medic` in their client console.
+A player can now enter `.medic` in their client console. Do this
+reload-and-check step every time you add a new command or event script.
 
 The script has three parts:
 
@@ -51,6 +54,16 @@ Create `welcome.ser`:
 Broadcast @evPlayer 10s "Welcome {@evPlayer -> name}!"
 Hint @evPlayer 6s "Have fun—and read the rules."
 ```
+
+Save it, then reload and check it again. The earlier reload happened before this
+file existed:
+
+```text
+serreload
+serstatus
+```
+
+Now join the server, or ask someone to join, to see the welcome.
 
 This time there is no command to run. `OnEvent Joined` starts the script when a
 player joins. SER supplies `@evPlayer`, meaning **the player involved in this

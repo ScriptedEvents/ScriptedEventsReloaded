@@ -43,13 +43,17 @@ Without that pause, a script could monopolize the server thread.
 
 ## 3. Choose a carrier
 
-Inside the loop:
+Add this inside the loop, after the wait:
 
 ```ser
-@potatoCarrier = Take {Except @alivePlayers @scpPlayers} 1
+forever
+    wait {ToDuration {Random 30 90} seconds}
 
-if {AmountOf @potatoCarrier} is 0
-    continue
+    @potatoCarrier = Take {Except @alivePlayers @scpPlayers} 1
+
+    if {AmountOf @potatoCarrier} is 0
+        continue
+    end
 end
 ```
 
@@ -59,15 +63,21 @@ returns to the random wait.
 
 ## 4. Keep hold of the actual item
 
+Still inside the loop, below the carrier check:
+
 ```ser
-*item = AdvGiveItem @potatoCarrier GunA7
+forever
+    # ...the wait and carrier check from above...
 
-if {*item -> isInvalid}
-    continue
+    *item = AdvGiveItem @potatoCarrier GunA7
+
+    if {*item -> isInvalid}
+        continue
+    end
+
+    Hint @potatoCarrier 3s "YOU HAVE THE HOT POTATO!<br>DROP IT OR DIE!"
+    wait 6s
 end
-
-Hint @potatoCarrier 3s "YOU HAVE THE HOT POTATO!<br>DROP IT OR DIE!"
-wait 6s
 ```
 
 `AdvGiveItem` returns a reference to the item it created. References use `*`
@@ -79,20 +89,26 @@ wait.
 
 ## 5. Resolve and clean up
 
+At the end of the loop:
+
 ```ser
-if {*item -> inInventory}
-    Explode {*item -> currentOwner}
-    Broadcast @all 5s "Player {*item -> currentOwner -> name} has failed the Hot Potato!"
-end
+forever
+    # ...everything from the steps above...
 
-AdvDestroyItem *item
+    if {*item -> inInventory}
+        Explode {*item -> currentOwner}
+        Broadcast @all 5s "Player {*item -> currentOwner -> name} has failed the Hot Potato!"
+    end
 
-chance 70%
-    Broadcast @all 5s "The Hot Potato will return soon!"
-    continue
-else
-    Broadcast @all 5s "The Hot Potato got tired and will not return..."
-    stop
+    AdvDestroyItem *item
+
+    chance 70%
+        Broadcast @all 5s "The Hot Potato will return soon!"
+        continue
+    else
+        Broadcast @all 5s "The Hot Potato got tired and will not return..."
+        stop
+    end
 end
 ```
 

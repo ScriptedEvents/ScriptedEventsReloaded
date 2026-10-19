@@ -15,7 +15,7 @@ old releases.
 | Block damage between teammates | [`friendlyFireGuard.ser`](../../Example%20Scripts/friendlyFireGuard.ser) |
 | Send a round result to Discord | [`roundReport.ser`](../../Example%20Scripts/roundReport.ser) |
 | Build a timed event | [`hotPotato.ser`](../../Example%20Scripts/hotPotato.ser) |
-| Store persistent-style data | [`coinTracker.ser`](../../Example%20Scripts/coinTracker.ser) |
+| Track player data during a round | [`coinTracker.ser`](../../Example%20Scripts/coinTracker.ser) |
 | Create custom roles | [`customRoles.ser`](../../Example%20Scripts/customRoles.ser) |
 | Build a larger multi-event system | [`zombieInfection.ser`](../../Example%20Scripts/zombieInfection.ser) |
 | Run whole-round administrator events | [`EventPack`](../../Example%20Scripts/EventPack) |

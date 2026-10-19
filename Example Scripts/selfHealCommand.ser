@@ -7,16 +7,20 @@
 -- availableFor player
 -- requireSender
 -- description "Restores 35 health once per round"
--- cooldown 30s
--- onCooldownMessage "You must wait %time% seconds before healing again."
--- maxUses 1
--- onMaxUsesMessage "You have already used your medic charge this round."
 
+# Check that the player can be healed before spending the charge.
 if {@sender -> isAlive} is false
     Reply "You must be alive to use this command."
     stop
 end
 
+# "medic used" is stored on the player and is cleared when a new round starts.
+if {GetPlayerData @sender "medic used" false} is true
+    Reply "You have already used your medic charge this round."
+    stop
+end
+
+SetPlayerData @sender "medic used" true
 Heal @sender 35
 Hint @sender 4s "<color=#73ff73>Medic charge used: +35 HP</color>"
 Reply "Medic charge used."

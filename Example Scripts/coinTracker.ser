@@ -1,5 +1,6 @@
 # Disabled by default: remove # from the filename to enable this script.
-# Tracks each player's coin results for the current server session.
+# Tracks each player's coin results for the current round.
+# The totals start again from zero when a new round begins.
 # Demonstrates player data and multiple sections in one file.
 
 !-- OnEvent FlippedCoin
@@ -20,7 +21,7 @@ end
 !-- CustomCommand coinstats
 -- availableFor player
 -- requireSender
--- description "Shows your coin-flip totals"
+-- description "Shows your coin-flip totals for this round"
 -- cooldown 2s
 
 $heads = GetPlayerData @sender "coin_heads" 0

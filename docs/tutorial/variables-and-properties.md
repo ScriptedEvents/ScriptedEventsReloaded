@@ -22,6 +22,15 @@ Reply "Role: {$role}"
 Reply "Health: {$health}"
 ```
 
+Save it, then register the new command and check it:
+
+```text
+serreload
+serstatus
+```
+
+Enter `.whoami` in your client console to see your own details.
+
 The command already gave you `@sender`. The `->` operator asks that player for
 a **property**. The result is stored so the reply lines can reuse it.
 
